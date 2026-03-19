@@ -7,7 +7,7 @@
     <Filter Include="98. Default">
       <UniqueIdentifier>{0f6c0f2b-5b14-441d-8501-d9c31ac9d3ac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="99. Engine_Define">
+    <Filter Include="98. Client_Defines">
       <UniqueIdentifier>{5aad0948-e1a1-4f7b-b343-cbc137a99d3f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -24,11 +24,11 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
-    <ClInclude Include="Engine_Define.h">
-      <Filter>99. Engine_Define</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\CMainGame.h">
       <Filter>00. MainGame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Client_Defines.h">
+      <Filter>98. Client_Defines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

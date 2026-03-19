@@ -1,35 +1,44 @@
 #include "CMainGame.h"
+#include "GameInstance.h"
 
-CMainGame::CMainGame()
+Client::CMainGame::CMainGame()
 {
 }
 
-CMainGame::~CMainGame()
+Client::CMainGame::~CMainGame()
+{
+
+}
+
+HRESULT Client::CMainGame::Initialize()
+{
+	/* 엔진을 사용할 준비를 한다. */
+	if (FAILED(CGameInstance::Get().Initialize_Engine()))
+		return E_FAIL;
+
+
+
+	CGameInstance::Get();
+
+
+	return S_OK;
+}
+
+void Client::CMainGame::Update(float fTimeDelta)
 {
 }
 
-HRESULT CMainGame::Initalize()
+HRESULT Client::CMainGame::Render()
 {
 	return S_OK;
 }
 
-HRESULT CMainGame::Update(float deltaTime)
+unique_ptr<CMainGame> Client::CMainGame::Create()
 {
-	return S_OK;
-}
+	auto	pInstance = unique_ptr<CMainGame>(new CMainGame());
 
-void CMainGame::Render()
-{
-}
+	if (FAILED(pInstance->Initialize()))
+		MessageBox(g_hWnd, TEXT("Failed to Created : CMainGame"), nullptr, MB_OK);
 
-unique_ptr<CMainGame> CMainGame::Create()
-{
-	unique_ptr<CMainGame> p_MainGame = unique_ptr<CMainGame>(new CMainGame());
-
-	if (FAILED(p_MainGame->Initalize()))
-	{
-		MSG_BOX("p_MainGame Create Failed");
-	}
-
-	return p_MainGame;
+	return pInstance;
 }

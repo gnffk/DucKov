@@ -1,9 +1,11 @@
 ﻿// Client.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
-
 #include "framework.h"
 #include "Client.h"
+
 #include "CMainGame.h"
+#include "GameInstance.h"
+
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
@@ -45,22 +47,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
     
-    //// 기본 메시지 루프입니다:
-    //while (GetMessage(&msg, nullptr, 0, 0))
-    //{
-    //    if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-    //    {
-    //        TranslateMessage(&msg);
-    //        DispatchMessage(&msg);
-    //    }
-    //}
-    unique_ptr<CMainGame> p_MainGame = CMainGame::Create();
-    while (true) {
-        if (PeekMessage(&msg, g_hWnd, 0, 0, 0)) {
 
+    unique_ptr<CMainGame> p_MainGame = CMainGame::Create();
+
+
+ 
+    while (true) {
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (WM_QUIT == msg.message)
+                break;
+
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
         }
-        p_MainGame->Update(0.f);
-        p_MainGame->Render();
+        else {
+            p_MainGame->Update(0.f);
+            p_MainGame->Render();
+        }
+     
     }
 
     
@@ -89,7 +96,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CLIENT));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_CLIENT);
+    wcex.lpszMenuName   = NULL;
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
