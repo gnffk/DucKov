@@ -25,7 +25,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -49,9 +49,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     
 
     unique_ptr<CMainGame> p_MainGame = CMainGame::Create();
-
-
+    CGameInstance::Get().Add_Timer(TEXT("Timer_Default"));
+    CGameInstance::Get().Add_Timer(TEXT("Timer_FPS60"));
  
+    float fTimeAcc{};
+
     while (true) {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             if (WM_QUIT == msg.message)
@@ -64,8 +66,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             }
         }
         else {
-            p_MainGame->Update(0.f);
-            p_MainGame->Render();
+           
+            CGameInstance::Get().Set_TimeDelta(TEXT("Timer_Default"));
+
+            fTimeAcc += CGameInstance::Get().Get_TimeDelta(TEXT("Timer_Default"));
+
+            if (fTimeAcc >= 1.f / 60.f) {
+                CGameInstance::Get().Set_TimeDelta(TEXT("Timer_FPS60"));
+
+
+
+                p_MainGame->Update(CGameInstance::Get().Get_TimeDelta(TEXT("Timer_Default")));
+                p_MainGame->Render();
+                fTimeAcc = 0.f;
+
+            }
+
         }
      
     }
@@ -148,6 +164,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+    case WM_KEYDOWN:
+    {
+        if (wParam == VK_ESCAPE)
+        {
+            DestroyWindow(hWnd);
+        }
+    }
+    break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);

@@ -13,6 +13,8 @@ using namespace DirectX;
 #include <unordered_map>
 #include <ctime>
 #include <memory>
+#include <wrl/client.h>
+using namespace Microsoft::WRL;
 
 using namespace std;
 

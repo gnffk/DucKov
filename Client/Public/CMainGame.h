@@ -17,7 +17,9 @@ public:
 	void Update(float fTimeDelta);
 	HRESULT Render();
 
-
+private:
+	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
+	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
 public:
 	static unique_ptr<CMainGame> Create();
 };

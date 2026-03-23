@@ -13,6 +13,12 @@
     <Filter Include="99.Defines">
       <UniqueIdentifier>{d2172ce8-2a75-43d7-88d1-576988ac81fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.Device">
+      <UniqueIdentifier>{c5420b2d-76f9-445e-bf4f-a31698de3246}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Device\Graphic">
+      <UniqueIdentifier>{17718b39-620d-4f2d-b88c-c629a278d134}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -23,6 +29,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Timer.cpp">
       <Filter>01.Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Graphic_Device.cpp">
+      <Filter>02.Device\Graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -52,6 +61,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Typedef.h">
       <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Graphic_Device.h">
+      <Filter>02.Device\Graphic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

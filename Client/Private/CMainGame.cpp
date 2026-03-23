@@ -7,13 +7,19 @@ Client::CMainGame::CMainGame()
 
 Client::CMainGame::~CMainGame()
 {
-
+	CGameInstance::Get().Release_Engine();
 }
 
 HRESULT Client::CMainGame::Initialize()
 {
 	/* 엔진을 사용할 준비를 한다. */
-	if (FAILED(CGameInstance::Get().Initialize_Engine()))
+	ENGINE_DESC EngineDesc{};
+	EngineDesc.hWnd = g_hWnd;
+	EngineDesc.eWinMode = WINMODE::WIN;
+	EngineDesc.iWinSizeX = g_iWinSizeX;
+	EngineDesc.iWinSizeY = g_iWinSizeY;
+
+	if (FAILED(CGameInstance::Get().Initialize_Engine(EngineDesc, m_pDevice, m_pContext)))
 		return E_FAIL;
 
 

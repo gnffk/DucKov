@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-	//enum WINMODE { MODE_FULL, MODE_WIN };
+	enum class WINMODE { FULL, WIN };
 
 	//// Dynamic 컴포넌트 경우 매 프레임마다 갱신해야하는 컴포넌트 집단
 	//enum COMPONENTID { ID_DYNAMIC, ID_STATIC, ID_END };
