@@ -19,6 +19,12 @@
     <Filter Include="02.Device\Graphic">
       <UniqueIdentifier>{17718b39-620d-4f2d-b88c-c629a278d134}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.Level">
+      <UniqueIdentifier>{9e4daaf0-5c70-437f-8cb2-f75a9e3135fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Level\Manager">
+      <UniqueIdentifier>{36b4c6de-448f-4014-984e-65f9a6807f20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -32,6 +38,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Graphic_Device.cpp">
       <Filter>02.Device\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CLevel.cpp">
+      <Filter>03.Level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Manager.cpp">
+      <Filter>03.Level\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +76,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Graphic_Device.h">
       <Filter>02.Device\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CLevel.h">
+      <Filter>03.Level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Manager.h">
+      <Filter>03.Level\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #include "GameInstance.h"
 #include "Graphic_Device.h"
 #include "Timer_Manager.h"
-
+#include "Level_Manager.h"
 CGameInstance::CGameInstance()
 {
 }
@@ -11,7 +11,7 @@ CGameInstance::~CGameInstance()
 
 }
 
-HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC Engine_Desc, ComPtr<ID3D11Device>& pOutDevice, ComPtr<ID3D11DeviceContext>& pOutDeviceContext)
+HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<ID3D11Device>& pOutDevice, ComPtr<ID3D11DeviceContext>& pOutDeviceContext)
 {
     m_pGraphic_Device = Graphic_Device::Create(Engine_Desc.hWnd, Engine_Desc.eWinMode, Engine_Desc.iWinSizeX, Engine_Desc.iWinSizeY, pOutDevice, pOutDeviceContext);
     if (nullptr == m_pGraphic_Device)
@@ -21,9 +21,35 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC Engine_Desc, ComPtr<I
     if (nullptr == m_pTimer_Manager)
         return E_FAIL;
 
+    m_pLevel_Manager = Level_Manager::Create();
+    if (nullptr == m_pLevel_Manager)
+        return E_FAIL;
+
+
     return S_OK;
 }
 
+void CGameInstance::Update_Engine(_float fTimeDelta)
+{
+    m_pLevel_Manager->Update(fTimeDelta);
+}
+
+HRESULT CGameInstance::Draw()
+{
+
+
+    if (FAILED(m_pLevel_Manager->Render()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+void CGameInstance::Clear_Resource(uint32_t iClearLevelIndex)
+{
+}
+
+
+#pragma region TIMER_MANAGER
 _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
 {
     return m_pTimer_Manager->Get_TimeDelta(strTimerTag);
@@ -39,12 +65,41 @@ HRESULT CGameInstance::Add_Timer(const _wstring& strTimerTag)
 {
     return m_pTimer_Manager->Ready_Timer(strTimerTag);
 }
+#pragma endregion
+
+#pragma region Graphic_Device
+HRESULT CGameInstance::Clear_BackBuffer_View(const _float4* pClearColor)
+{
+    return m_pGraphic_Device->Clear_BackBuffer_View(pClearColor);
+}
+
+HRESULT CGameInstance::Clear_DepthStencil_View()
+{
+    return m_pGraphic_Device->Clear_DepthStencil_View();
+}
+
+HRESULT CGameInstance::Present()
+{
+    return m_pGraphic_Device->Present();
+}
+#pragma endregion
+
+
+#pragma region Level_Manager
+HRESULT CGameInstance::Change_Level(uint32_t iNewLevelIndex, unique_ptr<class CLevel> pNewLevel)
+{
+    return m_pLevel_Manager->Change_Level(iNewLevelIndex, std::move(pNewLevel));
+}
+
+#pragma endregion
 
 void CGameInstance::Release_Engine()
 {
+    m_pLevel_Manager.reset();
+ 
     m_pTimer_Manager.reset();
 
-   // m_pGraphic_Device->Shutdown();
+    m_pGraphic_Device->Shutdown();
 
     m_pGraphic_Device.reset();
 }

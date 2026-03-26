@@ -14,6 +14,7 @@ public:
 
 public:
 	HRESULT Initialize();
+	HRESULT Start_Level(LEVEL eStartLevelIndex);
 	void Update(float fTimeDelta);
 	HRESULT Render();
 

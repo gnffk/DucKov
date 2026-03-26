@@ -93,7 +93,7 @@ void Graphic_Device::Shutdown()
 	m_pSwapChain.Reset();
 	m_pBackBufferRTV.Reset();
 	m_pDepthStencilView.Reset();
-	m_pDeviceContext.Reset();
+	//m_pDeviceContext.Reset();
 
 
 
@@ -162,6 +162,8 @@ HRESULT Graphic_Device::Ready_SwapChain(HWND hWnd, WINMODE isWindowed, int32_t i
 
 	SwapChain.OutputWindow = hWnd;
 	SwapChain.Windowed = static_cast<BOOL>(isWindowed);
+	// 질문 Effect_Flip_DisCard
+	
 	SwapChain.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 	/* 백버퍼라는 텍스처(ID3D11Texture2D)를 생성했다. */

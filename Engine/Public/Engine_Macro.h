@@ -1,6 +1,9 @@
 #ifndef Engine_Macro_h__
 #define Engine_Macro_h__
 
+#define			ETOI(_enum)			static_cast<int32_t>(_enum)
+#define			ETOUI(_enum)		static_cast<uint32_t>(_enum)
+
 #ifndef			MSG_BOX
 #define			MSG_BOX(_message)			MessageBox(NULL, TEXT(_message), L"System Message", MB_OK)
 #endif
