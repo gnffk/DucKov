@@ -18,7 +18,7 @@ public:
 	virtual HRESULT Render();
 
 private:
-	LEVEL				m_eNextLevelIndex = { LEVEL::END };
+	LEVEL							m_eNextLevelIndex = { LEVEL::END };
 	unique_ptr<class CLoader>		m_pLoader = { nullptr };
 
 private:
