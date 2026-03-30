@@ -14,12 +14,12 @@ public:
 
 public:
 	HRESULT Initialize(HWND hWnd, ComPtr<ID3D11Device>p_Device, ComPtr<ID3D11DeviceContext>p_DeviceContext);
-#ifdef _DEBUG
+
 	void Update_Imgui(_float fTimeDelta);
 	void Render_Imgui();
 
 	bool ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-#endif
+
 
 private:
 	ComPtr<ID3D11Device>			m_pDevice{ nullptr };

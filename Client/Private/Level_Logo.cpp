@@ -20,23 +20,20 @@ HRESULT Level_Logo::Initialize()
 
 void Level_Logo::Update(_float fTimeDelta)
 {
+#if _DEBUG
+	ImGui::Begin("NEXT_SCENE", nullptr, ImGuiWindowFlags_NoTitleBar);
 
-	ImGui::Begin("Internal Tool", nullptr, ImGuiWindowFlags_NoTitleBar);
-	ImGui::Text("Hello from another window!");
+
+	ImGui::Text(u8"다음 씬으로 넘어가기");
 	if (ImGui::Button("Close Me")) {
-
-	}
-
-	ImGui::End();
-
-	if (GetKeyState(VK_RETURN) & 0x8000)
-	{
 		if (FAILED(CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING),
-			Level_Loading::Create(m_pDevice, m_pDeviceContext, LEVEL::GAMEPLAY))))
-			return;
+			Level_Loading::Create(m_pDevice, m_pDeviceContext, LEVEL::GAMEPLAY)))) {
 
-		return;
+			return;
+		}
 	}
+	ImGui::End();
+#endif
 }
 
 HRESULT Level_Logo::Render()

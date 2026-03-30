@@ -38,7 +38,12 @@ HRESULT ImGUI_Manager::Initialize(HWND hWnd, ComPtr<ID3D11Device> p_Device, ComP
     // - Read 'docs/FONTS.md' for more instructions and details.
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
     //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+    ImFont* font = io.Fonts->AddFontFromFileTTF("../../Resources/Fonts/NanumGothic.ttf", 14.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+
+    if (font == nullptr) {
+        // 만약 폰트 로드에 실패하면 기본 폰트라도 사용하게 설정
+        io.Fonts->AddFontDefault();
+    }
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
