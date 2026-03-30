@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <d3d11.h>
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -15,6 +16,9 @@ using namespace DirectX;
 #include <memory>
 #include <wrl/client.h>
 using namespace Microsoft::WRL;
+#include "imgui.h"
+#include "imgui_internal.h"
+#include "ImGuizmo.h"
 
 using namespace std;
 

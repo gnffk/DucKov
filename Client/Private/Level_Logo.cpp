@@ -20,6 +20,15 @@ HRESULT Level_Logo::Initialize()
 
 void Level_Logo::Update(_float fTimeDelta)
 {
+
+	ImGui::Begin("Internal Tool", nullptr, ImGuiWindowFlags_NoTitleBar);
+	ImGui::Text("Hello from another window!");
+	if (ImGui::Button("Close Me")) {
+
+	}
+
+	ImGui::End();
+
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		if (FAILED(CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING),

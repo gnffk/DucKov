@@ -2,6 +2,9 @@
 #include "Graphic_Device.h"
 #include "Timer_Manager.h"
 #include "Level_Manager.h"
+#include "ProtoType_Manager.h"
+#include "Object_Manager.h"
+#include "ImGUI_Manager.h"
 CGameInstance::CGameInstance()
 {
 }
@@ -17,6 +20,21 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pGraphic_Device)
         return E_FAIL;
 
+    m_pImGUI_Manager = ImGUI_Manager::Create(Engine_Desc.hWnd,  pOutDevice, pOutDeviceContext);
+    if (nullptr == m_pImGUI_Manager)
+        return E_FAIL;
+
+    
+
+    m_pPrototype_Manager = Prototype_Manager::Create(Engine_Desc.iNumLevels);
+    if (nullptr == m_pPrototype_Manager)
+        return E_FAIL;
+
+    m_pObject_Manager = Object_Manager::Create(Engine_Desc.iNumLevels);
+    if (nullptr == m_pObject_Manager)
+        return E_FAIL;
+
+
     m_pTimer_Manager = CTimer_Manager::Create();
     if (nullptr == m_pTimer_Manager)
         return E_FAIL;
@@ -31,6 +49,14 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+    m_pImGUI_Manager->Update_Imgui(fTimeDelta);
+
+    m_pObject_Manager->Priority_Update(fTimeDelta);
+
+    m_pObject_Manager->Update(fTimeDelta);
+
+    m_pObject_Manager->Late_Update(fTimeDelta);
+
     m_pLevel_Manager->Update(fTimeDelta);
 }
 
@@ -40,6 +66,8 @@ HRESULT CGameInstance::Draw()
 
     if (FAILED(m_pLevel_Manager->Render()))
         return E_FAIL;
+
+    m_pImGUI_Manager->Render_Imgui();
 
     return S_OK;
 }
@@ -93,11 +121,44 @@ HRESULT CGameInstance::Change_Level(uint32_t iNewLevelIndex, unique_ptr<class CL
 
 #pragma endregion
 
+#pragma region PROTOTYPE_MANAGER
+HRESULT CGameInstance::Add_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, unique_ptr<Prototype> pPrototype)
+{
+    return m_pPrototype_Manager->Add_Prototype(iLevelIndex, strPrototypeTag, std::move(pPrototype));
+}
+shared_ptr<Prototype> CGameInstance::Clone_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, void* pArg)
+{
+    return m_pPrototype_Manager->Clone_Prototype(iLevelIndex, strPrototypeTag, pArg);
+}
+#pragma endregion
+
+#pragma region GAMEOBJECT_MANAGER
+HRESULT CGameInstance::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag, uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg)
+{
+    return m_pObject_Manager->Add_GameObject_toLayer(iPrototypeLevelIndex, strPrototypeTag, iLayerLevelIndex, strLayerTag, pArg);
+}
+
+#pragma endregion
+
+#pragma region IMGUI_MANAGER
+HRESULT CGameInstance::WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    return m_pImGUI_Manager->ImGui_WndProcHandler(hWnd,msg,wParam,lParam);
+}
+#pragma endregion
+
+
 void CGameInstance::Release_Engine()
 {
     m_pLevel_Manager.reset();
- 
+
     m_pTimer_Manager.reset();
+
+    m_pObject_Manager.reset();
+
+    m_pPrototype_Manager.reset();
+
+    m_pImGUI_Manager.reset();
 
     m_pGraphic_Device->Shutdown();
 

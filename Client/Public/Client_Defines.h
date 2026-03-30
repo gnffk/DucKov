@@ -4,6 +4,7 @@
 #include <memory>
 #include <process.h>
 
+
 namespace Client
 {
 	static const unsigned int		g_iWinSizeX = { 1280 };

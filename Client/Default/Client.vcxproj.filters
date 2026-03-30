@@ -57,6 +57,9 @@
     <ClInclude Include="..\Public\Level_Logo.h">
       <Filter>01. Levels\Logo</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

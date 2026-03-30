@@ -1,9 +1,8 @@
 #pragma once
-#include "Engine_Defines.h"
-
+#include "Prototype.h"
 NS_BEGIN(Engine)
 
-class ENGINE_DLL GameObject abstract
+class ENGINE_DLL GameObject abstract : public Prototype
 {
 protected:
 	GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
@@ -24,7 +23,7 @@ protected:
 	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
 
 public:
-	virtual shared_ptr<GameObject> Clone(void* pArg) = 0;
+	virtual shared_ptr<Prototype> Clone(void* pArg) = 0;
 
 };
 

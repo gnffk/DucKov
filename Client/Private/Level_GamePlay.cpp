@@ -1,3 +1,4 @@
+
 #include "Level_GamePlay.h"
 
 Level_GamePlay::Level_GamePlay(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
@@ -11,12 +12,13 @@ Level_GamePlay::~Level_GamePlay()
 
 HRESULT Level_GamePlay::Initialize()
 {
+
 	return S_OK;
 }
 
 void Level_GamePlay::Update(_float fTimeDelta)
 {
-	uint32_t iData = 10;
+
 }
 
 HRESULT Level_GamePlay::Render()

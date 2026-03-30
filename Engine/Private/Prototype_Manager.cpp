@@ -4,6 +4,10 @@ Prototype_Manager::Prototype_Manager()
 {
 }
 
+Prototype_Manager::~Prototype_Manager()
+{
+}
+
 HRESULT Prototype_Manager::Initialize(uint32_t iNumLevels)
 {
 	m_pPrototypes = unique_ptr<PROTOTYPES[]>(new PROTOTYPES[iNumLevels]);
@@ -13,9 +17,9 @@ HRESULT Prototype_Manager::Initialize(uint32_t iNumLevels)
 	return S_OK;
 }
 
-HRESULT Prototype_Manager::Add_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, std::any pPrototype)
+HRESULT Prototype_Manager::Add_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, unique_ptr<Prototype>  pPrototype)
 {
-	if (0 == Find_Prototype(iLevelIndex, strPrototypeTag).has_value())
+	if (nullptr != Find_Prototype(iLevelIndex, strPrototypeTag))
 		return E_FAIL;
 
 	m_pPrototypes[iLevelIndex].emplace(strPrototypeTag, std::move(pPrototype));
@@ -23,7 +27,16 @@ HRESULT Prototype_Manager::Add_Prototype(uint32_t iLevelIndex, const _wstring& s
 	return S_OK;
 }
 
-std::any Prototype_Manager::Find_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag)
+shared_ptr<Prototype> Prototype_Manager::Clone_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, void* pArg)
+{
+	Prototype* pPrototype = Find_Prototype(iLevelIndex, strPrototypeTag);
+	if (nullptr == pPrototype)
+		return nullptr;
+
+	return pPrototype->Clone(pArg);
+}
+
+Prototype* Prototype_Manager::Find_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag)
 {
 	if (iLevelIndex >= m_iNumLevels)
 		return nullptr;
@@ -32,7 +45,7 @@ std::any Prototype_Manager::Find_Prototype(uint32_t iLevelIndex, const _wstring&
 	if (iter == m_pPrototypes[iLevelIndex].end())
 		return nullptr;
 
-	return iter->second;
+	return iter->second.get();
 }
 
 unique_ptr<Prototype_Manager> Prototype_Manager::Create(uint32_t iNumLevels)
@@ -41,9 +54,10 @@ unique_ptr<Prototype_Manager> Prototype_Manager::Create(uint32_t iNumLevels)
 
 	if (FAILED(pInstance->Initialize(iNumLevels)))
 	{
-		MSG_BOX("Failed to Created : Prototype_Manager");
+		MSG_BOX("Failed to Created : CPrototype_Manager");
 		return nullptr;
 	}
 
 	return pInstance;
 }
+

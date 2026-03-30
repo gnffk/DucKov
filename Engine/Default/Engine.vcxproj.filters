@@ -34,11 +34,32 @@
     <Filter Include="06.Component">
       <UniqueIdentifier>{684bf64d-ba9b-4434-b80a-692c325e582a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="100. Default">
-      <UniqueIdentifier>{fc5b91ef-6f67-420b-a1fa-bd5f0897ecfa}</UniqueIdentifier>
+    <Filter Include="04.Prototype\Manager">
+      <UniqueIdentifier>{03358375-895e-451b-b849-ee2fc291bad3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="101. Test">
+    <Filter Include="05.GameObject\Manager">
+      <UniqueIdentifier>{615b3905-a2e4-4195-a997-66ae8f060def}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05.GameObject\Manager\Layer">
+      <UniqueIdentifier>{d453ff19-4222-4bfd-b7a9-3d233d3ec7fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="07.Renderer">
+      <UniqueIdentifier>{43698cb2-63b4-4d5e-a55d-42cf8442e5ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="100.Test">
       <UniqueIdentifier>{06c47b4d-9dd3-41bb-9827-64f7da27c701}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98.ImGui">
+      <UniqueIdentifier>{fc1ad67a-1562-428e-ab43-204e2be57a1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98.ImGui\Manager">
+      <UniqueIdentifier>{743f0a46-d3be-4dce-acad-35c9d43058a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98.ImGui\ImGUI">
+      <UniqueIdentifier>{69818df8-1b83-471b-8022-575e255da66b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98.ImGui\ImGUIzmo">
+      <UniqueIdentifier>{f91ad1f7-25fa-44a0-8979-d29a55b78a14}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,9 +81,6 @@
     <ClCompile Include="..\Private\Level_Manager.cpp">
       <Filter>03.Level\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Prototype_Manager.cpp">
-      <Filter>04.Prototype</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\GameObject.cpp">
       <Filter>05.GameObject</Filter>
     </ClCompile>
@@ -70,10 +88,64 @@
       <Filter>06.Component</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.cpp">
-      <Filter>101. Test</Filter>
+      <Filter>100.Test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.cpp">
-      <Filter>101. Test</Filter>
+      <Filter>100.Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Prototype_Manager.cpp">
+      <Filter>04.Prototype\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Prototype.cpp">
+      <Filter>04.Prototype</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Object_Manager.cpp">
+      <Filter>05.GameObject\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Layer.cpp">
+      <Filter>05.GameObject\Manager\Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Renderer.cpp">
+      <Filter>07.Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ImGUI_Manager.cpp">
+      <Filter>98.ImGui\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\imgui-1.83\imgui.cpp">
+      <Filter>98.ImGui\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\imgui-1.83\imgui_demo.cpp">
+      <Filter>98.ImGui\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\imgui-1.83\imgui_draw.cpp">
+      <Filter>98.ImGui\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\imgui-1.83\imgui_impl_dx11.cpp">
+      <Filter>98.ImGui\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\imgui-1.83\imgui_impl_win32.cpp">
+      <Filter>98.ImGui\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\imgui-1.83\imgui_tables.cpp">
+      <Filter>98.ImGui\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\imgui-1.83\imgui_widgets.cpp">
+      <Filter>98.ImGui\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\GraphEditor.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImCurveEdit.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -113,9 +185,6 @@
     <ClInclude Include="..\Public\Level_Manager.h">
       <Filter>03.Level\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Prototype_Manager.h">
-      <Filter>04.Prototype</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\GameObject.h">
       <Filter>05.GameObject</Filter>
     </ClInclude>
@@ -123,16 +192,34 @@
       <Filter>06.Component</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\Mesh.h">
-      <Filter>101. Test</Filter>
+      <Filter>100.Test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.h">
-      <Filter>101. Test</Filter>
+      <Filter>100.Test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\SafeRelease.hpp">
-      <Filter>101. Test</Filter>
+      <Filter>100.Test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.h">
-      <Filter>101. Test</Filter>
+      <Filter>100.Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Prototype_Manager.h">
+      <Filter>04.Prototype\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Prototype.h">
+      <Filter>04.Prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Object_Manager.h">
+      <Filter>05.GameObject\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Layer.h">
+      <Filter>05.GameObject\Manager\Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Renderer.h">
+      <Filter>07.Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ImGUI_Manager.h">
+      <Filter>98.ImGui\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -36,11 +36,29 @@ public:
 #pragma endregion
 
 
+#pragma region PROTOTYPE_MANAGER
+	HRESULT Add_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, unique_ptr<class Prototype> pPrototype);
+	shared_ptr<Prototype> Clone_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+#pragma endregion
+
+
+#pragma region GAMEOBJECT_MANAGER
+	HRESULT Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag,
+		uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg = nullptr);
+#pragma endregion
+
+#pragma region IMGUI_MANAGER
+	HRESULT WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#pragma endregion
 
 private:
 	unique_ptr<class Graphic_Device>				m_pGraphic_Device = { nullptr };
+	unique_ptr<class ImGUI_Manager>					m_pImGUI_Manager = { nullptr };
 	unique_ptr<class CTimer_Manager>				m_pTimer_Manager = { nullptr };
 	unique_ptr<class Level_Manager>					m_pLevel_Manager = { nullptr};
+	unique_ptr<class Prototype_Manager>				m_pPrototype_Manager = { nullptr };
+	unique_ptr<class Object_Manager>				m_pObject_Manager = { nullptr };
+
 
 public:
 	void			Release_Engine();

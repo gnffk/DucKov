@@ -34,6 +34,7 @@ HRESULT Level_Loading::Initialize(LEVEL eNextLevelIndex)
 
 void Level_Loading::Update(_float fTimeDelta)
 {
+	
 	if (true == m_pLoader->isFinished() &&
 		GetKeyState(VK_SPACE) & 0x8000)
 	{

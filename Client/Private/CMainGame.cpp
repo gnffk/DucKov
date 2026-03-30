@@ -27,7 +27,7 @@ HRESULT Client::CMainGame::Initialize()
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;
 
-	CGameInstance::Get();
+
 
 
 	return S_OK;
