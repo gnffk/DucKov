@@ -34,6 +34,12 @@
     <Filter Include="06.Component">
       <UniqueIdentifier>{684bf64d-ba9b-4434-b80a-692c325e582a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="100. Default">
+      <UniqueIdentifier>{fc5b91ef-6f67-420b-a1fa-bd5f0897ecfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="101. Test">
+      <UniqueIdentifier>{06c47b4d-9dd3-41bb-9827-64f7da27c701}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -62,6 +68,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Component.cpp">
       <Filter>06.Component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.cpp">
+      <Filter>101. Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.cpp">
+      <Filter>101. Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +121,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Component.h">
       <Filter>06.Component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\Mesh.h">
+      <Filter>101. Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.h">
+      <Filter>101. Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\SafeRelease.hpp">
+      <Filter>101. Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.h">
+      <Filter>101. Test</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
