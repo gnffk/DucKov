@@ -5,21 +5,23 @@ class VIBuffer : public Component
 {
 protected:
 	VIBuffer() = default;
+public:
 	virtual ~VIBuffer() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Draw();
 
 
 	shared_ptr<vector<vertex2>> vertices;
-	shared_ptr<INDEX32[]>		pIndex;
+	shared_ptr<vector<INDEX32>> indices;
 
-	shared_ptr<ID3D11Buffer> VertexBuffer_;
-	shared_ptr<ID3D11Buffer> IndexBuffer_;
+	ComPtr<ID3D11Buffer> VertexBuffer_;
+	ComPtr<ID3D11Buffer> IndexBuffer_;
 
 
 public:
-	shared_ptr<Prototype> Clone(void* pArg) = 0;
+     virtual shared_ptr<Prototype> Clone(void* pArg) = 0;
 };
 

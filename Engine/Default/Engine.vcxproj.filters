@@ -67,6 +67,15 @@
     <Filter Include="06.Component\VIBuffer\fbx">
       <UniqueIdentifier>{640a9aad-3471-473c-8347-15d3686d2746}</UniqueIdentifier>
     </Filter>
+    <Filter Include="08.Resource">
+      <UniqueIdentifier>{04c9d799-b9ad-4186-a1a9-dd411c18564b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="08.Resource\Manager">
+      <UniqueIdentifier>{8e85e7e9-17c0-4361-b2fb-ef74c190af3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="08.Resource\FbxResource">
+      <UniqueIdentifier>{a3747b3a-f444-4642-afc6-4ded4d16c7d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -159,6 +168,12 @@
     <ClCompile Include="..\Private\FbxBuffer.cpp">
       <Filter>06.Component\VIBuffer\fbx</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Resource_Manager.cpp">
+      <Filter>08.Resource\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Resource.cpp">
+      <Filter>08.Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -238,6 +253,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\FbxBuffer.h">
       <Filter>06.Component\VIBuffer\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Resource_Manager.h">
+      <Filter>08.Resource\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Resource.h">
+      <Filter>08.Resource</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

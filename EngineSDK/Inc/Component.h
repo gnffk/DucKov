@@ -9,6 +9,7 @@ class ENGINE_DLL Component abstract : public Prototype
 protected:
 	Component(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	Component(const Component& Prototype);
+public:
 	virtual ~Component() = default;
 
 public:
