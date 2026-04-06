@@ -45,7 +45,7 @@ HRESULT VIBuffer_Fbx::Initialize_Prototype()
 
     // make_shared 에서는 배열 동적 할당 안된다.
 
-    std::shared_ptr<VTXTEX[]> pVertices(new VTXTEX[4]);
+    std::shared_ptr<VTXTEX[]> pVertices = make_shared<VTXTEX[]>(m_iNumVertices);
   
     pVertices[0].vPosition = _float3(-0.5f, 0.5f, 0.f);
     pVertices[0].vTexcoord = _float2(0.f, 0.f);
@@ -76,8 +76,7 @@ HRESULT VIBuffer_Fbx::Initialize_Prototype()
     IndexBufferDesc.StructureByteStride = m_iIndexStride;
     IndexBufferDesc.CPUAccessFlags = 0;
     IndexBufferDesc.MiscFlags = 0;
-
-    std::shared_ptr<uint16_t[]> pIndices(new uint16_t[m_iNumIndices]);
+    std::shared_ptr<uint16_t[]> pIndices = make_shared<uint16_t[]>(m_iNumIndices);
 
     pIndices[0] = 0;
     pIndices[1] = 1;
