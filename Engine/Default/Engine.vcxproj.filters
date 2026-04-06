@@ -73,8 +73,8 @@
     <Filter Include="08.Resource\Manager">
       <UniqueIdentifier>{8e85e7e9-17c0-4361-b2fb-ef74c190af3a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="08.Resource\FbxResource">
-      <UniqueIdentifier>{a3747b3a-f444-4642-afc6-4ded4d16c7d8}</UniqueIdentifier>
+    <Filter Include="06.Component\Transform">
+      <UniqueIdentifier>{6b1c9871-e341-4926-9d31-2203c8df479a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -165,7 +165,7 @@
     <ClCompile Include="..\Private\VIBuffer.cpp">
       <Filter>06.Component\VIBuffer</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\FbxBuffer.cpp">
+    <ClCompile Include="..\Private\VIBuffer_Fbx.cpp">
       <Filter>06.Component\VIBuffer\fbx</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Resource_Manager.cpp">
@@ -173,6 +173,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Resource.cpp">
       <Filter>08.Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Transform.cpp">
+      <Filter>06.Component\Transform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -251,7 +254,7 @@
     <ClInclude Include="..\Public\VIBuffer.h">
       <Filter>06.Component\VIBuffer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\FbxBuffer.h">
+    <ClInclude Include="..\Public\VIBuffer_Fbx.h">
       <Filter>06.Component\VIBuffer\fbx</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Resource_Manager.h">
@@ -259,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Resource.h">
       <Filter>08.Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Transform.h">
+      <Filter>06.Component\Transform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

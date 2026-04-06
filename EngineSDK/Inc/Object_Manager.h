@@ -16,8 +16,9 @@ public:
 	void Priority_Update(_float fTimeDelta);
 	void Update(_float fTimeDelta);
 	void Late_Update(_float fTimeDelta);
-
+	void Clear(uint32_t iClearLevelIndex);
 public:
+
 	HRESULT Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag,
 		uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg);
 

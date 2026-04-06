@@ -5,6 +5,8 @@
 #include "ProtoType_Manager.h"
 #include "Object_Manager.h"
 #include "ImGUI_Manager.h"
+#include "Renderer.h"
+
 CGameInstance::CGameInstance()
 {
 }
@@ -24,6 +26,9 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pImGUI_Manager)
         return E_FAIL;
 
+    m_pRenderer = Renderer::Create(pOutDevice, pOutDeviceContext);
+    if (nullptr == m_pRenderer)
+        return E_FAIL;
     
 
     m_pPrototype_Manager = Prototype_Manager::Create(Engine_Desc.iNumLevels);
@@ -62,7 +67,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 HRESULT CGameInstance::Draw()
 {
-
+    if (FAILED(m_pRenderer->Draw()))
+        return E_FAIL;
 
     if (FAILED(m_pLevel_Manager->Render()))
         return E_FAIL;
@@ -74,6 +80,9 @@ HRESULT CGameInstance::Draw()
 
 void CGameInstance::Clear_Resource(uint32_t iClearLevelIndex)
 {
+    m_pObject_Manager->Clear(iClearLevelIndex);
+
+    m_pPrototype_Manager->Clear(iClearLevelIndex);
 }
 
 
@@ -140,6 +149,14 @@ HRESULT CGameInstance::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, con
 
 #pragma endregion
 
+#pragma region RENDERER
+
+HRESULT CGameInstance::Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObject> pRenderObject)
+{
+    return m_pRenderer->Add_RenderObject(eRenderGroup, pRenderObject);
+}
+#pragma endregion
+
 #pragma region IMGUI_MANAGER
 HRESULT CGameInstance::WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -150,6 +167,8 @@ HRESULT CGameInstance::WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 
 void CGameInstance::Release_Engine()
 {
+    m_pRenderer.reset();
+
     m_pLevel_Manager.reset();
 
     m_pTimer_Manager.reset();

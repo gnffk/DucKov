@@ -49,6 +49,19 @@ void Object_Manager::Late_Update(_float fTimeDelta)
 	}
 }
 
+void Object_Manager::Clear(uint32_t iClearLevelIndex)
+{
+	if (iClearLevelIndex >= m_iNumLevels ||
+		nullptr == m_pLayers)
+		return;
+
+	for (auto& Pair : m_pLayers[iClearLevelIndex])
+	{
+		Pair.second.reset();
+	}
+	m_pLayers[iClearLevelIndex].clear();
+
+}
 HRESULT Object_Manager::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag, uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg)
 {
 	if (nullptr == m_pLayers ||
@@ -59,8 +72,7 @@ HRESULT Object_Manager::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, co
 	if (nullptr == pGameObject)
 		return E_FAIL;
 
-	/* 현재 객체를 추가할려고하는 레이어가 없어ㅕㅆ다면. */
-	/* 새로 레이어를 ㅁ난드러어서 추가해주닺3ㅏ. */
+
 	auto		pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
 	if (nullptr == pLayer)
 	{
@@ -73,7 +85,7 @@ HRESULT Object_Manager::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, co
 
 		m_pLayers[iLayerLevelIndex].emplace(strLayerTag, std::move(pNewLayer));
 	}
-	/* 이미 추가할려고하는 레이어가 있었다. */
+
 	else
 		pLayer->Add_GameObject(pGameObject);
 

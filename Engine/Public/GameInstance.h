@@ -51,6 +51,10 @@ public:
 	HRESULT WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #pragma endregion
 
+#pragma region RENDERER
+	HRESULT Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObject> pRenderObject);
+#pragma endregion
+
 private:
 	unique_ptr<class Graphic_Device>				m_pGraphic_Device = { nullptr };
 	unique_ptr<class ImGUI_Manager>					m_pImGUI_Manager = { nullptr };
@@ -58,7 +62,7 @@ private:
 	unique_ptr<class Level_Manager>					m_pLevel_Manager = { nullptr};
 	unique_ptr<class Prototype_Manager>				m_pPrototype_Manager = { nullptr };
 	unique_ptr<class Object_Manager>				m_pObject_Manager = { nullptr };
-
+	unique_ptr<class Renderer>						m_pRenderer = { nullptr };
 
 public:
 	void			Release_Engine();

@@ -16,6 +16,7 @@ public:
 	HRESULT	Initialize(uint32_t iNumLevels);
 	HRESULT Add_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, unique_ptr<Prototype> pPrototype);
 	shared_ptr<Prototype> Clone_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, void* pArg);
+	void Clear(uint32_t iClearLevelIndex);
 private:
 	uint32_t m_iNumLevels{};
 

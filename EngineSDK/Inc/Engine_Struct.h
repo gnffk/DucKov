@@ -12,17 +12,11 @@ namespace Engine
 		int32_t		iNumLevels;
 	}ENGINE_DESC;
 
-	typedef struct Vertex1 {
-		XMFLOAT3 Pos;
-		XMFLOAT4 Color;
-	}vertex1;
-
-	typedef struct Vertex2 {
-		XMFLOAT3 Pos;
-		XMFLOAT3 Normal;
-		XMFLOAT2 Tex0;
-		XMFLOAT2 Tex1;
-	}vertex2;
+	typedef struct tagVertexPositionTexcoord
+	{
+		XMFLOAT3	vPosition;
+		XMFLOAT2	vTexcoord;
+	}VTXTEX;
 
 	typedef struct tagIndex32
 	{

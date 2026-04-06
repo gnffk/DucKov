@@ -17,6 +17,20 @@ HRESULT Prototype_Manager::Initialize(uint32_t iNumLevels)
 	return S_OK;
 }
 
+void Prototype_Manager::Clear(uint32_t iClearLevelIndex)
+{
+	if (iClearLevelIndex >= m_iNumLevels ||
+		nullptr == m_pPrototypes)
+		return;
+
+	for (auto& Pair : m_pPrototypes[iClearLevelIndex])
+	{
+		Pair.second.reset();
+	}
+	m_pPrototypes[iClearLevelIndex].clear();
+}
+
+
 HRESULT Prototype_Manager::Add_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, unique_ptr<Prototype>  pPrototype)
 {
 	if (nullptr != Find_Prototype(iLevelIndex, strPrototypeTag))
