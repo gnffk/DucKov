@@ -26,6 +26,20 @@ namespace Engine
 
 	}INDEX32;
 
+	typedef struct Mesh_VIBUFFER
+	{
+		UINT m_iNumVertexBuffers = 1;
+		UINT m_iNumVertices = 0;
+		UINT m_iVertexStride = sizeof(VTXTEX);
+
+		UINT m_iNumIndices = 0;
+		UINT m_iIndexStride = 2;
+		DXGI_FORMAT m_eIndexFormat = DXGI_FORMAT_R32_UINT; // ¶Ç´Â R16_UINT
+		D3D11_PRIMITIVE_TOPOLOGY m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+		std::vector<VTXTEX> vertices;
+		std::vector<INDEX32> indices;
+	}MESHVI;
 }
 
 
