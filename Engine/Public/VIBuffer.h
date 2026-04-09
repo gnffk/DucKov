@@ -24,6 +24,8 @@ protected:
 	ComPtr<ID3D11Buffer>			m_pIB = { nullptr };
 
 protected:
+	shared_ptr <vector<Mesh_VIBUFFER>> Meshes_VIBuffers;
+protected:
 	uint32_t					m_iNumVertexBuffers = {};
 	uint32_t					m_iVertexStride = {};
 	uint32_t					m_iNumVertices = {};

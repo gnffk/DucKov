@@ -20,6 +20,10 @@ using namespace Microsoft::WRL;
 #include "imgui_internal.h"
 #include "ImGuizmo.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 using namespace std;
 
 #include "Engine_Enum.h"
@@ -46,6 +50,7 @@ using namespace std;
 
 #endif
 #endif
+
 
 
 using namespace Engine;

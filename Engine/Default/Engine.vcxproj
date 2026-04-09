@@ -194,13 +194,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>../Bin\</OutDir>
-    <IncludePath>$(ProjectDir)..\lib\assimp\include\;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>../Bin\</OutDir>
-    <IncludePath>$(ProjectDir)..\lib\assimp\include\;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

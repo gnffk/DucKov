@@ -24,11 +24,13 @@ HRESULT VIBuffer::Initialize(void* pArg)
 
 HRESULT VIBuffer::Bind_Resources()
 {
+
+
     ID3D11Buffer* pVertexBuffers[] = {
         m_pVB.Get(),
         // m_pVBInstance.Get(), 
     };
-
+    
     uint32_t       iVertexStrides[] = {
         m_iVertexStride,
     };

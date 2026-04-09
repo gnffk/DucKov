@@ -14,17 +14,12 @@ namespace Engine
 
 	typedef struct tagVertexPositionTexcoord
 	{
-		XMFLOAT3	vPosition;
-		XMFLOAT2	vTexcoord;
+		XMFLOAT3 vPosition;
+		XMFLOAT3 vNormal;
+		XMFLOAT2 vTexcoord;
+		XMFLOAT3 vTangent;
 	}VTXTEX;
 
-	typedef struct tagIndex32
-	{
-		unsigned long	_0;
-		unsigned long	_1;
-		unsigned long	_2;
-
-	}INDEX32;
 
 	typedef struct Mesh_VIBUFFER
 	{
@@ -34,11 +29,11 @@ namespace Engine
 
 		UINT m_iNumIndices = 0;
 		UINT m_iIndexStride = 2;
-		DXGI_FORMAT m_eIndexFormat = DXGI_FORMAT_R32_UINT; // ¶Ç´Â R16_UINT
+		DXGI_FORMAT m_eIndexFormat = DXGI_FORMAT_R16_UINT;
 		D3D11_PRIMITIVE_TOPOLOGY m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-		std::vector<VTXTEX> vertices;
-		std::vector<INDEX32> indices;
+		shared_ptr<vector<VTXTEX>> vertices;
+		shared_ptr<vector<uint16_t>> indices;
 	}MESHVI;
 }
 
