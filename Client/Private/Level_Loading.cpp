@@ -5,7 +5,7 @@
 
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
-
+#include "MapEditor.h"
 
 Level_Loading::Level_Loading(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
@@ -35,26 +35,36 @@ HRESULT Level_Loading::Initialize(LEVEL eNextLevelIndex)
 void Level_Loading::Update(_float fTimeDelta)
 {
 	
-	if (true == m_pLoader->isFinished() &&
-		GetKeyState(VK_SPACE) & 0x8000)
+	if (true == m_pLoader->isFinished())
 	{
+		ImGui::Begin("NEXT_SCENE", nullptr, ImGuiWindowFlags_NoTitleBar);
 
-		unique_ptr<CLevel>		pNewLevel = { nullptr };
 
-		switch (m_eNextLevelIndex)
-		{
-		case LEVEL::LOGO:
-			pNewLevel = Level_Logo::Create(m_pDevice, m_pDeviceContext);
-			break;
-		case LEVEL::GAMEPLAY:
-			pNewLevel = Level_GamePlay::Create(m_pDevice, m_pDeviceContext);
-			break;
+		ImGui::Text(u8"로딩 완료");
+		if (ImGui::Button(u8"다음 씬")) {
+			unique_ptr<CLevel>		pNewLevel = { nullptr };
+
+			switch (m_eNextLevelIndex)
+			{
+			case LEVEL::LOGO:
+				pNewLevel = Level_Logo::Create(m_pDevice, m_pDeviceContext);
+				break;
+			case LEVEL::GAMEPLAY:
+				pNewLevel = Level_GamePlay::Create(m_pDevice, m_pDeviceContext);
+				break;
+			case LEVEL::MAPEDITOR:
+				pNewLevel = MapEditor::Create(m_pDevice, m_pDeviceContext);
+				break;
+			}
+
+			if (FAILED(CGameInstance::Get().Change_Level(ETOUI(m_eNextLevelIndex), std::move(pNewLevel)))) {
+
+				return;
+			}
 		}
 
-		if (FAILED(CGameInstance::Get().Change_Level(ETOUI(m_eNextLevelIndex), std::move(pNewLevel))))
-			return;
-
-		return;
+		ImGui::End();
+		
 	}
 }
 

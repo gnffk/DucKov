@@ -36,7 +36,9 @@ HRESULT Prototype_Manager::Add_Prototype(uint32_t iLevelIndex, const _wstring& s
 	if (nullptr != Find_Prototype(iLevelIndex, strPrototypeTag))
 		return E_FAIL;
 
+	size_t a = m_pPrototypes[iLevelIndex].size();
 	m_pPrototypes[iLevelIndex].emplace(strPrototypeTag, std::move(pPrototype));
+	size_t b = m_pPrototypes[iLevelIndex].size();
 
 	return S_OK;
 }
@@ -54,6 +56,8 @@ Prototype* Prototype_Manager::Find_Prototype(uint32_t iLevelIndex, const _wstrin
 {
 	if (iLevelIndex >= m_iNumLevels)
 		return nullptr;
+
+
 
 	auto	iter = m_pPrototypes[iLevelIndex].find(strPrototypeTag);
 	if (iter == m_pPrototypes[iLevelIndex].end())

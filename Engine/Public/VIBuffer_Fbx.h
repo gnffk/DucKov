@@ -17,16 +17,23 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	static shared_ptr<VIBuffer_Fbx> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, string filePath);
+	static unique_ptr<VIBuffer_Fbx> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, string filePath);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 
-	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
 
-	void ProcessNode(aiNode* node, const aiScene* scene);
 
 protected:
 
 	string m_filePath;
+
+private:
+#ifdef ENGINE_BUILD
+	void ProcessMesh(aiMesh* mesh, const aiScene* scene);
+
+	void ProcessNode(aiNode* node, const aiScene* scene);
+#endif
+
+
 };
 
 NS_END

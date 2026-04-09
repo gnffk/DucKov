@@ -19,22 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\Mesh.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\SafeRelease.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\Public\Component.h" />
     <ClInclude Include="..\Public\VIBuffer_Fbx.h" />
     <ClInclude Include="..\Public\ImGUI_Manager.h" />
@@ -62,14 +46,6 @@
     <ClInclude Include="..\Public\VIBuffer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\lib\imgui\imgui-1.83\imgui.cpp">
       <OrderInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">99</OrderInUnityFile>
       <OrderInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">99</OrderInUnityFile>
@@ -98,26 +74,11 @@
       <OrderInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">99</OrderInUnityFile>
       <OrderInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">99</OrderInUnityFile>
     </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\GraphEditor.cpp">
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IncludeInUnityFile>
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IncludeInUnityFile>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImCurveEdit.cpp">
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IncludeInUnityFile>
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IncludeInUnityFile>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp">
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IncludeInUnityFile>
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IncludeInUnityFile>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp">
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IncludeInUnityFile>
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IncludeInUnityFile>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp">
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IncludeInUnityFile>
-      <IncludeInUnityFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</IncludeInUnityFile>
-    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\GraphEditor.cpp" />
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImCurveEdit.cpp" />
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp" />
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp" />
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp" />
     <ClCompile Include="..\Private\CLevel.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Fbx.cpp" />
@@ -195,12 +156,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>../Bin\</OutDir>
     <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\imgui;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>../Bin\</OutDir>
     <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\imgui;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -238,7 +199,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);IMGUI_API=__declspec(dllexport)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);IMGUI_API=__declspec(dllexport);ENGINE_BUILD</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -262,7 +223,7 @@ call Copy.bat</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);IMGUI_API=__declspec(dllexport)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);IMGUI_API=__declspec(dllexport);ENGINE_BUILD</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>

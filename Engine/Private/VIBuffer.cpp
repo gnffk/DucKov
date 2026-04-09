@@ -52,6 +52,8 @@ HRESULT VIBuffer::Render()
     if (nullptr == m_pContext)
         return E_FAIL;
 
+    Bind_Resources();
+
     m_pContext->DrawIndexed(m_iNumIndices, 0, 0);
 
     return S_OK;

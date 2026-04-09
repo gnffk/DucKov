@@ -16,13 +16,16 @@ using namespace DirectX;
 #include <memory>
 #include <wrl/client.h>
 using namespace Microsoft::WRL;
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "ImGuizmo.h"
 
+#ifdef ENGINE_BUILD
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#endif
 
 using namespace std;
 

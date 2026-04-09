@@ -29,6 +29,7 @@ private:
 
 public:
 	static unique_ptr<ImGUI_Manager> Create(HWND hWnd,ComPtr<ID3D11Device>& pOutDevice, ComPtr<ID3D11DeviceContext>& pOutContext);
+
 };
 
 NS_END

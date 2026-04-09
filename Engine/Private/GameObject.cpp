@@ -15,11 +15,26 @@ GameObject::GameObject(const GameObject& Prototype)
 
 HRESULT GameObject::Initialize_Prototype()
 {
+	
+
 	return S_OK;
 }
 
 HRESULT GameObject::Initialize(void* pArg)
 {
+	m_pTransformCom = Transform::Create(m_pDevice, m_pContext);
+	if (nullptr == m_pTransformCom)
+		return E_FAIL;
+
+	if (nullptr == pArg)
+		return S_OK;
+
+	auto		pDesc = static_cast<GAMEOBJECT_DESC*>(pArg);
+	lstrcpy(m_szName, pDesc->pGameObjectTag);
+
+	if (FAILED(m_pTransformCom->Initialize(pArg)))
+		return E_FAIL;
+
 	return S_OK;
 }
 

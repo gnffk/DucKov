@@ -157,7 +157,8 @@ namespace ImSequencer
          ImVec2 childFramePos = ImGui::GetCursorScreenPos();
          ImVec2 childFrameSize(canvas_size.x, canvas_size.y - 8.f - headerSize.y - (hasScrollBar ? scrollBarSize.y : 0));
          ImGui::PushStyleColor(ImGuiCol_FrameBg, 0);
-         ImGui::BeginChildFrame(889, childFrameSize);
+         ImGui::BeginChild(889, childFrameSize, ImGuiChildFlags_FrameStyle);
+     
          sequence->focused = ImGui::IsWindowFocused();
          ImGui::InvisibleButton("contentBar", ImVec2(canvas_size.x, float(controlHeight)));
          const ImVec2 contentMin = ImGui::GetItemRectMin();
@@ -418,44 +419,47 @@ namespace ImSequencer
          // moving
          if (/*backgroundRect.Contains(io.MousePos) && */movingEntry >= 0)
          {
-            ImGui::CaptureMouseFromApp();
-            int diffFrame = int((cx - movingPos) / framePixelWidth);
-            if (std::abs(diffFrame) > 0)
-            {
-               int* start, * end;
-               sequence->Get(movingEntry, &start, &end, NULL, NULL);
-               if (selectedEntry)
-                  *selectedEntry = movingEntry;
-               int& l = *start;
-               int& r = *end;
-               if (movingPart & 1)
-                  l += diffFrame;
-               if (movingPart & 2)
-                  r += diffFrame;
-               if (l < 0)
-               {
-                  if (movingPart & 2)
-                     r -= l;
-                  l = 0;
-               }
-               if (movingPart & 1 && l > r)
-                  l = r;
-               if (movingPart & 2 && r < l)
-                  r = l;
-               movingPos += int(diffFrame * framePixelWidth);
-            }
-            if (!io.MouseDown[0])
-            {
-               // single select
-               if (!diffFrame && movingPart && selectedEntry)
-               {
-                  *selectedEntry = movingEntry;
-                  ret = true;
-               }
+             if (ImGui::IsItemActive() || ImGui::IsWindowHovered())
+             {
+                 int diffFrame = int((cx - movingPos) / framePixelWidth);
+                 if (std::abs(diffFrame) > 0)
+                 {
+                     int* start, * end;
+                     sequence->Get(movingEntry, &start, &end, NULL, NULL);
+                     if (selectedEntry)
+                         *selectedEntry = movingEntry;
+                     int& l = *start;
+                     int& r = *end;
+                     if (movingPart & 1)
+                         l += diffFrame;
+                     if (movingPart & 2)
+                         r += diffFrame;
+                     if (l < 0)
+                     {
+                         if (movingPart & 2)
+                             r -= l;
+                         l = 0;
+                     }
+                     if (movingPart & 1 && l > r)
+                         l = r;
+                     if (movingPart & 2 && r < l)
+                         r = l;
+                     movingPos += int(diffFrame * framePixelWidth);
+                 }
+                 if (!io.MouseDown[0])
+                 {
+                     // single select
+                     if (!diffFrame && movingPart && selectedEntry)
+                     {
+                         *selectedEntry = movingEntry;
+                         ret = true;
+                     }
 
-               movingEntry = -1;
-               sequence->EndEdit();
-            }
+                     movingEntry = -1;
+                     sequence->EndEdit();
+                 }
+             }
+           
          }
 
          // cursor
@@ -503,7 +507,7 @@ namespace ImSequencer
          }
          //
 
-         ImGui::EndChildFrame();
+         ImGui::EndChild();
          ImGui::PopStyleColor();
          if (hasScrollBar)
          {

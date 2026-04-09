@@ -3,7 +3,7 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Prototype abstract
+class ENGINE_DLL Prototype abstract : public enable_shared_from_this<Prototype>
 {
 protected:
 	Prototype();

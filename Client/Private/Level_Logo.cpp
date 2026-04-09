@@ -25,13 +25,21 @@ void Level_Logo::Update(_float fTimeDelta)
 
 
 	ImGui::Text(u8"다음 씬으로 넘어가기");
-	if (ImGui::Button("Close Me")) {
+	if (ImGui::Button(u8"게임 플레이")) {
 		if (FAILED(CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING),
 			Level_Loading::Create(m_pDevice, m_pDeviceContext, LEVEL::GAMEPLAY)))) {
 
 			return;
 		}
 	}
+	if (ImGui::Button(u8"맵 에디터")) {
+		if (FAILED(CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING),
+			Level_Loading::Create(m_pDevice, m_pDeviceContext, LEVEL::MAPEDITOR)))) {
+
+			return;
+		}
+	}
+	
 	ImGui::End();
 #endif
 }

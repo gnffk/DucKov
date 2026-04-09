@@ -1,4 +1,6 @@
 #include "Loader.h"
+#include "GameInstance.h"
+#include "TestModel.h"
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
@@ -55,6 +57,10 @@ HRESULT CLoader::Loading()
 	case LEVEL::GAMEPLAY:
 		hr = Loading_For_GamePlay();
 		break;
+
+	case LEVEL::MAPEDITOR:
+		hr = Loading_For_MapEditor();
+		break;
 	}
 
 	if (FAILED(hr))
@@ -84,6 +90,28 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	return S_OK;
 }
+
+HRESULT CLoader::Loading_For_MapEditor()
+{
+	/* Prototype_GameObject_TestModel */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
+		VIBuffer_Fbx::Create(m_pDevice, m_pContext, "../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx")))){
+		return E_FAIL;
+	}
+
+
+	/* Prototype_GameObject_TestModel */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_TestModel"),
+		TestModel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+
+	m_isFinished = true;
+
+	return S_OK;
+}
+
 
 unique_ptr<CLoader> CLoader::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, LEVEL eNextLevelIndex)
 {

@@ -46,9 +46,6 @@
     <Filter Include="07.Renderer">
       <UniqueIdentifier>{43698cb2-63b4-4d5e-a55d-42cf8442e5ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="100.Test">
-      <UniqueIdentifier>{06c47b4d-9dd3-41bb-9827-64f7da27c701}</UniqueIdentifier>
-    </Filter>
     <Filter Include="98.ImGui">
       <UniqueIdentifier>{fc1ad67a-1562-428e-ab43-204e2be57a1e}</UniqueIdentifier>
     </Filter>
@@ -76,6 +73,9 @@
     <Filter Include="06.Component\Transform">
       <UniqueIdentifier>{6b1c9871-e341-4926-9d31-2203c8df479a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05.GameObject\Camera">
+      <UniqueIdentifier>{bf83737a-d9ea-4998-8a05-3f7352155fb1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -101,12 +101,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Component.cpp">
       <Filter>06.Component</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.cpp">
-      <Filter>100.Test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.cpp">
-      <Filter>100.Test</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Prototype_Manager.cpp">
       <Filter>04.Prototype\Manager</Filter>
@@ -147,21 +141,6 @@
     <ClCompile Include="..\lib\imgui\imgui-1.83\imgui_widgets.cpp">
       <Filter>98.ImGui\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\GraphEditor.cpp">
-      <Filter>98.ImGui\ImGUIzmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImCurveEdit.cpp">
-      <Filter>98.ImGui\ImGUIzmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp">
-      <Filter>98.ImGui\ImGUIzmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp">
-      <Filter>98.ImGui\ImGUIzmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp">
-      <Filter>98.ImGui\ImGUIzmo</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\VIBuffer.cpp">
       <Filter>06.Component\VIBuffer</Filter>
     </ClCompile>
@@ -176,6 +155,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\Transform.cpp">
       <Filter>06.Component\Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\GraphEditor.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImCurveEdit.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp">
+      <Filter>98.ImGui\ImGUIzmo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -220,18 +214,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Component.h">
       <Filter>06.Component</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\Mesh.h">
-      <Filter>100.Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\ModelLoader.h">
-      <Filter>100.Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\SafeRelease.hpp">
-      <Filter>100.Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Users\gnffk\source\repos\assimp\samples\SimpleTexturedDirectx11\SimpleTexturedDirectx11\TextureLoader.h">
-      <Filter>100.Test</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Prototype_Manager.h">
       <Filter>04.Prototype\Manager</Filter>

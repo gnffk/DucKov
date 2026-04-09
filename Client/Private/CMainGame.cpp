@@ -20,7 +20,7 @@ HRESULT Client::CMainGame::Initialize()
 	EngineDesc.eWinMode = WINMODE::WIN;
 	EngineDesc.iWinSizeX = g_iWinSizeX;
 	EngineDesc.iWinSizeY = g_iWinSizeY;
-
+	EngineDesc.iNumLevels = ETOUI(LEVEL::END);
 	if (FAILED(CGameInstance::Get().Initialize_Engine(EngineDesc, m_pDevice, m_pContext)))
 		return E_FAIL;
 

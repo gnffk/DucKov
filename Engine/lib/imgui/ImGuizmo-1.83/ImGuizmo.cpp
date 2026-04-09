@@ -23,11 +23,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-
-#include "imgui.h"
-#ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
-#endif
+#include "imgui.h"
+
 #include "imgui_internal.h"
 #include "ImGuizmo.h"
 
@@ -1878,7 +1876,7 @@ namespace ImGuizmo
       // move
       if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID) && IsTranslateType(gContext.mCurrentOperation))
       {
-         ImGui::CaptureMouseFromApp();
+         
          const float len = fabsf(IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan)); // near plan
          vec_t newPos = gContext.mRayOrigin + gContext.mRayVector * len;
 
@@ -1948,7 +1946,7 @@ namespace ImGuizmo
          type = GetMoveType(op, &gizmoHitProportion);
          if (type != MT_NONE)
          {
-            ImGui::CaptureMouseFromApp();
+          
          }
          if (CanActivate() && type != MT_NONE)
          {
@@ -1993,7 +1991,7 @@ namespace ImGuizmo
          type = GetScaleType(op);
          if (type != MT_NONE)
          {
-            ImGui::CaptureMouseFromApp();
+          
          }
          if (CanActivate() && type != MT_NONE)
          {
@@ -2016,7 +2014,7 @@ namespace ImGuizmo
       // scale
       if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID) && IsScaleType(gContext.mCurrentOperation))
       {
-         ImGui::CaptureMouseFromApp();
+        
          const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan);
          vec_t newPos = gContext.mRayOrigin + gContext.mRayVector * len;
          vec_t newOrigin = newPos - gContext.mRelativeOrigin * gContext.mScreenFactor;
@@ -2107,7 +2105,7 @@ namespace ImGuizmo
 
          if (type != MT_NONE)
          {
-            ImGui::CaptureMouseFromApp();
+          
          }
 
          if (type == MT_ROTATE_SCREEN)
@@ -2141,53 +2139,55 @@ namespace ImGuizmo
       // rotation
       if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID) && IsRotateType(gContext.mCurrentOperation))
       {
-         ImGui::CaptureMouseFromApp();
-         gContext.mRotationAngle = ComputeAngleOnPlan();
-         if (snap)
-         {
-            float snapInRadian = snap[0] * DEG2RAD;
-            ComputeSnap(&gContext.mRotationAngle, snapInRadian);
-         }
-         vec_t rotationAxisLocalSpace;
+          if (ImGui::IsItemActive() || ImGui::IsWindowHovered())
+          {
+              gContext.mRotationAngle = ComputeAngleOnPlan();
+              if (snap)
+              {
+                  float snapInRadian = snap[0] * DEG2RAD;
+                  ComputeSnap(&gContext.mRotationAngle, snapInRadian);
+              }
+              vec_t rotationAxisLocalSpace;
 
-         rotationAxisLocalSpace.TransformVector(makeVect(gContext.mTranslationPlan.x, gContext.mTranslationPlan.y, gContext.mTranslationPlan.z, 0.f), gContext.mModelInverse);
-         rotationAxisLocalSpace.Normalize();
+              rotationAxisLocalSpace.TransformVector(makeVect(gContext.mTranslationPlan.x, gContext.mTranslationPlan.y, gContext.mTranslationPlan.z, 0.f), gContext.mModelInverse);
+              rotationAxisLocalSpace.Normalize();
 
-         matrix_t deltaRotation;
-         deltaRotation.RotationAxis(rotationAxisLocalSpace, gContext.mRotationAngle - gContext.mRotationAngleOrigin);
-         if (gContext.mRotationAngle != gContext.mRotationAngleOrigin)
-         {
-            modified = true;
-         }
-         gContext.mRotationAngleOrigin = gContext.mRotationAngle;
+              matrix_t deltaRotation;
+              deltaRotation.RotationAxis(rotationAxisLocalSpace, gContext.mRotationAngle - gContext.mRotationAngleOrigin);
+              if (gContext.mRotationAngle != gContext.mRotationAngleOrigin)
+              {
+                  modified = true;
+              }
+              gContext.mRotationAngleOrigin = gContext.mRotationAngle;
 
-         matrix_t scaleOrigin;
-         scaleOrigin.Scale(gContext.mModelScaleOrigin);
+              matrix_t scaleOrigin;
+              scaleOrigin.Scale(gContext.mModelScaleOrigin);
 
-         if (applyRotationLocaly)
-         {
-            *(matrix_t*)matrix = scaleOrigin * deltaRotation * gContext.mModel;
-         }
-         else
-         {
-            matrix_t res = gContext.mModelSource;
-            res.v.position.Set(0.f);
+              if (applyRotationLocaly)
+              {
+                  *(matrix_t*)matrix = scaleOrigin * deltaRotation * gContext.mModel;
+              }
+              else
+              {
+                  matrix_t res = gContext.mModelSource;
+                  res.v.position.Set(0.f);
 
-            *(matrix_t*)matrix = res * deltaRotation;
-            ((matrix_t*)matrix)->v.position = gContext.mModelSource.v.position;
-         }
+                  *(matrix_t*)matrix = res * deltaRotation;
+                  ((matrix_t*)matrix)->v.position = gContext.mModelSource.v.position;
+              }
 
-         if (deltaMatrix)
-         {
-            *(matrix_t*)deltaMatrix = gContext.mModelInverse * deltaRotation * gContext.mModel;
-         }
+              if (deltaMatrix)
+              {
+                  *(matrix_t*)deltaMatrix = gContext.mModelInverse * deltaRotation * gContext.mModel;
+              }
 
-         if (!io.MouseDown[0])
-         {
-            gContext.mbUsing = false;
-            gContext.mEditingID = -1;
-         }
-         type = gContext.mCurrentOperation;
+              if (!io.MouseDown[0])
+              {
+                  gContext.mbUsing = false;
+                  gContext.mEditingID = -1;
+              }
+              type = gContext.mCurrentOperation;
+          }
       }
       return modified;
    }

@@ -3,6 +3,7 @@
 
 
 
+
 VIBuffer_Fbx::VIBuffer_Fbx(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, string filePath)
     : VIBuffer{ pDevice, pContext }, m_filePath{ filePath }
 {
@@ -39,6 +40,8 @@ HRESULT VIBuffer_Fbx::Initialize_Prototype()
 
 
     if (pScene->HasMeshes()) {
+        Meshes_VIBuffers  = make_shared<vector<Mesh_VIBUFFER>>();
+        (Meshes_VIBuffers)->reserve(pScene->mNumMeshes);
         aiNode* pNode = pScene->mRootNode;
 
         ProcessNode(pNode,pScene);
@@ -48,7 +51,11 @@ HRESULT VIBuffer_Fbx::Initialize_Prototype()
 
 
 
-for (auto& Mesh : *Meshes_VIBuffers) {
+    m_iVertexStride = sizeof(VTXTEX);
+    m_iIndexStride = 2;
+
+
+for (auto Mesh : *Meshes_VIBuffers) {
         m_iNumVertices += Mesh.m_iNumVertices;
         m_iNumIndices += Mesh.m_iNumIndices;
 }
@@ -79,8 +86,11 @@ for (auto& Mesh : *Meshes_VIBuffers) {
     D3D11_SUBRESOURCE_DATA          VertexInitialData{};
     VertexInitialData.pSysMem = pVertices->data();
 
-    if (FAILED(m_pDevice->CreateBuffer(&VertexBufferDesc, &VertexInitialData, &m_pVB)))
+    if (FAILED(m_pDevice->CreateBuffer(&VertexBufferDesc, &VertexInitialData, &m_pVB))) {
+  
         return E_FAIL;
+    }
+     
 
 #pragma endregion
 
@@ -111,19 +121,21 @@ for (auto& Mesh : *Meshes_VIBuffers) {
 
 #pragma endregion
 
-
+    
     return S_OK;
 }
 
 HRESULT VIBuffer_Fbx::Initialize(void* pArg)
 {
     m_filePath = this->m_filePath;
+    
+
     return S_OK;
 }
 
-shared_ptr<VIBuffer_Fbx> VIBuffer_Fbx::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, string filePath)
+unique_ptr<VIBuffer_Fbx> VIBuffer_Fbx::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, string filePath)
 {
-    auto		pInstance = shared_ptr<VIBuffer_Fbx>(new VIBuffer_Fbx(pDevice, pContext, filePath));
+    auto		pInstance = unique_ptr<VIBuffer_Fbx>(new VIBuffer_Fbx(pDevice, pContext, filePath));
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
@@ -208,14 +220,15 @@ void VIBuffer_Fbx::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
    
     Meshes.m_iNumVertexBuffers = 1;
-    Meshes.m_iNumVertices = Meshes.vertices->size();
+    Meshes.m_iNumVertices = (UINT)Meshes.vertices->size();
     Meshes.m_iVertexStride = sizeof(VTXTEX);
 
-    Meshes.m_iNumIndices = Meshes.indices->size();
+    Meshes.m_iNumIndices = (UINT)Meshes.indices->size();
     Meshes.m_iIndexStride = 2;
     Meshes.m_eIndexFormat = DXGI_FORMAT_R16_UINT;
     Meshes.m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     
+    (*Meshes_VIBuffers).emplace_back(Meshes);
 
 }
 

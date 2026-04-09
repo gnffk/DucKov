@@ -1,9 +1,14 @@
 #pragma once
-#include "Prototype.h"
+#include "Transform.h"
 NS_BEGIN(Engine)
 
 class ENGINE_DLL GameObject abstract : public Prototype
 {
+public:
+	typedef struct tagGameObjectDesc : public Transform::TRANSFORM_DESC
+	{
+		const _tchar* pGameObjectTag;
+	}GAMEOBJECT_DESC;
 protected:
 	GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	GameObject(const GameObject& Prototype);
@@ -21,6 +26,11 @@ public:
 protected:
 	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
 	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
+
+	shared_ptr<class Transform>	m_pTransformCom = { nullptr };
+
+protected:
+	_tchar					m_szName[MAX_PATH] = {};
 
 public:
 	virtual shared_ptr<Prototype> Clone(void* pArg) = 0;

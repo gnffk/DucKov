@@ -25,6 +25,12 @@
     <Filter Include="01. Levels\Loading\Loader">
       <UniqueIdentifier>{15cf30cc-bd31-417f-bb24-8b7f16cc28b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\MapEditor">
+      <UniqueIdentifier>{132a5a52-ab19-4441-a252-68cd97eee680}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject">
+      <UniqueIdentifier>{f53b673a-829b-4eee-a8da-9ae4b4a48719}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -60,6 +66,12 @@
     <ClInclude Include="pch.h">
       <Filter>98. Default</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MapEditor.h">
+      <Filter>01. Levels\MapEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestModel.h">
+      <Filter>02. GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -92,6 +104,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Logo.cpp">
       <Filter>01. Levels\Logo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapEditor.cpp">
+      <Filter>01. Levels\MapEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestModel.cpp">
+      <Filter>02. GameObject</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
