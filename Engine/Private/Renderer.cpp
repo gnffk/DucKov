@@ -30,6 +30,8 @@ HRESULT Renderer::Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObje
 
 HRESULT Renderer::Draw()
 {
+
+
     if (FAILED(Render_Priority()))
         return E_FAIL;
 

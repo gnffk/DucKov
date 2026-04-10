@@ -21,21 +21,21 @@ HRESULT VIBuffer_Fbx::Initialize_Prototype()
 
 #pragma region ASSIMP
     Assimp::Importer importer;
-
+    
     const aiScene* pScene = importer.ReadFile(m_filePath,
         aiProcess_Triangulate |
         aiProcess_ConvertToLeftHanded |
         aiProcess_GenNormals |
         aiProcess_CalcTangentSpace
     );
+    
 
 
     if (pScene == nullptr) {
         MSG_BOX("Failed to Open Assimp : VIBuffer_Fbx");
         return E_FAIL;
+       
     }
-
-
 
 
 
@@ -49,8 +49,9 @@ HRESULT VIBuffer_Fbx::Initialize_Prototype()
     }
 #pragma endregion
 
-
-
+    m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    m_eIndexFormat = DXGI_FORMAT_R16_UINT;
+    m_iNumVertexBuffers = 1;
     m_iVertexStride = sizeof(VTXTEX);
     m_iIndexStride = 2;
 
@@ -127,8 +128,7 @@ for (auto Mesh : *Meshes_VIBuffers) {
 
 HRESULT VIBuffer_Fbx::Initialize(void* pArg)
 {
-    m_filePath = this->m_filePath;
-    
+ 
 
     return S_OK;
 }

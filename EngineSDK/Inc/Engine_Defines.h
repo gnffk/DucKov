@@ -25,6 +25,7 @@ using namespace Microsoft::WRL;
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <d3dcompiler.h>
 #endif
 
 using namespace std;

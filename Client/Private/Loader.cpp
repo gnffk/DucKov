@@ -1,7 +1,7 @@
 #include "Loader.h"
 #include "GameInstance.h"
 #include "TestModel.h"
-
+#include "BaseShaderDX11.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -93,17 +93,32 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 HRESULT CLoader::Loading_For_MapEditor()
 {
+
+
+
+
+#pragma region Shader Resource
+	if (FAILED(CGameInstance::Get().Add_Resource(Engine::ERESOURCE::SHADER,L"Shader_Base", BaseShaderDX11::Create(m_pDevice, m_pContext)))) {
+		return E_FAIL;
+	}
+
+#pragma endregion
+
+#pragma region VIBuffer Component Prototype
 	/* Prototype_GameObject_TestModel */
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
 		VIBuffer_Fbx::Create(m_pDevice, m_pContext, "../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx")))){
 		return E_FAIL;
 	}
+#pragma endregion
 
 
+#pragma region GameObject Prototype
 	/* Prototype_GameObject_TestModel */
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_TestModel"),
 		TestModel::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+#pragma endregion
 
 
 

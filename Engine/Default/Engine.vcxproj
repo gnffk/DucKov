@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\BaseShaderDX11.h" />
     <ClInclude Include="..\Public\Component.h" />
+    <ClInclude Include="..\Public\Shader.h" />
     <ClInclude Include="..\Public\VIBuffer_Fbx.h" />
     <ClInclude Include="..\Public\ImGUI_Manager.h" />
     <ClInclude Include="..\Public\Renderer.h" />
@@ -79,8 +81,10 @@
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp" />
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp" />
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp" />
+    <ClCompile Include="..\Private\BaseShaderDX11.cpp" />
     <ClCompile Include="..\Private\CLevel.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
+    <ClCompile Include="..\Private\Shader.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Fbx.cpp" />
     <ClCompile Include="..\Private\ImGUI_Manager.cpp" />
     <ClCompile Include="..\Private\Renderer.cpp" />
@@ -98,6 +102,12 @@
     <ClCompile Include="..\Private\Timer_Manager.cpp" />
     <ClCompile Include="..\Private\Transform.cpp" />
     <ClCompile Include="..\Private\VIBuffer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Base.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -156,12 +166,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>../Bin\</OutDir>
     <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\imgui;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>../Bin\</OutDir>
     <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\imgui;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -210,7 +220,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;dxguid.lib;Effects11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd /d $(SolutionDir)
@@ -234,7 +244,7 @@ call Copy.bat</Command>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;dxguid.lib;Effects11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>cd /d $(SolutionDir)

@@ -76,6 +76,15 @@
     <Filter Include="05.GameObject\Camera">
       <UniqueIdentifier>{bf83737a-d9ea-4998-8a05-3f7352155fb1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="08.Resource\Shader">
+      <UniqueIdentifier>{2c2dd43b-9a8c-4b60-891f-0aca875ed636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="08.Resource\Shader\HLSL">
+      <UniqueIdentifier>{8bafd80c-a923-41eb-9d67-386de7644b1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="08.Resource\Shader\ShaderType">
+      <UniqueIdentifier>{843c003c-c4b7-454c-bf4b-fb907afa1f30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -171,6 +180,12 @@
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp">
       <Filter>98.ImGui\ImGUIzmo</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Shader.cpp">
+      <Filter>08.Resource\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BaseShaderDX11.cpp">
+      <Filter>08.Resource\Shader\ShaderType</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -248,5 +263,16 @@
     <ClInclude Include="..\Public\Transform.h">
       <Filter>06.Component\Transform</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Shader.h">
+      <Filter>08.Resource\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BaseShaderDX11.h">
+      <Filter>08.Resource\Shader\ShaderType</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Base.hlsl">
+      <Filter>08.Resource\Shader\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

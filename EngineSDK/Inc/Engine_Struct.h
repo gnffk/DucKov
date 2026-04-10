@@ -35,6 +35,21 @@ namespace Engine
 		shared_ptr<vector<VTXTEX>> vertices;
 		shared_ptr<vector<uint16_t>> indices;
 	}MESHVI;
+
+	// shader
+
+	typedef struct tagBaseShader
+	{
+		wstring m_FileName;
+		string m_VSEntry;
+		string m_PSEntry;
+
+		UINT m_StencilRef = 1;
+		UINT m_SamplerSlot = 0;
+
+		shared_ptr<vector<D3D11_INPUT_ELEMENT_DESC>> m_InputDescs;
+		UINT m_NumElements = 0;
+	}BASESHADER_DESC;
 }
 
 

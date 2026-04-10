@@ -2,7 +2,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "VIBuffer_Fbx.h"
-
+#include "BaseShaderDX11.h"
 NS_BEGIN(Client)
 
 class TestModel final : public GameObject
@@ -31,6 +31,7 @@ private:
 	uint32_t			m_iData = {};
 
 	shared_ptr<Engine::VIBuffer_Fbx>	m_pViBuffer = { nullptr };
+	shared_ptr<Engine::BaseShaderDX11>	m_pShader = { nullptr };
 public:
 	static unique_ptr<TestModel> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;

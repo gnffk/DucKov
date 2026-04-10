@@ -45,18 +45,23 @@ HRESULT TestModel::Initialize(void* pArg)
 	}
 
 
-	m_pViBuffer = static_pointer_cast<VIBuffer_Fbx>((CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), L"Prototype_Component_VIBuffer_Fbx_TestModel")));
+	m_pViBuffer = static_pointer_cast<VIBuffer_Fbx>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), L"Prototype_Component_VIBuffer_Fbx_TestModel"));
 
 	if (nullptr == m_pViBuffer) {
 		return E_FAIL;
 	}
 
+
+	m_pShader =  static_pointer_cast<BaseShaderDX11>((CGameInstance::Get().Find_Resources(ETOUI(ERESOURCE::SHADER),L"Shader_Base")));
+	if (nullptr == m_pViBuffer) {
+		return E_FAIL;
+	}
 	return S_OK;
 }
 
 void TestModel::Priority_Update(_float fTimeDelta)
 {
-
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::BLEND, SHARED_THIS(TestModel));
 }
 
 void TestModel::Update(_float fTimeDelta)
@@ -66,12 +71,14 @@ void TestModel::Update(_float fTimeDelta)
 
 void TestModel::Late_Update(_float fTimeDelta)
 {
-	CGameInstance::Get().Add_RenderObject(RENDERGROUP::BLEND, SHARED_THIS(TestModel));
+	
 }
 
 HRESULT TestModel::Render()
 {
-
+	m_pViBuffer->Bind_Resources();
+	m_pShader->SetShader();
+	m_pViBuffer->Render();
 	return S_OK;
 }
 
