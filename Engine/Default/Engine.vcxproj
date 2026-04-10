@@ -21,7 +21,9 @@
   <ItemGroup>
     <ClInclude Include="..\Public\BaseShaderDX11.h" />
     <ClInclude Include="..\Public\Component.h" />
+    <ClInclude Include="..\Public\Material.h" />
     <ClInclude Include="..\Public\Shader.h" />
+    <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\VIBuffer_Fbx.h" />
     <ClInclude Include="..\Public\ImGUI_Manager.h" />
     <ClInclude Include="..\Public\Renderer.h" />
@@ -84,7 +86,9 @@
     <ClCompile Include="..\Private\BaseShaderDX11.cpp" />
     <ClCompile Include="..\Private\CLevel.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
+    <ClCompile Include="..\Private\Material.cpp" />
     <ClCompile Include="..\Private\Shader.cpp" />
+    <ClCompile Include="..\Private\Texture.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Fbx.cpp" />
     <ClCompile Include="..\Private\ImGUI_Manager.cpp" />
     <ClCompile Include="..\Private\Renderer.cpp" />

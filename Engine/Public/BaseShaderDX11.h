@@ -13,7 +13,7 @@ public:
 
 
 public:
-	virtual HRESULT SetShader() override;
+	virtual HRESULT SetShader() ;
 	virtual HRESULT Recompile() override;
 
 	virtual HRESULT Initialize() override;

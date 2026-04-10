@@ -76,8 +76,10 @@ void TestModel::Late_Update(_float fTimeDelta)
 
 HRESULT TestModel::Render()
 {
-	m_pViBuffer->Bind_Resources();
 	m_pShader->SetShader();
+
+	m_pViBuffer->Bind_Resources();
+
 	m_pViBuffer->Render();
 	return S_OK;
 }
@@ -109,3 +111,37 @@ shared_ptr<Prototype> TestModel::Clone(void* pArg)
 	return pInstance;
 }
 
+void TestModel::CreateViewAndPerspective()
+{
+	//// Use DirectXMath to create view and perspective matrices.
+
+	//DirectX::XMVECTOR eye = DirectX::XMVectorSet(0.0f, 0.7f, 1.5f, 0.f);
+	//DirectX::XMVECTOR at = DirectX::XMVectorSet(0.0f, -0.1f, 0.0f, 0.f);
+	//DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.f);
+	//m_pContext->GetAspectRatio();
+	//DirectX::XMStoreFloat4x4(
+	//	pDevice.view,
+	//	DirectX::XMMatrixTranspose(
+	//		DirectX::XMMatrixLookAtRH(
+	//			eye,
+	//			at,
+	//			up
+	//		)
+	//	)
+	//);
+
+	//float aspectRatioX = m_deviceResources->GetAspectRatio();
+	//float aspectRatioY = aspectRatioX < (16.0f / 9.0f) ? aspectRatioX / (16.0f / 9.0f) : 1.0f;
+
+	//DirectX::XMStoreFloat4x4(
+	//	&m_constantBufferData.projection,
+	//	DirectX::XMMatrixTranspose(
+	//		DirectX::XMMatrixPerspectiveFovRH(
+	//			2.0f * std::atan(std::tan(DirectX::XMConvertToRadians(70) * 0.5f) / aspectRatioY),
+	//			aspectRatioX,
+	//			0.01f,
+	//			100.0f
+	//		)
+	//	)
+	//);
+}

@@ -50,6 +50,15 @@ namespace Engine
 		shared_ptr<vector<D3D11_INPUT_ELEMENT_DESC>> m_InputDescs;
 		UINT m_NumElements = 0;
 	}BASESHADER_DESC;
+
+
+	typedef struct CB_DATA
+	{
+		XMMATRIX matWorld;
+		XMMATRIX matView;
+		XMMATRIX matProj;
+	}cbData;
+
 }
 
 

@@ -1,5 +1,5 @@
 #include "BaseShaderDX11.h"
-
+#include "Transform.h"
 BaseShaderDX11::BaseShaderDX11(ComPtr<ID3D11Device> Device, ComPtr<ID3D11DeviceContext> Context) 
     : ShaderDX11{ Device, Context }
 {
@@ -8,13 +8,24 @@ BaseShaderDX11::BaseShaderDX11(ComPtr<ID3D11Device> Device, ComPtr<ID3D11DeviceC
 HRESULT BaseShaderDX11::SetShader()
 {
 
+
+
+
     // 1. Input Layout
     m_Context->IASetInputLayout(m_InputLayout.Get());
 
-    
+  
+    //CB_DATA cbData{};
+    //cbData.matWorld = transform;
+    //cbData.matView = ...;
+    //cbData.matProj = ...;
 
+    //// 4. 상수버퍼 업데이트 + 바인딩
+    //m_Context->UpdateSubresource(m_pConstantBuffer.Get(), 0, nullptr, &cbData, 0, 0);
+    //m_Context->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+    //m_Context->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+    //m_Context->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
     // 5. Shader
-
     m_Context->VSSetShader(m_VS.Get(), nullptr, 0);
     m_Context->PSSetShader(m_PS.Get(), nullptr, 0);
     m_Context->PSSetSamplers(0, 1, m_pSampler.GetAddressOf());

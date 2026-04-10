@@ -36,6 +36,8 @@ protected:
     HRESULT CreateVSAndInputLayout();
     HRESULT CreatePS();
 
+
+
 protected:
     ComPtr<ID3D11Device> m_Device = nullptr;
     ComPtr<ID3D11DeviceContext> m_Context = nullptr;
@@ -48,6 +50,7 @@ protected:
     ComPtr<ID3DBlob> m_PSBlob;
 
     ComPtr<ID3D11SamplerState> m_pSampler;
+
     BASESHADER_DESC m_BaseDesc;
 };
 
