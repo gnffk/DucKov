@@ -39,6 +39,7 @@
 
 # debug information files
 *.dwo
+**/Resources/
 
 /.vs/
 x64/
@@ -46,3 +47,5 @@ x64/
 /Reference/
 
 **/Bin/
+/Resources/Fbx/
+/Engine/Private/ShaderManager.cpp
