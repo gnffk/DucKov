@@ -32,6 +32,15 @@ protected:
 protected:
 	_tchar					m_szName[MAX_PATH] = {};
 
+
+protected:
+	map<const _wstring, shared_ptr<class Component>>		m_Components;
+protected:
+	HRESULT Add_Component(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag,
+		const _wstring& strComponentTag, shared_ptr<Component>& pOut, void* pArg = nullptr);
+
+	shared_ptr<class Component> Find_Component(const _wstring& strComponentTag);
+
 public:
 	virtual shared_ptr<Prototype> Clone(void* pArg) = 0;
 

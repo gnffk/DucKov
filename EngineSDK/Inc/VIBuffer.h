@@ -19,21 +19,9 @@ public:
 	virtual HRESULT Bind_Resources();
 	virtual HRESULT Render();
 
-protected:
-	ComPtr<ID3D11Buffer>			m_pVB = { nullptr };
-	ComPtr<ID3D11Buffer>			m_pIB = { nullptr };
 
 protected:
 	shared_ptr <vector<Mesh_VIBUFFER>> Meshes_VIBuffers;
-protected:
-	uint32_t					m_iNumVertexBuffers = {};
-	uint32_t					m_iVertexStride = {};
-	uint32_t					m_iNumVertices = {};
-	uint32_t					m_iIndexStride = {};
-	uint32_t					m_iNumIndices = {};
-	DXGI_FORMAT					m_eIndexFormat = {};
-	D3D11_PRIMITIVE_TOPOLOGY	m_ePrimitiveType = {};
-
 
 
 public:

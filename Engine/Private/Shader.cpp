@@ -1,107 +1,115 @@
 #include "Shader.h"
 
-
-ComPtr<ID3DBlob> Shader::CompileHLSL(LPCWSTR fileName,LPCSTR entryPoint,LPCSTR target)
+Shader::Shader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
+    : Component{ pDevice, pContext }
 {
-    UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+}
+
+Shader::~Shader()
+{
+}
+
+HRESULT Shader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pInputElements, uint32_t iNumElements)
+{
+    uint32_t        iFlag = {};
 
 #ifdef _DEBUG
-    flags |= D3DCOMPILE_DEBUG;
-    flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+    iFlag |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+    iFlag |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
 #endif
 
-    ComPtr<ID3DBlob> shaderBlob;
-    ComPtr<ID3DBlob> errorBlob;
+    ID3DBlob* pData = { nullptr };
 
-    HRESULT hr = D3DCompileFromFile(
-        fileName,
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        entryPoint,
-        target,
-        flags,
-        0,
-        shaderBlob.GetAddressOf(),
-        errorBlob.GetAddressOf()
-    );
+    if (FAILED(D3DX11CompileEffectFromFile(pShaderFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, iFlag, 0, m_pDevice.Get(), &m_pEffect, nullptr)))
+        return E_FAIL;
 
-    if (FAILED(hr))
+    ComPtr<ID3DX11EffectTechnique>  pTechnique = m_pEffect->GetTechniqueByIndex(0);
+
+    D3DX11_TECHNIQUE_DESC   TechniqueDesc{};
+
+    pTechnique->GetDesc(&TechniqueDesc);
+
+    m_iNumPasses = TechniqueDesc.Passes;
+
+    for (uint32_t i = 0; i < m_iNumPasses; i++)
     {
-        if (errorBlob)
-        {
-            OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-        }
+        ComPtr<ID3D11InputLayout>       pInputLayout = { nullptr };
+
+        D3DX11_PASS_DESC        PassDesc{};
+
+        ComPtr<ID3DX11EffectPass>   pPass = pTechnique->GetPassByIndex(i);
+
+        pPass->GetDesc(&PassDesc);
+
+        PassDesc.pIAInputSignature;
+        PassDesc.IAInputSignatureSize;
+
+        if (FAILED(m_pDevice->CreateInputLayout(pInputElements, iNumElements, PassDesc.pIAInputSignature, PassDesc.IAInputSignatureSize, &pInputLayout)))
+            return E_FAIL;
+
+        m_InputLayouts.push_back(pInputLayout);
+    }
+
+    return S_OK;
+}
+
+HRESULT Shader::Initialize(void* pArg)
+{
+    return S_OK;
+}
+
+HRESULT Shader::Begin(uint32_t iPassIndex)
+{
+    if (iPassIndex >= m_iNumPasses)
+        return E_FAIL;
+
+    m_pContext->IASetInputLayout(m_InputLayouts[iPassIndex].Get());
+
+    m_pEffect->GetTechniqueByIndex(0)->GetPassByIndex(iPassIndex)->Apply(0, m_pContext.Get());
+
+    return S_OK;
+}
+
+HRESULT Shader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix)
+{
+    if (nullptr == m_pEffect)
+        return E_FAIL;
+
+    ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+    if (nullptr == pVariable)
+        return E_FAIL;
+
+    ID3DX11EffectMatrixVariable* pMatrixVariable = pVariable->AsMatrix();
+    if (nullptr == pMatrixVariable)
+        return E_FAIL;
+
+    return pMatrixVariable->SetMatrix(reinterpret_cast<const _float*>(pMatrix));
+}
+
+unique_ptr<Shader> Shader::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pInputElements, uint32_t iNumElements)
+{
+    auto		pInstance = unique_ptr<Shader>(new Shader(pDevice, pContext));
+
+    if (FAILED(pInstance->Initialize_Prototype(pShaderFilePath, pInputElements, iNumElements)))
+    {
+        MSG_BOX("Failed to Created : Shader");
         return nullptr;
     }
 
-    return shaderBlob;
+    return pInstance;
 }
 
-ShaderDX11::ShaderDX11(ComPtr<ID3D11Device> Device, ComPtr<ID3D11DeviceContext> Context) : m_Device(Device), m_Context(Context)
+
+shared_ptr<Prototype> Shader::Clone(void* pArg)
 {
+    auto		pInstance = shared_ptr<Shader>(new Shader(*this));
+
+    if (FAILED(pInstance->Initialize(pArg)))
+    {
+        MSG_BOX("Failed to Created : Shader");
+        return nullptr;
+    }
+
+    return pInstance;
 }
-
-HRESULT ShaderDX11::SetShader()
-{
-    return S_OK;
-}
-
-HRESULT ShaderDX11::Recompile()
-{
-    return S_OK;
-}
-
-HRESULT ShaderDX11::Initialize()
-{
-    return S_OK;
-}
-
-HRESULT ShaderDX11::CreateVSAndInputLayout()
-{
-    D3D11_SAMPLER_DESC sampDesc{};
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    sampDesc.MinLOD = 0;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-    HRESULT hr = m_Device->CreateSamplerState(&sampDesc, m_pSampler.GetAddressOf());
-    if (FAILED(hr))
-        return hr;
-
-
-    hr = m_Device->CreateVertexShader(
-        m_VSBlob->GetBufferPointer(),
-        m_VSBlob->GetBufferSize(),
-        nullptr,
-        m_VS.GetAddressOf()
-    );
-    if (FAILED(hr))
-        return hr;
-
-    hr = m_Device->CreateInputLayout(
-        m_BaseDesc.m_InputDescs->data(),
-        m_BaseDesc.m_NumElements,
-        m_VSBlob->GetBufferPointer(),
-        m_VSBlob->GetBufferSize(),
-        m_InputLayout.GetAddressOf()
-    );
-    if (FAILED(hr))
-        return hr;
-
-    return S_OK;
-}
-
-HRESULT ShaderDX11::CreatePS()
-{
-    return m_Device->CreatePixelShader(
-        m_PSBlob->GetBufferPointer(),
-        m_PSBlob->GetBufferSize(),
-        nullptr,
-        m_PS.GetAddressOf()
-    );
-}
-
-

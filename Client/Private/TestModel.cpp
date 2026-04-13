@@ -27,29 +27,12 @@ HRESULT TestModel::Initialize_Prototype()
 
 HRESULT TestModel::Initialize(void* pArg)
 {
-	if (nullptr != pArg) {
-		auto		pDesc = static_cast<TestModelDec*>(pArg);
-		m_iData = pDesc->iData;
-
-		pDesc->pGameObjectTag = TEXT("TestModel");
-		pDesc->fSpeedPerSec = 10.f;
-		pDesc->fRotationPerSec = 180.f;
-
-
-		if (FAILED(__super::Initialize(pDesc)))
-			return E_FAIL;
-	}
-	else {
-		if (FAILED(__super::Initialize(pArg)))
-			return E_FAIL;
-	}
-
-
-	m_pViBuffer = static_pointer_cast<VIBuffer_Fbx>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), L"Prototype_Component_VIBuffer_Fbx_TestModel"));
-
-	if (nullptr == m_pViBuffer) {
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-	}
+
+	if (FAILED(Ready_Components()))
+		return E_FAIL;
+
 
 
 	return S_OK;
@@ -72,10 +55,51 @@ void TestModel::Late_Update(_float fTimeDelta)
 
 HRESULT TestModel::Render()
 {
+	_float4x4		IdentityMatrix = {};
+	XMStoreFloat4x4(&IdentityMatrix, XMMatrixIdentity());
 
-	//m_pViBuffer->Bind_Resources();
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &IdentityMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &IdentityMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &IdentityMatrix)))
+		return E_FAIL;
 
-	//m_pViBuffer->Render();
+	if (FAILED(m_pShaderCom->Begin(0)))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBufferCom->Bind_Resources()))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBufferCom->Render()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT TestModel::Ready_Components()
+{
+	
+	//auto VIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferCom);
+	//if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
+	//	TEXT("Com_VIBuffer"), VIBufferCom)))
+	//	return E_FAIL;
+	//m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Fbx>(VIBufferCom);
+
+	auto VIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferCom);
+	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
+		TEXT("Com_VIBuffer"), VIBufferCom)))
+		return E_FAIL;
+	m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Rect>(VIBufferCom);
+
+
+	auto ShaderCom = dynamic_pointer_cast<Component>(m_pShaderCom);
+	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex"),
+		TEXT("Com_Shader"), ShaderCom)))
+		return E_FAIL;
+	m_pShaderCom = dynamic_pointer_cast<Shader>(ShaderCom);
+
+
 	return S_OK;
 }
 

@@ -2,6 +2,8 @@
 
 
 #include <d3d11.h>
+#include "Fx11/d3dx11effect.h"
+#include <d3dcompiler.h>
 #include <DirectXMath.h>
 using namespace DirectX;
 #include  <any>
@@ -25,7 +27,8 @@ using namespace Microsoft::WRL;
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <d3dcompiler.h>
+
+
 #endif
 
 using namespace std;

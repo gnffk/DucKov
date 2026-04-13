@@ -49,78 +49,50 @@ HRESULT VIBuffer_Fbx::Initialize_Prototype()
     }
 #pragma endregion
 
-    m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    m_eIndexFormat = DXGI_FORMAT_R16_UINT;
-    m_iNumVertexBuffers = 1;
-    m_iVertexStride = sizeof(VTXTEX);
-    m_iIndexStride = 2;
 
-
-for (auto Mesh : *Meshes_VIBuffers) {
-        m_iNumVertices += Mesh.m_iNumVertices;
-        m_iNumIndices += Mesh.m_iNumIndices;
-}
-
-
-
+    for (auto& mesh : *Meshes_VIBuffers) {
 #pragma region VERTEX_BUFFER
 
-    D3D11_BUFFER_DESC           VertexBufferDesc{};
-    VertexBufferDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
-    VertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    VertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    VertexBufferDesc.StructureByteStride = m_iVertexStride;
-    VertexBufferDesc.CPUAccessFlags = 0;
-    VertexBufferDesc.MiscFlags = 0;
+        D3D11_BUFFER_DESC           VertexBufferDesc{};
+        VertexBufferDesc.ByteWidth = static_cast<UINT>(mesh.vertices->size() * sizeof(VTXTEX));
+        VertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        VertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        VertexBufferDesc.StructureByteStride = mesh.m_iVertexStride;
+        VertexBufferDesc.CPUAccessFlags = 0;
+        VertexBufferDesc.MiscFlags = 0;
 
-    std::shared_ptr<vector<VTXTEX>> pVertices = make_shared<vector<VTXTEX>>();
-    pVertices->reserve(m_iNumVertices);
-    
-    for (auto& mesh : *Meshes_VIBuffers) {
-        for (auto vertices : *(mesh.vertices)) {
-            (*pVertices).emplace_back(vertices);
+        D3D11_SUBRESOURCE_DATA          VertexInitialData{};
+        VertexInitialData.pSysMem = mesh.vertices->data();
+
+        if (FAILED(m_pDevice->CreateBuffer(&VertexBufferDesc, &VertexInitialData, mesh.m_pVB.GetAddressOf()))) {
+
+            return E_FAIL;
         }
-    }
-    
-    
 
-    D3D11_SUBRESOURCE_DATA          VertexInitialData{};
-    VertexInitialData.pSysMem = pVertices->data();
-
-    if (FAILED(m_pDevice->CreateBuffer(&VertexBufferDesc, &VertexInitialData, &m_pVB))) {
-  
-        return E_FAIL;
-    }
-     
 
 #pragma endregion
 
 
 #pragma region INDEX_BUFFER
-    D3D11_BUFFER_DESC           IndexBufferDesc{};
-    IndexBufferDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
-    IndexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    IndexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    IndexBufferDesc.StructureByteStride = m_iIndexStride;
-    IndexBufferDesc.CPUAccessFlags = 0;
-    IndexBufferDesc.MiscFlags = 0;
+        D3D11_BUFFER_DESC           IndexBufferDesc{};
+        IndexBufferDesc.ByteWidth = static_cast<UINT>(mesh.indices->size() * sizeof(uint16_t));
+        IndexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        IndexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        IndexBufferDesc.StructureByteStride = mesh.m_iIndexStride;
+        IndexBufferDesc.CPUAccessFlags = 0;
+        IndexBufferDesc.MiscFlags = 0;
 
-    std::shared_ptr<vector<uint16_t>> pIndices = make_shared<vector<uint16_t>>();
-    pVertices->reserve(m_iNumIndices);
 
-    for (auto& mesh : *Meshes_VIBuffers) {
-        for (auto& indices : *(mesh.indices)) {
-            (*pIndices).emplace_back(indices);
-        }
-    }
 
-    D3D11_SUBRESOURCE_DATA          IndexInitialData{};
-    IndexInitialData.pSysMem = pIndices->data();
+        D3D11_SUBRESOURCE_DATA          IndexInitialData{};
+        IndexInitialData.pSysMem = mesh.indices->data();
 
-    if (FAILED(m_pDevice->CreateBuffer(&IndexBufferDesc, &IndexInitialData, &m_pIB)))
-        return E_FAIL;
+        if (FAILED(m_pDevice->CreateBuffer(&IndexBufferDesc, &IndexInitialData, mesh.m_pIB.GetAddressOf())))
+            return E_FAIL;
 
 #pragma endregion
+    }
+
 
     
     return S_OK;
@@ -181,9 +153,9 @@ void VIBuffer_Fbx::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         // Normal
         if (mesh->HasNormals())
         {
-            v.vNormal.x = mesh->mNormals[i].x;
-            v.vNormal.y = mesh->mNormals[i].y;
-            v.vNormal.z = mesh->mNormals[i].z;
+            //v.vNormal.x = mesh->mNormals[i].x;
+            //v.vNormal.y = mesh->mNormals[i].y;
+            //v.vNormal.z = mesh->mNormals[i].z;
         }
 
         // UV
@@ -196,9 +168,9 @@ void VIBuffer_Fbx::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         // Tangent
         if (mesh->HasTangentsAndBitangents())
         {
-            v.vTangent.x = mesh->mTangents[i].x;
+        /*    v.vTangent.x = mesh->mTangents[i].x;
             v.vTangent.y = mesh->mTangents[i].y;
-            v.vTangent.z = mesh->mTangents[i].z;
+            v.vTangent.z = mesh->mTangents[i].z;*/
         }
 
         (*Meshes.vertices).emplace_back(v);

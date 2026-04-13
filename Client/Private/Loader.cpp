@@ -94,14 +94,23 @@ HRESULT CLoader::Loading_For_GamePlay()
 HRESULT CLoader::Loading_For_MapEditor()
 {
 
+#pragma region Shader Component Prototype
 
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex"),
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Vtx_Fbx.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
+		return E_FAIL;
 
-
+#pragma endregion
 
 #pragma region VIBuffer Component Prototype
 	/* Prototype_GameObject_TestModel */
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
 		VIBuffer_Fbx::Create(m_pDevice, m_pContext, "../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx")))){
+		return E_FAIL;
+	}
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
+		VIBuffer_Rect::Create(m_pDevice, m_pContext)))) {
 		return E_FAIL;
 	}
 #pragma endregion

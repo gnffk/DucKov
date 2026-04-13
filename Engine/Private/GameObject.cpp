@@ -1,5 +1,8 @@
 #include "GameObject.h"
 
+#include "Transform.h"
+#include "GameInstance.h"
+
 GameObject::GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -53,4 +56,28 @@ void GameObject::Late_Update(_float fTimeDelta)
 HRESULT GameObject::Render()
 {
 	return S_OK;
+}
+
+HRESULT GameObject::Add_Component(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, shared_ptr<Component>& pOut, void* pArg)
+{
+	if (nullptr != Find_Component(strComponentTag))
+		return E_FAIL;
+
+	auto	pComponent = dynamic_pointer_cast<Component>(CGameInstance::Get().Clone_Prototype(iPrototypeLevelIndex, strPrototypeTag, pArg));
+	if (nullptr == pComponent)
+		return E_FAIL;
+
+	m_Components.emplace(strComponentTag, pComponent);
+	
+	pOut = pComponent;
+	return S_OK;
+}
+
+shared_ptr<class Component> GameObject::Find_Component(const _wstring& strComponentTag)
+{
+	auto	iter = m_Components.find(strComponentTag);
+	if (iter == m_Components.end())
+		return nullptr;
+
+	return iter->second;
 }

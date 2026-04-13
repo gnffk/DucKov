@@ -70,6 +70,12 @@
     <Filter Include="05.GameObject\Camera">
       <UniqueIdentifier>{bf83737a-d9ea-4998-8a05-3f7352155fb1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\Shader">
+      <UniqueIdentifier>{7cf50a54-085a-4cba-bdd5-b6667a5f03ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="06.Component\VIBuffer\Test">
+      <UniqueIdentifier>{2c6acf3a-bb1c-4755-a39a-90f291498126}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -159,6 +165,12 @@
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp">
       <Filter>98.ImGui\ImGUIzmo</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Shader.cpp">
+      <Filter>06.Component\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Rect.cpp">
+      <Filter>06.Component\VIBuffer\Test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -229,6 +241,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Transform.h">
       <Filter>06.Component\Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Shader.h">
+      <Filter>06.Component\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Rect.h">
+      <Filter>06.Component\VIBuffer\Test</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

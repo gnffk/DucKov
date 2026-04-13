@@ -25,24 +25,28 @@ HRESULT VIBuffer::Initialize(void* pArg)
 HRESULT VIBuffer::Bind_Resources()
 {
 
+    for (auto& mesh : *Meshes_VIBuffers) {
+        ID3D11Buffer* pVertexBuffers[] = {
+            mesh.m_pVB.Get(),
+       // m_pVBInstance.Get(), 
+        };
 
-    ID3D11Buffer* pVertexBuffers[] = {
-        m_pVB.Get(),
-        // m_pVBInstance.Get(), 
-    };
+        uint32_t       iVertexStrides[] = {
+             mesh.m_iVertexStride,
+        };
+
+        uint32_t        iOffSets[] = {
+            0,
+
+        };
+
+        m_pContext->IASetVertexBuffers(0, mesh.m_iNumVertexBuffers, pVertexBuffers, iVertexStrides, iOffSets);
+        m_pContext->IASetIndexBuffer(mesh.m_pIB.Get(), mesh.m_eIndexFormat, 0);
+        m_pContext->IASetPrimitiveTopology(mesh.m_ePrimitiveType);
+
     
-    uint32_t       iVertexStrides[] = {
-        m_iVertexStride,
-    };
-
-    uint32_t        iOffSets[] = {
-        0,
-
-    };
-
-    m_pContext->IASetVertexBuffers(0, m_iNumVertexBuffers, pVertexBuffers, iVertexStrides, iOffSets);
-    m_pContext->IASetIndexBuffer(m_pIB.Get(), m_eIndexFormat, 0);
-    m_pContext->IASetPrimitiveTopology(m_ePrimitiveType);
+    }
+   
 
     return S_OK;
 }
@@ -53,8 +57,12 @@ HRESULT VIBuffer::Render()
         return E_FAIL;
 
  
+    for (auto& mesh : *Meshes_VIBuffers) {
+ 
 
-    m_pContext->DrawIndexed(m_iNumIndices, 0, 0);
+        m_pContext->DrawIndexed(mesh.m_iNumIndices, 0, 0);
+    }
+   
 
     return S_OK;
 }

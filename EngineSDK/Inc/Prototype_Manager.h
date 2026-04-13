@@ -1,6 +1,9 @@
 #pragma once
 #include "GameObject.h"
 #include "Component.h"
+#include "Shader.h"
+#include "VIBuffer_Fbx.h"
+#include "VIBuffer_Rect.h"
 
 NS_BEGIN(Engine)
 

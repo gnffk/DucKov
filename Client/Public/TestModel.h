@@ -1,7 +1,13 @@
 #pragma once
 #include "Client_Defines.h"
 #include "GameObject.h"
-#include "VIBuffer_Fbx.h"
+
+
+NS_BEGIN(Engine)
+class VIBuffer_Fbx;
+class VIBuffer_Rect;
+class Shader;
+NS_END
 
 NS_BEGIN(Client)
 
@@ -26,11 +32,15 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	HRESULT Ready_Components();
 	void CreateViewAndPerspective();
 private:
 	uint32_t			m_iData = {};
+private:
+	//shared_ptr<VIBuffer_Fbx>	m_pVIBufferCom = { nullptr };
+	shared_ptr<VIBuffer_Rect>	m_pVIBufferCom = { nullptr };
+	shared_ptr<Shader>			m_pShaderCom = { nullptr };
 
-	shared_ptr<Engine::VIBuffer_Fbx>	m_pViBuffer = { nullptr };
 
 public:
 	static unique_ptr<TestModel> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

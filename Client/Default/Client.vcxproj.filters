@@ -31,6 +31,9 @@
     <Filter Include="02. GameObject">
       <UniqueIdentifier>{f53b673a-829b-4eee-a8da-9ae4b4a48719}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97. ShaderFiles">
+      <UniqueIdentifier>{0ada410e-46fe-4a03-bc6e-d1b739f37aa0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -111,5 +114,10 @@
     <ClCompile Include="..\Private\TestModel.cpp">
       <Filter>02. GameObject</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
