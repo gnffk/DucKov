@@ -52,10 +52,6 @@ HRESULT TestModel::Initialize(void* pArg)
 	}
 
 
-	m_pShader =  static_pointer_cast<BaseShaderDX11>((CGameInstance::Get().Find_Resources(ETOUI(ERESOURCE::SHADER),L"Shader_Base")));
-	if (nullptr == m_pViBuffer) {
-		return E_FAIL;
-	}
 	return S_OK;
 }
 
@@ -76,11 +72,10 @@ void TestModel::Late_Update(_float fTimeDelta)
 
 HRESULT TestModel::Render()
 {
-	m_pShader->SetShader();
 
-	m_pViBuffer->Bind_Resources();
+	//m_pViBuffer->Bind_Resources();
 
-	m_pViBuffer->Render();
+	//m_pViBuffer->Render();
 	return S_OK;
 }
 

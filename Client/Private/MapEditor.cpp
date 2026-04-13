@@ -19,7 +19,7 @@ HRESULT MapEditor::Initialize()
 
 void MapEditor::Update(_float fTimeDelta)
 {
-	IMGUI_Update();
+
 
 }
 
@@ -36,6 +36,8 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 
 HRESULT MapEditor::Render()
 {
+	IMGUI_Render();
+
 
 	return S_OK;
 }
@@ -50,7 +52,7 @@ unique_ptr<MapEditor> MapEditor::Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3
 	return pInstance;
 }
 
-void MapEditor::IMGUI_Update() {
+void MapEditor::IMGUI_Render() {
 #if _DEBUG
 	ImGui::Begin(u8"¸Ê ¿¡µðÅÍ", nullptr, ImGuiWindowFlags_NoTitleBar);
 	ImGui::Text(u8"¸Ê ¿¡µðÅÍ");

@@ -17,7 +17,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	HRESULT Ready_Layer_MapEditor(const _wstring& strLayerTag);
 	virtual HRESULT Render() override;
-	void	IMGUI_Update();
+	void	IMGUI_Render();
 	
 
 

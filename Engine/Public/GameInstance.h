@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Prototype_Manager.h"
-#include "Resource_Manager.h"
+
 
 NS_BEGIN(Engine)
 
@@ -56,10 +56,7 @@ public:
 	HRESULT Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObject> pRenderObject);
 #pragma endregion
 
-#pragma region RESOURCE_MANAGER
-	shared_ptr<Resource> Find_Resources(uint32_t num, wstring key);
-	HRESULT Add_Resource(ERESOURCE num, wstring key, shared_ptr<Resource> pResource);
-#pragma endregion
+
 private:
 	unique_ptr<class Graphic_Device>				m_pGraphic_Device = { nullptr };
 	unique_ptr<class ImGUI_Manager>					m_pImGUI_Manager = { nullptr };
@@ -68,7 +65,7 @@ private:
 	unique_ptr<class Prototype_Manager>				m_pPrototype_Manager = { nullptr };
 	unique_ptr<class Object_Manager>				m_pObject_Manager = { nullptr };
 	unique_ptr<class Renderer>						m_pRenderer = { nullptr };
-	unique_ptr<class Resource_Manager>			    m_pResource_Manager = { nullptr };
+
 
 public:
 	void			Release_Engine();

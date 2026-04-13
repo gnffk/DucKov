@@ -19,11 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Public\BaseShaderDX11.h" />
     <ClInclude Include="..\Public\Component.h" />
-    <ClInclude Include="..\Public\Material.h" />
-    <ClInclude Include="..\Public\Shader.h" />
-    <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\VIBuffer_Fbx.h" />
     <ClInclude Include="..\Public\ImGUI_Manager.h" />
     <ClInclude Include="..\Public\Renderer.h" />
@@ -42,8 +38,6 @@
     <ClInclude Include="..\Public\Object_Manager.h" />
     <ClInclude Include="..\Public\Prototype.h" />
     <ClInclude Include="..\Public\Prototype_Manager.h" />
-    <ClInclude Include="..\Public\Resource.h" />
-    <ClInclude Include="..\Public\Resource_Manager.h" />
     <ClInclude Include="..\Public\Timer.h" />
     <ClInclude Include="..\Public\Timer_Manager.h" />
     <ClInclude Include="..\Public\Transform.h" />
@@ -83,12 +77,8 @@
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp" />
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp" />
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp" />
-    <ClCompile Include="..\Private\BaseShaderDX11.cpp" />
     <ClCompile Include="..\Private\CLevel.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
-    <ClCompile Include="..\Private\Material.cpp" />
-    <ClCompile Include="..\Private\Shader.cpp" />
-    <ClCompile Include="..\Private\Texture.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Fbx.cpp" />
     <ClCompile Include="..\Private\ImGUI_Manager.cpp" />
     <ClCompile Include="..\Private\Renderer.cpp" />
@@ -100,18 +90,10 @@
     <ClCompile Include="..\Private\Object_Manager.cpp" />
     <ClCompile Include="..\Private\Prototype.cpp" />
     <ClCompile Include="..\Private\Prototype_Manager.cpp" />
-    <ClCompile Include="..\Private\Resource.cpp" />
-    <ClCompile Include="..\Private\Resource_Manager.cpp" />
     <ClCompile Include="..\Private\Timer.cpp" />
     <ClCompile Include="..\Private\Timer_Manager.cpp" />
     <ClCompile Include="..\Private\Transform.cpp" />
     <ClCompile Include="..\Private\VIBuffer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\..\Resources\Shaders\Shader_Base.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

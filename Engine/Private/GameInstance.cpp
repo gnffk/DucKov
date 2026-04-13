@@ -30,10 +30,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     m_pRenderer = Renderer::Create(pOutDevice, pOutDeviceContext);
     if (nullptr == m_pRenderer)
         return E_FAIL;
-    
-    m_pResource_Manager = Resource_Manager::Create(pOutDevice, pOutDeviceContext);
-    if (nullptr == m_pResource_Manager)
-        return E_FAIL;
+
 
     m_pPrototype_Manager = Prototype_Manager::Create(Engine_Desc.iNumLevels);
     if (nullptr == m_pPrototype_Manager)
@@ -86,7 +83,7 @@ void CGameInstance::Clear_Resource(uint32_t iClearLevelIndex)
 {
     m_pObject_Manager->Clear(iClearLevelIndex);
     m_pPrototype_Manager->Clear(iClearLevelIndex);
-    m_pResource_Manager->Clear();
+   
 }
 
 
@@ -161,18 +158,7 @@ HRESULT CGameInstance::Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<Gam
 }
 #pragma endregion
 
-#pragma region Resource_Manager
 
-
-shared_ptr<Resource> CGameInstance::Find_Resources(uint32_t num, wstring key)
-{
-    return m_pResource_Manager->Find_Resource(num,key);
-}
-
-HRESULT CGameInstance::Add_Resource(ERESOURCE num, wstring key, shared_ptr<Resource> pResource) {
-    return m_pResource_Manager->Add_Resource(num, key, std::move(pResource));
-}
-#pragma endregion
 
 #pragma region IMGUI_MANAGER
 HRESULT CGameInstance::WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -193,8 +179,6 @@ void CGameInstance::Release_Engine()
     m_pObject_Manager.reset();
 
     m_pPrototype_Manager.reset();
-
-    m_pResource_Manager.reset();
 
     m_pImGUI_Manager.reset();
 

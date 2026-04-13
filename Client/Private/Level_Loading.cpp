@@ -58,7 +58,7 @@ void Level_Loading::Update(_float fTimeDelta)
 			}
 
 			if (FAILED(CGameInstance::Get().Change_Level(ETOUI(m_eNextLevelIndex), std::move(pNewLevel)))) {
-
+				ImGui::End();
 				return;
 			}
 		}

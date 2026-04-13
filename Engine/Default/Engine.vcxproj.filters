@@ -64,32 +64,11 @@
     <Filter Include="06.Component\VIBuffer\fbx">
       <UniqueIdentifier>{640a9aad-3471-473c-8347-15d3686d2746}</UniqueIdentifier>
     </Filter>
-    <Filter Include="08.Resource">
-      <UniqueIdentifier>{04c9d799-b9ad-4186-a1a9-dd411c18564b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08.Resource\Manager">
-      <UniqueIdentifier>{8e85e7e9-17c0-4361-b2fb-ef74c190af3a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="06.Component\Transform">
       <UniqueIdentifier>{6b1c9871-e341-4926-9d31-2203c8df479a}</UniqueIdentifier>
     </Filter>
     <Filter Include="05.GameObject\Camera">
       <UniqueIdentifier>{bf83737a-d9ea-4998-8a05-3f7352155fb1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08.Resource\Shader">
-      <UniqueIdentifier>{2c2dd43b-9a8c-4b60-891f-0aca875ed636}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08.Resource\Shader\HLSL">
-      <UniqueIdentifier>{8bafd80c-a923-41eb-9d67-386de7644b1a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08.Resource\Shader\ShaderType">
-      <UniqueIdentifier>{843c003c-c4b7-454c-bf4b-fb907afa1f30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08.Resource\Material">
-      <UniqueIdentifier>{3032a17a-56d1-4aeb-bbb4-75365c63e762}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08.Resource\Texture">
-      <UniqueIdentifier>{fbcb140d-414c-477c-a2bc-ccf8e3e4388b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -162,12 +141,6 @@
     <ClCompile Include="..\Private\VIBuffer_Fbx.cpp">
       <Filter>06.Component\VIBuffer\fbx</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Resource_Manager.cpp">
-      <Filter>08.Resource\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Resource.cpp">
-      <Filter>08.Resource</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Transform.cpp">
       <Filter>06.Component\Transform</Filter>
     </ClCompile>
@@ -185,18 +158,6 @@
     </ClCompile>
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp">
       <Filter>98.ImGui\ImGUIzmo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Shader.cpp">
-      <Filter>08.Resource\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\BaseShaderDX11.cpp">
-      <Filter>08.Resource\Shader\ShaderType</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Material.cpp">
-      <Filter>08.Resource\Material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Texture.cpp">
-      <Filter>08.Resource\Texture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -266,31 +227,8 @@
     <ClInclude Include="..\Public\VIBuffer_Fbx.h">
       <Filter>06.Component\VIBuffer\fbx</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Resource_Manager.h">
-      <Filter>08.Resource\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Resource.h">
-      <Filter>08.Resource</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Transform.h">
       <Filter>06.Component\Transform</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Shader.h">
-      <Filter>08.Resource\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\BaseShaderDX11.h">
-      <Filter>08.Resource\Shader\ShaderType</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Material.h">
-      <Filter>08.Resource\Material</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Texture.h">
-      <Filter>08.Resource\Texture</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\..\Resources\Shaders\Shader_Base.hlsl">
-      <Filter>08.Resource\Shader\HLSL</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>

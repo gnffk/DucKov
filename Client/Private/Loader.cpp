@@ -1,7 +1,7 @@
 #include "Loader.h"
 #include "GameInstance.h"
 #include "TestModel.h"
-#include "BaseShaderDX11.h"
+
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -97,12 +97,6 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 
 
-#pragma region Shader Resource
-	if (FAILED(CGameInstance::Get().Add_Resource(Engine::ERESOURCE::SHADER,L"Shader_Base", BaseShaderDX11::Create(m_pDevice, m_pContext)))) {
-		return E_FAIL;
-	}
-
-#pragma endregion
 
 #pragma region VIBuffer Component Prototype
 	/* Prototype_GameObject_TestModel */
