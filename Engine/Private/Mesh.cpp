@@ -14,9 +14,9 @@ Mesh::~Mesh()
 
 HRESULT Mesh::Initialize_Prototype(shared_ptr<vector<VTXTEX>> pvertices, shared_ptr<vector<uint16_t>> pindices, wstring ModelName, uint32_t m_iLevelIndex)
 {
-    std::wstring prototypeTag = L"Prototype_Component_VIBuffer_Mesh" + ModelName;
+    std::wstring prototypeTag = L"Prototype_Component_VIBuffer_Mesh_" + ModelName;
 
-    if (FAILED(CGameInstance::Get().Add_Prototype(m_iLevelIndex, ModelName, VIBuffer_Mesh::Create(m_pDevice, m_pContext, pvertices, pindices)))) {
+    if (FAILED(CGameInstance::Get().Add_Prototype(m_iLevelIndex, prototypeTag, VIBuffer_Mesh::Create(m_pDevice, m_pContext, pvertices, pindices)))) {
         return E_FAIL;
     }
     return S_OK;

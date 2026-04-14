@@ -43,7 +43,7 @@ private:
 	//shared_ptr<VIBuffer_Rect>	m_pVIBufferCom = { nullptr };
 
 	shared_ptr<Model>			m_pModelCom = { nullptr };
-	vector<shared_ptr<VIBuffer_Mesh>>	m_pVIBufferComs = { nullptr };
+	vector<shared_ptr<VIBuffer_Mesh>>	m_pVIBufferComs;
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
 
 

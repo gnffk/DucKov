@@ -27,7 +27,7 @@ HRESULT VIBuffer::Bind_Resources()
 
    
     ID3D11Buffer* pVertexBuffers[] = {
-       m_pVB.Get(),
+        m_pVB.Get(),
         // m_pVBInstance.Get(), 
     };
     

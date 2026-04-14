@@ -69,7 +69,7 @@ HRESULT TestModel::Render()
 		return E_FAIL;
 
 	
-	for (auto& m_pVIBufferCom : m_pVIBufferComs) {
+	for (auto m_pVIBufferCom : m_pVIBufferComs) {
 		if (FAILED(m_pVIBufferCom->Bind_Resources()))
 			return E_FAIL;
 
@@ -107,13 +107,14 @@ HRESULT TestModel::Ready_Components()
 	m_pShaderCom = dynamic_pointer_cast<Shader>(ShaderCom);
 	
 
-	m_pVIBufferComs.reserve(m_pModelCom->GetMeshNames().size());
 
-	for (int i = 0; i < m_pModelCom->GetMeshNames().size(); ++i) {
-	
-		auto pVIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferComs[i]);
 
- 		std::wstring FindTag= L"Prototype_Component_Mesh_" + m_pModelCom->GetMeshNames()[i];
+	for (int i = 0; i < m_pModelCom->GetMeshNames().size(); i++) {
+		shared_ptr<Component> DummyVIBufferCom;
+
+		auto pVIBufferCom = dynamic_pointer_cast<Component>(DummyVIBufferCom);
+
+ 		std::wstring FindTag= L"Prototype_Component_VIBuffer_Mesh_" + m_pModelCom->GetMeshNames()[i];
 		std::wstring TagGameObject= L"Com_" + m_pModelCom->GetMeshNames()[i];
 		if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), FindTag,
 			TagGameObject, pVIBufferCom)))

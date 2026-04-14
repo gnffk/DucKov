@@ -97,7 +97,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx"))))
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/Duck_Jeff.fbx"))))
 		return E_FAIL;
 
 #pragma endregion

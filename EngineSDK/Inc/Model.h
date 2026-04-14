@@ -25,7 +25,7 @@ public:
 
 
 public:
-	// 유도리 있게
+	// 유도리 있게 찡긋
 	vector<wstring>& GetMeshNames() { return meshNames; }
 	
 private:
