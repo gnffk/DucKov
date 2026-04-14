@@ -21,18 +21,9 @@ HRESULT Level_Logo::Initialize()
 void Level_Logo::Update(_float fTimeDelta)
 {
 #if _DEBUG
-	ImGui::Begin("NEXT_SCENE", nullptr, ImGuiWindowFlags_NoTitleBar);
+	
 
-
-	ImGui::Text(u8"다음 씬으로 넘어가기");
-	if (ImGui::Button(u8"게임 플레이")) {
-		if (FAILED(CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING),
-			Level_Loading::Create(m_pDevice, m_pDeviceContext, LEVEL::GAMEPLAY)))) {
-
-			return;
-		}
-	}
-	if (ImGui::Button(u8"맵 에디터")) {
+	if (GetKeyState(VK_SPACE) & 0x8000) {
 		if (FAILED(CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING),
 			Level_Loading::Create(m_pDevice, m_pDeviceContext, LEVEL::MAPEDITOR)))) {
 
@@ -40,7 +31,7 @@ void Level_Logo::Update(_float fTimeDelta)
 		}
 	}
 	
-	ImGui::End();
+
 #endif
 }
 

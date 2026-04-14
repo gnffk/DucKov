@@ -22,6 +22,15 @@ public:
 
 	void Shutdown();
 
+public:
+	ComPtr<ID3D11RenderTargetView>& Get_BackBufferRTV() {
+		return m_pBackBufferRTV;
+	};
+	ComPtr<ID3D11DepthStencilView>& Get_DepthStencilView() {
+		return m_pDepthStencilView;
+	};
+
+
 private:
 	ComPtr<ID3D11Device>		m_pDevice{ nullptr };
 

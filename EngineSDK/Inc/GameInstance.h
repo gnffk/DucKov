@@ -50,6 +50,7 @@ public:
 
 #pragma region IMGUI_MANAGER
 	HRESULT WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void Render_IMGUI();
 #pragma endregion
 
 #pragma region RENDERER

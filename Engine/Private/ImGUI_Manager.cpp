@@ -11,57 +11,62 @@ ImGUI_Manager::~ImGUI_Manager()
     ImGui::DestroyContext();
 }
 
-HRESULT ImGUI_Manager::Initialize(HWND hWnd, ComPtr<ID3D11Device> p_Device, ComPtr<ID3D11DeviceContext> p_DeviceContext)
+HRESULT ImGUI_Manager::Initialize(HWND hWnd,
+    ComPtr<ID3D11Device> p_Device,
+    ComPtr<ID3D11DeviceContext> p_DeviceContext,
+    ComPtr<ID3D11RenderTargetView> p_MainRTV,
+    ComPtr<ID3D11DepthStencilView> p_MainDSV)
 {
-    // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
 
-    // Setup Platform/Renderer backends
+    // 멀티 뷰포트용 권장 스타일
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
+
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX11_Init(p_Device.Get(), p_DeviceContext.Get());
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //io.Fonts->AddFontDefault();
-    ImFont* font = io.Fonts->AddFontFromFileTTF("../../Resources/Fonts/NanumGothic.ttf", 14.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+    ImFont* font = io.Fonts->AddFontFromFileTTF(
+        "../../Resources/Fonts/NanumGothic.ttf",
+        14.0f,
+        nullptr,
+        io.Fonts->GetGlyphRangesKorean());
 
-    if (font == nullptr) {
-        // 만약 폰트 로드에 실패하면 기본 폰트라도 사용하게 설정
+    if (!font)
         io.Fonts->AddFontDefault();
-    }
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != NULL);
 
     m_pDevice = p_Device;
     m_pDeviceContext = p_DeviceContext;
-    D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+    m_pMainRTV = p_MainRTV;
+    m_pMainDSV = p_MainDSV;
 
-    dsDesc.DepthEnable = FALSE;       
-    dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO; 
+    UINT numViewports = 1;
+    m_pDeviceContext->RSGetViewports(&numViewports, &m_MainViewport);
+
+    D3D11_DEPTH_STENCIL_DESC dsDesc{};
+    dsDesc.DepthEnable = FALSE;
+    dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
     dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
-    m_pDevice->CreateDepthStencilState(&dsDesc, &pDepthDisabledState);
 
- 
+    HRESULT hr = m_pDevice->CreateDepthStencilState(&dsDesc, &pDepthDisabledState);
+    if (FAILED(hr))
+        return hr;
+
     return S_OK;
+
+
 }
 
 void ImGUI_Manager::Update_Imgui(_float fTimeDelta)
@@ -82,7 +87,6 @@ void ImGUI_Manager::Render_Imgui()
 
     m_pDeviceContext->OMSetDepthStencilState(pDepthDisabledState.Get(), 0);
 
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
@@ -90,8 +94,12 @@ void ImGUI_Manager::Render_Imgui()
     {
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-    }
 
+        // 핵심: 메인 렌더 타겟/깊이 버퍼/뷰포트 복구
+        m_pDeviceContext->OMSetRenderTargets(1, m_pMainRTV.GetAddressOf(), m_pMainDSV.Get());
+        m_pDeviceContext->RSSetViewports(1, &m_MainViewport);
+        m_pDeviceContext->OMSetDepthStencilState(pDepthDisabledState.Get(), 0);
+    }
 }
 
 bool ImGUI_Manager::ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -104,11 +112,15 @@ bool ImGUI_Manager::ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPA
     return false;
 }
 
-unique_ptr<ImGUI_Manager> ImGUI_Manager::Create(HWND hWnd, ComPtr<ID3D11Device>& pOutDevice, ComPtr<ID3D11DeviceContext>& pOutContext)
+unique_ptr<ImGUI_Manager> ImGUI_Manager::Create(HWND hWnd, 
+    ComPtr<ID3D11Device>& p_Device,
+    ComPtr<ID3D11DeviceContext>& p_DeviceContext,
+    ComPtr<ID3D11RenderTargetView>& p_MainRTV,
+    ComPtr<ID3D11DepthStencilView>& p_MainDSV)
 {
     auto		pInstance = unique_ptr<ImGUI_Manager>(new ImGUI_Manager());
 
-    if (FAILED(pInstance->Initialize(hWnd,  pOutDevice, pOutContext)))
+    if (FAILED(pInstance->Initialize(hWnd, p_Device, p_DeviceContext, p_MainRTV, p_MainDSV)))
     {
         MSG_BOX("Failed to Created : ImGUI_Manager");
 

@@ -78,6 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
                 p_MainGame->Update(CGameInstance::Get().Get_TimeDelta(TEXT("Timer_Default")));
                 p_MainGame->Render();
+             
                 fTimeAcc = 0.f;
 
             }

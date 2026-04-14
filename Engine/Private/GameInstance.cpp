@@ -23,7 +23,9 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pGraphic_Device)
         return E_FAIL;
 
-    m_pImGUI_Manager = ImGUI_Manager::Create(Engine_Desc.hWnd,  pOutDevice, pOutDeviceContext);
+
+
+    m_pImGUI_Manager = ImGUI_Manager::Create(Engine_Desc.hWnd,  pOutDevice, pOutDeviceContext, m_pGraphic_Device->Get_BackBufferRTV(), m_pGraphic_Device->Get_DepthStencilView());
     if (nullptr == m_pImGUI_Manager)
         return E_FAIL;
 
@@ -75,7 +77,6 @@ HRESULT CGameInstance::Draw()
         return E_FAIL;
 
     m_pImGUI_Manager->Render_Imgui();
-
     return S_OK;
 }
 
@@ -165,6 +166,13 @@ HRESULT CGameInstance::WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 {
     return m_pImGUI_Manager->ImGui_WndProcHandler(hWnd,msg,wParam,lParam);
 }
+
+void CGameInstance::Render_IMGUI()
+{
+    return m_pImGUI_Manager->Render_Imgui();
+
+}
+
 #pragma endregion
 
 

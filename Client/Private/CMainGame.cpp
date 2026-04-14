@@ -62,6 +62,8 @@ HRESULT Client::CMainGame::Render()
 	if (FAILED(CGameInstance::Get().Present()))
 		return E_FAIL;
 
+
+
 	return S_OK;
 }
 

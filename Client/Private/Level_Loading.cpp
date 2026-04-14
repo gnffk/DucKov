@@ -35,13 +35,9 @@ HRESULT Level_Loading::Initialize(LEVEL eNextLevelIndex)
 void Level_Loading::Update(_float fTimeDelta)
 {
 	
-	if (true == m_pLoader->isFinished())
+	if (true == m_pLoader->isFinished() && GetKeyState(VK_SPACE) & 0x8000)
 	{
-		ImGui::Begin("NEXT_SCENE", nullptr, ImGuiWindowFlags_NoTitleBar);
-
-
-		ImGui::Text(u8"로딩 완료");
-		if (ImGui::Button(u8"다음 씬")) {
+		
 			unique_ptr<CLevel>		pNewLevel = { nullptr };
 
 			switch (m_eNextLevelIndex)
@@ -58,12 +54,10 @@ void Level_Loading::Update(_float fTimeDelta)
 			}
 
 			if (FAILED(CGameInstance::Get().Change_Level(ETOUI(m_eNextLevelIndex), std::move(pNewLevel)))) {
-				ImGui::End();
+			
 				return;
 			}
-		}
-
-		ImGui::End();
+		
 		
 	}
 }
