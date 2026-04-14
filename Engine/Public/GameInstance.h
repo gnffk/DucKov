@@ -40,6 +40,7 @@ public:
 #pragma region PROTOTYPE_MANAGER
 	HRESULT Add_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, unique_ptr<class Prototype> pPrototype);
 	shared_ptr<Prototype> Clone_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	vector<wstring> Get_PrototypeNames(uint32_t levelIndex);
 #pragma endregion
 
 

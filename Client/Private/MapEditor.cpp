@@ -55,11 +55,19 @@ unique_ptr<MapEditor> MapEditor::Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3
 
 void MapEditor::IMGUI_Render() {
 #if _DEBUG
-	ImGui::Begin(u8"맵 에디터", nullptr, ImGuiWindowFlags_NoTitleBar);
-	ImGui::Text(u8"맵 에디터");
+	ImGui::Begin(u8"Prototype Manager", nullptr, ImGuiWindowFlags_NoTitleBar);
+	ImGui::Text(u8"초기 프로토타입");
 
-	
+
+
+	auto names = CGameInstance::Get().Get_PrototypeNames(ETOUI(LEVEL::MAPEDITOR));
+	for (auto& name : names)
+	{
+		ImGui::Text(u8"%ls", name.c_str());
+	}
 	ImGui::End();
+
+
 #endif
 
 }

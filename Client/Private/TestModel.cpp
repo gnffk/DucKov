@@ -46,6 +46,7 @@ void TestModel::Priority_Update(_float fTimeDelta)
 void TestModel::Update(_float fTimeDelta)
 {
 
+
 }
 
 void TestModel::Late_Update(_float fTimeDelta)
@@ -55,21 +56,42 @@ void TestModel::Late_Update(_float fTimeDelta)
 
 HRESULT TestModel::Render()
 {
-	_float4x4		IdentityMatrix = {};
-	XMStoreFloat4x4(&IdentityMatrix, XMMatrixIdentity());
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &IdentityMatrix)))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &IdentityMatrix)))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &IdentityMatrix)))
-		return E_FAIL;
+	for (auto m_pVIBufferCom : m_pVIBufferComs) {
 
-	if (FAILED(m_pShaderCom->Begin(0)))
-		return E_FAIL;
+		_float4x4 World, View, Proj;
+
+		// 1. World = Identity (원점에 배치)
+		XMStoreFloat4x4(&World, XMMatrixIdentity());
+
+		// 2. View = 카메라 위치 (뒤에서 바라보기)
+		XMVECTOR vEye = XMVectorSet(0.f, 0.f, -200.f, 1.f); // 카메라 위치
+		XMVECTOR vAt = XMVectorSet(0.f, 0.f, 0.f, 1.f);  // 보는 위치
+		XMVECTOR vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+		XMStoreFloat4x4(&View, XMMatrixLookAtLH(vEye, vAt, vUp));
+
+		// 3. Proj = 기본 원근 투영
+		float fAspect = 1280.f / 720.f;
+		XMStoreFloat4x4(&Proj, XMMatrixPerspectiveFovLH(
+			XMConvertToRadians(60.f),
+			fAspect,
+			0.1f,
+			100.f
+		));
 
 	
-	for (auto m_pVIBufferCom : m_pVIBufferComs) {
+
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
+
 		if (FAILED(m_pVIBufferCom->Bind_Resources()))
 			return E_FAIL;
 
@@ -94,28 +116,20 @@ HRESULT TestModel::Ready_Components()
 	//	return E_FAIL;
 	//m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Rect>(VIBufferCom);
 
+#pragma region 모델일때
 	auto ModelCom = dynamic_pointer_cast<Component>(m_pModelCom);
 	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
 		TEXT("Com_Model"), ModelCom)))
 		return E_FAIL;
 	m_pModelCom = dynamic_pointer_cast<Model>(ModelCom);
 
-	auto ShaderCom = dynamic_pointer_cast<Component>(m_pShaderCom);
-	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex"),
-		TEXT("Com_Shader"), ShaderCom)))
-		return E_FAIL;
-	m_pShaderCom = dynamic_pointer_cast<Shader>(ShaderCom);
-	
-
-
-
 	for (int i = 0; i < m_pModelCom->GetMeshNames().size(); i++) {
 		shared_ptr<Component> DummyVIBufferCom;
 
 		auto pVIBufferCom = dynamic_pointer_cast<Component>(DummyVIBufferCom);
 
- 		std::wstring FindTag= L"Prototype_Component_VIBuffer_Mesh_" + m_pModelCom->GetMeshNames()[i];
-		std::wstring TagGameObject= L"Com_" + m_pModelCom->GetMeshNames()[i];
+		std::wstring FindTag = L"Prototype_Component_VIBuffer_Mesh_" + m_pModelCom->GetMeshNames()[i];
+		std::wstring TagGameObject = L"Com_" + m_pModelCom->GetMeshNames()[i];
 		if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), FindTag,
 			TagGameObject, pVIBufferCom)))
 			return E_FAIL;
@@ -125,6 +139,15 @@ HRESULT TestModel::Ready_Components()
 		}
 		m_pVIBufferComs.emplace_back(dynamic_pointer_cast<VIBuffer_Mesh>(pVIBufferCom));
 	}
+#pragma endregion
+
+	auto ShaderCom = dynamic_pointer_cast<Component>(m_pShaderCom);
+	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex"),
+		TEXT("Com_Shader"), ShaderCom)))
+		return E_FAIL;
+	m_pShaderCom = dynamic_pointer_cast<Shader>(ShaderCom);
+	
+	
 	
 
 	return S_OK;

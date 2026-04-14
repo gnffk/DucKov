@@ -141,6 +141,10 @@ shared_ptr<Prototype> CGameInstance::Clone_Prototype(uint32_t iLevelIndex, const
 {
     return m_pPrototype_Manager->Clone_Prototype(iLevelIndex, strPrototypeTag, pArg);
 }
+
+vector<wstring> CGameInstance::Get_PrototypeNames(uint32_t levelIndex) {
+    return m_pPrototype_Manager->Get_PrototypeNames(levelIndex);
+}
 #pragma endregion
 
 #pragma region GAMEOBJECT_MANAGER

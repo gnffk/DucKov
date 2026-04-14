@@ -21,6 +21,23 @@ public:
 	HRESULT Add_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, unique_ptr<Prototype> pPrototype);
 	shared_ptr<Prototype> Clone_Prototype(uint32_t iLevelIndex, const _wstring& strPrototypeTag, void* pArg);
 	void Clear(uint32_t iClearLevelIndex);
+
+
+	vector<wstring> Get_PrototypeNames(uint32_t levelIndex)
+	{
+		vector<wstring> names;
+
+		PROTOTYPES& protos = m_pPrototypes[levelIndex];
+
+		for (auto& pair : protos)
+		{
+			names.push_back(pair.first); 
+		}
+
+		return names;
+	}
+
+
 private:
 	uint32_t m_iNumLevels{};
 
