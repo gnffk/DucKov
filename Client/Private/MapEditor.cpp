@@ -30,6 +30,7 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 		ETOUI(LEVEL::MAPEDITOR), strLayerTag)))
 		return E_FAIL;
 
+
 	return S_OK;
 }
 
@@ -56,6 +57,8 @@ void MapEditor::IMGUI_Render() {
 #if _DEBUG
 	ImGui::Begin(u8"¸Ê ¿¡µðÅÍ", nullptr, ImGuiWindowFlags_NoTitleBar);
 	ImGui::Text(u8"¸Ê ¿¡µðÅÍ");
+
+	
 	ImGui::End();
 #endif
 

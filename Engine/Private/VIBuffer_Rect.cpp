@@ -13,108 +13,91 @@ VIBuffer_Rect::~VIBuffer_Rect()
 
 HRESULT VIBuffer_Rect::Initialize_Prototype()
 {
-#pragma region mesh 바인딩
-    Meshes_VIBuffers = make_shared<vector<Mesh_VIBUFFER>>();
-    Meshes_VIBuffers->reserve(1);
-    Mesh_VIBUFFER Meshes{};
-    Meshes.vertices = make_shared<vector<VTXTEX>>();
-    Meshes.indices = make_shared<vector<uint16_t>>();
-   
-#pragma region VERTEX_BUFFER
+
+
+   vertices = make_shared<vector<VTXTEX>>();
+   indices = make_shared<vector<uint16_t>>();
+
 
     VTXTEX v;
 
     v.vPosition = _float3(-0.5f, 0.5f, 0.f);
     v.vTexcoord = _float2(0.f, 0.f);
-    (*Meshes.vertices).emplace_back(v);
+    (*vertices).emplace_back(v);
 
     v.vPosition = _float3(0.5f, 0.5f, 0.f);
     v.vTexcoord = _float2(1.f, 0.f);
-    (*Meshes.vertices).emplace_back(v);
+    (*vertices).emplace_back(v);
 
 
     v.vPosition = _float3(0.5f, -0.5f, 0.f);
     v.vTexcoord = _float2(1.f, 1.f);
-    (*Meshes.vertices).emplace_back(v);
+    (*vertices).emplace_back(v);
 
     v.vPosition = _float3(-0.5f, -0.5f, 0.f);
     v.vTexcoord = _float2(0.f, 1.f);
-    (*Meshes.vertices).emplace_back(v);
-#pragma endregion
+    (*vertices).emplace_back(v);
+
+    (*indices).emplace_back(0);
+    (*indices).emplace_back(1);
+    (*indices).emplace_back(2);
+
+    (*indices).emplace_back(0);
+    (*indices).emplace_back(2);
+    (*indices).emplace_back(3);
 
 
-#pragma region INDEX_BUFFER
-    (*Meshes.indices).emplace_back(0);
-    (*Meshes.indices).emplace_back(1);
-    (*Meshes.indices).emplace_back(2);
-
-    (*Meshes.indices).emplace_back(0);
-    (*Meshes.indices).emplace_back(2);
-    (*Meshes.indices).emplace_back(3);
-
-#pragma endregion
+     m_iNumVertexBuffers = 1;
+     m_iNumVertices = (UINT)vertices->size();
+     m_iVertexStride = sizeof(VTXTEX);
+     
+     m_iNumIndices = (UINT)indices->size();
+     m_iIndexStride = 2;
+     m_eIndexFormat = DXGI_FORMAT_R16_UINT;
+     m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 
-    Meshes.m_iNumVertexBuffers = 1;
-    Meshes.m_iNumVertices = (UINT)Meshes.vertices->size();
-    Meshes.m_iVertexStride = sizeof(VTXTEX);
-
-    Meshes.m_iNumIndices = (UINT)Meshes.indices->size();
-    Meshes.m_iIndexStride = 2;
-    Meshes.m_eIndexFormat = DXGI_FORMAT_R16_UINT;
-    Meshes.m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-    (*Meshes_VIBuffers).emplace_back(Meshes);
 
 
-#pragma endregion mesh 바인딩
-    
-
-#pragma region mesh Buffer Create
-    for (auto& mesh : *Meshes_VIBuffers) {
-#pragma region VERTEX_BUFFER
 
         D3D11_BUFFER_DESC           VertexBufferDesc{};
-        VertexBufferDesc.ByteWidth = static_cast<UINT>(mesh.vertices->size() * sizeof(VTXTEX));
+        VertexBufferDesc.ByteWidth = static_cast<UINT>(vertices->size() * sizeof(VTXTEX));
         VertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         VertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        VertexBufferDesc.StructureByteStride = mesh.m_iVertexStride;
+        VertexBufferDesc.StructureByteStride = m_iVertexStride;
         VertexBufferDesc.CPUAccessFlags = 0;
         VertexBufferDesc.MiscFlags = 0;
 
         D3D11_SUBRESOURCE_DATA          VertexInitialData{};
-        VertexInitialData.pSysMem = mesh.vertices->data();
+        VertexInitialData.pSysMem = vertices->data();
 
-        if (FAILED(m_pDevice->CreateBuffer(&VertexBufferDesc, &VertexInitialData, mesh.m_pVB.GetAddressOf()))) {
+        if (FAILED(m_pDevice->CreateBuffer(&VertexBufferDesc, &VertexInitialData, m_pVB.GetAddressOf()))) {
 
             return E_FAIL;
         }
 
 
-#pragma endregion
 
 
-#pragma region INDEX_BUFFER
+
         D3D11_BUFFER_DESC           IndexBufferDesc{};
-        IndexBufferDesc.ByteWidth = static_cast<UINT>(mesh.indices->size() * sizeof(uint16_t));
+        IndexBufferDesc.ByteWidth = static_cast<UINT>(indices->size() * sizeof(uint16_t));
         IndexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         IndexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        IndexBufferDesc.StructureByteStride = mesh.m_iIndexStride;
+        IndexBufferDesc.StructureByteStride = m_iIndexStride;
         IndexBufferDesc.CPUAccessFlags = 0;
         IndexBufferDesc.MiscFlags = 0;
 
 
 
         D3D11_SUBRESOURCE_DATA          IndexInitialData{};
-        IndexInitialData.pSysMem = mesh.indices->data();
+        IndexInitialData.pSysMem = indices->data();
 
-        if (FAILED(m_pDevice->CreateBuffer(&IndexBufferDesc, &IndexInitialData, mesh.m_pIB.GetAddressOf())))
+        if (FAILED(m_pDevice->CreateBuffer(&IndexBufferDesc, &IndexInitialData, m_pIB.GetAddressOf())))
             return E_FAIL;
 
-#pragma endregion
-    }
 
-#pragma endregion mesh Buffer Create
+        return S_OK;
 }
 
 HRESULT VIBuffer_Rect::Initialize(void* pArg)

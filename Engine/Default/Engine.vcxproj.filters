@@ -76,6 +76,12 @@
     <Filter Include="06.Component\VIBuffer\Test">
       <UniqueIdentifier>{2c6acf3a-bb1c-4755-a39a-90f291498126}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\Model">
+      <UniqueIdentifier>{d09fff03-15ea-4a82-9acf-b84db8b185d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="06.Component\Model\Mesh">
+      <UniqueIdentifier>{7ed7df89-2844-43fc-802d-f6141a26eef7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -171,6 +177,15 @@
     <ClCompile Include="..\Private\VIBuffer_Rect.cpp">
       <Filter>06.Component\VIBuffer\Test</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Mesh.cpp">
+      <Filter>06.Component\VIBuffer\fbx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Mesh.cpp">
+      <Filter>06.Component\Model\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Model.cpp">
+      <Filter>06.Component\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -247,6 +262,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_Rect.h">
       <Filter>06.Component\VIBuffer\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Mesh.h">
+      <Filter>06.Component\VIBuffer\fbx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Mesh.h">
+      <Filter>06.Component\Model\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Model.h">
+      <Filter>06.Component\Model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

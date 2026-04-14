@@ -5,7 +5,9 @@
 
 NS_BEGIN(Engine)
 class VIBuffer_Fbx;
+class VIBuffer_Mesh;
 class VIBuffer_Rect;
+class Model;
 class Shader;
 NS_END
 
@@ -33,12 +35,15 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	HRESULT Ready_Components();
-	void CreateViewAndPerspective();
+
 private:
 	uint32_t			m_iData = {};
 private:
 	//shared_ptr<VIBuffer_Fbx>	m_pVIBufferCom = { nullptr };
-	shared_ptr<VIBuffer_Rect>	m_pVIBufferCom = { nullptr };
+	//shared_ptr<VIBuffer_Rect>	m_pVIBufferCom = { nullptr };
+
+	shared_ptr<Model>			m_pModelCom = { nullptr };
+	vector<shared_ptr<VIBuffer_Mesh>>	m_pVIBufferComs = { nullptr };
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
 
 

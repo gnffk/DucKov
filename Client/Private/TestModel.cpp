@@ -50,7 +50,7 @@ void TestModel::Update(_float fTimeDelta)
 
 void TestModel::Late_Update(_float fTimeDelta)
 {
-	
+
 }
 
 HRESULT TestModel::Render()
@@ -68,37 +68,63 @@ HRESULT TestModel::Render()
 	if (FAILED(m_pShaderCom->Begin(0)))
 		return E_FAIL;
 
-	if (FAILED(m_pVIBufferCom->Bind_Resources()))
-		return E_FAIL;
+	
+	for (auto& m_pVIBufferCom : m_pVIBufferComs) {
+		if (FAILED(m_pVIBufferCom->Bind_Resources()))
+			return E_FAIL;
 
-	if (FAILED(m_pVIBufferCom->Render()))
-		return E_FAIL;
-
+		if (FAILED(m_pVIBufferCom->Render()))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 
 HRESULT TestModel::Ready_Components()
 {
-	
+
 	//auto VIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferCom);
 	//if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
 	//	TEXT("Com_VIBuffer"), VIBufferCom)))
 	//	return E_FAIL;
 	//m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Fbx>(VIBufferCom);
 
-	auto VIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferCom);
-	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
-		TEXT("Com_VIBuffer"), VIBufferCom)))
-		return E_FAIL;
-	m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Rect>(VIBufferCom);
+	//auto VIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferCom);
+	//if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
+	//	TEXT("Com_VIBuffer"), VIBufferCom)))
+	//	return E_FAIL;
+	//m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Rect>(VIBufferCom);
 
+	auto ModelCom = dynamic_pointer_cast<Component>(m_pModelCom);
+	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
+		TEXT("Com_Model"), ModelCom)))
+		return E_FAIL;
+	m_pModelCom = dynamic_pointer_cast<Model>(ModelCom);
 
 	auto ShaderCom = dynamic_pointer_cast<Component>(m_pShaderCom);
 	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex"),
 		TEXT("Com_Shader"), ShaderCom)))
 		return E_FAIL;
 	m_pShaderCom = dynamic_pointer_cast<Shader>(ShaderCom);
+	
 
+	m_pVIBufferComs.reserve(m_pModelCom->GetMeshNames().size());
+
+	for (int i = 0; i < m_pModelCom->GetMeshNames().size(); ++i) {
+	
+		auto pVIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferComs[i]);
+
+ 		std::wstring FindTag= L"Prototype_Component_Mesh_" + m_pModelCom->GetMeshNames()[i];
+		std::wstring TagGameObject= L"Com_" + m_pModelCom->GetMeshNames()[i];
+		if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), FindTag,
+			TagGameObject, pVIBufferCom)))
+			return E_FAIL;
+
+		if (pVIBufferCom == nullptr) {
+			return E_FAIL;
+		}
+		m_pVIBufferComs.emplace_back(dynamic_pointer_cast<VIBuffer_Mesh>(pVIBufferCom));
+	}
+	
 
 	return S_OK;
 }
@@ -128,39 +154,4 @@ shared_ptr<Prototype> TestModel::Clone(void* pArg)
 	}
 
 	return pInstance;
-}
-
-void TestModel::CreateViewAndPerspective()
-{
-	//// Use DirectXMath to create view and perspective matrices.
-
-	//DirectX::XMVECTOR eye = DirectX::XMVectorSet(0.0f, 0.7f, 1.5f, 0.f);
-	//DirectX::XMVECTOR at = DirectX::XMVectorSet(0.0f, -0.1f, 0.0f, 0.f);
-	//DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.f);
-	//m_pContext->GetAspectRatio();
-	//DirectX::XMStoreFloat4x4(
-	//	pDevice.view,
-	//	DirectX::XMMatrixTranspose(
-	//		DirectX::XMMatrixLookAtRH(
-	//			eye,
-	//			at,
-	//			up
-	//		)
-	//	)
-	//);
-
-	//float aspectRatioX = m_deviceResources->GetAspectRatio();
-	//float aspectRatioY = aspectRatioX < (16.0f / 9.0f) ? aspectRatioX / (16.0f / 9.0f) : 1.0f;
-
-	//DirectX::XMStoreFloat4x4(
-	//	&m_constantBufferData.projection,
-	//	DirectX::XMMatrixTranspose(
-	//		DirectX::XMMatrixPerspectiveFovRH(
-	//			2.0f * std::atan(std::tan(DirectX::XMConvertToRadians(70) * 0.5f) / aspectRatioY),
-	//			aspectRatioX,
-	//			0.01f,
-	//			100.0f
-	//		)
-	//	)
-	//);
 }

@@ -4,7 +4,8 @@
 #include "Shader.h"
 #include "VIBuffer_Fbx.h"
 #include "VIBuffer_Rect.h"
-
+#include "VIBuffer_Mesh.h"
+#include "Model.h"
 NS_BEGIN(Engine)
 
 class ENGINE_DLL Prototype_Manager final

@@ -107,7 +107,7 @@ shared_ptr<Prototype> Shader::Clone(void* pArg)
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Created : Shader");
+        MSG_BOX("Failed to Clone : Shader");
         return nullptr;
     }
 

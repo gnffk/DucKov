@@ -93,6 +93,14 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 HRESULT CLoader::Loading_For_MapEditor()
 {
+#pragma region Model Component Prototype
+
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx"))))
+		return E_FAIL;
+
+#pragma endregion
 
 #pragma region Shader Component Prototype
 
@@ -103,16 +111,16 @@ HRESULT CLoader::Loading_For_MapEditor()
 #pragma endregion
 
 #pragma region VIBuffer Component Prototype
-	/* Prototype_GameObject_TestModel */
-	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
-		VIBuffer_Fbx::Create(m_pDevice, m_pContext, "../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx")))){
-		return E_FAIL;
-	}
+	///* Prototype_GameObject_TestModel */
+	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
+	//	VIBuffer_Fbx::Create(m_pDevice, m_pContext, "../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx")))){
+	//	return E_FAIL;
+	//}
 
-	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
-		VIBuffer_Rect::Create(m_pDevice, m_pContext)))) {
-		return E_FAIL;
-	}
+	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
+	//	VIBuffer_Rect::Create(m_pDevice, m_pContext)))) {
+	//	return E_FAIL;
+	//}
 #pragma endregion
 
 
