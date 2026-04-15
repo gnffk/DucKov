@@ -3,6 +3,7 @@
 #include "Transform.h"
 #include "GameInstance.h"
 
+
 GameObject::GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -33,7 +34,10 @@ HRESULT GameObject::Initialize(void* pArg)
 		return S_OK;
 
 	auto		pDesc = static_cast<GAMEOBJECT_DESC*>(pArg);
-	lstrcpy(m_szName, pDesc->pGameObjectTag);
+
+	m_ObjectName = pDesc->m_strName;
+
+
 
 	if (FAILED(m_pTransformCom->Initialize(pArg)))
 		return E_FAIL;

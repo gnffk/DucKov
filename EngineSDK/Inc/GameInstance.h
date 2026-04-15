@@ -47,6 +47,10 @@ public:
 #pragma region GAMEOBJECT_MANAGER
 	HRESULT Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag,
 		uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg = nullptr);
+
+	shared_ptr<class GameObject> Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag);
+
+
 #pragma endregion
 
 #pragma region IMGUI_MANAGER
@@ -58,7 +62,12 @@ public:
 	HRESULT Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObject> pRenderObject);
 #pragma endregion
 
-
+#pragma region Camera_Manager
+	HRESULT Change_Camera(uint32_t iCameraType);
+	HRESULT Add_Camera(uint32_t iCameraType, shared_ptr<class Camera> pCamera);
+	HRESULT Get_MainCameraMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix);
+	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
+#pragma endregion
 private:
 	unique_ptr<class Graphic_Device>				m_pGraphic_Device = { nullptr };
 	unique_ptr<class ImGUI_Manager>					m_pImGUI_Manager = { nullptr };
@@ -67,6 +76,7 @@ private:
 	unique_ptr<class Prototype_Manager>				m_pPrototype_Manager = { nullptr };
 	unique_ptr<class Object_Manager>				m_pObject_Manager = { nullptr };
 	unique_ptr<class Renderer>						m_pRenderer = { nullptr };
+	unique_ptr<class Camera_Manager>				m_pCamera_Manager = { nullptr };
 
 
 public:

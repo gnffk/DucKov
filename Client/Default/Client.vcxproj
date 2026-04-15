@@ -146,6 +146,7 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MapEditor.h" />
+    <ClInclude Include="..\Public\PerspectiveCamera.h" />
     <ClInclude Include="..\Public\TestModel.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MapEditor.cpp" />
+    <ClCompile Include="..\Private\PerspectiveCamera.cpp" />
     <ClCompile Include="..\Private\TestModel.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>

@@ -28,7 +28,8 @@ public:
 	void Set_State(STATE eState, _fvector vState) {
 		XMStoreFloat4(reinterpret_cast<_float4*>(&m_WorldMatrix.m[ETOUI(eState)][0]), vState);
 	}
-
+	void GetWorldMatrix(_float4x4 worldMatrix) { worldMatrix = m_WorldMatrix; }
+	
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);

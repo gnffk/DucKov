@@ -1,7 +1,7 @@
 #include "Loader.h"
 #include "GameInstance.h"
 #include "TestModel.h"
-
+#include "PerspectiveCamera.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -93,11 +93,13 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 HRESULT CLoader::Loading_For_MapEditor()
 {
+
+
 #pragma region Model Component Prototype
 
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/Duck_Jeff.fbx"))))
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/Banana.fbx"))))
 		return E_FAIL;
 
 #pragma endregion
@@ -129,7 +131,13 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_TestModel"),
 		TestModel::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	/* Prototype_GameObject_PerspectiveCamera */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_PerspectiveCamera"),
+		PerspectiveCamera::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 #pragma endregion
+
 
 
 

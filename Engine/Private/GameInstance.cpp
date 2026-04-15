@@ -6,6 +6,7 @@
 #include "Object_Manager.h"
 #include "ImGUI_Manager.h"
 #include "Renderer.h"
+#include "Camera_Manager.h"
 
 
 CGameInstance::CGameInstance()
@@ -23,7 +24,9 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pGraphic_Device)
         return E_FAIL;
 
-
+    m_pCamera_Manager = Camera_Manager::Create();
+    if (nullptr == m_pCamera_Manager)
+        return E_FAIL;
 
     m_pImGUI_Manager = ImGUI_Manager::Create(Engine_Desc.hWnd,  pOutDevice, pOutDeviceContext, m_pGraphic_Device->Get_BackBufferRTV(), m_pGraphic_Device->Get_DepthStencilView());
     if (nullptr == m_pImGUI_Manager)
@@ -153,6 +156,9 @@ HRESULT CGameInstance::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, con
     return m_pObject_Manager->Add_GameObject_toLayer(iPrototypeLevelIndex, strPrototypeTag, iLayerLevelIndex, strLayerTag, pArg);
 }
 
+shared_ptr<GameObject> CGameInstance::Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag) {
+    return m_pObject_Manager->Find_Object(iLayerLevelIndex, strLayerTag, strObjectTag);
+}
 #pragma endregion
 
 #pragma region RENDERER
@@ -179,9 +185,33 @@ void CGameInstance::Render_IMGUI()
 
 #pragma endregion
 
+#pragma region Camera_Manager
+HRESULT CGameInstance::Change_Camera(uint32_t iCameraType) {
+
+    return m_pCamera_Manager->Change_Camera(iCameraType);
+}
+
+HRESULT  CGameInstance::Add_Camera(uint32_t iCameraType, shared_ptr<class Camera> pCamera) {
+    return m_pCamera_Manager->Add_Camera(iCameraType, pCamera);
+}
+HRESULT CGameInstance::Get_MainCameraMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix) {
+    return m_pCamera_Manager->Get_MainCameraMatrix( ViewMatrix, ProjectionMatrix);
+
+}
+weak_ptr<Camera> CGameInstance::Find_Camera(uint32_t iCameraType)
+{
+    return m_pCamera_Manager->Find_Camera(iCameraType);
+ 
+}
+
+
+#pragma endregion
+
 
 void CGameInstance::Release_Engine()
 {
+    m_pCamera_Manager.reset();
+
     m_pRenderer.reset();
 
     m_pLevel_Manager.reset();

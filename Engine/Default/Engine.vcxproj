@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Camera.h" />
+    <ClInclude Include="..\Public\Camera_Manager.h" />
     <ClInclude Include="..\Public\Component.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Model.h" />
@@ -82,6 +84,8 @@
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp" />
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp" />
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp" />
+    <ClCompile Include="..\Private\Camera.cpp" />
+    <ClCompile Include="..\Private\Camera_Manager.cpp" />
     <ClCompile Include="..\Private\CLevel.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />

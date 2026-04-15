@@ -34,7 +34,7 @@ HRESULT TestModel::Initialize(void* pArg)
 		return E_FAIL;
 
 
-
+	m_pTransformCom->Set_Scale(0.0001f,0.0001f,0.0001f);
 	return S_OK;
 }
 
@@ -59,28 +59,13 @@ HRESULT TestModel::Render()
 
 	for (auto m_pVIBufferCom : m_pVIBufferComs) {
 
-		_float4x4 World, View, Proj;
 
-		// 1. World = Identity (원점에 배치)
+		_float4x4 World, View, Proj;
+		CGameInstance::Get().Get_MainCameraMatrix(View,Proj);
 		XMStoreFloat4x4(&World, XMMatrixIdentity());
 
-		// 2. View = 카메라 위치 (뒤에서 바라보기)
-		XMVECTOR vEye = XMVectorSet(0.f, 0.f, -200.f, 1.f); // 카메라 위치
-		XMVECTOR vAt = XMVectorSet(0.f, 0.f, 0.f, 1.f);  // 보는 위치
-		XMVECTOR vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-
-		XMStoreFloat4x4(&View, XMMatrixLookAtLH(vEye, vAt, vUp));
-
-		// 3. Proj = 기본 원근 투영
-		float fAspect = 1280.f / 720.f;
-		XMStoreFloat4x4(&Proj, XMMatrixPerspectiveFovLH(
-			XMConvertToRadians(60.f),
-			fAspect,
-			0.1f,
-			100.f
-		));
-
-	
+		m_pTransformCom->GetWorldMatrix(World);
+		
 
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
 			return E_FAIL;

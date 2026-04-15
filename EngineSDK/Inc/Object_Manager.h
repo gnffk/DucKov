@@ -22,6 +22,7 @@ public:
 	HRESULT Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag,
 		uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg);
 
+	shared_ptr<GameObject> Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag);
 private:
 	uint32_t	m_iNumLevels = {};
 private:

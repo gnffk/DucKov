@@ -68,10 +68,12 @@ HRESULT Object_Manager::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, co
 		iLayerLevelIndex >= m_iNumLevels)
 		return E_FAIL;
 
+
+
 	auto	pGameObject = dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(iPrototypeLevelIndex, strPrototypeTag, pArg));
 	if (nullptr == pGameObject)
 		return E_FAIL;
-
+	
 
 	auto		pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
 	if (nullptr == pLayer)
@@ -102,6 +104,16 @@ Layer* Object_Manager::Find_Layer(uint32_t iLayerLevelIndex, const _wstring& str
 		return nullptr;
 
 	return iter->second.get();
+}
+
+shared_ptr<GameObject> Object_Manager::Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag)
+{
+	for (auto obj : Find_Layer(iLayerLevelIndex, strLayerTag)->Get_GameObjects()) {
+		if (obj->m_ObjectName == strObjectTag) {
+			return obj;
+		}
+	}
+	return nullptr;
 }
 
 unique_ptr<Object_Manager> Object_Manager::Create(uint32_t iNumLevels)

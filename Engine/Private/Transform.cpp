@@ -32,7 +32,13 @@ HRESULT Transform::Initialize(void* pArg)
     m_fSpeedPerSec = pDesc->fSpeedPerSec;
     m_fRotationPerSec = pDesc->fRotationPerSec;
 
+    Set_State(STATE::RIGHT, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+    Set_State(STATE::UP, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+    Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, 1.f, 0.f));
+    Set_State(STATE::POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+
     return S_OK;
+
 }
 
 void Transform::Set_Scale(_float fScaleX, _float fScaleY, _float fScaleZ)

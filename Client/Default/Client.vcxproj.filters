@@ -34,6 +34,12 @@
     <Filter Include="97. ShaderFiles">
       <UniqueIdentifier>{0ada410e-46fe-4a03-bc6e-d1b739f37aa0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\TestModel">
+      <UniqueIdentifier>{ed46eb8c-21f7-404f-8b34-0b7c251e6949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Camera">
+      <UniqueIdentifier>{b71c7a40-ea76-458c-b0fe-55f010003b28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -73,7 +79,10 @@
       <Filter>01. Levels\MapEditor</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestModel.h">
-      <Filter>02. GameObject</Filter>
+      <Filter>02. GameObject\TestModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PerspectiveCamera.h">
+      <Filter>02. GameObject\Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -112,7 +121,10 @@
       <Filter>01. Levels\MapEditor</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestModel.cpp">
-      <Filter>02. GameObject</Filter>
+      <Filter>02. GameObject\TestModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PerspectiveCamera.cpp">
+      <Filter>02. GameObject\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

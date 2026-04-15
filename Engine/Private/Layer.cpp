@@ -4,6 +4,7 @@ HRESULT Layer::Add_GameObject(shared_ptr<GameObject> pGameObject)
 {
     if (nullptr == pGameObject)
         return E_FAIL;
+    
 
     m_GameObjects.push_back(pGameObject);
 

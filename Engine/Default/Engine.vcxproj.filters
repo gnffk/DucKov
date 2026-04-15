@@ -67,9 +67,6 @@
     <Filter Include="06.Component\Transform">
       <UniqueIdentifier>{6b1c9871-e341-4926-9d31-2203c8df479a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05.GameObject\Camera">
-      <UniqueIdentifier>{bf83737a-d9ea-4998-8a05-3f7352155fb1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="06.Component\Shader">
       <UniqueIdentifier>{7cf50a54-085a-4cba-bdd5-b6667a5f03ab}</UniqueIdentifier>
     </Filter>
@@ -81,6 +78,9 @@
     </Filter>
     <Filter Include="06.Component\Model\Mesh">
       <UniqueIdentifier>{7ed7df89-2844-43fc-802d-f6141a26eef7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05.GameObject\Camera">
+      <UniqueIdentifier>{91479fe1-3a1d-4889-be92-0a9e9c9f098a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +186,12 @@
     <ClCompile Include="..\Private\Model.cpp">
       <Filter>06.Component\Model</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Camera.cpp">
+      <Filter>05.GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Manager.cpp">
+      <Filter>05.GameObject\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -271,6 +277,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Model.h">
       <Filter>06.Component\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera.h">
+      <Filter>05.GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Manager.h">
+      <Filter>05.GameObject\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

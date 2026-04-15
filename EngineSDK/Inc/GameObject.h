@@ -7,7 +7,8 @@ class ENGINE_DLL GameObject abstract : public Prototype
 public:
 	typedef struct tagGameObjectDesc : public Transform::TRANSFORM_DESC
 	{
-		const _tchar* pGameObjectTag;
+		wstring		  m_strName;
+		uint32_t	  pCameraType;
 	}GAMEOBJECT_DESC;
 protected:
 	GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
@@ -29,11 +30,12 @@ protected:
 
 	shared_ptr<class Transform>	m_pTransformCom = { nullptr };
 
-protected:
-	_tchar					m_szName[MAX_PATH] = {};
+public:
+	std::wstring m_ObjectName;
 
 
 protected:
+	// clone 한 컴포넌트들을 보관하는 곳
 	map<const _wstring, shared_ptr<class Component>>		m_Components;
 protected:
 	HRESULT Add_Component(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag,
