@@ -82,6 +82,12 @@
     <Filter Include="05.GameObject\Camera">
       <UniqueIdentifier>{91479fe1-3a1d-4889-be92-0a9e9c9f098a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="08.Key">
+      <UniqueIdentifier>{a801db61-e4b3-4e2a-a4d2-83944a1393ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="08.Key\Manager">
+      <UniqueIdentifier>{feb22599-cbcf-46d9-81af-7a2c8f225b67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -192,6 +198,9 @@
     <ClCompile Include="..\Private\Camera_Manager.cpp">
       <Filter>05.GameObject\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Key_Manager.cpp">
+      <Filter>08.Key\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -283,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Camera_Manager.h">
       <Filter>05.GameObject\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Key_Manager.h">
+      <Filter>08.Key\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

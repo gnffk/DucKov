@@ -15,7 +15,7 @@ public:
 	virtual ~CGameInstance();
 
 public:
-	HRESULT Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<ID3D11Device>& pOutDevice, ComPtr<ID3D11DeviceContext>&pOutDeviceContext);
+	HRESULT Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<ID3D11Device>& pOutDevice, ComPtr<ID3D11DeviceContext>& pOutDeviceContext);
 	void	Update_Engine(_float fTimeDelta);
 	HRESULT Draw();
 	void Clear_Resource(uint32_t iClearLevelIndex);
@@ -49,8 +49,6 @@ public:
 		uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg = nullptr);
 
 	shared_ptr<class GameObject> Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag);
-
-
 #pragma endregion
 
 #pragma region IMGUI_MANAGER
@@ -65,8 +63,26 @@ public:
 #pragma region Camera_Manager
 	HRESULT Change_Camera(uint32_t iCameraType);
 	HRESULT Add_Camera(uint32_t iCameraType, shared_ptr<class Camera> pCamera);
-	HRESULT Get_MainCameraMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix);
+	HRESULT Get_MainCameraMatrix(_float4x4& ViewMatrix, _float4x4& ProjectionMatrix);
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
+#pragma endregion
+
+#pragma region KEY_MANAGER
+	HRESULT Ready_Key(HINSTANCE hInst, HWND hWnd);
+
+	_char	Get_DIKeyState(_uchar byKeyID);
+
+	_char	Get_DIMouseState(MOUSEKEYSTATE eMouse);
+
+	_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState);
+
+	bool Key_Pressing(_uchar byKeyID);
+	bool Key_Up(_uchar byKeyID);
+	bool Key_Down(_uchar byKeyID);
+
+	bool Mouse_Pressing(MOUSEKEYSTATE eMouseState);
+	bool Mouse_Up(MOUSEKEYSTATE eMouseState);
+	bool Mouse_Down(MOUSEKEYSTATE eMouseState);
 #pragma endregion
 private:
 	unique_ptr<class Graphic_Device>				m_pGraphic_Device = { nullptr };
@@ -77,6 +93,7 @@ private:
 	unique_ptr<class Object_Manager>				m_pObject_Manager = { nullptr };
 	unique_ptr<class Renderer>						m_pRenderer = { nullptr };
 	unique_ptr<class Camera_Manager>				m_pCamera_Manager = { nullptr };
+	unique_ptr<class Key_Manager>					m_pKey_Manager = { nullptr };
 
 
 public:

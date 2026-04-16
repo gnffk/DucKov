@@ -110,6 +110,31 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 	if (GetAsyncKeyState('D') & 0x8000)
 		m_pTransformCom->Go_Right(fTimeDelta);
 
+	if (GetAsyncKeyState('Q') & 0x8000)
+		m_pTransformCom->Go_Up(fTimeDelta);
+
+	if (GetAsyncKeyState('E') & 0x8000)
+		m_pTransformCom->Go_Down(fTimeDelta);
+
+
+	if (CGameInstance::Get().Mouse_Down(MOUSEKEYSTATE::DIM_RB)) {
+
+		GetCursorPos(&m_OldCursorPos);
+	}
+
+	if (CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_RB)) {
+
+		POINT curPos{};
+		GetCursorPos(&curPos);
+
+		float deltaX = static_cast<float>(curPos.x - m_OldCursorPos.x) / 10.f;
+		float deltaY = static_cast<float>(curPos.y - m_OldCursorPos.y) / 10.f;
+
+		Rotate(deltaX, deltaY);
+
+	}
+
+
 }
 
 void PerspectiveCamera::Rotate(_float fDeltaX, _float fDeltaY)
@@ -117,12 +142,15 @@ void PerspectiveCamera::Rotate(_float fDeltaX, _float fDeltaY)
 	if (nullptr == m_pTransformCom)
 		return;
 
-	const _float fMouseSensitivity = 0.01f;
 
-	// Yaw : 월드 Y축 기준 좌우 회전
-	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDeltaX * fMouseSensitivity);
 
-	// Pitch : 현재 Right 축 기준 상하 회전
+	//m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDeltaX );
+
+
+	//_vector vUp = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
+	//m_pTransformCom->Rotation(vUp, fDeltaX);
+
+
 	_vector vRight = XMVector3Normalize(m_pTransformCom->Get_State(STATE::RIGHT));
-	m_pTransformCom->Turn(vRight, fDeltaY * fMouseSensitivity);
+	m_pTransformCom->Rotation(vRight, fDeltaY );
 }

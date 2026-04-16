@@ -95,6 +95,26 @@ void Transform::Go_Right(_float fTimeDelta)
     Set_State(STATE::POSITION, vPosition);
 }
 
+void Transform::Go_Up(_float fTimeDelta)
+{
+    _vector         vPosition = Get_State(STATE::POSITION);
+    _vector         vUp = Get_State(STATE::UP);
+
+    vPosition += XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;
+
+    Set_State(STATE::POSITION, vPosition);
+}
+
+void Transform::Go_Down(_float fTimeDelta)
+{
+    _vector         vPosition = Get_State(STATE::POSITION);
+    _vector         vDown = Get_State(STATE::UP);
+
+    vPosition -= XMVector3Normalize(vDown) * m_fSpeedPerSec * fTimeDelta;
+
+    Set_State(STATE::POSITION, vPosition);
+}
+
 void Transform::Rotation(_fvector vAxis, _float fAngle)
 {
     _float3     vScaled = Get_Scaled();

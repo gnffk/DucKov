@@ -34,7 +34,7 @@ HRESULT TestModel::Initialize(void* pArg)
 		return E_FAIL;
 
 
-	m_pTransformCom->Set_Scale(0.0001f,0.0001f,0.0001f);
+
 	return S_OK;
 }
 

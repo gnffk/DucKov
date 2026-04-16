@@ -6,7 +6,11 @@ namespace Engine
 
 	typedef		bool						_bool;
 	typedef		char						_char;
+	typedef		unsigned char				_uchar;
 	typedef		wchar_t						_tchar;
+	typedef		long						_long;
+	typedef		unsigned long				_ulong;
+
 	typedef		float						_float;
 	typedef		double						_double;
 	typedef		wstring						_wstring;

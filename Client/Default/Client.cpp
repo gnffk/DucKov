@@ -51,7 +51,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     unique_ptr<CMainGame> p_MainGame = CMainGame::Create();
     CGameInstance::Get().Add_Timer(TEXT("Timer_Default"));
     CGameInstance::Get().Add_Timer(TEXT("Timer_FPS60"));
- 
+    CGameInstance::Get().Ready_Key(hInstance, g_hWnd);
     float fTimeAcc{};
 
     while (true) {
@@ -76,7 +76,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 
-                p_MainGame->Update(CGameInstance::Get().Get_TimeDelta(TEXT("Timer_Default")));
+                p_MainGame->Update(CGameInstance::Get().Get_TimeDelta(TEXT("Timer_FPS60")));
                 p_MainGame->Render();
              
                 fTimeAcc = 0.f;

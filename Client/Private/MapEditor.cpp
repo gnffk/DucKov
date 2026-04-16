@@ -45,7 +45,7 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 	GameObject::GAMEOBJECT_DESC descMain_Camera{};
 	descMain_Camera.m_strName = L"Main_Camera";
 	descMain_Camera.pCameraType = ETOUI(CAMERA::MAIN);
-	descMain_Camera.fSpeedPerSec = 10000.f;
+	descMain_Camera.fSpeedPerSec = 10.f;
 	descMain_Camera.fRotationPerSec = XMConvertToRadians(1.f);
 
 

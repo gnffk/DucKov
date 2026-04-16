@@ -7,7 +7,7 @@
 #include "ImGUI_Manager.h"
 #include "Renderer.h"
 #include "Camera_Manager.h"
-
+#include "Key_Manager.h"
 
 CGameInstance::CGameInstance()
 {
@@ -22,6 +22,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
 {
     m_pGraphic_Device = Graphic_Device::Create(Engine_Desc.hWnd, Engine_Desc.eWinMode, Engine_Desc.iWinSizeX, Engine_Desc.iWinSizeY, pOutDevice, pOutDeviceContext);
     if (nullptr == m_pGraphic_Device)
+        return E_FAIL;
+
+    m_pKey_Manager = Key_Manager::Create();
+    if (nullptr == m_pKey_Manager)
         return E_FAIL;
 
     m_pCamera_Manager = Camera_Manager::Create();
@@ -60,6 +64,8 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+    m_pKey_Manager->Update_InputDev();
+
     m_pImGUI_Manager->Update_Imgui(fTimeDelta);
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
@@ -207,6 +213,44 @@ weak_ptr<Camera> CGameInstance::Find_Camera(uint32_t iCameraType)
 
 #pragma endregion
 
+#pragma region Key_Manager
+HRESULT CGameInstance::Ready_Key(HINSTANCE hInst, HWND hWnd) {
+   return m_pKey_Manager->Ready_Key(hInst, hWnd);
+}
+
+_char	CGameInstance::Get_DIKeyState(_uchar byKeyID) {
+    return m_pKey_Manager->Get_DIKeyState(byKeyID);
+}
+
+_char	CGameInstance::Get_DIMouseState(MOUSEKEYSTATE eMouse) {
+    return m_pKey_Manager->Get_DIMouseState(eMouse);
+}
+
+_long	CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState){
+    return m_pKey_Manager->Get_DIMouseMove(eMouseState);
+}
+
+bool CGameInstance::Key_Pressing(_uchar byKeyID) {
+    return m_pKey_Manager->Key_Pressing(byKeyID);
+}
+bool CGameInstance::Key_Up(_uchar byKeyID) {
+    return m_pKey_Manager->Key_Up(byKeyID);
+}
+bool CGameInstance::Key_Down(_uchar byKeyID) {
+    return m_pKey_Manager->Key_Down(byKeyID);
+}
+
+bool CGameInstance::Mouse_Pressing(MOUSEKEYSTATE eMouseState) {
+    return m_pKey_Manager->Mouse_Pressing(eMouseState);
+}
+bool CGameInstance::Mouse_Up(MOUSEKEYSTATE eMouseState) {
+    return m_pKey_Manager->Mouse_Up(eMouseState);
+}
+bool CGameInstance::Mouse_Down(MOUSEKEYSTATE eMouseState) {
+    return m_pKey_Manager->Mouse_Down(eMouseState);
+}
+
+#pragma endregion
 
 void CGameInstance::Release_Engine()
 {
