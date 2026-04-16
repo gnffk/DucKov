@@ -98,22 +98,22 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 
 
 	// ÀÌµ¿
- 	if (GetAsyncKeyState('W') & 0x8000)
+ 	if (CGameInstance::Get().Key_Pressing(DIK_W) )
 		m_pTransformCom->Go_Straight(fTimeDelta);
 
-	if (GetAsyncKeyState('S') & 0x8000)
+	if (CGameInstance::Get().Key_Pressing(DIK_S) )
 		m_pTransformCom->Go_Backward(fTimeDelta);
 
-	if (GetAsyncKeyState('A') & 0x8000)
-		m_pTransformCom->Go_Left(fTimeDelta);
+	if (CGameInstance::Get().Key_Pressing(DIK_A) )
+		m_pTransformCom->Go_Static_Left(fTimeDelta);
 
-	if (GetAsyncKeyState('D') & 0x8000)
-		m_pTransformCom->Go_Right(fTimeDelta);
+	if (CGameInstance::Get().Key_Pressing(DIK_D) )
+		m_pTransformCom->Go_Static_Right(fTimeDelta);
 
-	if (GetAsyncKeyState('Q') & 0x8000)
+	if (CGameInstance::Get().Key_Pressing(DIK_Q) )
 		m_pTransformCom->Go_Up(fTimeDelta);
 
-	if (GetAsyncKeyState('E') & 0x8000)
+	if (CGameInstance::Get().Key_Pressing(DIK_E) )
 		m_pTransformCom->Go_Down(fTimeDelta);
 
 
@@ -127,30 +127,27 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 		POINT curPos{};
 		GetCursorPos(&curPos);
 
-		float deltaX = static_cast<float>(curPos.x - m_OldCursorPos.x) / 10.f;
-		float deltaY = static_cast<float>(curPos.y - m_OldCursorPos.y) / 10.f;
-
-		Rotate(deltaX, deltaY);
-
+		float deltaX = static_cast<float>(curPos.x - m_OldCursorPos.x)/20.f;
+		float deltaY = static_cast<float>(curPos.y - m_OldCursorPos.y) / 20.f;
+		
+		Rotate(deltaX, deltaY, fTimeDelta);
+		
 	}
+	
 
 
 }
 
-void PerspectiveCamera::Rotate(_float fDeltaX, _float fDeltaY)
+void PerspectiveCamera::Rotate(_float fDeltaX, _float fDeltaY, _float fTimeDelta)
 {
 	if (nullptr == m_pTransformCom)
 		return;
 
-
-
-	//m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDeltaX );
-
-
-	//_vector vUp = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
-	//m_pTransformCom->Rotation(vUp, fDeltaX);
+	
+	_vector vUp = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
+	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDeltaX);
 
 
 	_vector vRight = XMVector3Normalize(m_pTransformCom->Get_State(STATE::RIGHT));
-	m_pTransformCom->Rotation(vRight, fDeltaY );
+	m_pTransformCom->Turn(vRight, fDeltaY);
 }

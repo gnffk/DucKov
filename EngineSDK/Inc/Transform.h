@@ -28,8 +28,7 @@ public:
 	void Set_State(STATE eState, _fvector vState) {
 		XMStoreFloat4(reinterpret_cast<_float4*>(&m_WorldMatrix.m[ETOUI(eState)][0]), vState);
 	}
-	void GetWorldMatrix(_float4x4 worldMatrix) { worldMatrix = m_WorldMatrix; }
-	
+	_float4x4 GetWorldMatrix(){return m_WorldMatrix;}
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -44,8 +43,15 @@ public:
 	void Go_Right(_float fTimeDelta);
 	void Go_Up(_float fTimeDelta);
 	void Go_Down(_float fTimeDelta);
+	void Go_Static_Right(_float fTimeDelta);
+	void Go_Static_Left(_float fTimeDelta);
 	void Rotation(_fvector vAxis, _float fAngle);
 	void Turn(_fvector vAxis, _float fTimeDelta);
+
+
+
+
+
 	void LookAt(_fvector vAt);
 	void Chase(_fvector vGoal, _float fTimeDelta, _float fLimit = 0.f);
 

@@ -33,7 +33,8 @@ HRESULT TestModel::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-
+	m_pTransformCom->Set_Scale(0.01f, 0.01f, 0.01f);
+	m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), 90.f);
 
 	return S_OK;
 }
@@ -60,18 +61,34 @@ HRESULT TestModel::Render()
 	for (auto m_pVIBufferCom : m_pVIBufferComs) {
 
 
-		_float4x4 World, View, Proj;
+		_float4x4 View, Proj;
 		CGameInstance::Get().Get_MainCameraMatrix(View,Proj);
-		XMStoreFloat4x4(&World, XMMatrixIdentity());
 
-		m_pTransformCom->GetWorldMatrix(World);
-		
+		_float4x4 World = m_pTransformCom->GetWorldMatrix();
+
+
+
+ 		ImGui::Begin("TestModel Info");
+
+
+		ImGui::Text("World Matrix");
+		ImGui::Text("%.3f %.3f %.3f %.3f", World._11, World._12, World._13, World._14);
+		ImGui::Text("%.3f %.3f %.3f %.3f", World._21, World._22, World._23, World._24);
+		ImGui::Text("%.3f %.3f %.3f %.3f", World._31, World._32, World._33, World._34);
+		ImGui::Text("%.3f %.3f %.3f %.3f", World._41, World._42, World._43, World._44);
+
+
+		ImGui::End();
+
 
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
 			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
 			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
+			return E_FAIL;
+
+		if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
 			return E_FAIL;
 
 		if (FAILED(m_pShaderCom->Begin(0)))
@@ -131,8 +148,14 @@ HRESULT TestModel::Ready_Components()
 		TEXT("Com_Shader"), ShaderCom)))
 		return E_FAIL;
 	m_pShaderCom = dynamic_pointer_cast<Shader>(ShaderCom);
+
+	auto TextureCom = dynamic_pointer_cast<Component>(m_pTextureCom);
+	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
+		TEXT("Com_Texture"), TextureCom)))
+		return E_FAIL;
+	m_pTextureCom = dynamic_pointer_cast<Texture>(TextureCom);
 	
-	
+
 	
 
 	return S_OK;

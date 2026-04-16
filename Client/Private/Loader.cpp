@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "TestModel.h"
 #include "PerspectiveCamera.h"
+
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -94,12 +95,29 @@ HRESULT CLoader::Loading_For_GamePlay()
 HRESULT CLoader::Loading_For_MapEditor()
 {
 
+#pragma region Model Component Prototype
+
+
+	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
+	//	Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Fbx/Garden-Palette.png"), 1))))
+	//	return E_FAIL;
+	 
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
+		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Fbx/Player_Duck_Tex_AlbedoTint.png"), 1))))
+		return E_FAIL;
+
+
+#pragma endregion
 
 #pragma region Model Component Prototype
 
 
+	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
+	//	Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/Banana_02_LOD0.fbx"))))
+	//	return E_FAIL;
+
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/Banana.fbx"))))
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx"))))
 		return E_FAIL;
 
 #pragma endregion

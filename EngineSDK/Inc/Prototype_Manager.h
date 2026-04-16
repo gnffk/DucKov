@@ -6,6 +6,7 @@
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Mesh.h"
 #include "Model.h"
+#include "Texture.h"
 
 
 NS_BEGIN(Engine)

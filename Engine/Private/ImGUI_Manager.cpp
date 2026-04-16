@@ -81,9 +81,12 @@ void ImGUI_Manager::Update_Imgui(_float fTimeDelta)
 
 
 }
-
 void ImGUI_Manager::Render_Imgui()
 {
+    ID3D11DepthStencilState* pOldDepthState = nullptr;
+    UINT oldStencilRef = 0;
+
+    m_pDeviceContext->OMGetDepthStencilState(&pOldDepthState, &oldStencilRef);
 
     m_pDeviceContext->OMSetDepthStencilState(pDepthDisabledState.Get(), 0);
 
@@ -95,13 +98,15 @@ void ImGUI_Manager::Render_Imgui()
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
 
-        // ÇÙ½É: ¸ÞÀÎ ·»´õ Å¸°Ù/±íÀÌ ¹öÆÛ/ºäÆ÷Æ® º¹±¸
         m_pDeviceContext->OMSetRenderTargets(1, m_pMainRTV.GetAddressOf(), m_pMainDSV.Get());
         m_pDeviceContext->RSSetViewports(1, &m_MainViewport);
-        m_pDeviceContext->OMSetDepthStencilState(pDepthDisabledState.Get(), 0);
     }
-}
 
+    m_pDeviceContext->OMSetDepthStencilState(pOldDepthState, oldStencilRef);
+
+    if (pOldDepthState)
+        pOldDepthState->Release();
+}
 bool ImGUI_Manager::ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (!ImGui::GetCurrentContext()) return false;

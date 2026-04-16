@@ -22,7 +22,7 @@ public:
 	virtual HRESULT Render() override;
 	HRESULT Ready_Components();
 	void	KeyTestInput(_float fTimeDelta);
-	void	Rotate(_float fDeltaX, _float fDeltaY);
+	void	Rotate(_float fDeltaX, _float fDeltaY, _float fTimeDelta);
 private:
 	bool  m_bMouseLook = false;
 	POINT m_OldCursorPos{};

@@ -218,11 +218,11 @@ HRESULT CGameInstance::Ready_Key(HINSTANCE hInst, HWND hWnd) {
    return m_pKey_Manager->Ready_Key(hInst, hWnd);
 }
 
-_char	CGameInstance::Get_DIKeyState(_uchar byKeyID) {
+_uchar	CGameInstance::Get_DIKeyState(_uchar byKeyID) {
     return m_pKey_Manager->Get_DIKeyState(byKeyID);
 }
 
-_char	CGameInstance::Get_DIMouseState(MOUSEKEYSTATE eMouse) {
+_uchar	CGameInstance::Get_DIMouseState(MOUSEKEYSTATE eMouse) {
     return m_pKey_Manager->Get_DIMouseState(eMouse);
 }
 
@@ -255,6 +255,8 @@ bool CGameInstance::Mouse_Down(MOUSEKEYSTATE eMouseState) {
 void CGameInstance::Release_Engine()
 {
     m_pCamera_Manager.reset();
+
+    m_pKey_Manager.reset();
 
     m_pRenderer.reset();
 

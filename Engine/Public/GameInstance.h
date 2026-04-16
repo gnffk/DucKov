@@ -70,9 +70,10 @@ public:
 #pragma region KEY_MANAGER
 	HRESULT Ready_Key(HINSTANCE hInst, HWND hWnd);
 
-	_char	Get_DIKeyState(_uchar byKeyID);
+	_uchar	Get_DIKeyState(_uchar byKeyID);
 
-	_char	Get_DIMouseState(MOUSEKEYSTATE eMouse);
+	_uchar	Get_DIMouseState(MOUSEKEYSTATE eMouse);
+
 
 	_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState);
 

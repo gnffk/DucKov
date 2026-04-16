@@ -26,6 +26,7 @@
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Model.h" />
     <ClInclude Include="..\Public\Shader.h" />
+    <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\VIBuffer_Fbx.h" />
     <ClInclude Include="..\Public\ImGUI_Manager.h" />
     <ClInclude Include="..\Public\Renderer.h" />
@@ -93,6 +94,7 @@
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\Model.cpp" />
     <ClCompile Include="..\Private\Shader.cpp" />
+    <ClCompile Include="..\Private\Texture.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Fbx.cpp" />
     <ClCompile Include="..\Private\ImGUI_Manager.cpp" />
     <ClCompile Include="..\Private\Renderer.cpp" />
@@ -168,12 +170,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>../Bin\</OutDir>
     <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(ProjectDir)..\lib\DirectXToolKit;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>../Bin\</OutDir>
     <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(ProjectDir)..\lib\DirectXToolKit;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -222,7 +224,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;dxguid.lib;dinput8.lib;Effects11d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;dxguid.lib;dinput8.lib;Effects11d.lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -247,7 +249,7 @@ call Copy.bat</Command>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;dxguid.lib;dinput8.lib;Effects11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;dxguid.lib;dinput8.lib;Effects11.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../lib\shader;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>

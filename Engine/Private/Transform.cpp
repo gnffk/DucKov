@@ -115,6 +115,27 @@ void Transform::Go_Down(_float fTimeDelta)
     Set_State(STATE::POSITION, vPosition);
 }
 
+void Transform::Go_Static_Right(_float fTimeDelta)
+{
+    _vector         vPosition = Get_State(STATE::POSITION);
+    _vector         vRight = Get_State(STATE::RIGHT);
+
+    vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
+
+    Set_State(STATE::POSITION, vPosition);
+}
+
+void Transform::Go_Static_Left(_float fTimeDelta)
+{
+    _vector         vPosition = Get_State(STATE::POSITION);
+    _vector         vRight = Get_State(STATE::RIGHT);
+
+    vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
+
+    Set_State(STATE::POSITION, vPosition);
+}
+
+
 void Transform::Rotation(_fvector vAxis, _float fAngle)
 {
     _float3     vScaled = Get_Scaled();
@@ -145,6 +166,8 @@ void Transform::Turn(_fvector vAxis, _float fTimeDelta)
     Set_State(STATE::UP, XMVector3TransformNormal(vUp, RotationMatrix));
     Set_State(STATE::LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
 }
+
+
 
 void Transform::LookAt(_fvector vAt)
 {

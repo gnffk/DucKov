@@ -71,6 +71,22 @@ HRESULT Shader::Begin(uint32_t iPassIndex)
     return S_OK;
 }
 
+HRESULT Shader::Bind_SRV(const _char* pConstantName, ComPtr<ID3D11ShaderResourceView> pSRV)
+{
+    if (nullptr == m_pEffect)
+        return E_FAIL;
+
+    ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+    if (nullptr == pVariable)
+        return E_FAIL;
+
+    ID3DX11EffectShaderResourceVariable* pShaderResourceVariable = pVariable->AsShaderResource();
+    if (nullptr == pShaderResourceVariable)
+        return E_FAIL;
+
+    return pShaderResourceVariable->SetResource(pSRV.Get());
+}
+
 HRESULT Shader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix)
 {
     if (nullptr == m_pEffect)

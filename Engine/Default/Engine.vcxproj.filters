@@ -88,6 +88,9 @@
     <Filter Include="08.Key\Manager">
       <UniqueIdentifier>{feb22599-cbcf-46d9-81af-7a2c8f225b67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\Texture">
+      <UniqueIdentifier>{c98dae71-ce96-4ba4-8e9a-047a31956773}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -201,6 +204,9 @@
     <ClCompile Include="..\Private\Key_Manager.cpp">
       <Filter>08.Key\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Texture.cpp">
+      <Filter>06.Component\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -295,6 +301,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Key_Manager.h">
       <Filter>08.Key\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Texture.h">
+      <Filter>06.Component\Texture</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

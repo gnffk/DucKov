@@ -45,8 +45,8 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 	GameObject::GAMEOBJECT_DESC descMain_Camera{};
 	descMain_Camera.m_strName = L"Main_Camera";
 	descMain_Camera.pCameraType = ETOUI(CAMERA::MAIN);
-	descMain_Camera.fSpeedPerSec = 10.f;
-	descMain_Camera.fRotationPerSec = XMConvertToRadians(1.f);
+	descMain_Camera.fSpeedPerSec = 1.f;
+	descMain_Camera.fRotationPerSec = XMConvertToRadians(10.f);
 
 
 	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_PerspectiveCamera"),
