@@ -98,6 +98,7 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 
 
 	// ÀÌµ¿
+
  	if (CGameInstance::Get().Key_Pressing(DIK_W) )
 		m_pTransformCom->Go_Straight(fTimeDelta);
 
@@ -110,10 +111,10 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 	if (CGameInstance::Get().Key_Pressing(DIK_D) )
 		m_pTransformCom->Go_Static_Right(fTimeDelta);
 
-	if (CGameInstance::Get().Key_Pressing(DIK_Q) )
+	if (CGameInstance::Get().Key_Pressing(DIK_E))
 		m_pTransformCom->Go_Up(fTimeDelta);
 
-	if (CGameInstance::Get().Key_Pressing(DIK_E) )
+	if (CGameInstance::Get().Key_Pressing(DIK_Q) )
 		m_pTransformCom->Go_Down(fTimeDelta);
 
 
@@ -127,9 +128,12 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 		POINT curPos{};
 		GetCursorPos(&curPos);
 
-		float deltaX = static_cast<float>(curPos.x - m_OldCursorPos.x)/20.f;
-		float deltaY = static_cast<float>(curPos.y - m_OldCursorPos.y) / 20.f;
+		float deltaX = static_cast<float>(curPos.x - m_OldCursorPos.x);
+		float deltaY = static_cast<float>(curPos.y - m_OldCursorPos.y) ;
 		
+
+
+
 		Rotate(deltaX, deltaY, fTimeDelta);
 		
 	}
@@ -146,8 +150,11 @@ void PerspectiveCamera::Rotate(_float fDeltaX, _float fDeltaY, _float fTimeDelta
 	
 	_vector vUp = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
 	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fDeltaX);
+	//m_pTransformCom->Turn(vUp, fDeltaX);
 
 
 	_vector vRight = XMVector3Normalize(m_pTransformCom->Get_State(STATE::RIGHT));
 	m_pTransformCom->Turn(vRight, fDeltaY);
+
+	GetCursorPos(&m_OldCursorPos);
 }
