@@ -19,6 +19,9 @@ public:
 	void	Update_Engine(_float fTimeDelta);
 	HRESULT Draw();
 	void Clear_Resource(uint32_t iClearLevelIndex);
+	_float2 Get_ViewportSize() const {
+		return m_vViewportSize;
+	}
 public:
 #pragma region TIME_MANAGER
 	_float			Get_TimeDelta(const _wstring& strTimerTag);
@@ -85,6 +88,9 @@ public:
 	bool Mouse_Up(MOUSEKEYSTATE eMouseState);
 	bool Mouse_Down(MOUSEKEYSTATE eMouseState);
 #pragma endregion
+
+private:
+	_float2											m_vViewportSize = {};
 private:
 	unique_ptr<class Graphic_Device>				m_pGraphic_Device = { nullptr };
 	unique_ptr<class ImGUI_Manager>					m_pImGUI_Manager = { nullptr };

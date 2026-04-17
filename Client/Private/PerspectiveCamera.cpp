@@ -97,25 +97,7 @@ shared_ptr<Prototype> PerspectiveCamera::Clone(void* pArg)
 void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 
 
-	// 이동
-
- 	if (CGameInstance::Get().Key_Pressing(DIK_W) )
-		m_pTransformCom->Go_Straight(fTimeDelta);
-
-	if (CGameInstance::Get().Key_Pressing(DIK_S) )
-		m_pTransformCom->Go_Backward(fTimeDelta);
-
-	if (CGameInstance::Get().Key_Pressing(DIK_A) )
-		m_pTransformCom->Go_Static_Left(fTimeDelta);
-
-	if (CGameInstance::Get().Key_Pressing(DIK_D) )
-		m_pTransformCom->Go_Static_Right(fTimeDelta);
-
-	if (CGameInstance::Get().Key_Pressing(DIK_E))
-		m_pTransformCom->Go_Up(fTimeDelta);
-
-	if (CGameInstance::Get().Key_Pressing(DIK_Q) )
-		m_pTransformCom->Go_Down(fTimeDelta);
+	
 
 
 	if (CGameInstance::Get().Mouse_Down(MOUSEKEYSTATE::DIM_RB)) {
@@ -124,7 +106,25 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 	}
 
 	if (CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_RB)) {
+		// 이동
 
+		if (CGameInstance::Get().Key_Pressing(DIK_W))
+			m_pTransformCom->Go_Straight(fTimeDelta);
+
+		if (CGameInstance::Get().Key_Pressing(DIK_S))
+			m_pTransformCom->Go_Backward(fTimeDelta);
+
+		if (CGameInstance::Get().Key_Pressing(DIK_A))
+			m_pTransformCom->Go_Static_Left(fTimeDelta);
+
+		if (CGameInstance::Get().Key_Pressing(DIK_D))
+			m_pTransformCom->Go_Static_Right(fTimeDelta);
+
+		if (CGameInstance::Get().Key_Pressing(DIK_E))
+			m_pTransformCom->Go_Up(fTimeDelta);
+
+		if (CGameInstance::Get().Key_Pressing(DIK_Q))
+			m_pTransformCom->Go_Down(fTimeDelta);
 		POINT curPos{};
 		GetCursorPos(&curPos);
 

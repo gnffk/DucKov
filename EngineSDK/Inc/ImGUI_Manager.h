@@ -25,6 +25,7 @@ public:
 
 
 private:
+	
 	ComPtr<ID3D11Device> m_pDevice;
 	ComPtr<ID3D11DeviceContext> m_pDeviceContext;
 	ComPtr<ID3D11DepthStencilState> pDepthDisabledState;
@@ -32,7 +33,7 @@ private:
 	ComPtr<ID3D11RenderTargetView> m_pMainRTV;
 	ComPtr<ID3D11DepthStencilView> m_pMainDSV;
 	D3D11_VIEWPORT m_MainViewport{};
-
+	HWND m_hWnd;
 
 public:
 	static unique_ptr<ImGUI_Manager> Create(HWND hWnd, ComPtr<ID3D11Device>& p_Device, ComPtr<ID3D11DeviceContext>& p_DeviceContext, ComPtr<ID3D11RenderTargetView>& p_MainRTV, ComPtr<ID3D11DepthStencilView>& p_MainDSV);

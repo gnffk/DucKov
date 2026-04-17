@@ -34,7 +34,7 @@ HRESULT ImGUI_Manager::Initialize(HWND hWnd,
         style.WindowRounding = 0.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
-
+    m_hWnd = hWnd;
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX11_Init(p_Device.Get(), p_DeviceContext.Get());
 
@@ -79,6 +79,14 @@ void ImGUI_Manager::Update_Imgui(_float fTimeDelta)
 
     ImGuizmo::BeginFrame();
 
+    RECT rc{};
+    GetWindowRect(m_hWnd, &rc);
+
+    int x = rc.left;
+    int y = rc.top;
+
+    ImGuizmo::SetRect(x, y, 1280, 720);
+    //ImGui::SetWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
 
 }
 void ImGUI_Manager::Render_Imgui()

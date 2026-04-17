@@ -29,6 +29,7 @@ public:
 		XMStoreFloat4(reinterpret_cast<_float4*>(&m_WorldMatrix.m[ETOUI(eState)][0]), vState);
 	}
 	_float4x4 GetWorldMatrix(){return m_WorldMatrix;}
+	void  Set_WorldMatrix(_float4x4 matrix){ m_WorldMatrix = matrix;}
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);

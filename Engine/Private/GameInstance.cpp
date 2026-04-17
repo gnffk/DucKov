@@ -20,6 +20,9 @@ CGameInstance::~CGameInstance()
 
 HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<ID3D11Device>& pOutDevice, ComPtr<ID3D11DeviceContext>& pOutDeviceContext)
 {
+    m_vViewportSize = _float2((float)Engine_Desc.iWinSizeX, (float)Engine_Desc.iWinSizeY);
+
+
     m_pGraphic_Device = Graphic_Device::Create(Engine_Desc.hWnd, Engine_Desc.eWinMode, Engine_Desc.iWinSizeX, Engine_Desc.iWinSizeY, pOutDevice, pOutDeviceContext);
     if (nullptr == m_pGraphic_Device)
         return E_FAIL;

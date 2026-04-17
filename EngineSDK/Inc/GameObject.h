@@ -23,7 +23,7 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
-
+	void RenderGUI();
 protected:
 	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
 	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
@@ -42,6 +42,7 @@ protected:
 		const _wstring& strComponentTag, shared_ptr<Component>& pOut, void* pArg = nullptr);
 
 	shared_ptr<class Component> Find_Component(const _wstring& strComponentTag);
+
 
 public:
 	virtual shared_ptr<Prototype> Clone(void* pArg) = 0;

@@ -45,7 +45,7 @@ HRESULT Graphic_Device::Initialize(HWND hWnd, WINMODE eWinMode, int32_t iWinSize
 	ViewPortDesc.Width = (_float)iWinSizeX;
 	ViewPortDesc.Height = (_float)iWinSizeY;
 	ViewPortDesc.MinDepth = 0.f;
-	ViewPortDesc.MaxDepth = 1.f;
+ 	ViewPortDesc.MaxDepth = 1.f;
 
 	m_pDeviceContext->RSSetViewports(1, &ViewPortDesc);
 

@@ -57,7 +57,7 @@ void TestModel::Late_Update(_float fTimeDelta)
 
 HRESULT TestModel::Render()
 {
-
+	
 	for (auto m_pVIBufferCom : m_pVIBufferComs) {
 
 
@@ -100,6 +100,8 @@ HRESULT TestModel::Render()
 		if (FAILED(m_pVIBufferCom->Render()))
 			return E_FAIL;
 	}
+
+	RenderGUI();
 	return S_OK;
 }
 
