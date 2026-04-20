@@ -185,7 +185,7 @@ HRESULT CGameInstance::Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<Gam
 
 
 #pragma region IMGUI_MANAGER
-HRESULT CGameInstance::WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+bool CGameInstance::WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     return m_pImGUI_Manager->ImGui_WndProcHandler(hWnd,msg,wParam,lParam);
 }

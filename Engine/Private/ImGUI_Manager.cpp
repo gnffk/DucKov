@@ -81,6 +81,10 @@ void ImGUI_Manager::Update_Imgui(_float fTimeDelta)
 
     ImGuizmo::BeginFrame();
 
+
+
+
+
     RECT rc{};
     GetWindowRect(m_hWnd, &rc);
 
@@ -88,14 +92,14 @@ void ImGUI_Manager::Update_Imgui(_float fTimeDelta)
     float y = (float)rc.top;
 
     ImGuizmo::SetRect(x, y, 1280, 720);
-    //ImGui::SetWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
 
+    Update_Guizmo();
 }
 void ImGUI_Manager::Render_Imgui()
 {
-    Render_Gizimo();
 
-    ID3D11DepthStencilState* pOldDepthState = nullptr;
+
+    ComPtr<ID3D11DepthStencilState> pOldDepthState = nullptr;
     UINT oldStencilRef = 0;
 
     m_pDeviceContext->OMGetDepthStencilState(&pOldDepthState, &oldStencilRef);
@@ -114,28 +118,33 @@ void ImGUI_Manager::Render_Imgui()
         m_pDeviceContext->RSSetViewports(1, &m_MainViewport);
     }
 
-    m_pDeviceContext->OMSetDepthStencilState(pOldDepthState, oldStencilRef);
+    m_pDeviceContext->OMSetDepthStencilState(pOldDepthState.Get(), oldStencilRef);
 
     if (pOldDepthState)
         pOldDepthState->Release();
 }
-void ImGUI_Manager::Render_Gizimo()
+void ImGUI_Manager::Update_Guizmo()
 {
-
+    
     if (!m_pSelectObject)
         return;
 
-    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
-    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+    _float4x4 view, proj;
+    CGameInstance::Get().Get_MainCameraMatrix(view, proj);
 
-    if (!CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_RB)) {
-        if (ImGui::IsKeyPressed(ImGuiKey_T))
+    if (!CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_RB))
+    {
+        if (CGameInstance::Get().Key_Down(DIK_T))
             mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-        if (ImGui::IsKeyPressed(ImGuiKey_E))
+        if (CGameInstance::Get().Key_Down(DIK_R))
             mCurrentGizmoOperation = ImGuizmo::ROTATE;
-        if (ImGui::IsKeyPressed(ImGuiKey_R))
+        if (CGameInstance::Get().Key_Down(DIK_E))
             mCurrentGizmoOperation = ImGuizmo::SCALE;
     }
+
+    _float4x4 matrix = m_pSelectObject->GetTransform()->GetWorldMatrix();
+
+    ImGui::Begin("Imguizmo");
 
     if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
         mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
@@ -145,17 +154,6 @@ void ImGUI_Manager::Render_Gizimo()
     ImGui::SameLine();
     if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
         mCurrentGizmoOperation = ImGuizmo::SCALE;
-    float matrixTranslation[3], matrixRotation[3], matrixScale[3];
- 
-   
-    _float4x4 matrix = m_pSelectObject->GetTransform()->GetWorldMatrix();
-    ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
-    ImGui::InputFloat3("Tr", matrixTranslation);
-    ImGui::InputFloat3("Rt", matrixRotation);
-    ImGui::InputFloat3("Sc", matrixScale);
-    ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, reinterpret_cast<float*>(&matrix));
-    m_pSelectObject->GetTransform()->Set_WorldMatrix(matrix);
-
 
     if (mCurrentGizmoOperation != ImGuizmo::SCALE)
     {
@@ -166,15 +164,20 @@ void ImGUI_Manager::Render_Gizimo()
             mCurrentGizmoMode = ImGuizmo::WORLD;
     }
 
+    float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+    ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
+
+    ImGui::InputFloat3("Tr", matrixTranslation);
+    ImGui::InputFloat3("Rt", matrixRotation);
+    ImGui::InputFloat3("Sc", matrixScale);
+    ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, reinterpret_cast<float*>(&matrix));
 
 
-    _float4x4 view, proj;
-    CGameInstance::Get().Get_MainCameraMatrix(view, proj);
+    ImGui::End();
 
-
-
-    ImGuizmo::Manipulate(reinterpret_cast<float*>(&view), reinterpret_cast<float*>(&proj), mCurrentGizmoOperation, mCurrentGizmoMode,
-        reinterpret_cast<float*>(&matrix), NULL, NULL);
+    ImGuizmo::Manipulate( reinterpret_cast<float*>(&view), reinterpret_cast<float*>(&proj), mCurrentGizmoOperation, mCurrentGizmoMode,reinterpret_cast<float*>(&matrix));
+  
+    m_pSelectObject->GetTransform()->Set_WorldMatrix(matrix);
 
 }
 bool ImGUI_Manager::ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

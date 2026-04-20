@@ -68,18 +68,6 @@ HRESULT TestModel::Render()
 
 
 
- 		ImGui::Begin("TestModel Info");
-
-
-		ImGui::Text("World Matrix");
-		ImGui::Text("%.3f %.3f %.3f %.3f", World._11, World._12, World._13, World._14);
-		ImGui::Text("%.3f %.3f %.3f %.3f", World._21, World._22, World._23, World._24);
-		ImGui::Text("%.3f %.3f %.3f %.3f", World._31, World._32, World._33, World._34);
-		ImGui::Text("%.3f %.3f %.3f %.3f", World._41, World._42, World._43, World._44);
-
-
-		ImGui::End();
-
 
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
 			return E_FAIL;

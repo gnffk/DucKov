@@ -47,6 +47,7 @@ public:
 	void Go_Static_Right(_float fTimeDelta);
 	void Go_Static_Left(_float fTimeDelta);
 	void Rotation(_fvector vAxis, _float fAngle);
+	void Rotation(_float fAngleX, _float fAngleY, _float fAngleZ);
 	void Turn(_fvector vAxis, _float fTimeDelta);
 
 

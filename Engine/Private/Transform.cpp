@@ -152,6 +152,22 @@ void Transform::Rotation(_fvector vAxis, _float fAngle)
 
 }
 
+void Transform::Rotation(_float fAngleX, _float fAngleY, _float fAngleZ)
+{
+    _float3     vScaled = Get_Scaled();
+
+    _vector     vRight = XMVectorSet(1.f, 0.f, 0.f, 0.f) * vScaled.x;
+    _vector     vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f) * vScaled.y;
+    _vector     vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f) * vScaled.z;
+
+    _matrix RotationMatrix = XMMatrixRotationQuaternion(XMQuaternionRotationRollPitchYaw(XMConvertToRadians(fAngleX), XMConvertToRadians(fAngleY), XMConvertToRadians(fAngleZ)));
+    /*_matrix     RotationMatrix = XMMatrixRotationAxis(vAxis, XMConvertToRadians(fAngle));*/
+
+    Set_State(STATE::RIGHT, XMVector3TransformNormal(vRight, RotationMatrix));
+    Set_State(STATE::UP, XMVector3TransformNormal(vUp, RotationMatrix));
+    Set_State(STATE::LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
+}
+
 void Transform::Turn(_fvector vAxis, _float fTimeDelta)
 {
     _float3     vScaled = Get_Scaled();

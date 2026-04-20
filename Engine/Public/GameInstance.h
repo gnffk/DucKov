@@ -58,7 +58,7 @@ public:
 #pragma endregion
 
 #pragma region IMGUI_MANAGER
-	HRESULT WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	bool WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Render_IMGUI();
 	HRESULT SetSeletObject(GameObject* select);
 	class GameObject* GetSelectObject();

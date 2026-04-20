@@ -18,7 +18,7 @@ public:
 
 	void Update_Imgui(_float fTimeDelta);
 	void Render_Imgui();
-	void Render_Gizimo();
+	void Update_Guizmo();
 	bool ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	HRESULT SetSeletObject(GameObject* select) { m_pSelectObject = select;	return true;}
@@ -37,6 +37,8 @@ private:
 	D3D11_VIEWPORT m_MainViewport{};
 	HWND m_hWnd;
 
+	ImGuizmo::OPERATION mCurrentGizmoOperation{ ImGuizmo::ROTATE };
+	ImGuizmo::MODE mCurrentGizmoMode{ImGuizmo::WORLD };
 private:
 	GameObject* m_pSelectObject{nullptr};
 public:

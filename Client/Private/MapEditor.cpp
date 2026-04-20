@@ -34,7 +34,7 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 	descTestModel0.m_strName =L"TestModel0";
 	descTestModel0.pCameraType = ETOUI(CAMERA::NONE);
 	descTestModel0.fSpeedPerSec = 5.f;
-	descTestModel0.fRotationPerSec = XMConvertToRadians(90.0f);
+	descTestModel0.fRotationPerSec = 1.f;
 
  	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_TestModel"),
 		ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTestModel0) ))
@@ -46,7 +46,7 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 	descMain_Camera.m_strName = L"Main_Camera";
 	descMain_Camera.pCameraType = ETOUI(CAMERA::MAIN);
 	descMain_Camera.fSpeedPerSec = 1.f;
-	descMain_Camera.fRotationPerSec = XMConvertToRadians(10.f);
+	descMain_Camera.fRotationPerSec = 0.1f;
 
 
 	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_PerspectiveCamera"),
@@ -106,7 +106,7 @@ void MapEditor::IMGUI_Level_Render()
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoCollapse;
 
-	ImGui::Begin("Level", nullptr, flags);
+	ImGui::Begin("Level", nullptr);
 
 
 
