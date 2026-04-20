@@ -17,7 +17,7 @@ public:
 	void Update(_float fTimeDelta);
 	void Late_Update(_float fTimeDelta);
 
-	list<shared_ptr<GameObject>> Get_GameObjects(){ return m_GameObjects; }
+	list<shared_ptr<GameObject>>& Get_GameObjects(){ return m_GameObjects; }
 private:
 	list<shared_ptr<GameObject>>			m_GameObjects;
 

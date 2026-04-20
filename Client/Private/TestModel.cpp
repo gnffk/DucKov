@@ -101,7 +101,7 @@ HRESULT TestModel::Render()
 			return E_FAIL;
 	}
 
-	RenderGUI();
+
 	return S_OK;
 }
 
@@ -133,7 +133,7 @@ HRESULT TestModel::Ready_Components()
 		auto pVIBufferCom = dynamic_pointer_cast<Component>(DummyVIBufferCom);
 
 		std::wstring FindTag = L"Prototype_Component_VIBuffer_Mesh_" + m_pModelCom->GetMeshNames()[i];
-		std::wstring TagGameObject = L"Com_" + m_pModelCom->GetMeshNames()[i];
+		std::wstring TagGameObject = L"Com_VIBuffer_Mesh_" + m_pModelCom->GetMeshNames()[i];
 		if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), FindTag,
 			TagGameObject, pVIBufferCom)))
 			return E_FAIL;

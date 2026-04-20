@@ -18,7 +18,8 @@ public:
 	HRESULT Ready_Layer_MapEditor(const _wstring& strLayerTag);
 	virtual HRESULT Render() override;
 	void	IMGUI_Render();
-	
+	void	IMGUI_Level_Render();
+	void	IMGUI_OTHER_Render();
 
 
 public:

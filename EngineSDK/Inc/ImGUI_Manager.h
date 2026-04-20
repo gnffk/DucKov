@@ -18,9 +18,11 @@ public:
 
 	void Update_Imgui(_float fTimeDelta);
 	void Render_Imgui();
-
+	void Render_Gizimo();
 	bool ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	HRESULT SetSeletObject(GameObject* select) { m_pSelectObject = select;	return true;}
+	GameObject* GetSelectObject() { return m_pSelectObject; }
 
 
 
@@ -35,6 +37,8 @@ private:
 	D3D11_VIEWPORT m_MainViewport{};
 	HWND m_hWnd;
 
+private:
+	GameObject* m_pSelectObject{nullptr};
 public:
 	static unique_ptr<ImGUI_Manager> Create(HWND hWnd, ComPtr<ID3D11Device>& p_Device, ComPtr<ID3D11DeviceContext>& p_DeviceContext, ComPtr<ID3D11RenderTargetView>& p_MainRTV, ComPtr<ID3D11DepthStencilView>& p_MainDSV);
 

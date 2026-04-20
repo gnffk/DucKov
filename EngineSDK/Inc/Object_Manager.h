@@ -23,6 +23,8 @@ public:
 		uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg);
 
 	shared_ptr<GameObject> Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag);
+	map<const _wstring, unique_ptr<Layer>>& Find_Layer_Lists(uint32_t iLayerLevelIndex);
+	
 private:
 	uint32_t	m_iNumLevels = {};
 private:

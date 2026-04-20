@@ -2,7 +2,7 @@
 #include "MapEditor.h"
 #include "GameInstance.h"
 #include "Camera.h"
-
+#include "Layer.h"
 MapEditor::MapEditor(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -81,6 +81,90 @@ unique_ptr<MapEditor> MapEditor::Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3
 
 void MapEditor::IMGUI_Render() {
 #if _DEBUG
+
+	IMGUI_OTHER_Render();
+
+	IMGUI_Level_Render();
+
+#endif
+
+}
+
+void MapEditor::IMGUI_Level_Render()
+{// --------------------------------Levels -----------------------------------------------------
+	ImGui::SetNextWindowBgAlpha(0.5f);
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+	float leftPanelWidth = 260.f;
+
+	ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y));
+	ImGui::SetNextWindowSize(
+		ImVec2(leftPanelWidth, viewport->WorkSize.y),
+		ImGuiCond_Once  
+	);
+	ImGuiWindowFlags flags =
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoCollapse;
+
+	ImGui::Begin("Level", nullptr, flags);
+
+
+
+	for (auto& layer : CGameInstance::Get().Find_Layer_Lists(ETOUI(LEVEL::MAPEDITOR)))
+	{
+		std::string layerLabel = WStringToString(layer.first);
+
+		if (ImGui::TreeNode(layerLabel.c_str()))
+		{
+			auto& gameObjects = layer.second->Get_GameObjects();
+
+			for (auto& object : gameObjects)
+			{
+				std::string objectName = WStringToString(object->GetObjectName());
+
+				ImGuiTreeNodeFlags flags =
+					ImGuiTreeNodeFlags_OpenOnArrow |
+					ImGuiTreeNodeFlags_SpanAvailWidth |
+					(CGameInstance::Get().GetSelectObject() == object.get()
+						? ImGuiTreeNodeFlags_Selected
+						: 0);
+
+				bool opened = ImGui::TreeNodeEx(
+					(objectName + "##" + std::to_string((uintptr_t)object.get())).c_str(),
+					flags
+				);
+
+	
+				if (ImGui::IsItemClicked())
+				{
+					CGameInstance::Get().SetSeletObject(object.get());
+				}
+
+				if (opened)
+				{
+					auto& components = object->GetComponents();
+
+					for (auto& component : components)
+					{
+						std::string compName = WStringToString(component.first);
+
+					
+						ImGui::BulletText("%s", compName.c_str());
+					}
+
+					ImGui::TreePop();
+				}
+			}
+
+			ImGui::TreePop();
+		}
+	}
+
+	ImGui::End();
+}
+
+void MapEditor::IMGUI_OTHER_Render()
+{
 	ImGui::Begin(u8"Prototype Manager", nullptr, ImGuiWindowFlags_NoTitleBar);
 	ImGui::Text(u8"초기 프로토타입");
 
@@ -132,12 +216,11 @@ void MapEditor::IMGUI_Render() {
 	}
 	// ---------------------------------frame--------------------------------------------
 	ImGui::Begin("Performance");
-	
+
 
 	ImGui::Text("FPS        : %.1f", ImGui::GetIO().Framerate);
 	ImGui::Text("Frame Time : %.3f ms", 1000.0f / ImGui::GetIO().Framerate);
 
 	ImGui::End();
-#endif
-
 }
+

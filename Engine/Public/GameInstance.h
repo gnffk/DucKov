@@ -52,11 +52,16 @@ public:
 		uint32_t iLayerLevelIndex, const _wstring& strLayerTag, void* pArg = nullptr);
 
 	shared_ptr<class GameObject> Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag);
+
+	map<const _wstring, unique_ptr<class Layer>>& Find_Layer_Lists(uint32_t iLayerLevelIndex);
+
 #pragma endregion
 
 #pragma region IMGUI_MANAGER
 	HRESULT WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void Render_IMGUI();
+	HRESULT SetSeletObject(GameObject* select);
+	class GameObject* GetSelectObject();
 #pragma endregion
 
 #pragma region RENDERER

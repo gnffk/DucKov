@@ -168,6 +168,10 @@ HRESULT CGameInstance::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, con
 shared_ptr<GameObject> CGameInstance::Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag) {
     return m_pObject_Manager->Find_Object(iLayerLevelIndex, strLayerTag, strObjectTag);
 }
+
+map<const _wstring, unique_ptr<Layer>>& CGameInstance::Find_Layer_Lists(uint32_t iLayerLevelIndex) {
+    return m_pObject_Manager->Find_Layer_Lists(iLayerLevelIndex);
+}
 #pragma endregion
 
 #pragma region RENDERER
@@ -192,6 +196,13 @@ void CGameInstance::Render_IMGUI()
 
 }
 
+HRESULT CGameInstance::SetSeletObject(GameObject* select) {
+    return m_pImGUI_Manager->SetSeletObject(select);
+}
+
+GameObject* CGameInstance::GetSelectObject() {
+    return m_pImGUI_Manager->GetSelectObject();
+}
 #pragma endregion
 
 #pragma region Camera_Manager

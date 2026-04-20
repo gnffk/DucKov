@@ -78,7 +78,7 @@ HRESULT Object_Manager::Add_GameObject_toLayer(uint32_t iPrototypeLevelIndex, co
 	auto		pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
 	if (nullptr == pLayer)
 	{
-		auto	pNewLayer = Layer::Create();
+ 		auto	pNewLayer = Layer::Create();
 		if (nullptr == pNewLayer)
 			return E_FAIL;
 
@@ -109,12 +109,22 @@ Layer* Object_Manager::Find_Layer(uint32_t iLayerLevelIndex, const _wstring& str
 shared_ptr<GameObject> Object_Manager::Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag)
 {
 	for (auto obj : Find_Layer(iLayerLevelIndex, strLayerTag)->Get_GameObjects()) {
-		if (obj->m_ObjectName == strObjectTag) {
+		if (obj->GetObjectName() == strObjectTag) {
 			return obj;
 		}
 	}
 	return nullptr;
 }
+
+map<const _wstring, unique_ptr<Layer>>& Object_Manager::Find_Layer_Lists(uint32_t iLayerLevelIndex)
+{
+	return m_pLayers.get()[iLayerLevelIndex];
+}
+
+
+
+
+
 
 unique_ptr<Object_Manager> Object_Manager::Create(uint32_t iNumLevels)
 {

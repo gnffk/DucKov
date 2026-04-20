@@ -20,6 +20,9 @@ protected:
 	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
 	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
 
+
+protected:
+
 public:
 	virtual shared_ptr<Prototype> Clone(void* pArg) = 0;
 

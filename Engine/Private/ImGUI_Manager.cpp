@@ -1,6 +1,8 @@
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 #include "ImGUI_Manager.h"
+#include "GameInstance.h"
+#include "GameObject.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 ImGUI_Manager::~ImGUI_Manager()
@@ -71,7 +73,7 @@ HRESULT ImGUI_Manager::Initialize(HWND hWnd,
 
 void ImGUI_Manager::Update_Imgui(_float fTimeDelta)
 {
-
+    
     // Start the Dear ImGui frame
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -82,8 +84,8 @@ void ImGUI_Manager::Update_Imgui(_float fTimeDelta)
     RECT rc{};
     GetWindowRect(m_hWnd, &rc);
 
-    int x = rc.left;
-    int y = rc.top;
+    float x = (float)rc.left;
+    float y = (float)rc.top;
 
     ImGuizmo::SetRect(x, y, 1280, 720);
     //ImGui::SetWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
@@ -91,13 +93,15 @@ void ImGUI_Manager::Update_Imgui(_float fTimeDelta)
 }
 void ImGUI_Manager::Render_Imgui()
 {
+    Render_Gizimo();
+
     ID3D11DepthStencilState* pOldDepthState = nullptr;
     UINT oldStencilRef = 0;
 
     m_pDeviceContext->OMGetDepthStencilState(&pOldDepthState, &oldStencilRef);
 
     m_pDeviceContext->OMSetDepthStencilState(pDepthDisabledState.Get(), 0);
-
+    
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
@@ -114,6 +118,64 @@ void ImGUI_Manager::Render_Imgui()
 
     if (pOldDepthState)
         pOldDepthState->Release();
+}
+void ImGUI_Manager::Render_Gizimo()
+{
+
+    if (!m_pSelectObject)
+        return;
+
+    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
+    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+
+    if (!CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_RB)) {
+        if (ImGui::IsKeyPressed(ImGuiKey_T))
+            mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+        if (ImGui::IsKeyPressed(ImGuiKey_E))
+            mCurrentGizmoOperation = ImGuizmo::ROTATE;
+        if (ImGui::IsKeyPressed(ImGuiKey_R))
+            mCurrentGizmoOperation = ImGuizmo::SCALE;
+    }
+
+    if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
+        mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
+        mCurrentGizmoOperation = ImGuizmo::ROTATE;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
+        mCurrentGizmoOperation = ImGuizmo::SCALE;
+    float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+ 
+   
+    _float4x4 matrix = m_pSelectObject->GetTransform()->GetWorldMatrix();
+    ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
+    ImGui::InputFloat3("Tr", matrixTranslation);
+    ImGui::InputFloat3("Rt", matrixRotation);
+    ImGui::InputFloat3("Sc", matrixScale);
+    ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, reinterpret_cast<float*>(&matrix));
+    m_pSelectObject->GetTransform()->Set_WorldMatrix(matrix);
+
+
+    if (mCurrentGizmoOperation != ImGuizmo::SCALE)
+    {
+        if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
+            mCurrentGizmoMode = ImGuizmo::LOCAL;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
+            mCurrentGizmoMode = ImGuizmo::WORLD;
+    }
+
+
+
+    _float4x4 view, proj;
+    CGameInstance::Get().Get_MainCameraMatrix(view, proj);
+
+
+
+    ImGuizmo::Manipulate(reinterpret_cast<float*>(&view), reinterpret_cast<float*>(&proj), mCurrentGizmoOperation, mCurrentGizmoMode,
+        reinterpret_cast<float*>(&matrix), NULL, NULL);
+
 }
 bool ImGUI_Manager::ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
