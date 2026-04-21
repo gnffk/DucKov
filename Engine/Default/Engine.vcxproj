@@ -19,8 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\AABB_Collider.h" />
+    <ClInclude Include="..\Public\BaseCollider.h" />
     <ClInclude Include="..\Public\Camera.h" />
     <ClInclude Include="..\Public\Camera_Manager.h" />
+    <ClInclude Include="..\Public\Collider_Manager.h" />
     <ClInclude Include="..\Public\Component.h" />
     <ClInclude Include="..\Public\Key_Manager.h" />
     <ClInclude Include="..\Public\Mesh.h" />
@@ -86,9 +89,12 @@
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGradient.cpp" />
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImGuizmo.cpp" />
     <ClCompile Include="..\lib\imgui\ImGuizmo-1.83\ImSequencer.cpp" />
+    <ClCompile Include="..\Private\AABB_Collider.cpp" />
+    <ClCompile Include="..\Private\BaseCollider.cpp" />
     <ClCompile Include="..\Private\Camera.cpp" />
     <ClCompile Include="..\Private\Camera_Manager.cpp" />
     <ClCompile Include="..\Private\CLevel.cpp" />
+    <ClCompile Include="..\Private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
     <ClCompile Include="..\Private\Key_Manager.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />

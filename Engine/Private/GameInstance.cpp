@@ -8,6 +8,7 @@
 #include "Renderer.h"
 #include "Camera_Manager.h"
 #include "Key_Manager.h"
+#include "Collider_Manager.h"
 
 CGameInstance::CGameInstance()
 {
@@ -29,6 +30,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
 
     m_pKey_Manager = Key_Manager::Create();
     if (nullptr == m_pKey_Manager)
+        return E_FAIL;
+
+    m_pCollider_Manager = Collider_Manager::Create();
+    if (nullptr == m_pCollider_Manager)
         return E_FAIL;
 
     m_pCamera_Manager = Camera_Manager::Create();
@@ -82,6 +87,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 HRESULT CGameInstance::Draw()
 {
+    m_pCollider_Manager->Render();
+
     if (FAILED(m_pRenderer->Draw()))
         return E_FAIL;
 
@@ -94,6 +101,7 @@ HRESULT CGameInstance::Draw()
 
 void CGameInstance::Clear_Resource(uint32_t iClearLevelIndex)
 {
+    m_pCollider_Manager->Clear();
     m_pObject_Manager->Clear(iClearLevelIndex);
     m_pPrototype_Manager->Clear(iClearLevelIndex);
    
@@ -226,6 +234,14 @@ weak_ptr<Camera> CGameInstance::Find_Camera(uint32_t iCameraType)
 
 
 #pragma endregion
+#pragma region Collider_Manager
+HRESULT CGameInstance::Add_Collider(wstring GroupTag, class BaseCollider* pCollider) {
+    return S_OK;
+}
+std::vector<BaseCollider*>* CGameInstance::GetColliderGroups(wstring GroupTag) {
+    return nullptr;
+}
+#pragma endregion
 
 #pragma region Key_Manager
 HRESULT CGameInstance::Ready_Key(HINSTANCE hInst, HWND hWnd) {
@@ -269,6 +285,8 @@ bool CGameInstance::Mouse_Down(MOUSEKEYSTATE eMouseState) {
 void CGameInstance::Release_Engine()
 {
     m_pCamera_Manager.reset();
+
+    m_pCollider_Manager.reset();
 
     m_pKey_Manager.reset();
 

@@ -75,6 +75,11 @@ public:
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
 #pragma endregion
 
+#pragma region Collider_Manager
+	HRESULT Add_Collider(wstring GroupTag, class BaseCollider* pCollider);
+	std::vector<BaseCollider*>* GetColliderGroups(wstring GroupTag);
+#pragma endregion
+
 #pragma region KEY_MANAGER
 	HRESULT Ready_Key(HINSTANCE hInst, HWND hWnd);
 
@@ -106,6 +111,7 @@ private:
 	unique_ptr<class Renderer>						m_pRenderer = { nullptr };
 	unique_ptr<class Camera_Manager>				m_pCamera_Manager = { nullptr };
 	unique_ptr<class Key_Manager>					m_pKey_Manager = { nullptr };
+	unique_ptr<class Collider_Manager>				m_pCollider_Manager = { nullptr };
 
 
 public:

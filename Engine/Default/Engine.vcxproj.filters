@@ -91,6 +91,15 @@
     <Filter Include="06.Component\Texture">
       <UniqueIdentifier>{c98dae71-ce96-4ba4-8e9a-047a31956773}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\Collider">
+      <UniqueIdentifier>{dff704e8-7ce5-4879-9c44-bc10ceb2cefb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="06.Component\Collider\Manager">
+      <UniqueIdentifier>{3ea2c1b5-6298-4e61-88ae-b058ff8064fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="06.Component\Collider\AABB">
+      <UniqueIdentifier>{3120d182-7057-4c9d-8854-0fe283298d3e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -207,6 +216,15 @@
     <ClCompile Include="..\Private\Texture.cpp">
       <Filter>06.Component\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\BaseCollider.cpp">
+      <Filter>06.Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AABB_Collider.cpp">
+      <Filter>06.Component\Collider\AABB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Collider_Manager.cpp">
+      <Filter>06.Component\Collider\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -304,6 +322,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Texture.h">
       <Filter>06.Component\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BaseCollider.h">
+      <Filter>06.Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AABB_Collider.h">
+      <Filter>06.Component\Collider\AABB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Collider_Manager.h">
+      <Filter>06.Component\Collider\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,3 +1,4 @@
+#include "AABB_Collider.h"
 #include "CMainGame.h"
 #include "GameInstance.h"
 #include "Level_Loading.h"
@@ -41,6 +42,8 @@ HRESULT Client::CMainGame::Start_Level(LEVEL eStartLevelIndex)
 
 	return S_OK;
 }
+
+
 
 void Client::CMainGame::Update(float fTimeDelta)
 {

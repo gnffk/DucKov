@@ -8,7 +8,7 @@
 #include "DirectXTK/DDSTextureLoader.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/VertexTypes.h"
-
+#include <DirectXCollision.h>
 using namespace DirectX;
 #include  <any>
 #include <vector>
