@@ -9,7 +9,7 @@ class VIBuffer_Mesh;
 class VIBuffer_Rect;
 class Model;
 class Shader;
-
+class BaseCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -46,7 +46,7 @@ private:
 	shared_ptr<Model>			m_pModelCom = { nullptr };
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
 	shared_ptr<Texture>			m_pTextureCom = { nullptr };
-	
+	shared_ptr<BaseCollider>	m_pAABBCom = { nullptr };
 
 public:
 	static unique_ptr<TestModel> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

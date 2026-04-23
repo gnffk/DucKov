@@ -1,5 +1,8 @@
 #pragma once
 
+
+
+
 #include <filesystem>
 #include <d3d11.h>
 #include "Fx11/d3dx11effect.h"
@@ -8,6 +11,9 @@
 #include "DirectXTK/DDSTextureLoader.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/VertexTypes.h"
+#include "DirectXTK/PrimitiveBatch.h"
+#include "DirectXTK/CommonStates.h"
+#include "DirectXTK/Effects.h"
 #include <DirectXCollision.h>
 using namespace DirectX;
 #include  <any>

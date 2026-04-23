@@ -35,13 +35,14 @@ HRESULT TestModel::Initialize(void* pArg)
 
 	m_pTransformCom->Set_Scale(0.01f, 0.01f, 0.01f);
 	m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), 90.f);
-
+	m_pAABBCom->SetOwner(SHARED_THIS(TestModel).get());
 	return S_OK;
 }
 
 void TestModel::Priority_Update(_float fTimeDelta)
 {
 	CGameInstance::Get().Add_RenderObject(RENDERGROUP::BLEND, SHARED_THIS(TestModel));
+	CGameInstance::Get().Add_Collider(L"Player", m_pAABBCom.get());
 }
 
 void TestModel::Update(_float fTimeDelta)
@@ -60,14 +61,17 @@ HRESULT TestModel::Render()
 	
 
 
-		_float4x4 View, Proj;
-		CGameInstance::Get().Get_MainCameraMatrix(View,Proj);
+	_float4x4 View, Proj;
+	CGameInstance::Get().Get_MainCameraMatrix(View,Proj);
 
 	_float4x4 World = m_pTransformCom->GetWorldMatrix();
 
 
 
-
+	// QUESTION
+	// 형 Collider 전용 shader가 따로 있을거잖아 
+	// 그럼 그 Collider shader는 Collider 마다 가지고 있게 만들어줬어?
+	// DebugDraw 검색ㄱㄱ 배신자 그럼 Shader 없어도 돼?
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
@@ -104,7 +108,10 @@ HRESULT TestModel::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Texture"), m_pTextureCom)))
 		return E_FAIL;
 
-
+	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_AABB_Collider")));
+	if (FAILED(__super::Add_Component(TEXT("Com_Collider"), m_pAABBCom)))
+		return E_FAIL;
+	
 
 
 	

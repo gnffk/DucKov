@@ -22,7 +22,7 @@ public:
 
 public:
 	virtual void Update(float Timedelta);
-	virtual HRESULT Render();
+	virtual HRESULT Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch);
 
 private:
 	BoundingBox m_boudingBox;

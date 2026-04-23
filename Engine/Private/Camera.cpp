@@ -65,3 +65,7 @@ void Camera::GetShaderMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix
  	ProjectionMatrix = m_ProjectionMatrix;
 
 }
+
+void Camera::GetWorldMatrix(_float4x4& WorldMatrix) {
+	WorldMatrix = m_WorldMatrix;
+}

@@ -25,6 +25,8 @@ public:
 
 	void GetShaderMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix);
 
+	void GetWorldMatrix(_float4x4& WorldMatrix);
+
 
 protected:
 

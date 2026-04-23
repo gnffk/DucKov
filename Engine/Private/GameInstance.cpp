@@ -32,7 +32,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pKey_Manager)
         return E_FAIL;
 
-    m_pCollider_Manager = Collider_Manager::Create();
+    m_pCollider_Manager = Collider_Manager::Create(pOutDevice, pOutDeviceContext);
     if (nullptr == m_pCollider_Manager)
         return E_FAIL;
 
@@ -231,15 +231,18 @@ weak_ptr<Camera> CGameInstance::Find_Camera(uint32_t iCameraType)
     return m_pCamera_Manager->Find_Camera(iCameraType);
  
 }
-
+void  CGameInstance::GetWorldMatrix(_float4x4& WorldMatrix) {
+    m_pCamera_Manager->Get_MainCameraWorldMatrix(WorldMatrix);
+}
 
 #pragma endregion
 #pragma region Collider_Manager
 HRESULT CGameInstance::Add_Collider(wstring GroupTag, class BaseCollider* pCollider) {
-    return S_OK;
+
+    return  m_pCollider_Manager->Add_Collider(GroupTag, pCollider);
 }
 std::vector<BaseCollider*>* CGameInstance::GetColliderGroups(wstring GroupTag) {
-    return nullptr;
+    return m_pCollider_Manager->GetColliderGroups(GroupTag);
 }
 #pragma endregion
 

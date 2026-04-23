@@ -72,6 +72,7 @@ public:
 	HRESULT Change_Camera(uint32_t iCameraType);
 	HRESULT Add_Camera(uint32_t iCameraType, shared_ptr<class Camera> pCamera);
 	HRESULT Get_MainCameraMatrix(_float4x4& ViewMatrix, _float4x4& ProjectionMatrix);
+	void GetWorldMatrix(_float4x4& WorldMatrix);
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
 #pragma endregion
 

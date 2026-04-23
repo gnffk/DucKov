@@ -142,6 +142,18 @@ HRESULT CLoader::Loading_For_MapEditor()
 	//	return E_FAIL;
 	//}
 #pragma endregion
+#pragma region Collider Component Prototype
+	///* Prototype_GameObject_TestModel */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_AABB_Collider"),
+		AABB_Collider::Create(m_pDevice, m_pContext)))){
+		return E_FAIL;
+	}
+
+	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
+	//	VIBuffer_Rect::Create(m_pDevice, m_pContext)))) {
+	//	return E_FAIL;
+	//}
+#pragma endregion
 
 
 #pragma region GameObject Prototype

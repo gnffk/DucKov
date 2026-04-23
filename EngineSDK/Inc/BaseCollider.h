@@ -8,6 +8,12 @@ enum class ColliderType {
 	OBB
 };
 
+enum class ColliderColor {
+	RED,
+	GREEN,
+	BLACK
+};
+
 NS_BEGIN(Engine);
 
 class ENGINE_DLL BaseCollider : public Component
@@ -17,11 +23,6 @@ protected:
 public:
 	virtual ~BaseCollider();
 
-public:
-	void Set_OriginalColor(_ulong color) { m_dwOriginalColor = color; }
-	void Set_IntersectColor(_ulong color) { m_dwIntersectColor = color; }
-	void Set_CurrentColorIntersect() { m_dwCurrentColor = m_dwIntersectColor; };
-	void Set_CurrentColorOriginal() { m_dwCurrentColor = m_dwOriginalColor; };
 
 public:
 	wstring Get_Tag() const { return m_sTag; }
@@ -38,39 +39,20 @@ public:
 public:
 	virtual void Update(float Timedelta) = 0;
 	virtual HRESULT Bind_Resources();
-	virtual HRESULT Render();
-
+	virtual HRESULT Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch);
+	void SetOwner(GameObject* _owner) {
+		m_Owner = _owner;
+	}
 protected:
 	ColliderType m_eColliderID;
+	ColliderColor m_eColor;
 	wstring m_sTag;
-
-
+	GameObject* m_Owner{ nullptr };
 
 protected:
 	bool m_bRenderInitialized;
 
-	_ulong m_dwOriginalColor;
-	_ulong m_dwIntersectColor;
-	_ulong m_dwCurrentColor;
-
-
-
-protected:
-	ComPtr<ID3D11Buffer>			m_pVB = { nullptr };
-	ComPtr<ID3D11Buffer>			m_pIB = { nullptr };
-
-	UINT m_iNumVertexBuffers = 1;
-	UINT m_iNumVertices = 0;
-	UINT m_iVertexStride = sizeof(VTXTEX);
-
-	UINT m_iNumIndices = 0;
-	UINT m_iIndexStride = sizeof(uint16_t);
-	DXGI_FORMAT m_eIndexFormat = DXGI_FORMAT_R16_UINT;
-	D3D11_PRIMITIVE_TOPOLOGY m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-	shared_ptr<vector<VTXTEX>> vertices;
-	shared_ptr<vector<uint16_t>> indices;
-
+	
 
 public:
 	virtual shared_ptr<Prototype> Clone(void* pArg) = 0;

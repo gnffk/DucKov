@@ -20,7 +20,7 @@ public:
 
 
 	HRESULT Get_MainCameraMatrix( _float4x4& ViewMatrix  , _float4x4& ProjectionMatrix);
-
+	HRESULT Get_MainCameraWorldMatrix(_float4x4& WorldMatrix);
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
 	
 private:
