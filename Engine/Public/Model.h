@@ -25,7 +25,7 @@ public:
 
 
 public:
-	// À¯µµ¸® ÀÖ°Ô Âô±ß
+
 	vector<wstring>& GetMeshNames() { return meshNames; }
 	
 private:

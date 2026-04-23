@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "Mesh.h"
 #include "GameInstance.h"
 
 
@@ -6,6 +7,8 @@
 Mesh::Mesh(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : Component{pDevice, pContext}
 {
 }
+
+
 
 Mesh::~Mesh()
 {
