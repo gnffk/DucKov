@@ -21,6 +21,7 @@ using namespace DirectX;
 #include <ctime>
 #include <memory>
 #include <wrl/client.h>
+#include <fstream>
 using namespace Microsoft::WRL;
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"

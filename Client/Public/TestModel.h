@@ -46,7 +46,7 @@ private:
 	shared_ptr<Model>			m_pModelCom = { nullptr };
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
 	shared_ptr<Texture>			m_pTextureCom = { nullptr };
-	vector<shared_ptr<VIBuffer_Mesh>>	m_pVIBufferComs;
+	
 
 public:
 	static unique_ptr<TestModel> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

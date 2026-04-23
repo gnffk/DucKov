@@ -58,36 +58,31 @@ void TestModel::Late_Update(_float fTimeDelta)
 HRESULT TestModel::Render()
 {
 	
-	for (auto m_pVIBufferCom : m_pVIBufferComs) {
 
 
 		_float4x4 View, Proj;
 		CGameInstance::Get().Get_MainCameraMatrix(View,Proj);
 
-		_float4x4 World = m_pTransformCom->GetWorldMatrix();
+	_float4x4 World = m_pTransformCom->GetWorldMatrix();
 
 
 
 
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
-			return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
+		return E_FAIL;
 
-		if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
-			return E_FAIL;
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+		return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
+	if (FAILED(m_pShaderCom->Begin(0)))
+		return E_FAIL;
 
-		if (FAILED(m_pVIBufferCom->Bind_Resources()))
-			return E_FAIL;
-
-		if (FAILED(m_pVIBufferCom->Render()))
-			return E_FAIL;
-	}
+	if (FAILED(m_pModelCom->Render()))
+		return E_FAIL;
 
 
 	return S_OK;
@@ -96,55 +91,21 @@ HRESULT TestModel::Render()
 HRESULT TestModel::Ready_Components()
 {
 
-	//auto VIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferCom);
-	//if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
-	//	TEXT("Com_VIBuffer"), VIBufferCom)))
-	//	return E_FAIL;
-	//m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Fbx>(VIBufferCom);
 
-	//auto VIBufferCom = dynamic_pointer_cast<Component>(m_pVIBufferCom);
-	//if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
-	//	TEXT("Com_VIBuffer"), VIBufferCom)))
-	//	return E_FAIL;
-	//m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Rect>(VIBufferCom);
-
-#pragma region ¸ðµ¨ÀÏ¶§
-	auto ModelCom = dynamic_pointer_cast<Component>(m_pModelCom);
-	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-		TEXT("Com_Model"), ModelCom)))
+	m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck")));
+	if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
 		return E_FAIL;
-	m_pModelCom = dynamic_pointer_cast<Model>(ModelCom);
 
-	for (int i = 0; i < m_pModelCom->GetMeshNames().size(); i++) {
-		shared_ptr<Component> DummyVIBufferCom;
-
-		auto pVIBufferCom = dynamic_pointer_cast<Component>(DummyVIBufferCom);
-
-		std::wstring FindTag = L"Prototype_Component_VIBuffer_Mesh_" + m_pModelCom->GetMeshNames()[i];
-		std::wstring TagGameObject = L"Com_VIBuffer_Mesh_" + m_pModelCom->GetMeshNames()[i];
-		if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), FindTag,
-			TagGameObject, pVIBufferCom)))
-			return E_FAIL;
-
-		if (pVIBufferCom == nullptr) {
-			return E_FAIL;
-		}
-		m_pVIBufferComs.emplace_back(dynamic_pointer_cast<VIBuffer_Mesh>(pVIBufferCom));
-	}
-#pragma endregion
-
-	auto ShaderCom = dynamic_pointer_cast<Component>(m_pShaderCom);
-	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex"),
-		TEXT("Com_Shader"), ShaderCom)))
+	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex")));
+	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
-	m_pShaderCom = dynamic_pointer_cast<Shader>(ShaderCom);
 
-	auto TextureCom = dynamic_pointer_cast<Component>(m_pTextureCom);
-	if (FAILED(__super::Add_Component(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
-		TEXT("Com_Texture"), TextureCom)))
+	m_pTextureCom = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo")));
+	if (FAILED(__super::Add_Component(TEXT("Com_Texture"), m_pTextureCom)))
 		return E_FAIL;
-	m_pTextureCom = dynamic_pointer_cast<Texture>(TextureCom);
-	
+
+
+
 
 	
 

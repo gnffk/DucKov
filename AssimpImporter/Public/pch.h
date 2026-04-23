@@ -32,6 +32,21 @@ using namespace std;
 #define			MSG_BOX(_message)			MessageBox(NULL, TEXT(_message), L"System Message", MB_OK)
 #endif
 
+typedef struct FileHeader
+{
+	uint32_t magic;
+	uint32_t version = 1;
+}FILEHEADER;
+
+typedef struct ChunkHeader
+{
+	uint32_t type;
+	uint32_t size;
+}CHUCKHEADER;
+
+enum FileHeaderType { FILEHEADER_MODEL,END};
+enum ChunkType { CHUNK_MESH = 1, CHUNK_MATERIAL, CHUNK_TEXTURE, CHUNK_SKELETON, CHUNK_ANIMATION };
+
 
 typedef struct tagVertexMesh
 {

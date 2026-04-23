@@ -117,7 +117,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 	//	return E_FAIL;
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx"))))
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC","../../Resources/Model/Bin/0_CharacterModel_Duck_Jeff.bin"))))
 		return E_FAIL;
 
 #pragma endregion
@@ -125,7 +125,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 #pragma region Shader Component Prototype
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex"),
-		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Vtx_Fbx.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Vtx_Fbx.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
 #pragma endregion

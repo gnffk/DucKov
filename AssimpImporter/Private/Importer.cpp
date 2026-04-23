@@ -196,9 +196,31 @@ HRESULT Importer::ExportMeshBinary(const char* filePath)
         MSG_BOX("no file path");
         return E_FAIL;
     }
-      
+    FileHeader fh;
+    fh.magic = ETOUI(FileHeaderType::FILEHEADER_MODEL);
+    fh.version = 1;
+    file.write((char*)&fh, sizeof(fh));
 
-    // Mesh 개수
+    ChunkHeader ch;
+    ch.type = ChunkType::CHUNK_MESH;
+
+    uint32_t totalSize = 0;
+    totalSize += sizeof(uint32_t);
+    for (auto& mesh : Meshes)
+    {
+        uint32_t vCount = mesh->m_vertices->size();
+        uint32_t iCount = mesh->m_indices->size();
+
+        totalSize += sizeof(uint32_t) * 2;
+        totalSize += sizeof(VTXMESH) * vCount;
+        totalSize += sizeof(uint32_t) * iCount;
+    }
+
+    ch.size = totalSize;
+
+    file.write((char*)&ch, sizeof(ch));
+
+    // 기존 코드 그대로
     uint32_t meshCount = Meshes.size();
     file.write((char*)&meshCount, sizeof(uint32_t));
 

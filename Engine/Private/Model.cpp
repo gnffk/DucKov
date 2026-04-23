@@ -8,128 +8,26 @@ Model::~Model()
 {
 }
 
-HRESULT Model::Initialize_Prototype(uint32_t iLevelIndex, wstring modelName)
+Model::Model(const Model& Prototype)
+    : Component{ Prototype }
+    , m_Meshes{ Prototype.m_Meshes }
+{
+
+}
+
+
+HRESULT Model::Initialize_Prototype(uint32_t iLevelIndex, wstring modelName, const char* modelFileName)
 {
     m_iLevelIndex = iLevelIndex;
     m_sModelName = modelName;
-    #pragma region ASSIMP
-    Assimp::Importer importer;
-
-    const aiScene* pScene = importer.ReadFile(WStringToString(m_sModelName),
-        aiProcess_Triangulate |
-        aiProcess_ConvertToLeftHanded |
-        aiProcess_GenNormals |
-        aiProcess_CalcTangentSpace
-    );
-    
-
-
-    if (pScene == nullptr) {
-        MSG_BOX("Failed to Open Assimp : Model Mesh");
+ 
+    if (FAILED(LoadBin(modelFileName))) {
+        MSG_BOX("Bin File Load FAILED");
         return E_FAIL;
-       
     }
-
-
-
-    if (pScene->HasMeshes()) {
-
-        aiNode* pNode = pScene->mRootNode;
-        meshNames.reserve(pScene->mNumMeshes);
-        ProcessNode(pNode,pScene);
-           
-    }
-#pragma endregion
-
 
 
     return S_OK;
-}
-
-
-void Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
-{
-    
-    shared_ptr<vector<VTXTEX>> vertices = make_shared<vector<VTXTEX>>();
-    shared_ptr<vector<uint16_t>> indices = make_shared<vector<uint16_t>>();
-
-    for (UINT i = 0; i < mesh->mNumVertices; ++i)
-    {
-        //std::vector<VTXTEX> vertices;
-        //std::vector<INDEX32> indices;
-        VTXTEX v;
-        // Position
-        v.vPosition.x = mesh->mVertices[i].x;
-        v.vPosition.y = mesh->mVertices[i].y;
-        v.vPosition.z = mesh->mVertices[i].z;
-
-        // Normal
-        if (mesh->HasNormals())
-        {
-            //v.vNormal.x = mesh->mNormals[i].x;
-            //v.vNormal.y = mesh->mNormals[i].y;
-            //v.vNormal.z = mesh->mNormals[i].z;
-        }
-
-        // UV
-        if (mesh->HasTextureCoords(0))
-        {
-            v.vTexcoord.x = mesh->mTextureCoords[0][i].x;
-            v.vTexcoord.y = mesh->mTextureCoords[0][i].y;
-        }
-
-        // Tangent
-        if (mesh->HasTangentsAndBitangents())
-        {
-        /*    v.vTangent.x = mesh->mTangents[i].x;
-            v.vTangent.y = mesh->mTangents[i].y;
-            v.vTangent.z = mesh->mTangents[i].z;*/
-        }
-        
-        vertices->emplace_back(v);
-    }
-
-    // Index
-    for (UINT i = 0; i < mesh->mNumFaces; ++i)
-    {
-        const aiFace& face = mesh->mFaces[i];
-
-      
-        for (UINT j = 0; j < face.mNumIndices; ++j) {
-     
-            indices->emplace_back(face.mIndices[j]);
-        }
-            
-    }
-
-
-   
-    std::string name = std::filesystem::path(m_sModelName).stem().string();
-    std::string meshName =  name + "_" + to_string(++i_meshCount);
-  
-
-
-    std::wstring wMeshName(meshName.begin(), meshName.end());
-    std::wstring prototypeTag = L"Prototype_Component_Mesh_" + wMeshName;
-
-    if (FAILED(CGameInstance::Get().Add_Prototype(m_iLevelIndex, prototypeTag, Mesh::Create(m_pDevice, m_pContext, vertices, indices, wMeshName,m_iLevelIndex)))) {
-        MSG_BOX("Mesh Proto SAVE FAILED");
-
-    }
-    meshNames.emplace_back(wMeshName);
-
-}
-
-void Model::ProcessNode(aiNode* node, const aiScene* scene)
-{
-    for (UINT i = 0; i < node->mNumMeshes; ++i)
-    {
-        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        ProcessMesh(mesh, scene);
-    }
-
-    for (UINT i = 0; i < node->mNumChildren; ++i)
-        ProcessNode(node->mChildren[i], scene);
 }
 
 
@@ -140,11 +38,11 @@ HRESULT Model::Initialize(void* pArg)
     return S_OK;
 }
 
-unique_ptr<Model> Model::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName)
+unique_ptr<Model> Model::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, const char* modelFileName)
 {
     auto		pInstance = unique_ptr<Model>(new Model(pDevice, pContext));
 
-    if (FAILED(pInstance->Initialize_Prototype(iLevelIndex, modelName)))
+    if (FAILED(pInstance->Initialize_Prototype(iLevelIndex, modelName, modelFileName)))
     {
         MSG_BOX("Failed to Created : Model");
         return nullptr;
@@ -166,25 +64,60 @@ shared_ptr<Prototype> Model::Clone(void* pArg)
     return pInstance;
 }
 
-string Model::WStringToString(const std::wstring& wstr)
+HRESULT Model::Render()
 {
-    if (wstr.empty()) return {};
+    for (auto& pMesh : m_Meshes)
+    {
+        pMesh->Bind_Resources();
+        pMesh->Render();
+    }
 
-    int size = WideCharToMultiByte(
-        CP_UTF8, 0,
-        wstr.c_str(), -1,
-        nullptr, 0,
-        nullptr, nullptr);
+    return S_OK;
+}
 
-    std::string str(size, 0);
 
-    WideCharToMultiByte(
-        CP_UTF8, 0,
-        wstr.c_str(), -1,
-        &str[0], size,
-        nullptr, nullptr);
+HRESULT Model::LoadBin(const char* modelFileName)
+{
+    ifstream file(modelFileName, ios::binary);
 
-    str.pop_back(); 
-    return str;
+    if (!file.is_open())
+        return E_FAIL;
+
+    FileHeader fh{};
+    file.read((char*)&fh, sizeof(fh));
+
+    if (fh.magic != ETOUI(FileHeaderType::FILEHEADER_MODEL))
+        return E_FAIL;
+
+    CHUCKHEADER ch{};
+    file.read((char*)&ch, sizeof(ch));
+
+    if (ch.type != ETOUI(ChunkType::CHUNK_MESH))
+        return E_FAIL;
+
+    uint32_t meshCount = 0;
+    file.read((char*)&meshCount, sizeof(uint32_t));
+
+    for (uint32_t i = 0; i < meshCount; i++)
+    {
+        auto vertexes = make_shared<vector<VTXMESH>>();
+        auto indices = make_shared<vector<uint32_t>>();
+
+        uint32_t vCount = 0;
+        uint32_t iCount = 0;
+
+        file.read((char*)&vCount, sizeof(uint32_t));
+        file.read((char*)&iCount, sizeof(uint32_t));
+
+        vertexes->resize(vCount);
+        indices->resize(iCount);
+
+        file.read((char*)vertexes->data(), sizeof(VTXMESH) * vCount);
+        file.read((char*)indices->data(), sizeof(uint32_t) * iCount);
+
+        m_Meshes.emplace_back(Mesh::Create(m_pDevice, m_pContext, vertexes, indices));
+    }
+
+    return S_OK;
 }
 

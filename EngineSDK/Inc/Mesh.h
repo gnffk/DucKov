@@ -1,10 +1,10 @@
 #pragma once
 #include "Component.h"
-
+#include "VIBuffer.h"
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Mesh final : public Component
+class ENGINE_DLL Mesh final : public VIBuffer
 {
 private:
 	Mesh(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) ;
@@ -14,16 +14,15 @@ public:
 
 
 public:
-	virtual HRESULT Initialize_Prototype(shared_ptr<vector<VTXTEX>> pvertices, shared_ptr<vector<uint16_t>> pindices, wstring ModelName, uint32_t m_iLevelIndex);
-	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices) ;
 
 public:
 	static unique_ptr<Mesh> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 
-		shared_ptr<vector<VTXTEX>> pvertices, shared_ptr<vector<uint16_t>> pindices, wstring ModelName, uint32_t m_iLevelIndex);
+		shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 private:
-	shared_ptr<vector<VTXTEX>> vertices;
-	shared_ptr<vector<uint16_t>> indices;
+	shared_ptr<vector<VTXMESH>> vertices;
+	shared_ptr<vector<uint32_t>> indices;
 };
 
 NS_END
