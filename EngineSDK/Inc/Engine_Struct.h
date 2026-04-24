@@ -60,6 +60,13 @@ namespace Engine
 		};
 	}VTXMESH;
 
+	typedef struct tagTexture {
+		uint32_t m_textureType;
+		uint32_t m_textureNum;
+		string File;
+		string Ext;
+	}TEXTUREINFO;
+
 
 
 

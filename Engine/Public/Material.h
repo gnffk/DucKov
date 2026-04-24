@@ -1,36 +1,30 @@
 #pragma once
-#include "Resource.h"
 
+#include "Engine_Defines.h"
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL Material abstract : public Resource
+class Material
 {
 private:
-    Material(ComPtr<ID3D11Device> Device, ComPtr<ID3D11DeviceContext> Context);
+	Material(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 public:
-	virtual ~Material() = default;
+	~Material();
 
 public:
-    virtual HRESULT Initialize();
-    virtual HRESULT Bind();
-    virtual void Update();
-    
-    virtual HRESULT SetShader(shared_ptr<class Shader> shader);
-    virtual HRESULT SetTexture(shared_ptr<class Texture> tex);
-    virtual HRESULT SetColor(const _float4& color);
+	HRESULT Initialize(uint32_t materialtype, vector<TEXTUREINFO>& textures, const _char* ModelFilePath);
+	HRESULT Bind_ShaderResource(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t eMaterialType, uint32_t iTextureIndex);
+private:
+	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
+	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
+
 
 private:
-    ComPtr<ID3D11Device> m_Device = nullptr;
-    ComPtr<ID3D11DeviceContext> m_Context = nullptr;
+	vector<ComPtr<ID3D11ShaderResourceView>>			m_Materials[TextureType::TextureType_END];
 
-
-    shared_ptr<class Shader> m_Shader;
-    shared_ptr<class Texture> m_Diffuse;
-
-    ComPtr<ID3D11Buffer> m_CBMaterial;
-
-
+public:
+	static shared_ptr<Material> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 
+		uint32_t materialtype, vector<TEXTUREINFO>& textures, const _char* ModelFilePath);
 };
 
 NS_END

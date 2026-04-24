@@ -26,7 +26,7 @@ void Importer::LoadFolder(const char* ModelFilePath)
             string outputPath = "../../Resources/Model/Bin/" + path.stem().string() + ".bin";
 
             Load((char*)inputPath.c_str());
-            ExportMeshBinary(outputPath.c_str());
+            ExportBinary(outputPath.c_str());
             Clear();
         }
 
@@ -44,7 +44,8 @@ HRESULT Importer::Load(char* ModelFilePath)
         aiProcess_Triangulate |
         aiProcess_ConvertToLeftHanded |
         aiProcess_GenNormals |
-        aiProcess_CalcTangentSpace
+        aiProcess_CalcTangentSpace | 
+        aiProcess_PreTransformVertices
     );
 
 
@@ -66,11 +67,65 @@ HRESULT Importer::Load(char* ModelFilePath)
     }
 
 
+    if (pScene->HasMaterials()) {
+        Ready_Material(pScene);
+    }
+
+
 
 
     return S_OK;
 }
 
+void Importer::Ready_Material(const aiScene* scene) {
+    uint32_t NumMaterials = scene->mNumMaterials;
+    Materials.reserve(NumMaterials);
+
+    for (size_t i = 0; i < NumMaterials; i++)
+    {
+        Load_Material(scene->mMaterials[i],i);
+       
+      
+    }
+}
+
+void Importer::Load_Material(aiMaterial* material, uint32_t materialNum)
+{
+
+    for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
+    {
+        uint32_t		iNumTextures = material->GetTextureCount(static_cast<aiTextureType>(i));
+        
+        if (iNumTextures == 0) {
+            continue;
+        }
+        shared_ptr<Material> fbxmaterial = make_shared<Material>();
+
+        fbxmaterial->m_textures.resize(iNumTextures);
+
+        for (size_t j = 0; j < iNumTextures; j++)
+        {
+
+            char	szFileName[MAX_PATH] = { };
+            char	szExt[MAX_PATH] = { };
+
+            aiString		strTexturePath = {};
+
+            material->GetTexture(static_cast<aiTextureType>(i), j, &strTexturePath);
+
+            _splitpath_s(strTexturePath.C_Str(), nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
+
+            fbxmaterial->m_textures[j].m_textureType = i;
+            fbxmaterial->m_textures[j].m_textureNum = j;
+            fbxmaterial->m_textures[j].File = szFileName;
+            fbxmaterial->m_textures[j].Ext = szExt;
+        }
+
+        fbxmaterial->m_materialtype = materialNum;
+        Materials.emplace_back(fbxmaterial);
+    }
+
+}
 
 void Importer::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
@@ -174,6 +229,9 @@ void Importer::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
     Meshes.emplace_back(fbxmesh);
 
+    mesh->mMaterialIndex;
+
+
 }
 
 void Importer::ProcessNode(aiNode* node, const aiScene* scene)
@@ -188,7 +246,7 @@ void Importer::ProcessNode(aiNode* node, const aiScene* scene)
         ProcessNode(node->mChildren[i], scene);
 }
 
-HRESULT Importer::ExportMeshBinary(const char* filePath)
+HRESULT Importer::ExportBinary(const char* filePath)
 {
     ofstream file(filePath, ios::binary);
 
@@ -201,6 +259,7 @@ HRESULT Importer::ExportMeshBinary(const char* filePath)
     fh.version = 1;
     file.write((char*)&fh, sizeof(fh));
 
+    //---------------------------------------------------Mesh-------------------------------------------------------------------//
     ChunkHeader ch;
     ch.type = ChunkType::CHUNK_MESH;
 
@@ -229,6 +288,34 @@ HRESULT Importer::ExportMeshBinary(const char* filePath)
         WriteMesh(file, mesh);
     }
 
+    //---------------------------------------------------Material-------------------------------------------------------------------//
+
+    ch.type = ChunkType::CHUNK_MATERIAL;
+    totalSize = 0;
+
+    totalSize += sizeof(uint32_t); // materialCount
+
+    for (auto& mat : Materials)
+    {
+        totalSize += sizeof(uint32_t); // materialtype
+        totalSize += sizeof(uint32_t); // textureNum
+        totalSize += sizeof(TEXTUREINFO) * mat->m_textures.size();
+    }
+
+    // ChunkHeader 쓰기
+    file.write((char*)&ch, sizeof(ch));
+
+    // Material 개수
+    uint32_t materialCount = Materials.size();
+    file.write((char*)&materialCount, sizeof(uint32_t));
+
+    // 실제 데이터
+    for (auto& mat : Materials)
+    {
+        WriteMaterial(file, mat);
+    }
+
+
     file.close();
     return S_OK;
 }
@@ -250,8 +337,37 @@ void Importer::WriteMesh(ofstream& file, shared_ptr<Mesh> mesh)
     file.write((char*)mesh->m_indices->data(), sizeof(uint32_t) * iCount);
 }
 
+void Importer::WriteMaterial(ofstream& file, shared_ptr<Material> mat) {
+
+    file.write((char*)&mat->m_materialtype, sizeof(uint32_t));
+
+    uint32_t textureCount = mat->m_textures.size();
+    file.write((char*)&textureCount, sizeof(uint32_t));
+
+    for (auto& tex : mat->m_textures)
+    {
+
+        file.write((char*)&tex.m_textureType, sizeof(uint32_t));
+        file.write((char*)&tex.m_textureNum, sizeof(uint32_t));
+
+        uint32_t len;
+
+
+        len = tex.File.size();
+        file.write((char*)&len, sizeof(uint32_t));
+        file.write(tex.File.c_str(), len);
+
+
+        len = tex.Ext.size();
+        file.write((char*)&len, sizeof(uint32_t));
+        file.write(tex.Ext.c_str(), len);
+    }
+}
+
 void Importer::Clear() {
     Meshes.clear();
+    Materials.clear();
+
 }
 
 HRESULT Importer::LoadMeshBinary(const char* filePath)

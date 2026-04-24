@@ -100,6 +100,9 @@
     <Filter Include="06.Component\Collider\AABB">
       <UniqueIdentifier>{3120d182-7057-4c9d-8854-0fe283298d3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\Model\Material">
+      <UniqueIdentifier>{2b431b6c-8ecc-44e7-ba46-d2ed1b054f74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -225,6 +228,9 @@
     <ClCompile Include="..\Private\Collider_Manager.cpp">
       <Filter>06.Component\Collider\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Material.cpp">
+      <Filter>06.Component\Model\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -331,6 +337,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Collider_Manager.h">
       <Filter>06.Component\Collider\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Material.h">
+      <Filter>06.Component\Model\Material</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

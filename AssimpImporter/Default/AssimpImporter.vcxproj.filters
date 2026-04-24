@@ -10,6 +10,9 @@
     <Filter Include="99.default">
       <UniqueIdentifier>{b496f1ad-cf24-4e2b-857d-dab93ce0c58b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Material">
+      <UniqueIdentifier>{36cc8274-4be7-4098-9c80-03eeedcf88e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Importer.cpp">
@@ -21,6 +24,9 @@
     <ClCompile Include="..\Private\Mesh.cpp">
       <Filter>01.Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Material.cpp">
+      <Filter>02. Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Importer.h">
@@ -31,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Mesh.h">
       <Filter>01.Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Material.h">
+      <Filter>02. Material</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

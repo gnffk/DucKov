@@ -2,6 +2,7 @@
 
 #include "Mesh.h"
 
+
 NS_BEGIN(Engine)
 
 class ENGINE_DLL Model : public Component
@@ -33,14 +34,22 @@ public:
 	vector<shared_ptr<Mesh>>& GetMeshes() { return m_Meshes; }
 
 private:
-	HRESULT LoadBin(const char* modelFileName);
+	HRESULT Ready_BinaryModelFile(const char* modelFileName);
+
+	HRESULT Ready_Mesh(ifstream& _file, const char* modelFileName);
+
+	HRESULT Ready_Material(ifstream& _file, const char* modelFileName);
 	
 private:
 	vector<shared_ptr<Mesh>> m_Meshes;
 
 	uint32_t m_iLevelIndex;
+	uint32_t m_iNumMesh{};
 	wstring m_sModelName;
-	int	    i_meshCount{};
+
+private:
+	uint32_t						m_iNumMaterials{};
+	vector<shared_ptr<class Material>>	m_Materials;
 
 };
 

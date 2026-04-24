@@ -13,6 +13,7 @@ namespace Engine
 
 	typedef		float						_float;
 	typedef		double						_double;
+	typedef		string						_string;
 	typedef		wstring						_wstring;
 
 	/* 저장용 데이터 */
