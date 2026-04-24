@@ -13,7 +13,10 @@ Model::~Model()
 
 Model::Model(const Model& Prototype)
     : Component{ Prototype }
+    , m_iNumMesh{ Prototype.m_iNumMesh }
     , m_Meshes{ Prototype.m_Meshes }
+    , m_iNumMaterials{ Prototype.m_iNumMaterials }
+    , m_Materials{ Prototype.m_Materials }
 {
 
 }
@@ -79,6 +82,19 @@ HRESULT Model::Render()
     return S_OK;
 }
 
+HRESULT Model::Render(uint32_t iMeshIndex)
+{
+    m_Meshes[iMeshIndex]->Bind_Resources();
+    m_Meshes[iMeshIndex]->Render();
+
+    return S_OK;
+}
+
+HRESULT Model::Bind_Materials(shared_ptr<Shader> pShader, const _char* pConstantName, uint32_t iMeshIndex, uint32_t eMaterialType, uint32_t iTextureIndex)
+{
+    return m_Materials[m_Meshes[iMeshIndex]->Get_MaterialIndex()]->Bind_ShaderResource(pShader, pConstantName, eMaterialType, iTextureIndex);
+}
+
 
 HRESULT Model::Ready_BinaryModelFile(const char* modelFileName)
 {
@@ -90,7 +106,7 @@ HRESULT Model::Ready_BinaryModelFile(const char* modelFileName)
     FileHeader fh{};
     file.read((char*)&fh, sizeof(fh));
 
-    if (fh.magic != ETOUI(FileHeaderType::FILEHEADER_MODEL))
+     if (fh.magic != ETOUI(FileHeaderType::FILEHEADER_MODEL))
         return E_FAIL;
 
 
@@ -130,6 +146,11 @@ HRESULT Model::Ready_Mesh(ifstream& _file, const char* modelFileName)
         auto vertexes = make_shared<vector<VTXMESH>>();
         auto indices = make_shared<vector<uint32_t>>();
 
+        // MaterialIndex
+
+        uint32_t materialIndex = 0;
+        _file.read((char*)&materialIndex, sizeof(uint32_t));
+
         uint32_t vCount = 0;
         uint32_t iCount = 0;
 
@@ -142,7 +163,7 @@ HRESULT Model::Ready_Mesh(ifstream& _file, const char* modelFileName)
         _file.read((char*)vertexes->data(), sizeof(VTXMESH) * vCount);
         _file.read((char*)indices->data(), sizeof(uint32_t) * iCount);
 
-        m_Meshes.emplace_back(Mesh::Create(m_pDevice, m_pContext, vertexes, indices));
+        m_Meshes.emplace_back(Mesh::Create(m_pDevice, m_pContext, vertexes, indices, materialIndex));
     }
 
     return S_OK;
@@ -164,43 +185,47 @@ HRESULT Model::Ready_Material(ifstream& _file, const char* modelFileName) {
 
     for (size_t i = 0; i < m_iNumMaterials; i++)
     {
+        // material번호, 텍스쳐 총 타입 카운트, 해당 종류 텍스쳐 카운트, 텍스쳐들 정보
 
-        uint32_t materialtype = 0;
-        uint32_t textureSize = 0;
-        vector<TEXTUREINFO> textures;
-        textures.clear();
-        _file.read((char*)&materialtype, sizeof(uint32_t));
-        _file.read((char*)&textureSize, sizeof(uint32_t));
+        uint32_t materialNum = 0;
+        uint32_t textureTypeCnt = 0;
+        vector<vector<TEXTUREINFO>> textureTypes;
+        textureTypes.clear();
+        _file.read((char*)&materialNum, sizeof(uint32_t));
+        _file.read((char*)&textureTypeCnt, sizeof(uint32_t));
+
+        textureTypes.reserve(textureTypeCnt);
+
+        for (uint32_t i = 0; i < textureTypeCnt; ++i) {
 
 
-
-        textures.reserve(textureSize);
-
-        for (uint32_t j = 0; j < textureSize; ++j)
-        {
-            TEXTUREINFO tex;
+            vector<TEXTUREINFO> texes;
             uint32_t len;
-            uint32_t m_textureType;
-            uint32_t m_textureNum;
+            uint32_t textureCnt = 0;
 
-            _file.read((char*)&m_textureType, sizeof(uint32_t));
-            _file.read((char*)&m_textureNum, sizeof(uint32_t));
+            _file.read((char*)&textureCnt, sizeof(uint32_t));
+            texes.resize(textureCnt);
 
-            // FilePath
-            _file.read((char*)&len, sizeof(uint32_t));
-            tex.File.resize(len);
-            _file.read(tex.File.data(), len);
+            for (uint32_t j = 0; j < textureCnt; ++j) {
+                _file.read((char*)&texes[j].m_textureType, sizeof(uint32_t));
+                _file.read((char*)&texes[j].m_textureNum, sizeof(uint32_t));
 
-            // FileName
-            _file.read((char*)&len, sizeof(uint32_t));
-            tex.Ext.resize(len);
-            _file.read(tex.Ext.data(), len);
+                // FilePath
+                _file.read((char*)&len, sizeof(uint32_t));
+                texes[j].File.resize(len);
+                _file.read(texes[j].File.data(), len);
 
-            textures.emplace_back(tex);
+                // FileName
+                _file.read((char*)&len, sizeof(uint32_t));
+                texes[j].Ext.resize(len);
+                _file.read(texes[j].Ext.data(), len);
+            }
+
+            textureTypes.emplace_back(texes);
         }
-
+   
         
-        auto  pMaterial = Material::Create(m_pDevice, m_pContext, materialtype, textures,  modelFileName);
+        auto  pMaterial = Material::Create(m_pDevice, m_pContext, materialNum, textureTypes,  modelFileName);
         m_Materials.emplace_back(pMaterial);
 
 

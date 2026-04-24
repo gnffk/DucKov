@@ -34,7 +34,6 @@ HRESULT TestModel::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_Scale(0.01f, 0.01f, 0.01f);
-	m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), 90.f);
 	m_pAABBCom->SetOwner(SHARED_THIS(TestModel).get());
 	return S_OK;
 }
@@ -79,14 +78,22 @@ HRESULT TestModel::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
-		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(0)))
-		return E_FAIL;
+	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	if (FAILED(m_pModelCom->Render()))
-		return E_FAIL;
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+			return E_FAIL;
+		//if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_Normals, 0)))
+		//	return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
+
+
+		m_pModelCom->Render(i);
+	}
 
 
 	return S_OK;
@@ -104,9 +111,7 @@ HRESULT TestModel::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
 
-	m_pTextureCom = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo")));
-	if (FAILED(__super::Add_Component(TEXT("Com_Texture"), m_pTextureCom)))
-		return E_FAIL;
+
 
 	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_AABB_Collider")));
 	if (FAILED(__super::Add_Component(TEXT("Com_Collider"), m_pAABBCom)))

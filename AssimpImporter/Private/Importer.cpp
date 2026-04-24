@@ -91,7 +91,7 @@ void Importer::Ready_Material(const aiScene* scene) {
 
 void Importer::Load_Material(aiMaterial* material, uint32_t materialNum)
 {
-
+    shared_ptr<Material> fbxmaterial = make_shared<Material>();
     for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
     {
         uint32_t		iNumTextures = material->GetTextureCount(static_cast<aiTextureType>(i));
@@ -99,9 +99,9 @@ void Importer::Load_Material(aiMaterial* material, uint32_t materialNum)
         if (iNumTextures == 0) {
             continue;
         }
-        shared_ptr<Material> fbxmaterial = make_shared<Material>();
-
-        fbxmaterial->m_textures.resize(iNumTextures);
+        
+       vector<TEXTUREINFO> textureDummy;
+       textureDummy.resize(iNumTextures);
 
         for (size_t j = 0; j < iNumTextures; j++)
         {
@@ -115,16 +115,18 @@ void Importer::Load_Material(aiMaterial* material, uint32_t materialNum)
 
             _splitpath_s(strTexturePath.C_Str(), nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
 
-            fbxmaterial->m_textures[j].m_textureType = i;
-            fbxmaterial->m_textures[j].m_textureNum = j;
-            fbxmaterial->m_textures[j].File = szFileName;
-            fbxmaterial->m_textures[j].Ext = szExt;
+            textureDummy[j].m_textureType = i;
+            textureDummy[j].m_textureNum = j;
+            textureDummy[j].File = szFileName;
+            textureDummy[j].Ext = szExt;
         }
 
-        fbxmaterial->m_materialtype = materialNum;
-        Materials.emplace_back(fbxmaterial);
+      
+        fbxmaterial->m_textures.push_back(textureDummy);
     }
+    fbxmaterial->m_materialNum = materialNum;
 
+    Materials.emplace_back(fbxmaterial);
 }
 
 void Importer::ProcessMesh(aiMesh* mesh, const aiScene* scene)
@@ -322,6 +324,11 @@ HRESULT Importer::ExportBinary(const char* filePath)
 
 void Importer::WriteMesh(ofstream& file, shared_ptr<Mesh> mesh)
 {
+    // MaterialIndex
+
+    uint32_t vMaterialIndex = mesh->m_materialIndex;
+    file.write((char*)&vMaterialIndex, sizeof(uint32_t));
+
     // Vertex Count
     uint32_t vCount = mesh->m_vertices->size();
     file.write((char*)&vCount, sizeof(uint32_t));
@@ -338,29 +345,33 @@ void Importer::WriteMesh(ofstream& file, shared_ptr<Mesh> mesh)
 }
 
 void Importer::WriteMaterial(ofstream& file, shared_ptr<Material> mat) {
+    // material번호, 텍스쳐 총 타입 카운트, 해당 종류 텍스쳐 카운트, 텍스쳐들 정보
+    file.write((char*)&mat->m_materialNum, sizeof(uint32_t));
 
-    file.write((char*)&mat->m_materialtype, sizeof(uint32_t));
+    uint32_t textureTypeCount = mat->m_textures.size();
+    file.write((char*)&textureTypeCount, sizeof(uint32_t));
 
-    uint32_t textureCount = mat->m_textures.size();
-    file.write((char*)&textureCount, sizeof(uint32_t));
-
-    for (auto& tex : mat->m_textures)
+    for (auto& texs : mat->m_textures)
     {
+        uint32_t textureCount = texs.size();
+        file.write((char*)&textureCount, sizeof(uint32_t));
 
-        file.write((char*)&tex.m_textureType, sizeof(uint32_t));
-        file.write((char*)&tex.m_textureNum, sizeof(uint32_t));
+        for (auto& tex : texs) {
+            file.write((char*)&tex.m_textureType, sizeof(uint32_t));
+            file.write((char*)&tex.m_textureNum, sizeof(uint32_t));
 
-        uint32_t len;
-
-
-        len = tex.File.size();
-        file.write((char*)&len, sizeof(uint32_t));
-        file.write(tex.File.c_str(), len);
+            uint32_t len;
 
 
-        len = tex.Ext.size();
-        file.write((char*)&len, sizeof(uint32_t));
-        file.write(tex.Ext.c_str(), len);
+            len = tex.File.size();
+            file.write((char*)&len, sizeof(uint32_t));
+            file.write(tex.File.c_str(), len);
+
+
+            len = tex.Ext.size();
+            file.write((char*)&len, sizeof(uint32_t));
+            file.write(tex.Ext.c_str(), len);
+        }
     }
 }
 

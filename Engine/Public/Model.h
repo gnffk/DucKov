@@ -15,12 +15,20 @@ public:
 	~Model();
 
 
+public:
+	uint32_t Get_NumMeshes() const {
+		return m_iNumMesh;
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype(uint32_t m_iLevelIndex, wstring modelName, const char* modelFileName);
 	virtual HRESULT Initialize(void* pArg) override;
 
 	HRESULT Render();
+	HRESULT Render(uint32_t iMeshIndex);
+
+public:
+	HRESULT Bind_Materials(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t iMeshIndex, uint32_t eMaterialType, uint32_t iTextureIndex);
 
 	
 public:

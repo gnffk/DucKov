@@ -15,46 +15,47 @@ Material::~Material()
 
 
 
-HRESULT Material::Initialize(uint32_t materialtype,vector<TEXTUREINFO>& textures, const _char* ModelFilePath)
+HRESULT Material::Initialize(uint32_t texturetype, vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath)
 {
 	_char	szDrive[MAX_PATH] = { };
 	_char	szDir[MAX_PATH] = { };
 
 	_splitpath_s(ModelFilePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
-	int a = textures.size();
-
-	for (auto texture : textures) {
-		for (size_t j = 0; j < texture.m_textureNum; j++)
-		{
-			_char	szFileName[MAX_PATH] = { };
-			_char	szExt[MAX_PATH] = { };
-			_char	szFullPath[MAX_PATH] = {};
-
-			strcpy_s(szFullPath, szDrive);
-			strcat_s(szFullPath, szDir);
-			strcat_s(szFullPath, szFileName);
-			strcat_s(szFullPath, szExt);
-
-			HRESULT         hr = {};
-			ComPtr<ID3D11ShaderResourceView>		pSRV = { nullptr };
-
-			_tchar	szFinalPath[MAX_PATH] = {};
-
-			MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath),
-				szFinalPath, MAX_PATH);
 
 
+	for (auto textures : textureTypes) {
+		for (auto texture : textures) {
+			m_Materials[texture.m_textureType].reserve(textures.size());
+			for (size_t j = 0; j < textures.size(); j++)
+			{
+				string File = texture.File;
+				string Ext = texture.Ext;
 
-			if (false == strcmp(szExt, ".dds"))
-				hr = CreateDDSTextureFromFile(m_pDevice.Get(), szFinalPath, nullptr, &pSRV);
+				string fullPath = string(szDir);
 
-			else if (false == strcmp(szExt, ".tga"))
-				hr = E_FAIL;
-			else
-				hr = CreateWICTextureFromFile(m_pDevice.Get(), szFinalPath, nullptr, &pSRV);
+		
 
-			m_Materials[texture.m_textureType].emplace_back(pSRV);
+				fullPath += File + Ext;
+
+				wstring wPath(fullPath.begin(), fullPath.end());
+
+
+				HRESULT         hr = {};
+				ComPtr<ID3D11ShaderResourceView>		pSRV = { nullptr };
+
+
+				if (Ext ==  ".dds")
+					hr = CreateDDSTextureFromFile(m_pDevice.Get(), wPath.c_str(), nullptr, &pSRV);
+
+				else if (Ext ==  ".tga")
+					hr = E_FAIL;
+				else
+					hr = CreateWICTextureFromFile(m_pDevice.Get(), wPath.c_str(), nullptr, &pSRV);
+
+				m_Materials[texture.m_textureType].emplace_back(pSRV);
+			}
 		}
+	
 	}
 
 
@@ -72,11 +73,11 @@ HRESULT Material::Bind_ShaderResource(shared_ptr<class Shader> pShader, const _c
 
 
 
-shared_ptr<Material> Material::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t materialtype,vector<TEXTUREINFO>& textures, const _char* ModelFilePath)
+shared_ptr<Material> Material::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t materialtype,vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath)
 {
 	auto	pInstance = shared_ptr<Material>(new Material(pDevice, pContext));
 
-	if (FAILED(pInstance->Initialize(materialtype, textures, ModelFilePath)))
+	if (FAILED(pInstance->Initialize(materialtype, textureTypes, ModelFilePath)))
 		MSG_BOX("Failed to Created : Material");
 
 	return pInstance;

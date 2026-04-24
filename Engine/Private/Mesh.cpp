@@ -16,10 +16,11 @@ Mesh::~Mesh()
 
 
 
-HRESULT Mesh::Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices)
+HRESULT Mesh::Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex)
 {
 	vertices = pvertices;
 	indices = pindices;
+	m_iMaterialIndex = materialIndex;
 
 	m_iNumVertexBuffers = 1;
 	m_iNumVertices = (UINT)vertices->size();
@@ -74,11 +75,11 @@ HRESULT Mesh::Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vecto
 	return S_OK;
 }
 
-unique_ptr<Mesh> Mesh::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices)
+unique_ptr<Mesh> Mesh::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices,uint32_t materialIndex)
 {
     auto		pInstance = unique_ptr<Mesh>(new Mesh(pDevice, pContext));
 
-    if (FAILED(pInstance->Initialize(pvertices, pindices)))
+    if (FAILED(pInstance->Initialize(pvertices, pindices, materialIndex)))
     {
         MSG_BOX("Failed to Created : Mesh");
         return nullptr;

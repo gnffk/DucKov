@@ -12,11 +12,10 @@ public:
 
 
 
-	HRESULT Set_Material(uint32_t _materialtype, vector<TEXTUREINFO> _textures);
+	HRESULT Set_Material(uint32_t _materialNum, vector<vector<TEXTUREINFO>> _textures);
 
-	uint32_t m_materialtype;
-	uint32_t m_texturesSize;
-	vector<TEXTUREINFO> m_textures;
+	uint32_t m_materialNum;
+	vector<vector<TEXTUREINFO>> m_textures;
 
 };
 
