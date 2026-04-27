@@ -67,10 +67,7 @@ HRESULT TestModel::Render()
 
 
 
-	// QUESTION
-	// 형 Collider 전용 shader가 따로 있을거잖아 
-	// 그럼 그 Collider shader는 Collider 마다 가지고 있게 만들어줬어?
-	// DebugDraw 검색ㄱㄱ 배신자 그럼 Shader 없어도 돼?
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
@@ -81,12 +78,11 @@ HRESULT TestModel::Render()
 
 	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for (uint32_t i = 0; i < iNumMeshes; i++)
 	{
 		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, ETOUI(TEXTURETYPE::DIFFUSE), 0)))
 			return E_FAIL;
-		//if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_Normals, 0)))
-		//	return E_FAIL;
+
 
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;

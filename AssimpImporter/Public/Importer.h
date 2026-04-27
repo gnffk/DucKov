@@ -11,8 +11,8 @@ public:
 
 
 public:
-	void	LoadFolder(const char* ModelFilePath);
-	HRESULT Load(char* ModelFilePath);
+	void	LoadFolder(const char* ModelFilePath, MODEL modelType);
+	HRESULT Load(char* ModelFilePath, MODEL modelType);
 	void Ready_Material(const aiScene* scene);
 	void Load_Material(aiMaterial* material,uint32_t materialNum);
 
@@ -29,6 +29,7 @@ public:
 	HRESULT LoadMeshBinary(const char* filePath);
 public:
 	int m_index{0};
+	int m_iFlagModelType;
 	vector<shared_ptr<Mesh>> Meshes;
 	vector<shared_ptr<Material>> Materials;
 	

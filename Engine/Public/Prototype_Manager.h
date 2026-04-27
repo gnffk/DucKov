@@ -7,7 +7,7 @@
 #include "VIBuffer_Mesh.h"
 #include "Model.h"
 #include "Texture.h"
-#include "BaseCollider.h"
+#include "AABB_Collider.h"
 
 
 

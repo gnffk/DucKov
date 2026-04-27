@@ -10,7 +10,7 @@ Importer::~Importer()
 }
 
 
-void Importer::LoadFolder(const char* ModelFilePath)
+void Importer::LoadFolder(const char* ModelFilePath, MODEL modelType)
 {
     for (const auto& entry : std::filesystem::directory_iterator(ModelFilePath))
     {
@@ -23,9 +23,30 @@ void Importer::LoadFolder(const char* ModelFilePath)
         if (path.extension() == ".fbx" || path.extension() == ".FBX")
         {
             string inputPath = path.string();
-            string outputPath = "../../Resources/Model/Bin/" + path.stem().string() + ".bin";
+            std::string modelName = path.stem().string();
 
-            Load((char*)inputPath.c_str());
+            std::string basePath = "../../Resources/Model/";
+
+            if (modelName.rfind("CH_", 0) == 0)  
+            {
+                basePath += "Character/";
+            }
+            else
+            {
+                basePath += "Bin/";
+            }
+
+            // 최종 디렉토리
+            std::string dirPath = basePath + modelName;
+
+            // 폴더 생성
+            std::filesystem::create_directories(dirPath);
+
+            // 최종 파일 경로
+            std::string outputPath = dirPath + "/" + modelName + ".bin";
+        
+
+            Load((char*)inputPath.c_str(), modelType);
             ExportBinary(outputPath.c_str());
             Clear();
         }
@@ -34,21 +55,21 @@ void Importer::LoadFolder(const char* ModelFilePath)
     }
 }
 
-HRESULT Importer::Load(char* ModelFilePath)
+HRESULT Importer::Load(char* ModelFilePath, MODEL modelType)
 {
 
     m_index = 0;
     Assimp::Importer importer;
-
-    const aiScene* pScene = importer.ReadFile(ModelFilePath,
-        aiProcess_Triangulate |
-        aiProcess_ConvertToLeftHanded |
-        aiProcess_GenNormals |
-        aiProcess_CalcTangentSpace | 
-        aiProcess_PreTransformVertices
-    );
+    uint32_t        iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
 
+
+    if (MODEL::NONANIM == modelType)
+        iFlag |= aiProcess_PreTransformVertices;
+
+
+
+    const aiScene* pScene = importer.ReadFile(ModelFilePath, iFlag);
 
     if (pScene == nullptr) {
         MSG_BOX("Failed to Open Assimp : Model Mesh");

@@ -95,16 +95,16 @@ HRESULT CLoader::Loading_For_GamePlay()
 HRESULT CLoader::Loading_For_MapEditor()
 {
 
-#pragma region Model Component Prototype
+#pragma region Texture Component Prototype
 
 
 	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
 	//	Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Fbx/Garden-Palette.png"), 1))))
 	//	return E_FAIL;
 	 
-	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
-		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Fbx/Player_Duck_Tex_AlbedoTint.png"), 1))))
-		return E_FAIL;
+	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
+	//	Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Fbx/Player_Duck_Tex_AlbedoTint.png"), 1))))
+	//	return E_FAIL;
 
 
 #pragma endregion
@@ -117,7 +117,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 	//	return E_FAIL;
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC","../../Resources/Model/Bin/0_CharacterModel_Duck_Jeff.bin"))))
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC","../../Resources/Model/Character/CH_DuckJeff/CH_DuckJeff.bin"))))
 		return E_FAIL;
 
 #pragma endregion

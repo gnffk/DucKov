@@ -45,7 +45,6 @@ private:
 
 	shared_ptr<Model>			m_pModelCom = { nullptr };
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
-	shared_ptr<Texture>			m_pTextureCom = { nullptr };
 	shared_ptr<BaseCollider>	m_pAABBCom = { nullptr };
 
 public:

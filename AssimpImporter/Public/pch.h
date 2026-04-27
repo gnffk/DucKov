@@ -82,3 +82,4 @@ typedef struct tagTexture {
 	string Ext;
 }TEXTUREINFO;
 
+enum class MODEL { NONANIM, ANIM, END };

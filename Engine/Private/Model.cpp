@@ -140,7 +140,7 @@ HRESULT Model::Ready_Mesh(ifstream& _file, const char* modelFileName)
 
     uint32_t meshCount = 0;
     _file.read((char*)&meshCount, sizeof(uint32_t));
-
+    m_iNumMesh = meshCount;
     for (uint32_t i = 0; i < meshCount; i++)
     {
         auto vertexes = make_shared<vector<VTXMESH>>();
