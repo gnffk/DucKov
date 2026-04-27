@@ -47,12 +47,17 @@ public:
 		return m_Owner;
 	}
 
+public:
+	void	GUI_ColliderExtend();
 protected:
 	ColliderType m_eColliderID;
 	ColliderColor m_eColor;
 	wstring m_sTag;
 	GameObject* m_Owner{ nullptr };
-
+	XMFLOAT4 m_color;
+protected:
+	XMFLOAT3	m_Extend{};
+	XMFLOAT3	m_Center{};
 protected:
 	bool m_bRenderInitialized;
 

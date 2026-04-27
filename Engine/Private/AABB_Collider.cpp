@@ -25,6 +25,8 @@ HRESULT AABB_Collider::Intersect(_vector vPos, _vector vDir, float& pOutDist)
 HRESULT AABB_Collider::Initialize_Prototype()
 {
     m_boudingBox.Extents = { 0.5f,0.5f,0.5f };
+    m_Extend = { 0.5f,0.5f,0.5f };
+    m_Center = { 0.f,0.f,0.f };
     return S_OK;
 
 }
@@ -62,10 +64,12 @@ void AABB_Collider::Update(float Timedelta) {
     XMFLOAT4X4 worldFloat = m_Owner->GetTransform()->GetWorldMatrix();
     XMMATRIX world = XMLoadFloat4x4(&worldFloat);
 
-    XMVECTOR scale, rotQuat, trans;
+    XMVECTOR localCenter = XMLoadFloat3(&m_Center);
 
-    XMMatrixDecompose(&scale, &rotQuat, &trans, world);
-    XMStoreFloat3(&m_boudingBox.Center, trans);
+    XMVECTOR worldCenter = XMVector3TransformCoord(localCenter, world);
+
+    XMStoreFloat3(&m_boudingBox.Center, worldCenter);
+    m_boudingBox.Extents = m_Extend;
 
 }
 HRESULT AABB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch) {
@@ -109,6 +113,8 @@ HRESULT AABB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_
     m_batch->DrawLine(v[2], v[6]);
     m_batch->DrawLine(v[3], v[7]);
 
+
+    GUI_ColliderExtend();
     return S_OK;
 }
 

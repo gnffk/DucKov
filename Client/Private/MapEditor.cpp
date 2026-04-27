@@ -290,6 +290,12 @@ void MapEditor::MousePicking()
 					if (dist < minDist)
 					{
 						minDist = dist;
+
+						if (CGameInstance::Get().Mouse_Up(MOUSEKEYSTATE::DIM_LB)) {
+							CGameInstance::Get().SetSeletObject(nullptr);
+							break;
+						}
+
 						if (CGameInstance::Get().GetSelectObject() != collider->GetOwner()) {
 
 							CGameInstance::Get().SetSeletObject(collider->GetOwner());
@@ -304,10 +310,7 @@ void MapEditor::MousePicking()
 					
 
 				}
-				else {
-					CGameInstance::Get().SetSeletObject(nullptr);
-					break;
-				}
+				
 			}
 		}
 	}

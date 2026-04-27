@@ -26,7 +26,7 @@ public:
 
 private:
 	BoundingBox m_boudingBox;
-	XMFLOAT4 m_color;
+
 
 public:
 	static unique_ptr<AABB_Collider> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

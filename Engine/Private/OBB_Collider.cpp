@@ -25,7 +25,9 @@ HRESULT OBB_Collider::Intersect(_vector vPos, _vector vDir, float& pOutDist)
 HRESULT OBB_Collider::Initialize_Prototype()
 {
 
-    m_boudingBox.Extents = {0.5f,0.5f,0.5f };
+    m_boudingBox.Extents = { 0.5f,0.5f,0.5f };
+    m_Extend = { 0.5f,0.5f,0.5f };
+    m_Center = { 0.f,0.f,0.f };
 
     return S_OK;
 
@@ -40,35 +42,28 @@ HRESULT OBB_Collider::Initialize(void* pArg) {
 
 }
 void OBB_Collider::Update(float Timedelta) {
-    XMFLOAT4X4 worldFloat = m_Owner->GetTransform()->GetWorldMatrix(); 
-    XMMATRIX world = XMLoadFloat4x4(&worldFloat); 
-    
-    XMVECTOR scale, rotQuat, trans; 
-    
-    XMMatrixDecompose(&scale, &rotQuat, &trans, world); 
-    XMStoreFloat3(&m_boudingBox.Center, trans); 
-    XMStoreFloat4(&m_boudingBox.Orientation, rotQuat);
 
+    
+
+
+    XMFLOAT4X4 worldFloat = m_Owner->GetTransform()->GetWorldMatrix();
+    XMMATRIX world = XMLoadFloat4x4(&worldFloat);
+    XMVECTOR scale, rotQuat, trans;
+
+    XMMatrixDecompose(&scale, &rotQuat, &trans, world);
+    XMVECTOR localCenter = XMLoadFloat3(&m_Center);
+
+    XMVECTOR worldCenter = XMVector3TransformCoord(localCenter, world);
+
+
+    XMStoreFloat3(&m_boudingBox.Center, worldCenter);
+    XMStoreFloat4(&m_boudingBox.Orientation, rotQuat);
+    m_boudingBox.Extents = m_Extend;
 
 
 }
 HRESULT OBB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch) {
     __super::Render(m_batch);
-
-    XMVECTOR color = XMVectorSet(0.f, 0.f, 0.f, 0.f);
-
-    switch (m_eColor)
-    {
-    case ColliderColor::GREEN:
-        color = XMVectorSet(0.f, 1.f, 0.f, 1.f);
-        break;
-    case ColliderColor::RED:
-        color = XMVectorSet(1.f, 0.f, 0.f, 1.f);
-        break;
-    case ColliderColor::BLACK:
-        color = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-        break;
-    }
 
 
     XMFLOAT3 corners[8];
@@ -79,27 +74,31 @@ HRESULT OBB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_b
     for (int i = 0; i < 8; ++i)
     {
         v[i].position = corners[i];
-
+        v[i].color = m_color;
     }
 
 
-    // Bottom
+    // Front
     m_batch->DrawLine(v[0], v[1]);
     m_batch->DrawLine(v[1], v[2]);
     m_batch->DrawLine(v[2], v[3]);
     m_batch->DrawLine(v[3], v[0]);
 
-    // Top
+    // Back
     m_batch->DrawLine(v[4], v[5]);
     m_batch->DrawLine(v[5], v[6]);
     m_batch->DrawLine(v[6], v[7]);
     m_batch->DrawLine(v[7], v[4]);
 
-    // Side
+    // Connect
     m_batch->DrawLine(v[0], v[4]);
     m_batch->DrawLine(v[1], v[5]);
     m_batch->DrawLine(v[2], v[6]);
     m_batch->DrawLine(v[3], v[7]);
+
+
+    GUI_ColliderExtend();
+
 
     return S_OK;
 }

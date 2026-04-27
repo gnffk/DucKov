@@ -110,7 +110,7 @@ HRESULT TestModel::Ready_Components()
 
 
 
-	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_AABB_Collider")));
+	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_OBB_Collider")));
 	if (FAILED(__super::Add_Component(TEXT("Com_Collider"), m_pAABBCom)))
 		return E_FAIL;
 	
