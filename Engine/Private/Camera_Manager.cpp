@@ -49,6 +49,26 @@ HRESULT Camera_Manager::Get_MainCameraWorldMatrix(_float4x4& WorldMatrix)
 	return E_FAIL;
 }
 
+HRESULT Camera_Manager::Get_MainCamerwaViewMatrix(_float4x4& ViewMatrix)
+{
+	auto camera = p_MainCamera.lock();
+	if (camera) {
+		camera->GetViewMatrix(ViewMatrix);
+		return S_OK;
+	}
+	return E_FAIL;
+}
+
+HRESULT Camera_Manager::Get_MainCamerwaProjectionMatrix(_float4x4& ProjectionMatrix)
+{
+	auto camera = p_MainCamera.lock();
+	if (camera) {
+		camera->GetProjectionMatrix(ProjectionMatrix);
+		return S_OK;
+	}
+	return E_FAIL;
+}
+
 weak_ptr<Camera> Camera_Manager::Find_Camera(uint32_t iCameraType)
 {
 

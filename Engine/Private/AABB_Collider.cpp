@@ -24,7 +24,7 @@ HRESULT AABB_Collider::Intersect(_vector vPos, _vector vDir, float& pOutDist)
 
 HRESULT AABB_Collider::Initialize_Prototype()
 {
-    
+    m_boudingBox.Extents = { 0.5f,0.5f,0.5f };
     return S_OK;
 
 }
@@ -39,31 +39,38 @@ HRESULT AABB_Collider::Initialize(void* pArg) {
 }
 void AABB_Collider::Update(float Timedelta) {
 
-}
-HRESULT AABB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch) {
-	__super::Render(m_batch);
-
-    XMFLOAT3 min = { -0.5f, -0.5f, -0.5f };
-    XMFLOAT3 max = { 0.5f, 0.5f, 0.5f };
-    XMVECTOR color = XMVectorSet(0.f, 0.f, 0.f, 0.f);
-
     switch (m_eColor) {
     case  ColliderColor::GREEN:
     {
-        color = XMVectorSet(0.f, 255.f, 0.f, 0.f);
+        XMStoreFloat4(&m_color, { 0.f, 255.f, 0.f, 0.f });
     }
     break;
     case  ColliderColor::RED:
     {
-        color = XMVectorSet(255.f, 0.f, 0.f, 0.f);
+        XMStoreFloat4(&m_color, { 255.f, 0.f, 0.f, 0.f });
+  
     }
     break;
     case  ColliderColor::BLACK:
     {
-        color = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+        XMStoreFloat4(&m_color, { 0.f, 0.f, 0.f, 0.f });
+     
     }
     break;
     }
+
+    XMFLOAT4X4 worldFloat = m_Owner->GetTransform()->GetWorldMatrix();
+    XMMATRIX world = XMLoadFloat4x4(&worldFloat);
+
+    XMVECTOR scale, rotQuat, trans;
+
+    XMMatrixDecompose(&scale, &rotQuat, &trans, world);
+    XMStoreFloat3(&m_boudingBox.Center, trans);
+
+}
+HRESULT AABB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch) {
+	__super::Render(m_batch);
+
 
     _vector world = XMVectorSet(0.f,0.f,0.f,1.f);
 
@@ -72,27 +79,17 @@ HRESULT AABB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_
   
     }
     
-    VertexPositionColor v[8] =
-    {
-        {{min.x, min.y, min.z}, color},
-        {{max.x, min.y, min.z}, color},
-        {{max.x, max.y, min.z}, color},
-        {{min.x, max.y, min.z}, color},
+    XMFLOAT3 corners[8];
+    m_boudingBox.GetCorners(corners);
 
-        {{min.x, min.y, max.z}, color},
-        {{max.x, min.y, max.z},color},
-        {{max.x, max.y, max.z},color},
-        {{min.x, max.y, max.z}, color},
-    };
 
+    VertexPositionColor v[8];
     for (int i = 0; i < 8; ++i)
     {
-        XMVECTOR pos = XMLoadFloat3(&v[i].position);
-
-        pos = XMVectorAdd(pos, world);
-
-        XMStoreFloat3(&v[i].position, pos);
+        v[i].position = corners[i];
+        v[i].color = m_color;
     }
+
 
     // Front
     m_batch->DrawLine(v[0], v[1]);

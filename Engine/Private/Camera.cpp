@@ -66,6 +66,16 @@ void Camera::GetShaderMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix
 
 }
 
+void Camera::GetViewMatrix(_float4x4& ViewMatrix)
+{
+	ViewMatrix = m_ViewMatrix;
+}
+
+void Camera::GetProjectionMatrix(_float4x4& ProjectionMatrix)
+{
+	ProjectionMatrix = m_ProjectionMatrix;
+}
+
 void Camera::GetWorldMatrix(_float4x4& WorldMatrix) {
-	WorldMatrix = m_WorldMatrix;
+	WorldMatrix = m_pTransformCom.get()->GetWorldMatrix();
 }

@@ -63,6 +63,16 @@ HRESULT Collider_Manager::Find_Collider(wstring GroupTag, BaseCollider* pCollide
     return S_OK;
 }
 
+void Collider_Manager::Update(float Timedelta)
+{
+    for (auto& ColliderGroup : m_Colliders) {
+        for (auto& Collider : ColliderGroup.second) {
+
+            Collider->Update(Timedelta);
+        }
+    }
+}
+
 HRESULT Collider_Manager::Clear()
 {
     m_Colliders.clear();
@@ -81,16 +91,16 @@ void Collider_Manager::Render() {
     _matrix matProj = XMLoadFloat4x4(&Proj);
     XMMATRIX matWorld = XMMatrixIdentity();
     
-    // 1. Effect ¼¼ÆÃ
+
     m_effect->SetWorld(matWorld);
     m_effect->SetView(matView);
     m_effect->SetProjection(matProj);
     m_effect->Apply(m_pDeviceContext.Get());
 
-    // 2. InputLayout
+
     m_pDeviceContext->IASetInputLayout(m_inputLayout.Get());
 
-    // 3. Begin
+
     m_batch->Begin();
 
 

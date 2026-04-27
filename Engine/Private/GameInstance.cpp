@@ -82,6 +82,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
     m_pObject_Manager->Late_Update(fTimeDelta);
 
+    m_pCollider_Manager->Update(fTimeDelta);
+
     m_pLevel_Manager->Update(fTimeDelta);
 }
 
@@ -226,6 +228,16 @@ HRESULT CGameInstance::Get_MainCameraMatrix( _float4x4& ViewMatrix, _float4x4& P
     return m_pCamera_Manager->Get_MainCameraMatrix( ViewMatrix, ProjectionMatrix);
 
 }
+HRESULT CGameInstance::Get_MainCameraWorldMatrix(_float4x4& WorldMatrix) {
+    return m_pCamera_Manager->Get_MainCameraWorldMatrix(WorldMatrix);
+
+}
+HRESULT CGameInstance::Get_MainCamerwaViewMatrix(_float4x4& ViewMatrix) {
+    return m_pCamera_Manager->Get_MainCamerwaViewMatrix(ViewMatrix);
+}
+HRESULT CGameInstance::Get_MainCamerwaProjectionMatrix(_float4x4& ProjectionMatrix) {
+    return m_pCamera_Manager->Get_MainCamerwaProjectionMatrix(ProjectionMatrix);
+}
 weak_ptr<Camera> CGameInstance::Find_Camera(uint32_t iCameraType)
 {
     return m_pCamera_Manager->Find_Camera(iCameraType);
@@ -243,6 +255,10 @@ HRESULT CGameInstance::Add_Collider(wstring GroupTag, class BaseCollider* pColli
 }
 std::vector<BaseCollider*>* CGameInstance::GetColliderGroups(wstring GroupTag) {
     return m_pCollider_Manager->GetColliderGroups(GroupTag);
+}
+
+std::unordered_map<wstring, std::vector<BaseCollider*>>& CGameInstance::GetAllCollders() {
+    return m_pCollider_Manager->GetAllCollders();
 }
 #pragma endregion
 

@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Camera.h"
 #include "Layer.h"
+#include "BaseCollider.h"
 MapEditor::MapEditor(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -24,7 +25,7 @@ HRESULT MapEditor::Initialize()
 void MapEditor::Update(_float fTimeDelta)
 {
 
-
+	MousePicking();
 }
 
 HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
@@ -222,5 +223,94 @@ void MapEditor::IMGUI_OTHER_Render()
 	ImGui::Text("Frame Time : %.3f ms", 1000.0f / ImGui::GetIO().Framerate);
 
 	ImGui::End();
+}
+
+void MapEditor::MousePicking()
+{
+
+	if (CGameInstance::Get().Mouse_Down(MOUSEKEYSTATE::DIM_LB))
+	{
+		
+		POINT pt;
+		GetCursorPos(&pt);
+		ScreenToClient(g_hWnd, &pt);
+
+		float mouseX = (float)pt.x;
+		float mouseY = (float)pt.y;
+
+		float width = CGameInstance::Get().Get_ViewportSize().x;
+		float height = CGameInstance::Get().Get_ViewportSize().y;
+	
+		float px = mouseX / (width *0.5f)- 1.0f;
+		float py = mouseY / -(height*0.5f) + 1.0f;
+
+		_float4x4 proj, view, Trans;
+		CGameInstance::Get().Get_MainCamerwaViewMatrix(view);
+		CGameInstance::Get().Get_MainCamerwaProjectionMatrix(proj);
+		CGameInstance::Get().GetWorldMatrix(Trans);
+
+		XMMATRIX matProj = XMLoadFloat4x4(&proj);
+		XMMATRIX matView = XMLoadFloat4x4(&view);
+
+		XMMATRIX invProj = XMMatrixInverse(nullptr, matProj);
+		XMMATRIX invView = XMMatrixInverse(nullptr, matView);
+
+		// Ray »ý¼º
+		XMVECTOR rayClip = XMVectorSet(px, py, 0.f, 1.0f);
+
+		// Near
+		XMVECTOR nearPoint = XMVectorSet(px, py, 0.0f, 1.0f);
+		nearPoint = XMVector3TransformCoord(nearPoint, invProj);
+		nearPoint = XMVector3TransformCoord(nearPoint, invView);
+
+		// Far
+		XMVECTOR farPoint = XMVectorSet(px, py, 1.0f, 1.0f);
+		farPoint = XMVector3TransformCoord(farPoint, invProj);
+		farPoint = XMVector3TransformCoord(farPoint, invView);
+
+		// Ray
+		XMVECTOR rayOrigin = nearPoint;
+		XMVECTOR rayDir = XMVector3Normalize(farPoint - nearPoint);
+
+		XMVECTOR rayView = XMVector3TransformCoord(rayClip, invProj);
+		rayView = XMVectorSet(rayView.m128_f32[0], rayView.m128_f32[1], 0.0f, 0.0f);
+
+
+		float minDist = FLT_MAX;
+
+		for (auto& CollderGruops : CGameInstance::Get().GetAllCollders())
+		{
+			auto& vec = CollderGruops.second;
+
+			for (auto collider : vec)
+			{
+				float dist;
+				if (collider->Intersect(rayOrigin, rayDir, dist))
+				{
+					if (dist < minDist)
+					{
+						minDist = dist;
+						if (CGameInstance::Get().GetSelectObject() != collider->GetOwner()) {
+
+							CGameInstance::Get().SetSeletObject(collider->GetOwner());
+						}
+						else if (CGameInstance::Get().GetSelectObject() == collider->GetOwner()) {
+						
+
+						}
+					
+						break;
+					}
+					
+
+				}
+				else {
+					CGameInstance::Get().SetSeletObject(nullptr);
+					break;
+				}
+			}
+		}
+	}
+	
 }
 

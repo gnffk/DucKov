@@ -72,6 +72,9 @@ public:
 	HRESULT Change_Camera(uint32_t iCameraType);
 	HRESULT Add_Camera(uint32_t iCameraType, shared_ptr<class Camera> pCamera);
 	HRESULT Get_MainCameraMatrix(_float4x4& ViewMatrix, _float4x4& ProjectionMatrix);
+	HRESULT Get_MainCamerwaViewMatrix(_float4x4& ViewMatrix);
+	HRESULT Get_MainCamerwaProjectionMatrix(_float4x4& ProjectionMatrix);
+	HRESULT Get_MainCameraWorldMatrix(_float4x4& WorldMatrix);
 	void GetWorldMatrix(_float4x4& WorldMatrix);
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
 #pragma endregion
@@ -79,6 +82,7 @@ public:
 #pragma region Collider_Manager
 	HRESULT Add_Collider(wstring GroupTag, class BaseCollider* pCollider);
 	std::vector<BaseCollider*>* GetColliderGroups(wstring GroupTag);
+	std::unordered_map<wstring, std::vector<BaseCollider*>>& GetAllCollders();
 #pragma endregion
 
 #pragma region KEY_MANAGER

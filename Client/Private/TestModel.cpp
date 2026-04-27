@@ -1,7 +1,8 @@
 #include "Engine_Macro.h"
 #include "TestModel.h"
 #include "GameInstance.h"
-
+#include "AABB_Collider.h"
+#include "OBB_Collider.h"
 TestModel::TestModel(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: GameObject{ pDevice, pContext }
 

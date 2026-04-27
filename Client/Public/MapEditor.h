@@ -23,6 +23,10 @@ public:
 
 
 public:
+	void	MousePicking();
+
+
+public:
 	static unique_ptr<MapEditor> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
 };
 

@@ -43,6 +43,10 @@ public:
 	void SetOwner(GameObject* _owner) {
 		m_Owner = _owner;
 	}
+	GameObject* GetOwner() {
+		return m_Owner;
+	}
+
 protected:
 	ColliderType m_eColliderID;
 	ColliderColor m_eColor;

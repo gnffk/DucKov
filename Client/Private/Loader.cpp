@@ -2,6 +2,8 @@
 #include "GameInstance.h"
 #include "TestModel.h"
 #include "PerspectiveCamera.h"
+#include "AABB_Collider.h"
+#include "OBB_Collider.h"
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
@@ -149,6 +151,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 		return E_FAIL;
 	}
 
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_OBB_Collider"),
+		OBB_Collider::Create(m_pDevice, m_pContext)))) {
+		return E_FAIL;
+	}
 	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
 	//	VIBuffer_Rect::Create(m_pDevice, m_pContext)))) {
 	//	return E_FAIL;

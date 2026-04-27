@@ -4,12 +4,12 @@
 
 NS_BEGIN(Engine);
 
-class ENGINE_DLL AABB_Collider : public BaseCollider
+class ENGINE_DLL OBB_Collider : public BaseCollider
 {
 protected:
-	AABB_Collider(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
+	OBB_Collider(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
 public:
-	virtual ~AABB_Collider();
+	virtual ~OBB_Collider();
 
 
 public:
@@ -25,12 +25,12 @@ public:
 	virtual HRESULT Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch);
 
 private:
-	BoundingBox m_boudingBox;
-	XMFLOAT4 m_color;
+	BoundingOrientedBox m_boudingBox;
+
 
 public:
-	static unique_ptr<AABB_Collider> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
-	virtual shared_ptr<Prototype> Clone(void* pArg) ;
+	static unique_ptr<OBB_Collider> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+	virtual shared_ptr<Prototype> Clone(void* pArg);
 };
 
 NS_END;

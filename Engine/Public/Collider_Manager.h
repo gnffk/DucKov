@@ -22,9 +22,13 @@ public:
 
 		return &iter->second;
 	}
+	std::unordered_map<wstring, std::vector<BaseCollider*>>& GetAllCollders() {
+		return m_Colliders;
+	}
 	
 public:
 	HRESULT Find_Collider(wstring GroupTag, class BaseCollider* pCollider);
+	void Update(float Timedelta);
 	void Render();
 	HRESULT Clear();
 private:
