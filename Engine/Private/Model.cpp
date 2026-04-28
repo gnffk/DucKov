@@ -22,11 +22,11 @@ Model::Model(const Model& Prototype)
 }
 
 
-HRESULT Model::Initialize_Prototype(uint32_t iLevelIndex, wstring modelName, const char* modelFileName)
+HRESULT Model::Initialize_Prototype(uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName)
 {
     m_iLevelIndex = iLevelIndex;
     m_sModelName = modelName;
-
+    m_eModelType = modeltype;
 
     if (FAILED(Ready_BinaryModelFile(modelFileName))) {
         MSG_BOX("Failed to Created : BinaryModelFile");
@@ -45,11 +45,11 @@ HRESULT Model::Initialize(void* pArg)
     return S_OK;
 }
 
-unique_ptr<Model> Model::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, const char* modelFileName)
+unique_ptr<Model> Model::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName)
 {
     auto		pInstance = unique_ptr<Model>(new Model(pDevice, pContext));
 
-    if (FAILED(pInstance->Initialize_Prototype(iLevelIndex, modelName, modelFileName)))
+    if (FAILED(pInstance->Initialize_Prototype(iLevelIndex, modelName, modeltype, modelFileName)))
     {
         MSG_BOX("Failed to Created : Model");
         return nullptr;
@@ -106,36 +106,47 @@ HRESULT Model::Ready_BinaryModelFile(const char* modelFileName)
     FileHeader fh{};
     file.read((char*)&fh, sizeof(fh));
 
-     if (fh.magic != ETOUI(FileHeaderType::FILEHEADER_MODEL))
+     if (fh.magic != ETOUI(FILEHEADERTYPE::FILEHEADER_MODEL))
         return E_FAIL;
 
 
+     switch (m_eModelType) {
+     case ETOUI(MODELTYPE::NONANIM):
+     {
+         if (FAILED(Ready_NonAnimMesh(file, modelFileName))) {
+             MSG_BOX("Ready_NonAnimMesh Load FAILED");
+             file.close();
+             return E_FAIL;
+         }
 
+         if (FAILED(Ready_NonAnimMaterial(file, modelFileName))) {
+             MSG_BOX("Ready_NonAnimMaterial Load FAILED");
+             file.close();
+             return E_FAIL;
+         }
+     }
+      
+         break;
 
-    if (FAILED(Ready_Mesh(file, modelFileName))) {
-        MSG_BOX("Mesh Load FAILED");
-        file.close();
-        return E_FAIL;
-    }
+     case ETOUI(MODELTYPE::ANIM):
 
-    if (FAILED(Ready_Material(file, modelFileName))) {
-        MSG_BOX("Material Load FAILED");
-        file.close();
-        return E_FAIL;
-    }
+         break;
+     }
+
+  
 
     file.close();
     return S_OK;
 }
 
-HRESULT Model::Ready_Mesh(ifstream& _file, const char* modelFileName)
+HRESULT Model::Ready_NonAnimMesh(ifstream& _file, const char* modelFileName)
 {
    
 
     CHUCKHEADER ch{};
     _file.read((char*)&ch, sizeof(ch));
 
-    if (ch.type != ETOUI(ChunkType::CHUNK_MESH))
+    if (ch.type != ETOUI(CHUNCKTYPE::CHUNK_MESH))
         return E_FAIL;
 
     uint32_t meshCount = 0;
@@ -169,13 +180,13 @@ HRESULT Model::Ready_Mesh(ifstream& _file, const char* modelFileName)
     return S_OK;
 }
 
-HRESULT Model::Ready_Material(ifstream& _file, const char* modelFileName) {
+HRESULT Model::Ready_NonAnimMaterial(ifstream& _file, const char* modelFileName) {
 
 
     CHUCKHEADER ch{};
     _file.read((char*)&ch, sizeof(ch));
 
-    if (ch.type != ETOUI(ChunkType::CHUNK_MATERIAL))
+    if (ch.type != ETOUI(CHUNCKTYPE::CHUNK_MATERIAL))
         return E_FAIL;
 
     uint32_t materialCount = 0;
@@ -210,12 +221,12 @@ HRESULT Model::Ready_Material(ifstream& _file, const char* modelFileName) {
                 _file.read((char*)&texes[j].m_textureType, sizeof(uint32_t));
                 _file.read((char*)&texes[j].m_textureNum, sizeof(uint32_t));
 
-                // FilePath
+          
                 _file.read((char*)&len, sizeof(uint32_t));
                 texes[j].File.resize(len);
                 _file.read(texes[j].File.data(), len);
 
-                // FileName
+           
                 _file.read((char*)&len, sizeof(uint32_t));
                 texes[j].Ext.resize(len);
                 _file.read(texes[j].Ext.data(), len);
@@ -232,5 +243,15 @@ HRESULT Model::Ready_Material(ifstream& _file, const char* modelFileName) {
     }
 
 
+    return S_OK;
+}
+
+HRESULT Model::Ready_AnimMesh(ifstream& _file, const char* modelFileName)
+{
+    return S_OK;
+}
+
+HRESULT Model::Ready_AnimMaterial(ifstream& _file, const char* modelFileName)
+{
     return S_OK;
 }

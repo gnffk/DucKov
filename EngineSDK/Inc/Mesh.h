@@ -18,7 +18,7 @@ public:
 	}
 public:
 	virtual HRESULT Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex) ;
-
+	HRESULT Bind_BoneMatrices(const vector<shared_ptr<class Bone>>& Bones, shared_ptr<class Shader> pShader, const _char* pConstantName);
 public:
 	static unique_ptr<Mesh> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 
 		shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex);
@@ -27,6 +27,16 @@ private:
 	shared_ptr<vector<VTXMESH>> vertices;
 	shared_ptr<vector<uint32_t>> indices;
 	uint32_t		m_iMaterialIndex = {};
+
+
+private:
+	uint32_t		m_iNumBones = {}; /* 이 메시가 이용하는 뼈의 갯수. */
+
+	/*  이 메시에 영향을 주는 뼈들의 전체뼈기준의 인덱스 */
+	vector<uint32_t>	m_BoneIndices;
+	vector<_float4x4>	m_BoneMatrices;
+	vector<_float4x4>	m_OffsetMatrices;
+
 };
 
 NS_END

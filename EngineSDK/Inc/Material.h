@@ -20,7 +20,7 @@ private:
 
 
 private:
-	vector<ComPtr<ID3D11ShaderResourceView>>			m_Materials[TextureType::TextureType_END];
+	vector<ComPtr<ID3D11ShaderResourceView>>			m_Materials[TEXTURETYPE::TextureType_END];
 
 public:
 	static shared_ptr<Material> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 

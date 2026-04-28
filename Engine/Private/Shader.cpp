@@ -103,6 +103,22 @@ HRESULT Shader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix
     return pMatrixVariable->SetMatrix(reinterpret_cast<const _float*>(pMatrix));
 }
 
+HRESULT Shader::Bind_Matrices(const _char* pConstantName, const _float4x4* pMatrices, uint32_t iNumMatrices)
+{
+    if (nullptr == m_pEffect)
+        return E_FAIL;
+
+    ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+    if (nullptr == pVariable)
+        return E_FAIL;
+
+    ID3DX11EffectMatrixVariable* pMatrixVariable = pVariable->AsMatrix();
+    if (nullptr == pMatrixVariable)
+        return E_FAIL;
+
+    return pMatrixVariable->SetMatrixArray(reinterpret_cast<const _float*>(pMatrices), 0, iNumMatrices);
+}
+
 unique_ptr<Shader> Shader::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pInputElements, uint32_t iNumElements)
 {
     auto		pInstance = unique_ptr<Shader>(new Shader(pDevice, pContext));

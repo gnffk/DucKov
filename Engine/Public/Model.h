@@ -21,7 +21,7 @@ public:
 	}
 
 public:
-	virtual HRESULT Initialize_Prototype(uint32_t m_iLevelIndex, wstring modelName, const char* modelFileName);
+	virtual HRESULT Initialize_Prototype(uint32_t m_iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName);
 	virtual HRESULT Initialize(void* pArg) override;
 
 	HRESULT Render();
@@ -30,10 +30,9 @@ public:
 public:
 	HRESULT Bind_Materials(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t iMeshIndex, uint32_t eMaterialType, uint32_t iTextureIndex);
 
-	
-public:
+	public:
 
-	static unique_ptr<Model> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, const char* modelFileName);
+	static unique_ptr<Model> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 
 
@@ -44,13 +43,17 @@ public:
 private:
 	HRESULT Ready_BinaryModelFile(const char* modelFileName);
 
-	HRESULT Ready_Mesh(ifstream& _file, const char* modelFileName);
+	HRESULT Ready_NonAnimMesh(ifstream& _file, const char* modelFileName);
 
-	HRESULT Ready_Material(ifstream& _file, const char* modelFileName);
+	HRESULT Ready_NonAnimMaterial(ifstream& _file, const char* modelFileName);
 	
+
+	HRESULT Ready_AnimMesh(ifstream& _file, const char* modelFileName);
+
+	HRESULT Ready_AnimMaterial(ifstream& _file, const char* modelFileName);
 private:
 	vector<shared_ptr<Mesh>> m_Meshes;
-
+	uint32_t m_eModelType;
 	uint32_t m_iLevelIndex;
 	uint32_t m_iNumMesh{};
 	wstring m_sModelName;

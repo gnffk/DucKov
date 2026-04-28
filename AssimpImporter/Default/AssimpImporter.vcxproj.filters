@@ -13,6 +13,9 @@
     <Filter Include="02. Material">
       <UniqueIdentifier>{36cc8274-4be7-4098-9c80-03eeedcf88e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Bone">
+      <UniqueIdentifier>{68ebd347-3348-4695-bccb-06362774c3c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Importer.cpp">
@@ -27,6 +30,9 @@
     <ClCompile Include="..\Private\Material.cpp">
       <Filter>02. Material</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Bone.cpp">
+      <Filter>03. Bone</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Importer.h">
@@ -40,6 +46,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Material.h">
       <Filter>02. Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bone.h">
+      <Filter>03. Bone</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

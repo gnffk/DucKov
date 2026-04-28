@@ -106,6 +106,9 @@
     <Filter Include="06.Component\Collider\OBB">
       <UniqueIdentifier>{77139711-9b81-4c5c-a6c5-9fb9e78dde3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\Model\Bone">
+      <UniqueIdentifier>{ede68cec-7555-4156-a30f-04ae038402d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -237,6 +240,9 @@
     <ClCompile Include="..\Private\OBB_Collider.cpp">
       <Filter>06.Component\Collider\OBB</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Bone.cpp">
+      <Filter>06.Component\Model\Bone</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -349,6 +355,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\OBB_Collider.h">
       <Filter>06.Component\Collider\OBB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bone.h">
+      <Filter>06.Component\Model\Bone</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

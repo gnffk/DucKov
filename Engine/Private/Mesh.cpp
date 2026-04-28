@@ -1,5 +1,5 @@
 #include "Mesh.h"
-
+#include "Bone.h"
 #include "GameInstance.h"
 
 
@@ -71,6 +71,19 @@ HRESULT Mesh::Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vecto
 	if (FAILED(m_pDevice->CreateBuffer(&IndexBufferDesc, &IndexInitialData, m_pIB.GetAddressOf())))
 		return E_FAIL;
 
+
+	return S_OK;
+}
+
+HRESULT Mesh::Bind_BoneMatrices(const vector<shared_ptr<Bone>>& Bones, shared_ptr<Shader> pShader, const _char* pConstantName)
+{
+	for (size_t i = 0; i < m_iNumBones; i++)
+	{
+		XMStoreFloat4x4(&m_BoneMatrices[i],
+			XMLoadFloat4x4(&m_OffsetMatrices[i]) * Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrix());
+	}
+
+	pShader->Bind_Matrices(pConstantName, &m_BoneMatrices.front(), m_iNumBones);
 
 	return S_OK;
 }
