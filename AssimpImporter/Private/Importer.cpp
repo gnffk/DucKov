@@ -31,6 +31,9 @@ void Importer::LoadFolder(const char* ModelFilePath, MODEL modelType)
             {
                 basePath += "Character/";
             }
+            else if (modelName.rfind("SK_", 0) == 0) {
+                basePath += "Skeleton/";
+            }
             else
             {
                 basePath += "Bin/";
@@ -102,7 +105,9 @@ HRESULT Importer::Load(char* ModelFilePath, MODEL modelType)
 
     if(modelType == MODEL::ANIM) {
         if (nullptr != pScene->mRootNode) {
-            Bones.resize(pScene->mNumSkeletons);
+            uint32_t boneMap = 0;
+
+          
             Ready_Bones(pScene->mRootNode, -1);
         }
 
@@ -325,63 +330,30 @@ void Importer::ProcessAnimMesh(aiMesh* mesh, const aiScene* scene)
     string _name;
 
 
+    if (mesh->mName.length > 0)
+        _name = mesh->mName.C_Str();
+    else
+        _name = "Mesh_" + to_string(++m_index);
+
+
     uint32_t _materialIndex;
     XMFLOAT3 _min = { FLT_MAX, FLT_MAX, FLT_MAX };
     XMFLOAT3 _max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
 
     uint32_t m_iNumBones = mesh->mNumBones;
-    shared_ptr<vector<XMFLOAT4X4>> m_BoneMatrices;
-    shared_ptr<vector<XMFLOAT4X4>> m_OffsetMatrices;
-    shared_ptr<vector<uint32_t>> m_indices;
+    shared_ptr<vector<uint32_t>> m_Boneindices = make_shared<vector<uint32_t>>();
+    shared_ptr<vector<XMFLOAT4X4>> m_BoneMatrices = make_shared<vector<XMFLOAT4X4>>();
+    shared_ptr<vector<XMFLOAT4X4>> m_OffsetMatrices = make_shared<vector<XMFLOAT4X4>>();
     shared_ptr<vector<VTXANIMMESH>> vertices = make_shared<vector<VTXANIMMESH>>();
     shared_ptr<vector<uint32_t>> indices = make_shared<vector<uint32_t>>();
-    m_BoneMatrices->reserve(m_iNumBones);
-    m_OffsetMatrices->reserve(m_iNumBones);
+
+    m_Boneindices->resize(m_iNumBones);
+    m_BoneMatrices->resize(m_iNumBones);
+    m_OffsetMatrices->resize(m_iNumBones);
     shared_ptr<Mesh> fbxmesh = make_shared<Mesh>();
 
-    for (size_t i = 0; i < m_iNumBones; i++)
-    {
-        aiBone* pAIBone = mesh->mBones[i];
-
-        XMFLOAT4X4   OffsetMatrix;
-        memcpy(&OffsetMatrix, &pAIBone->mOffsetMatrix, sizeof(XMFLOAT4X4));
-
-        XMStoreFloat4x4(&OffsetMatrix, XMMatrixTranspose(XMLoadFloat4x4(&OffsetMatrix)));
-
-        m_OffsetMatrices->emplace_back(OffsetMatrix);
-
-        int32_t    iBoneIndex = Get_BoneIndex(pAIBone->mName.C_Str());
 
 
-        m_indices->push_back(iBoneIndex);
-
-        for (size_t j = 0; j < pAIBone->mNumWeights; j++)
-        {
-            if (0 == (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.x)
-            {
-                (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendIndices.x = i;
-                (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.x = pAIBone->mWeights[j].mWeight;
-            }
-
-            else if (0 == (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.y)
-            {
-                (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendIndices.y = i;
-                (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.y = pAIBone->mWeights[j].mWeight;
-            }
-
-            else if (0 == (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.z)
-            {
-                (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendIndices.z = i;
-                (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.z = pAIBone->mWeights[j].mWeight;
-            }
-
-            else if (0 == (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.w)
-            {
-                (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendIndices.w = i;
-                (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.w = pAIBone->mWeights[j].mWeight;
-            }
-        }
-    }
 
 
     for (UINT i = 0; i < mesh->mNumVertices; ++i)
@@ -435,6 +407,72 @@ void Importer::ProcessAnimMesh(aiMesh* mesh, const aiScene* scene)
         vertices->emplace_back(v);
     }
 
+
+
+    if (0 == m_iNumBones)
+    {
+        m_iNumBones = 1;
+
+        int32_t        iBoneIndex = { -1 };
+
+        iBoneIndex = Get_BoneIndex(_name.data());
+
+        if (-1 == iBoneIndex)
+            return;
+
+        XMFLOAT4X4       OffsetMatrix;
+        XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
+
+        m_Boneindices->push_back(iBoneIndex);
+        m_OffsetMatrices->push_back(OffsetMatrix);
+        m_BoneMatrices->resize(iBoneIndex);
+    }
+    else {
+        for (size_t i = 0; i < m_iNumBones; i++)
+        {
+            aiBone* pAIBone = mesh->mBones[i];
+
+            XMFLOAT4X4   OffsetMatrix;
+            memcpy(&OffsetMatrix, &pAIBone->mOffsetMatrix, sizeof(XMFLOAT4X4));
+
+            XMStoreFloat4x4(&OffsetMatrix, XMMatrixTranspose(XMLoadFloat4x4(&OffsetMatrix)));
+            (*m_OffsetMatrices)[i]=(OffsetMatrix);
+
+
+            int32_t    iBoneIndex = Get_BoneIndex(pAIBone->mName.C_Str());
+            if (-1 == iBoneIndex)
+                return;
+
+            (*m_Boneindices)[i]= (iBoneIndex);
+
+            for (size_t j = 0; j < pAIBone->mNumWeights; j++)
+            {
+                if (0 == (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.x)
+                {
+                    (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendIndices.x = i;
+                    (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.x = pAIBone->mWeights[j].mWeight;
+                }
+
+                else if (0 == (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.y)
+                {
+                    (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendIndices.y = i;
+                    (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.y = pAIBone->mWeights[j].mWeight;
+                }
+
+                else if (0 == (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.z)
+                {
+                    (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendIndices.z = i;
+                    (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.z = pAIBone->mWeights[j].mWeight;
+                }
+
+                else if (0 == (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.w)
+                {
+                    (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendIndices.w = i;
+                    (*vertices)[pAIBone->mWeights[j].mVertexId].vBlendWeights.w = pAIBone->mWeights[j].mWeight;
+                }
+            }
+        }
+    }
     // Index
     for (UINT i = 0; i < mesh->mNumFaces; ++i)
     {
@@ -446,11 +484,6 @@ void Importer::ProcessAnimMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
 
-
-    if (mesh->mName.length > 0)
-        _name = mesh->mName.C_Str();
-    else
-        _name = "Mesh_" + to_string(++m_index);
 
     _materialIndex = mesh->mMaterialIndex;
 
@@ -471,7 +504,7 @@ void Importer::ProcessAnimMesh(aiMesh* mesh, const aiScene* scene)
    
     fbxmesh->Set_AnimMesh(_name, _materialIndex, _min, _max, vertices, indices);
     fbxmesh->m_iNumBones = m_iNumBones;
-    fbxmesh->m_BoneIndices = m_indices;
+    fbxmesh->m_BoneIndices = m_Boneindices;
     fbxmesh->m_BoneMatrices = m_BoneMatrices;
     fbxmesh->m_OffsetMatrices = m_OffsetMatrices;
 

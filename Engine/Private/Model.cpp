@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "GameInstance.h"
 #include "Material.h"
+#include "Bone.h"
 
 Model::Model(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : Component{ pDevice, pContext }
 {
@@ -17,17 +18,20 @@ Model::Model(const Model& Prototype)
     , m_Meshes{ Prototype.m_Meshes }
     , m_iNumMaterials{ Prototype.m_iNumMaterials }
     , m_Materials{ Prototype.m_Materials }
+    , m_eModelType{ Prototype.m_eModelType }
+    , m_Bones{ Prototype.m_Bones }
+    , m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
 {
 
 }
 
 
-HRESULT Model::Initialize_Prototype(uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName)
+HRESULT Model::Initialize_Prototype(uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName, _fmatrix PreTransformMatrix)
 {
     m_iLevelIndex = iLevelIndex;
     m_sModelName = modelName;
     m_eModelType = modeltype;
-
+    XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
     if (FAILED(Ready_BinaryModelFile(modelFileName))) {
         MSG_BOX("Failed to Created : BinaryModelFile");
         return E_FAIL;
@@ -45,11 +49,11 @@ HRESULT Model::Initialize(void* pArg)
     return S_OK;
 }
 
-unique_ptr<Model> Model::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName)
+unique_ptr<Model> Model::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName, _fmatrix PreTransformMatrix)
 {
     auto		pInstance = unique_ptr<Model>(new Model(pDevice, pContext));
 
-    if (FAILED(pInstance->Initialize_Prototype(iLevelIndex, modelName, modeltype, modelFileName)))
+    if (FAILED(pInstance->Initialize_Prototype(iLevelIndex, modelName, modeltype, modelFileName, PreTransformMatrix)))
     {
         MSG_BOX("Failed to Created : Model");
         return nullptr;
@@ -88,6 +92,22 @@ HRESULT Model::Render(uint32_t iMeshIndex)
     m_Meshes[iMeshIndex]->Render();
 
     return S_OK;
+}
+
+void Model::Play_Animation(_float fTimeDelta)
+{
+    /* 뼈들의 m_TransformationMatrix를 갱신해준다. */
+
+    for (auto& pBone : m_Bones)
+    {
+        pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+    }
+
+}
+
+HRESULT Model::Bind_BoneMatrices(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t iMeshIndex)
+{
+    return m_Meshes[iMeshIndex]->Bind_BoneMatrices(m_Bones, pShader, pConstantName);
 }
 
 HRESULT Model::Bind_Materials(shared_ptr<Shader> pShader, const _char* pConstantName, uint32_t iMeshIndex, uint32_t eMaterialType, uint32_t iTextureIndex)
@@ -129,7 +149,25 @@ HRESULT Model::Ready_BinaryModelFile(const char* modelFileName)
          break;
 
      case ETOUI(MODELTYPE::ANIM):
+     {
+         if (FAILED(Ready_AnimBone(file, modelFileName))) {
+             MSG_BOX("Ready_AnimBone Load FAILED");
+             file.close();
+             return E_FAIL;
+         }
 
+         if (FAILED(Ready_AnimMesh(file, modelFileName))) {
+             MSG_BOX("Ready_AnimMesh Load FAILED");
+             file.close();
+             return E_FAIL;
+         }
+
+         if (FAILED(Ready_AnimMaterial(file, modelFileName))) {
+             MSG_BOX("Ready_AnimMaterial Load FAILED");
+             file.close();
+             return E_FAIL;
+         }
+     }
          break;
      }
 
@@ -246,12 +284,172 @@ HRESULT Model::Ready_NonAnimMaterial(ifstream& _file, const char* modelFileName)
     return S_OK;
 }
 
+HRESULT Model::Ready_AnimBone(ifstream& _file, const char* modelFileName)
+{
+    CHUCKHEADER ch{};
+    _file.read((char*)&ch, sizeof(ch));
+
+    if (ch.type != ETOUI(CHUNCKTYPE::CHUNK_SKELETON))
+        return E_FAIL;
+
+    uint32_t iBoneCount = 0;
+    _file.read((char*)&iBoneCount, sizeof(uint32_t));
+    m_iBoneCount = iBoneCount;
+    m_Bones.reserve(iBoneCount);
+
+
+
+    for (uint32_t i = 0; i < iBoneCount; ++i) {
+        uint32_t BoneNamesize = 0;
+        _float4x4 BoneMatrix;
+        uint32_t ParentBoneIndex = 0;
+
+        XMStoreFloat4x4(&BoneMatrix, XMMatrixIdentity());
+
+        _file.read((char*)&BoneNamesize, sizeof(uint32_t));
+
+        _char* BoneName = new _char[BoneNamesize + 1];
+
+        _file.read(BoneName, BoneNamesize);
+        BoneName[BoneNamesize] = '\0';
+
+        _file.read((char*)&BoneMatrix, sizeof(_float4x4));
+        _file.read((char*)&ParentBoneIndex, sizeof(uint32_t));
+
+        m_Bones.emplace_back(
+            Bone::Create(BoneName, BoneMatrix, ParentBoneIndex)
+        );
+
+        delete[] BoneName;
+
+    }
+
+    return S_OK;
+}
+
 HRESULT Model::Ready_AnimMesh(ifstream& _file, const char* modelFileName)
 {
+    CHUCKHEADER ch{};
+    _file.read((char*)&ch, sizeof(ch));
+
+    if (ch.type != ETOUI(CHUNCKTYPE::CHUNK_MESH))
+        return E_FAIL;
+
+    uint32_t meshCount = 0;
+    _file.read((char*)&meshCount, sizeof(uint32_t));
+    m_iNumMesh = meshCount;
+    for (uint32_t i = 0; i < meshCount; i++)
+    {
+        auto vertexes = make_shared<vector<VTXANIMMESH>>();
+        auto indices = make_shared<vector<uint32_t>>();
+
+        // MaterialIndex
+
+        uint32_t materialIndex = 0;
+        _file.read((char*)&materialIndex, sizeof(uint32_t));
+
+        uint32_t vCount = 0;
+        uint32_t iCount = 0;
+
+        _file.read((char*)&vCount, sizeof(uint32_t));
+        _file.read((char*)&iCount, sizeof(uint32_t));
+
+        vertexes->resize(vCount);
+        indices->resize(iCount);
+
+        _file.read((char*)vertexes->data(), sizeof(VTXANIMMESH) * vCount);
+        _file.read((char*)indices->data(), sizeof(uint32_t) * iCount);
+
+        uint32_t numBones = 0;
+        _file.read((char*)&numBones, sizeof(uint32_t));
+
+
+        uint32_t numBonesIndices = 0;
+        uint32_t numBonesMatrices = 0;
+        uint32_t numBonesOffsetMatices = 0;
+        _file.read((char*)&numBonesIndices, sizeof(uint32_t));
+        _file.read((char*)&numBonesMatrices, sizeof(uint32_t));
+        _file.read((char*)&numBonesOffsetMatices, sizeof(uint32_t));
+
+        vector<uint32_t> BonesIndices;
+        vector<_float4x4> BonesMatrices;
+        vector<_float4x4> BonesOffsetMatices;
+    
+        BonesIndices.resize(numBonesIndices);
+        BonesMatrices.resize(numBonesMatrices);
+        BonesOffsetMatices.resize(numBonesOffsetMatices);
+
+        _file.read((char*)BonesIndices.data(), sizeof(uint32_t) * numBonesIndices);
+        _file.read((char*)BonesMatrices.data(), sizeof(_float4x4) * numBonesMatrices);
+        _file.read((char*)BonesOffsetMatices.data(), sizeof(_float4x4) * numBonesOffsetMatices);
+
+        m_Meshes.emplace_back(Mesh::Create(m_pDevice, m_pContext, vertexes, indices, materialIndex, numBones, BonesIndices, BonesMatrices, BonesOffsetMatices));
+    }
+
     return S_OK;
 }
 
 HRESULT Model::Ready_AnimMaterial(ifstream& _file, const char* modelFileName)
 {
+    CHUCKHEADER ch{};
+    _file.read((char*)&ch, sizeof(ch));
+
+    if (ch.type != ETOUI(CHUNCKTYPE::CHUNK_MATERIAL))
+        return E_FAIL;
+
+    uint32_t materialCount = 0;
+    _file.read((char*)&materialCount, sizeof(uint32_t));
+    m_iNumMaterials = materialCount;
+    m_Materials.reserve(m_iNumMaterials);
+
+    for (size_t i = 0; i < m_iNumMaterials; i++)
+    {
+        // material번호, 텍스쳐 총 타입 카운트, 해당 종류 텍스쳐 카운트, 텍스쳐들 정보
+
+        uint32_t materialNum = 0;
+        uint32_t textureTypeCnt = 0;
+        vector<vector<TEXTUREINFO>> textureTypes;
+        textureTypes.clear();
+        _file.read((char*)&materialNum, sizeof(uint32_t));
+        _file.read((char*)&textureTypeCnt, sizeof(uint32_t));
+
+        textureTypes.reserve(textureTypeCnt);
+
+        for (uint32_t i = 0; i < textureTypeCnt; ++i) {
+
+
+            vector<TEXTUREINFO> texes;
+            uint32_t len;
+            uint32_t textureCnt = 0;
+
+            _file.read((char*)&textureCnt, sizeof(uint32_t));
+            texes.resize(textureCnt);
+
+            for (uint32_t j = 0; j < textureCnt; ++j) {
+                _file.read((char*)&texes[j].m_textureType, sizeof(uint32_t));
+                _file.read((char*)&texes[j].m_textureNum, sizeof(uint32_t));
+
+
+                _file.read((char*)&len, sizeof(uint32_t));
+                texes[j].File.resize(len);
+                _file.read(texes[j].File.data(), len);
+
+
+                _file.read((char*)&len, sizeof(uint32_t));
+                texes[j].Ext.resize(len);
+                _file.read(texes[j].Ext.data(), len);
+            }
+
+            textureTypes.emplace_back(texes);
+        }
+
+
+        auto  pMaterial = Material::Create(m_pDevice, m_pContext, materialNum, textureTypes, modelFileName);
+        m_Materials.emplace_back(pMaterial);
+
+
+    }
+
+
     return S_OK;
 }

@@ -100,27 +100,8 @@ HRESULT CLoader::Loading_For_MapEditor()
 #pragma region Texture Component Prototype
 
 
-	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
-	//	Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Fbx/Garden-Palette.png"), 1))))
-	//	return E_FAIL;
-	 
-	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Texture_Logo"),
-	//	Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Fbx/Player_Duck_Tex_AlbedoTint.png"), 1))))
-	//	return E_FAIL;
 
 
-#pragma endregion
-
-#pragma region Model Component Prototype
-
-
-	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-	//	Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"../../Resources/Fbx/Banana_02_LOD0.fbx"))))
-	//	return E_FAIL;
-
-	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/Character/CH_DuckJeff/CH_DuckJeff.bin"))))
-		return E_FAIL;
 
 #pragma endregion
 
@@ -130,20 +111,29 @@ HRESULT CLoader::Loading_For_MapEditor()
 		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Vtx_Fbx.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_AnimFbx"),
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Vtx_AnimFbx.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+		return E_FAIL;
+
 #pragma endregion
+
+#pragma region Model Component Prototype
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC",ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Fiona/SK_Fiona.bin", PreTransformMatrix))))
+		return E_FAIL;
+
+#pragma endregion
+
+
 
 #pragma region VIBuffer Component Prototype
-	///* Prototype_GameObject_TestModel */
-	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Fbx_TestModel"),
-	//	VIBuffer_Fbx::Create(m_pDevice, m_pContext, "../../Resources/Fbx/0_CharacterModel_Duck_Jeff.fbx")))){
-	//	return E_FAIL;
-	//}
 
-	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
-	//	VIBuffer_Rect::Create(m_pDevice, m_pContext)))) {
-	//	return E_FAIL;
-	//}
 #pragma endregion
+
 #pragma region Collider Component Prototype
 	///* Prototype_GameObject_TestModel */
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_AABB_Collider"),
@@ -155,10 +145,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 		OBB_Collider::Create(m_pDevice, m_pContext)))) {
 		return E_FAIL;
 	}
-	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Rect"),
-	//	VIBuffer_Rect::Create(m_pDevice, m_pContext)))) {
-	//	return E_FAIL;
-	//}
+
 #pragma endregion
 
 

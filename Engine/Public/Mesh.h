@@ -18,13 +18,25 @@ public:
 	}
 public:
 	virtual HRESULT Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex) ;
+	virtual HRESULT Initialize(shared_ptr<vector<VTXANIMMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex,
+		uint32_t m_iNumBones, vector<uint32_t>	BoneIndices, vector<_float4x4>	BoneMatrices, vector<_float4x4>	OffsetMatrices) ;
+	
+
 	HRESULT Bind_BoneMatrices(const vector<shared_ptr<class Bone>>& Bones, shared_ptr<class Shader> pShader, const _char* pConstantName);
 public:
 	static unique_ptr<Mesh> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 
 		shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex);
+
+
+	static unique_ptr<Mesh> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 
+		shared_ptr<vector<VTXANIMMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex,
+		uint32_t m_iNumBones, vector<uint32_t>	BoneIndices, vector<_float4x4>	BoneMatrices, vector<_float4x4>	OffsetMatrices);
+
+
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 private:
 	shared_ptr<vector<VTXMESH>> vertices;
+	shared_ptr<vector<VTXANIMMESH>> animvertices;
 	shared_ptr<vector<uint32_t>> indices;
 	uint32_t		m_iMaterialIndex = {};
 

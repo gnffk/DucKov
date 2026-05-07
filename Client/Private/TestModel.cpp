@@ -34,7 +34,6 @@ HRESULT TestModel::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scale(0.01f, 0.01f, 0.01f);
 	m_pAABBCom->SetOwner(SHARED_THIS(TestModel).get());
 	return S_OK;
 }
@@ -47,7 +46,7 @@ void TestModel::Priority_Update(_float fTimeDelta)
 
 void TestModel::Update(_float fTimeDelta)
 {
-
+	m_pModelCom->Play_Animation(fTimeDelta);
 
 }
 
@@ -77,13 +76,18 @@ HRESULT TestModel::Render()
 		return E_FAIL;
 
 
+
 	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (uint32_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (uint32_t)i)))
 			return E_FAIL;
 
+		//if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_Normals, 0)))
+		//	return E_FAIL;
 
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
@@ -91,7 +95,6 @@ HRESULT TestModel::Render()
 
 		m_pModelCom->Render(i);
 	}
-
 
 	return S_OK;
 }
@@ -104,10 +107,9 @@ HRESULT TestModel::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
 		return E_FAIL;
 
-	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_FBX_Tex")));
+	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_AnimFbx")));
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
-
 
 
 	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_OBB_Collider")));

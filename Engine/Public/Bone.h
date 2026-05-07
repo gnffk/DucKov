@@ -19,12 +19,14 @@ public:
 	}
 
 public:
-	HRESULT Initialize( int32_t iParentIndex);
+	HRESULT Initialize(const _char* name, _float4x4 TransformMatrix, int32_t ParentBoneIndex);
 	_bool Compare_Name(const _char* pBoneName) {
 		return !strcmp(pBoneName, m_szName);
 	}
 
-	void Update_CombinedTransformationMatrix(const vector<shared_ptr<Bone>>& Bones);
+	void Update_CombinedTransformationMatrix(const vector<shared_ptr<Bone>>& Bones, _fmatrix PreTransformMatrix);
+
+public:
 
 private:
 	_char			m_szName[MAX_PATH] = {  };
@@ -33,7 +35,7 @@ private:
 	int32_t			m_iParentBoneIndex = { -1 };
 
 public:
-	static shared_ptr<Bone> Create( int32_t iParentIndex);
+	static shared_ptr<Bone> Create(const _char* name, _float4x4 TransformMatrix, int32_t ParentBoneIndex);
 };
 
 NS_END
