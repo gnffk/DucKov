@@ -32,6 +32,11 @@ using namespace std;
 #define			MSG_BOX(_message)			MessageBox(NULL, TEXT(_message), L"System Message", MB_OK)
 #endif
 
+enum FILEHEADERTYPE { FILEHEADER_MODEL, FILEHEADER_ANIMATION, END };
+enum ChunkType { CHUNK_MESH = 1, CHUNK_MATERIAL, CHUNK_TEXTURE, CHUNK_SKELETON, CHUNK_ANIMATION };
+
+
+
 typedef struct FileHeader
 {
 	uint32_t magic;
@@ -43,10 +48,6 @@ typedef struct ChunkHeader
 	uint32_t type;
 	uint32_t size;
 }CHUCKHEADER;
-
-enum FileHeaderType { FILEHEADER_MODEL,END};
-enum ChunkType { CHUNK_MESH = 1, CHUNK_MATERIAL, CHUNK_TEXTURE, CHUNK_SKELETON, CHUNK_ANIMATION };
-
 
 typedef struct tagVertexMesh
 {
@@ -67,7 +68,6 @@ typedef struct tagVertexMesh
 	//};
 }VTXMESH;
 
-/* 애니메이션이 있는 메시용 정점. */
 typedef struct tagVertexAnimMesh
 {
 	XMFLOAT3	vPosition;
@@ -92,8 +92,6 @@ typedef struct tagVertexAnimMesh
 	};
 }VTXANIMMESH;
 
-
-// Material 정보 <BIN>
 enum MATERIALTYPE {
 	NONE = 0, DIFFUSE = 1, SPECULAR = 2, AMBIENT = 3, EMISSIVE = 4, HEIGHT = 5, NORMALS = 6, SHININESS = 7, OPACITY = 8, DISPLACEMENT = 9, LIGHTMAP = 10, REFLECTION = 11, BASE_COLOR = 12,
 	NORMAL_CAMERA = 13, EMISSION_COLOR = 14, METALNESS = 15, DIFFUSE_ROUGHNESS = 16, AMBIENT_OCCLUSION = 17, UNKNOWN = 18, SHEEN = 19, CLEARCOAT = 20, TRANSMISSION = 21, MAYA_BASE = 22,
@@ -107,4 +105,26 @@ typedef struct tagTexture {
 	string Ext;
 }TEXTUREINFO;
 
+
+typedef struct tagKeyFrame {
+	XMFLOAT3  vScale;
+	XMFLOAT4  vRotation;
+	XMFLOAT3  vTranslation;
+	float	  fTrackPosition;
+}KEYFRAME;
+
+typedef struct tagChannel {
+	int32_t BoneIndex;
+	uint32_t KeyFrameCount;
+	shared_ptr<vector<KEYFRAME>> KeyFrames;
+}CHANNELDATA;
+
+typedef struct tagAnimation {
+	float AnimationDuration;
+	float AnimtaionTickPerSecond;
+	uint32_t ChannelCount;
+	shared_ptr<vector<CHANNELDATA>> Channels;
+}ANIMATIONDATA;
+
 enum class MODEL { NONANIM, ANIM, END };
+

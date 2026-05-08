@@ -143,7 +143,7 @@ HRESULT Mesh::Bind_BoneMatrices(const vector<shared_ptr<Bone>>& Bones, shared_pt
 {
 	for (size_t i = 0; i < m_iNumBones; i++)
 	{
- 		XMStoreFloat4x4(&m_BoneMatrices[i],
+  		XMStoreFloat4x4(&m_BoneMatrices[i],
 			XMLoadFloat4x4(&m_OffsetMatrices[i]) * Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrix());
 	}
 

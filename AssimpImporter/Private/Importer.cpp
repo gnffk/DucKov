@@ -49,14 +49,34 @@ void Importer::LoadFolder(const char* ModelFilePath, MODEL modelType)
             std::string outputPath = dirPath + "/" + modelName + ".bin";
         
 
+
+
+
             Load((char*)inputPath.c_str(), modelType);
 
             if (modelType == MODEL::NONANIM) {
                 ExportNonAnimBinary(outputPath.c_str());
             }
             if (modelType == MODEL::ANIM) {
-                ExportAnimBinary(outputPath.c_str());
+                ExportAnimMeshBinary(outputPath.c_str());
+
+                std::string path = outputPath;
+
+                size_t pos = path.find_last_of("/\\");
+                std::string directory = path.substr(0, pos + 1);
+                std::string filename = path.substr(pos + 1);
+
+                if (filename.rfind("SK_", 0) == 0)
+                {
+                    filename.replace(0, 3, "AN_");
+                }
+
+                std::string newPath = directory + filename;
+
+                ExportAnimationBinary(newPath.c_str());
+
             }
+
             Clear();
         }
 
@@ -123,6 +143,11 @@ HRESULT Importer::Load(char* ModelFilePath, MODEL modelType)
         if (pScene->HasMaterials()) {
             Ready_Material(pScene);
         }
+
+
+        if (pScene->HasAnimations()) {
+            Ready_Animation(pScene);
+        }
     }
 
    
@@ -161,6 +186,19 @@ void Importer::Ready_Bones(const aiNode* pAINode, int32_t iParentBoneIndex)
     for (uint32_t i = 0; i < pAINode->mNumChildren; ++i)
     {
         Ready_Bones(pAINode->mChildren[i], iParentIndex);
+    }
+
+}
+
+void Importer::Ready_Animation(const aiScene* scene)
+{
+    Animations.reserve(scene->mNumAnimations);
+    for (size_t i = 0; i < scene->mNumAnimations; i++)
+    {
+
+        Animations.emplace_back(make_shared<Animation>());
+
+        Load_Animaion(i, scene->mAnimations[i]);
     }
 
 }
@@ -324,16 +362,17 @@ void Importer::ProcessNonAnimNode(aiNode* node, const aiScene* scene)
         ProcessNonAnimNode(node->mChildren[i], scene);
 }
 
-void Importer::ProcessAnimMesh(aiMesh* mesh, const aiScene* scene)
+void Importer::ProcessAnimMesh(aiMesh* mesh, const aiScene* scene, string name)
 {
 
     string _name;
+    
+    _name = name;
 
-
-    if (mesh->mName.length > 0)
-        _name = mesh->mName.C_Str();
-    else
-        _name = "Mesh_" + to_string(++m_index);
+    //if (mesh->mName.length > 0)
+    //    _name = mesh->mName.C_Str();
+    //else
+    //    _name = "Mesh_" + to_string(++m_index);
 
 
     uint32_t _materialIndex;
@@ -518,12 +557,88 @@ void Importer::ProcessAnimNode(aiNode* node, const aiScene* scene)
 {
     for (UINT i = 0; i < node->mNumMeshes; ++i)
     {
+        string name = node->mName.C_Str();
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        ProcessAnimMesh(mesh, scene);
+        ProcessAnimMesh(mesh, scene, name);
     }
 
     for (UINT i = 0; i < node->mNumChildren; ++i)
         ProcessAnimNode(node->mChildren[i], scene);
+}
+
+void Importer::Load_Animaion(uint32_t iAnimaionCount, const aiAnimation* pAIAnimation)
+{
+    Animations[iAnimaionCount]->m_AnimationData.AnimationDuration = pAIAnimation->mDuration;
+    Animations[iAnimaionCount]->m_AnimationData.AnimtaionTickPerSecond = pAIAnimation->mTicksPerSecond;
+    Animations[iAnimaionCount]->m_AnimationData.ChannelCount = pAIAnimation->mNumChannels;
+
+    Animations[iAnimaionCount]->m_AnimationData.Channels = make_shared<vector<CHANNELDATA>>();
+    Animations[iAnimaionCount]->m_AnimationData.Channels->reserve(pAIAnimation->mNumChannels);
+
+
+    for (size_t i = 0; i < pAIAnimation->mNumChannels; i++)
+    {
+        CHANNELDATA ChanelData;
+
+        Load_Channel(ChanelData, pAIAnimation->mChannels[i]);
+        Animations[iAnimaionCount]->m_AnimationData.Channels->emplace_back(ChanelData);
+    }
+
+}
+
+void Importer::Load_Channel(CHANNELDATA& ChannelData, const aiNodeAnim* pAIChannel)
+{
+    ChannelData.BoneIndex = Get_BoneIndex(pAIChannel->mNodeName.C_Str());
+    if (-1 == ChannelData.BoneIndex) {
+        MSG_BOX("Chanel FAILED LOAD");
+        return;
+    }
+        
+
+    ChannelData.KeyFrameCount = max(pAIChannel->mNumScalingKeys, pAIChannel->mNumRotationKeys);
+    ChannelData.KeyFrameCount = max(ChannelData.KeyFrameCount, pAIChannel->mNumPositionKeys);
+
+    XMFLOAT3     vScale = {};
+    XMFLOAT4     vRotation = {};
+    XMFLOAT3     vTranslation = {};
+
+    ChannelData.KeyFrames = make_shared<vector< KEYFRAME>>();
+
+    ChannelData.KeyFrames->reserve(ChannelData.KeyFrameCount);
+
+    for (size_t i = 0; i < ChannelData.KeyFrameCount; i++)
+    {
+        KEYFRAME            KeyFrame = {};
+
+        if (i < pAIChannel->mNumScalingKeys) // 만약에 더 큰 값이 들어올떄 그 전의 값으로 마지막껄 채워준다.
+        {
+            memcpy(&vScale, &pAIChannel->mScalingKeys[i].mValue, sizeof vScale);
+            KeyFrame.fTrackPosition = pAIChannel->mScalingKeys[i].mTime;
+        }
+
+        if (i < pAIChannel->mNumRotationKeys)
+        {
+            // memcpy(&vRotation, &pAIChannel->mRotationKeys[i].mValue, sizeof vRotation);
+            vRotation.x = pAIChannel->mRotationKeys[i].mValue.x;
+            vRotation.y = pAIChannel->mRotationKeys[i].mValue.y;
+            vRotation.z = pAIChannel->mRotationKeys[i].mValue.z;
+            vRotation.w = pAIChannel->mRotationKeys[i].mValue.w;
+            KeyFrame.fTrackPosition = pAIChannel->mRotationKeys[i].mTime;
+        }
+
+        if (i < pAIChannel->mNumPositionKeys)
+        {
+            memcpy(&vTranslation, &pAIChannel->mPositionKeys[i].mValue, sizeof vTranslation);
+            KeyFrame.fTrackPosition = pAIChannel->mPositionKeys[i].mTime;
+        }
+
+        KeyFrame.vScale = vScale;
+        KeyFrame.vRotation = vRotation;
+        KeyFrame.vTranslation = vTranslation;
+
+        ChannelData.KeyFrames->emplace_back(KeyFrame);
+    }
+
 }
 
 HRESULT Importer::ExportNonAnimBinary(const char* filePath)
@@ -535,7 +650,7 @@ HRESULT Importer::ExportNonAnimBinary(const char* filePath)
         return E_FAIL;
     }
     FileHeader fh;
-    fh.magic = ETOUI(FileHeaderType::FILEHEADER_MODEL);
+    fh.magic = ETOUI(FILEHEADERTYPE::FILEHEADER_MODEL);
     fh.version = 1;
     file.write((char*)&fh, sizeof(fh));
 
@@ -600,7 +715,6 @@ HRESULT Importer::ExportNonAnimBinary(const char* filePath)
     return S_OK;
 }
 
-
 void Importer::WriteNonAnimMesh(ofstream& file, shared_ptr<Mesh> mesh)
 {
     // MaterialIndex
@@ -622,7 +736,7 @@ void Importer::WriteNonAnimMesh(ofstream& file, shared_ptr<Mesh> mesh)
     file.write((char*)mesh->m_indices->data(), sizeof(uint32_t) * iCount);
 }
 
-HRESULT Importer::ExportAnimBinary(const char* filePath)
+HRESULT Importer::ExportAnimMeshBinary(const char* filePath)
 {
     ofstream file(filePath, ios::binary);
 
@@ -631,7 +745,7 @@ HRESULT Importer::ExportAnimBinary(const char* filePath)
         return E_FAIL;
     }
     FileHeader fh;
-    fh.magic = ETOUI(FileHeaderType::FILEHEADER_MODEL);
+    fh.magic = ETOUI(FILEHEADERTYPE::FILEHEADER_MODEL);
     fh.version = 1;
     file.write((char*)&fh, sizeof(fh));
     //-------------------------------------------------Bone----------------------------------------------------------------------//
@@ -685,6 +799,41 @@ HRESULT Importer::ExportAnimBinary(const char* filePath)
     file.close();
     return S_OK;
 
+}
+
+HRESULT Importer::ExportAnimationBinary(const char* filePath)
+{
+    ofstream file(filePath, ios::binary);
+
+    if (!file.is_open()) {
+        MSG_BOX("no file path");
+        return E_FAIL;
+    }
+    FileHeader fh;
+    fh.magic = ETOUI(FILEHEADERTYPE::FILEHEADER_ANIMATION);
+    fh.version = 1;
+    file.write((char*)&fh, sizeof(fh));
+
+    //---------------------------------------------------Animaiton-------------------------------------------------------------------//
+    ChunkHeader ch;
+    ch.type = ChunkType::CHUNK_ANIMATION;
+
+    // ChunkHeader 쓰기
+    file.write((char*)&ch, sizeof(ch));
+
+    // Animation 개수
+    uint32_t AnimCount = Animations.size();
+    file.write((char*)&AnimCount, sizeof(uint32_t));
+
+    // 실제 데이터
+    for (auto& Anim : Animations)
+    {
+        WriteAnimation(file, Anim);
+    }
+
+
+    file.close();
+    return S_OK;
 }
 
 void Importer::WriteAnimMesh(ofstream& file, shared_ptr<Mesh> mesh)
@@ -778,10 +927,45 @@ void Importer::Writebone(ofstream& file, shared_ptr<Bone> bone)
 
 }
 
+void Importer::WriteAnimation(ofstream& file, shared_ptr<Animation> Animation)
+{
+    float AnimationDuration = Animation->m_AnimationData.AnimationDuration;
+    float AnimtaionTickPerSecond = Animation->m_AnimationData.AnimtaionTickPerSecond;
+
+    file.write((char*)&AnimationDuration, sizeof(float));
+    file.write((char*)&AnimtaionTickPerSecond, sizeof(float));
+
+    uint32_t  ChannelCount = Animation->m_AnimationData.ChannelCount;
+    file.write((char*)&ChannelCount, sizeof(uint32_t));
+
+    for (int i = 0; i < Animation->m_AnimationData.ChannelCount; ++i) {
+        int32_t  BoneIndex = (*Animation->m_AnimationData.Channels)[i].BoneIndex;
+        uint32_t  KeyFrameCount = (*Animation->m_AnimationData.Channels)[i].KeyFrameCount;
+
+        file.write((char*)&BoneIndex, sizeof(int32_t));
+        file.write((char*)&KeyFrameCount, sizeof(uint32_t));
+
+        for (int j = 0; j < (*Animation->m_AnimationData.Channels)[i].KeyFrameCount; ++j) {
+            XMFLOAT3  vScale = (*(*Animation->m_AnimationData.Channels)[i].KeyFrames)[j].vScale;
+            XMFLOAT4  vRotation = (*(*Animation->m_AnimationData.Channels)[i].KeyFrames)[j].vRotation;
+            XMFLOAT3  vTranslation = (*(*Animation->m_AnimationData.Channels)[i].KeyFrames)[j].vTranslation;
+            float  fTrackPosition = (*(*Animation->m_AnimationData.Channels)[i].KeyFrames)[j].fTrackPosition;
+
+
+            file.write((char*)&vScale, sizeof(XMFLOAT3));
+            file.write((char*)&vRotation, sizeof(XMFLOAT4));
+            file.write((char*)&vTranslation, sizeof(XMFLOAT3));
+            file.write((char*)&fTrackPosition, sizeof(float));
+          
+        }
+    }
+}
+
 void Importer::Clear() {
     Bones.clear();
     Meshes.clear();
     Materials.clear();
+    Animations.clear();
 }
 
 

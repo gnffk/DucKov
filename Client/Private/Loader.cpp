@@ -123,7 +123,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC",ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Fiona/SK_Fiona.bin", PreTransformMatrix))))
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC",ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CharacterModel_Duck_Jeff/SK_CharacterModel_Duck_Jeff.bin", PreTransformMatrix))))
 		return E_FAIL;
 
 #pragma endregion

@@ -12,6 +12,15 @@ namespace Engine
 		int32_t		iNumLevels;
 	}ENGINE_DESC;
 
+	typedef struct tagKeyFrame
+	{
+		XMFLOAT3	vScale;
+		XMFLOAT4	vRotation;
+		XMFLOAT3	vTranslation;
+		float		fTrackPosition;
+	}KEYFRAME;
+
+
 	typedef struct tagVertexPositionTexcoord
 	{
 		XMFLOAT3 vPosition;

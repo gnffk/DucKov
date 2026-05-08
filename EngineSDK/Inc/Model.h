@@ -3,6 +3,7 @@
 #include "Mesh.h"
 
 
+
 NS_BEGIN(Engine)
 
 class ENGINE_DLL Model : public Component
@@ -27,7 +28,14 @@ public:
 	HRESULT Render();
 	HRESULT Render(uint32_t iMeshIndex);
 
-	void	Play_Animation(_float fTimeDelta);
+	_bool	Play_Animation(_float fTimeDelta);
+
+public:
+	void Set_Animation(uint32_t iIndex, _bool isLoop = true) {
+		m_iCurrentAnimIndex = iIndex;
+		m_isAnimLoop = isLoop;
+	}
+
 
 public:
 	HRESULT Bind_BoneMatrices(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t iMeshIndex);
@@ -45,6 +53,8 @@ public:
 
 private:
 	HRESULT Ready_BinaryModelFile(const char* modelFileName);
+	
+	HRESULT Ready_BinaryAnimationFile(const char* modelFileName);
 
 	HRESULT Ready_NonAnimMesh(ifstream& _file, const char* modelFileName);
 
@@ -58,6 +68,7 @@ private:
 
 	HRESULT Ready_AnimMaterial(ifstream& _file, const char* modelFileName);
 
+
 private:
 	vector<shared_ptr<class Bone>> m_Bones;
 	_float4x4				m_PreTransformMatrix = {};
@@ -69,10 +80,16 @@ private:
 	uint32_t m_iNumMesh{};
 	wstring m_sModelName;
 
+
 private:
 	uint32_t						m_iNumMaterials{};
 	vector<shared_ptr<class Material>>	m_Materials;
 
+private:
+	_bool							m_isAnimLoop = { true };
+	uint32_t						m_iCurrentAnimIndex = {};
+	uint32_t						m_iNumAnimations = {};
+	vector<shared_ptr<class Animation>>	m_Animations;
 };
 
 NS_END

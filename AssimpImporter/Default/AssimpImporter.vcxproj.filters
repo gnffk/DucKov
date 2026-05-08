@@ -16,6 +16,9 @@
     <Filter Include="03. Bone">
       <UniqueIdentifier>{68ebd347-3348-4695-bccb-06362774c3c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="04. Animation">
+      <UniqueIdentifier>{4a3fe1d4-9e20-44e8-a1ff-58de731a44d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Importer.cpp">
@@ -33,6 +36,9 @@
     <ClCompile Include="..\Private\Bone.cpp">
       <Filter>03. Bone</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Animation.cpp">
+      <Filter>04. Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Importer.h">
@@ -49,6 +55,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Bone.h">
       <Filter>03. Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Animation.h">
+      <Filter>04. Animation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

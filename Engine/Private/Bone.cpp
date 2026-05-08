@@ -47,3 +47,8 @@ shared_ptr<Bone> Bone::Create(const _char* name, _float4x4 TransformMatrix, int3
 
     return pInstance;
 }
+
+shared_ptr<Bone> Bone::Clone()
+{
+    return shared_ptr<Bone>(new Bone(*this));
+}

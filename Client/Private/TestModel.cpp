@@ -34,7 +34,10 @@ HRESULT TestModel::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	m_pTransformCom->Set_Scale(0.01f, 0.01f, 0.01f);
 	m_pAABBCom->SetOwner(SHARED_THIS(TestModel).get());
+
+	m_pModelCom->Set_Animation(0, false);
 	return S_OK;
 }
 

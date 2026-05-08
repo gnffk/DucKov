@@ -3,6 +3,8 @@
 #include "GameInstance.h"
 #include "Material.h"
 #include "Bone.h"
+#include "Animation.h"
+#include "Channel.h"
 
 Model::Model(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : Component{ pDevice, pContext }
 {
@@ -19,9 +21,21 @@ Model::Model(const Model& Prototype)
     , m_iNumMaterials{ Prototype.m_iNumMaterials }
     , m_Materials{ Prototype.m_Materials }
     , m_eModelType{ Prototype.m_eModelType }
-    , m_Bones{ Prototype.m_Bones }
     , m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
 {
+    m_Bones.reserve(Prototype.m_iBoneCount);
+
+    for (auto& pPrototypeBone : Prototype.m_Bones)
+    {
+        m_Bones.emplace_back(pPrototypeBone->Clone());
+    }
+
+    m_Animations.reserve(Prototype.m_iNumAnimations);
+    for (auto& pPrototypeAnim : Prototype.m_Animations)
+    {
+        m_Animations.emplace_back(pPrototypeAnim->Clone());
+    }
+
 
 }
 
@@ -34,6 +48,11 @@ HRESULT Model::Initialize_Prototype(uint32_t iLevelIndex, wstring modelName, uin
     XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
     if (FAILED(Ready_BinaryModelFile(modelFileName))) {
         MSG_BOX("Failed to Created : BinaryModelFile");
+        return E_FAIL;
+    }
+
+    if (FAILED(Ready_BinaryAnimationFile(modelFileName))) {
+        MSG_BOX("Failed to Created : BinaryAnimationFile");
         return E_FAIL;
     }
 
@@ -94,14 +113,19 @@ HRESULT Model::Render(uint32_t iMeshIndex)
     return S_OK;
 }
 
-void Model::Play_Animation(_float fTimeDelta)
+_bool Model::Play_Animation(_float fTimeDelta)
 {
+    _bool           isFinished = { false };
+
     /* 뼈들의 m_TransformationMatrix를 갱신해준다. */
+    isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(fTimeDelta, m_Bones, m_isAnimLoop);
 
     for (auto& pBone : m_Bones)
     {
         pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
     }
+
+    return isFinished;
 
 }
 
@@ -174,6 +198,62 @@ HRESULT Model::Ready_BinaryModelFile(const char* modelFileName)
   
 
     file.close();
+    return S_OK;
+}
+
+HRESULT Model::Ready_BinaryAnimationFile(const char* modelFileName)
+{
+    if (m_eModelType != ETOUI(MODELTYPE::ANIM))
+        return S_OK;
+
+    std::string path = modelFileName;
+
+    size_t pos = path.find_last_of("/\\");
+    std::string directory = path.substr(0, pos + 1);
+    std::string filename = path.substr(pos + 1);
+
+    if (filename.rfind("SK_", 0) == 0)
+    {
+        filename.replace(0, 3, "AN_");
+    }
+
+    std::string newPath = directory + filename;
+
+
+    ifstream file(newPath, ios::binary);
+
+    if (!file.is_open())
+        return E_FAIL;
+
+    FileHeader fh{};
+    file.read((char*)&fh, sizeof(fh));
+
+    if (fh.magic != ETOUI(FILEHEADERTYPE::FILEHEADER_ANIMATION))
+        return E_FAIL;
+
+    CHUCKHEADER ch{};
+    file.read((char*)&ch, sizeof(ch));
+
+    if (ch.type != ETOUI(CHUNCKTYPE::CHUNK_ANIMATION))
+        return E_FAIL;
+
+
+    uint32_t iAnimationCount = 0;
+    file.read((char*)&iAnimationCount, sizeof(uint32_t));
+    m_iNumAnimations = iAnimationCount;
+    m_Animations.reserve(iAnimationCount);
+
+
+    for (uint32_t i = 0; i < m_iNumAnimations; ++i) {
+        shared_ptr<Animation> pAnimation = Animation::Create(file);
+        if (nullptr == pAnimation)
+            return E_FAIL;
+
+        m_Animations.emplace_back(pAnimation);
+    }
+
+    file.close();
+
     return S_OK;
 }
 
@@ -453,3 +533,4 @@ HRESULT Model::Ready_AnimMaterial(ifstream& _file, const char* modelFileName)
 
     return S_OK;
 }
+
