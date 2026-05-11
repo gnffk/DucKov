@@ -20,6 +20,9 @@ public:
 	uint32_t Get_NumMeshes() const {
 		return m_iNumMesh;
 	}
+	uint32_t Get_NumAnimation() const {
+		return m_iNumAnimations;
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype(uint32_t m_iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName, _fmatrix PreTransformMatrix);

@@ -12,7 +12,7 @@ public:
 	~Material();
 
 public:
-	HRESULT Initialize(uint32_t materialNum, vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath);
+	HRESULT Initialize( vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath);
 	HRESULT Bind_ShaderResource(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t eMaterialType, uint32_t iTextureIndex);
 private:
 	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
@@ -24,7 +24,7 @@ private:
 
 public:
 	static shared_ptr<Material> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 
-		uint32_t materialNum, vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath);
+		 vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath);
 };
 
 NS_END

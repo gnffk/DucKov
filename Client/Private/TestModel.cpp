@@ -61,7 +61,7 @@ void TestModel::Late_Update(_float fTimeDelta)
 HRESULT TestModel::Render()
 {
 	
-
+	IMGUITEST();
 
 	_float4x4 View, Proj;
 	CGameInstance::Get().Get_MainCameraMatrix(View,Proj);
@@ -151,4 +151,78 @@ shared_ptr<Prototype> TestModel::Clone(void* pArg)
 	}
 
 	return pInstance;
+}
+void TestModel::IMGUITEST()
+{
+	uint32_t iNumAnim = m_pModelCom->Get_NumAnimation();
+
+	static int  currentAnim = 0;
+	static bool bLoop = true;
+
+	ImGui::Begin("Animation Debug");
+
+	// 애니메이션 선택
+	ImGui::SliderInt("Anim Index", &currentAnim, 0, (int)iNumAnim - 1);
+
+	// 루프 여부
+	ImGui::Checkbox("Loop", &bLoop);
+
+	// 재생 버튼
+	if (ImGui::Button("Play Animation"))
+	{
+		m_pModelCom->Set_Animation(currentAnim, bLoop);
+	}
+
+	ImGui::SameLine();
+
+	// 정지 버튼
+	if (ImGui::Button("Stop Animation"))
+	{
+		// 엔진 구조에 맞게 수정
+		//m_pModelCom->Set_PlayAnimation(FALSE);
+
+		// 또는
+		// m_pModelCom->Stop_Animation();
+
+		// 또는
+		// m_pModelCom->Set_AnimationSpeed(0.f);
+	}
+
+	ImGui::Separator();
+
+	// 리스트 형태
+	for (uint32_t i = 0; i < iNumAnim; ++i)
+	{
+		ImGui::PushID(i);
+
+		bool bSelected = (currentAnim == i);
+
+		if (ImGui::Selectable(("Animation " + std::to_string(i)).c_str(), bSelected))
+		{
+			currentAnim = i;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::SmallButton("Play"))
+		{
+			m_pModelCom->Set_Animation(i, bLoop);
+		}
+
+		ImGui::SameLine();
+
+		std::string stopLabel = "Stop##" + std::to_string(i);
+
+		if (ImGui::SmallButton(stopLabel.c_str()))
+		{
+			//m_pModelCom->Set_PlayAnimation(FALSE);
+
+			// 또는
+			// m_pModelCom->Stop_Animation();
+		}
+
+		ImGui::PopID();
+	}
+
+	ImGui::End();
 }

@@ -206,6 +206,7 @@ void Importer::Ready_Animation(const aiScene* scene)
 void Importer::Load_Material(aiMaterial* material, uint32_t materialNum)
 {
     shared_ptr<Material> fbxmaterial = make_shared<Material>();
+    fbxmaterial->m_materialNum = materialNum;
     for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
     {
         uint32_t		iNumTextures = material->GetTextureCount(static_cast<aiTextureType>(i));
@@ -238,7 +239,7 @@ void Importer::Load_Material(aiMaterial* material, uint32_t materialNum)
       
         fbxmaterial->m_textures.push_back(textureDummy);
     }
-    fbxmaterial->m_materialNum = materialNum;
+
 
     Materials.emplace_back(fbxmaterial);
 }

@@ -15,7 +15,7 @@ Material::~Material()
 
 
 
-HRESULT Material::Initialize(uint32_t materialNum, vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath)
+HRESULT Material::Initialize( vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath)
 {
 	_char	szDrive[MAX_PATH] = { };
 	_char	szDir[MAX_PATH] = { };
@@ -67,17 +67,21 @@ HRESULT Material::Initialize(uint32_t materialNum, vector<vector<TEXTUREINFO>>& 
 
 HRESULT Material::Bind_ShaderResource(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t eMaterialType, uint32_t iTextureIndex)
 {
+	if (m_Materials[eMaterialType].size() == 0) {
+		return S_OK;
+	}
+
 	return pShader->Bind_SRV(pConstantName,
 		m_Materials[eMaterialType][iTextureIndex]);
 }
 
 
 
-shared_ptr<Material> Material::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t materialNum,vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath)
+shared_ptr<Material> Material::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext,vector<vector<TEXTUREINFO>>& textureTypes, const _char* ModelFilePath)
 {
 	auto	pInstance = shared_ptr<Material>(new Material(pDevice, pContext));
 
-	if (FAILED(pInstance->Initialize(materialNum, textureTypes, ModelFilePath)))
+	if (FAILED(pInstance->Initialize( textureTypes, ModelFilePath)))
 		MSG_BOX("Failed to Created : Material");
 
 	return pInstance;

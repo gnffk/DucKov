@@ -50,6 +50,8 @@ private:
 public:
 	static unique_ptr<TestModel> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
+
+	void IMGUITEST();
 	
 };
 
