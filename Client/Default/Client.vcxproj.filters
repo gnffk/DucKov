@@ -31,14 +31,14 @@
     <Filter Include="02. GameObject">
       <UniqueIdentifier>{f53b673a-829b-4eee-a8da-9ae4b4a48719}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97. ShaderFiles">
-      <UniqueIdentifier>{0ada410e-46fe-4a03-bc6e-d1b739f37aa0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\TestModel">
       <UniqueIdentifier>{ed46eb8c-21f7-404f-8b34-0b7c251e6949}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject\Camera">
       <UniqueIdentifier>{b71c7a40-ea76-458c-b0fe-55f010003b28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\97. ShaderFiles">
+      <UniqueIdentifier>{0ada410e-46fe-4a03-bc6e-d1b739f37aa0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -129,10 +129,10 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
-      <Filter>97. ShaderFiles</Filter>
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_AnimFbx.hlsl">
-      <Filter>97. ShaderFiles</Filter>
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -15,6 +15,7 @@
 #include "DirectXTK/CommonStates.h"
 #include "DirectXTK/Effects.h"
 #include <DirectXCollision.h>
+
 using namespace DirectX;
 #include  <any>
 #include <vector>
@@ -39,7 +40,7 @@ using namespace Microsoft::WRL;
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-
+#include <nlohmann/json.hpp>
 #endif
 
 using namespace std;

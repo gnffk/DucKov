@@ -123,6 +123,7 @@ void ImGUI_Manager::Render_Imgui()
     if (pOldDepthState)
         pOldDepthState->Release();
 }
+
 void ImGUI_Manager::Update_Guizmo()
 {
     
@@ -141,7 +142,7 @@ void ImGUI_Manager::Update_Guizmo()
         if (CGameInstance::Get().Key_Down(DIK_E))
             mCurrentGizmoOperation = ImGuizmo::SCALE;
     }
-
+    
     _float4x4 matrix = m_pSelectObject->GetTransform()->GetWorldMatrix();
 
     ImGui::Begin("Imguizmo");
@@ -179,6 +180,9 @@ void ImGUI_Manager::Update_Guizmo()
   
     m_pSelectObject->GetTransform()->Set_WorldMatrix(matrix);
 
+}
+void ImGUI_Manager::Clear() {
+    m_pSelectObject = nullptr;
 }
 bool ImGUI_Manager::ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

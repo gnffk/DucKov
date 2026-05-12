@@ -25,6 +25,8 @@ public:
 	HRESULT Get_MainCamerwaProjectionMatrix(_float4x4& ProjectionMatrix);
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
 	
+
+	void	Clear();
 private:
 	map<uint32_t , weak_ptr<Camera>> p_Cameras;
 	weak_ptr<Camera> p_MainCamera;

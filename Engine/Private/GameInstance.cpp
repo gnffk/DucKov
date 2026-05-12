@@ -9,6 +9,7 @@
 #include "Camera_Manager.h"
 #include "Key_Manager.h"
 #include "Collider_Manager.h"
+#include "Map_Manager.h"
 
 CGameInstance::CGameInstance()
 {
@@ -36,6 +37,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pCollider_Manager)
         return E_FAIL;
 
+    m_pMap_Manager = Map_Manager::Create();
+    if (nullptr == m_pMap_Manager)
+        return E_FAIL;
+
     m_pCamera_Manager = Camera_Manager::Create();
     if (nullptr == m_pCamera_Manager)
         return E_FAIL;
@@ -56,7 +61,6 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     m_pObject_Manager = Object_Manager::Create(Engine_Desc.iNumLevels);
     if (nullptr == m_pObject_Manager)
         return E_FAIL;
-
 
     m_pTimer_Manager = CTimer_Manager::Create();
     if (nullptr == m_pTimer_Manager)
@@ -106,7 +110,16 @@ void CGameInstance::Clear_Resource(uint32_t iClearLevelIndex)
     m_pCollider_Manager->Clear();
     m_pObject_Manager->Clear(iClearLevelIndex);
     m_pPrototype_Manager->Clear(iClearLevelIndex);
+
    
+}
+
+void CGameInstance::Clear_Resource_SameLevel(uint32_t iClearLevelIndex)
+{
+    m_pCollider_Manager->Clear();
+    m_pObject_Manager->Clear(iClearLevelIndex);
+    m_pImGUI_Manager->Clear();
+
 }
 
 
@@ -301,6 +314,21 @@ bool CGameInstance::Mouse_Down(MOUSEKEYSTATE eMouseState) {
 
 #pragma endregion
 
+
+#pragma region Map_Manager
+HRESULT CGameInstance::Save(string _mapDataName, bool _overwrite) {
+    return m_pMap_Manager->Save(_mapDataName, _overwrite);
+}
+HRESULT CGameInstance::Load(string _mapDataName, uint32_t Levelindex) {
+    return m_pMap_Manager->Load(_mapDataName, Levelindex);
+}
+vector<string>& CGameInstance::GetMapNames() {
+    return m_pMap_Manager->GetMapNames();
+}
+#pragma endregion
+
+
+
 void CGameInstance::Release_Engine()
 {
     m_pCamera_Manager.reset();
@@ -308,6 +336,8 @@ void CGameInstance::Release_Engine()
     m_pCollider_Manager.reset();
 
     m_pKey_Manager.reset();
+
+    m_pMap_Manager.reset();
 
     m_pRenderer.reset();
 

@@ -9,6 +9,7 @@ public:
 	typedef struct tagGameObjectDesc : public Transform::TRANSFORM_DESC
 	{
 		wstring		  m_strName;
+		wstring		  m_strPrototypeName;
 		uint32_t	  pCameraType;
 	}GAMEOBJECT_DESC;
 protected:
@@ -27,7 +28,9 @@ public:
 
 public:
 	Transform* GetTransform() { return m_pTransformCom.get(); }
-	wstring GetObjectName() { return m_ObjectName; }
+	GAMEOBJECT_DESC& GetObjectINFO() { return Object_INFO; }
+
+
 	map<const _wstring, shared_ptr<class Component>>& GetComponents() { return m_Components; }
 
 protected:
@@ -42,7 +45,8 @@ protected:
 protected:
 	// clone 한 컴포넌트들을 보관하는 곳
 	map<const _wstring, shared_ptr<class Component>>		m_Components;
-	std::wstring m_ObjectName;
+	GAMEOBJECT_DESC Object_INFO;
+
 
 
 protected:

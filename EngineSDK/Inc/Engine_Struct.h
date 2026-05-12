@@ -57,6 +57,22 @@ namespace Engine
 		string Ext;
 	}TEXTUREINFO;
 
+	struct SAVE_GAMEOBJECT_DESC
+	{
+		string Prototype;
+		string Layer;
+		string Name;
+
+		XMFLOAT3 Position;
+		XMFLOAT4 Rotation;
+		XMFLOAT3 Scale;
+
+		uint32_t CameraType;
+
+		float SpeedPerSec;
+		float RotationPerSec;
+	};
+
 	typedef struct tagVertexMesh
 	{
 		XMFLOAT3	vPosition;

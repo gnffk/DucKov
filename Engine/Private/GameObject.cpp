@@ -13,6 +13,7 @@ GameObject::GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext>
 GameObject::GameObject(const GameObject& Prototype)
     : m_pDevice{ Prototype.m_pDevice }
     , m_pContext{ Prototype.m_pContext }
+    , Object_INFO{ Prototype.Object_INFO}
 {
 }
 
@@ -35,9 +36,11 @@ HRESULT GameObject::Initialize(void* pArg)
 
     auto		pDesc = static_cast<GAMEOBJECT_DESC*>(pArg);
 
-    m_ObjectName = pDesc->m_strName;
-
-
+    Object_INFO.m_strName = pDesc->m_strName;
+    Object_INFO.m_strPrototypeName = pDesc->m_strPrototypeName;
+    Object_INFO.pCameraType = pDesc->pCameraType;
+    Object_INFO.fSpeedPerSec = pDesc->fSpeedPerSec;
+    Object_INFO.fRotationPerSec = pDesc->fRotationPerSec;
 
     if (FAILED(m_pTransformCom->Initialize(pArg)))
         return E_FAIL;

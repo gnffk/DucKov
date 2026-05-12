@@ -19,6 +19,7 @@ public:
 	void Update_Imgui(_float fTimeDelta);
 	void Render_Imgui();
 	void Update_Guizmo();
+	void Clear();
 	bool ImGui_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	HRESULT SetSeletObject(GameObject* select) { m_pSelectObject = select;	return true;}

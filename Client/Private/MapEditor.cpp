@@ -31,32 +31,34 @@ void MapEditor::Update(_float fTimeDelta)
 HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 {
 
-	GameObject::GAMEOBJECT_DESC descTestModel0{};
-	descTestModel0.m_strName =L"TestModel0";
-	descTestModel0.pCameraType = ETOUI(CAMERA::NONE);
-	descTestModel0.fSpeedPerSec = 5.f;
-	descTestModel0.fRotationPerSec = 1.f;
+	//GameObject::GAMEOBJECT_DESC descTestModel0{};
+	//descTestModel0.m_strName =L"TestModel0";
+	//descTestModel0.m_strPrototypeName =L"Prototype_GameObject_TestModel";
+	//descTestModel0.pCameraType = ETOUI(CAMERA::NONE);
+	//descTestModel0.fSpeedPerSec = 5.f;
+	//descTestModel0.fRotationPerSec = 1.f;
 
- 	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_TestModel"),
-		ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTestModel0) ))
-		return E_FAIL;
-
-
-
-	GameObject::GAMEOBJECT_DESC descMain_Camera{};
-	descMain_Camera.m_strName = L"Main_Camera";
-	descMain_Camera.pCameraType = ETOUI(CAMERA::MAIN);
-	descMain_Camera.fSpeedPerSec = 1.f;
-	descMain_Camera.fRotationPerSec = 0.1f;
+ //	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_TestModel"),
+	//	ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTestModel0) ))
+	//	return E_FAIL;
 
 
-	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_PerspectiveCamera"),
-		ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descMain_Camera)))
-		return E_FAIL;
-	
-	if(FAILED(CGameInstance::Get().Add_Camera(ETOUI(CAMERA::MAIN),
-		dynamic_pointer_cast<Camera>(CGameInstance::Get().Find_Object(ETOUI(LEVEL::MAPEDITOR), L"MapEditorLayer", L"Main_Camera")))))
-		return E_FAIL;
+
+	//GameObject::GAMEOBJECT_DESC descMain_Camera{};
+	//descMain_Camera.m_strName = L"Main_Camera";
+	//descMain_Camera.m_strPrototypeName = L"Prototype_GameObject_PerspectiveCamera";
+	//descMain_Camera.pCameraType = ETOUI(CAMERA::MAIN);
+	//descMain_Camera.fSpeedPerSec = 1.f;
+	//descMain_Camera.fRotationPerSec = 0.1f;
+
+
+	//if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_PerspectiveCamera"),
+	//	ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descMain_Camera)))
+	//	return E_FAIL;
+	//
+	//if(FAILED(CGameInstance::Get().Add_Camera(ETOUI(CAMERA::MAIN),
+	//	dynamic_pointer_cast<Camera>(CGameInstance::Get().Find_Object(ETOUI(LEVEL::MAPEDITOR), L"MapEditorLayer", L"Main_Camera")))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -121,7 +123,7 @@ void MapEditor::IMGUI_Level_Render()
 
 			for (auto& object : gameObjects)
 			{
-				std::string objectName = WStringToString(object->GetObjectName());
+				std::string objectName = WStringToString(object->GetObjectINFO().m_strName);
 
 				ImGuiTreeNodeFlags flags =
 					ImGuiTreeNodeFlags_OpenOnArrow |
@@ -167,7 +169,7 @@ void MapEditor::IMGUI_Level_Render()
 void MapEditor::IMGUI_OTHER_Render()
 {
 	ImGui::Begin(u8"Prototype Manager", nullptr, ImGuiWindowFlags_NoTitleBar);
-	ImGui::Text(u8"초기 프로토타입");
+	ImGui::Text(u8"프로토타입");
 
 	auto names = CGameInstance::Get().Get_PrototypeNames(ETOUI(LEVEL::MAPEDITOR));
 	for (auto& name : names)
@@ -223,6 +225,98 @@ void MapEditor::IMGUI_OTHER_Render()
 	ImGui::Text("Frame Time : %.3f ms", 1000.0f / ImGui::GetIO().Framerate);
 
 	ImGui::End();
+
+	//-----------------------------Save Load---------------------------------------------
+	auto& mapNames = CGameInstance::Get().GetMapNames();
+
+	ImGui::Begin("SAVE LOAD");
+
+
+
+
+	// ---------------- LOAD ----------------
+	ImGui::Text("Load Scene");
+	static string currentMap;
+
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10.f, 8.f));
+
+	ImGui::PushStyleColor(ImGuiCol_Header,
+		ImVec4(0.20f, 0.22f, 0.25f, 1.0f));
+
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered,
+		ImVec4(0.30f, 0.32f, 0.35f, 1.0f));
+
+	ImGui::PushStyleColor(ImGuiCol_HeaderActive,
+		ImVec4(0.15f, 0.50f, 0.75f, 1.0f));
+
+	for (auto& name : mapNames)
+	{
+		bool selected = (currentMap == name);
+
+		if (ImGui::Selectable(
+			name.c_str(),
+			selected,
+			ImGuiSelectableFlags_None,
+			ImVec2(250.f, 35.f)))
+		{
+			currentMap = name;
+
+			CGameInstance::Get().Load(name, ETOUI(LEVEL::MAPEDITOR));
+		}
+
+		ImGui::Spacing();
+	}
+
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar();
+	ImGui::Separator();
+
+
+	// ---------------- SAVE ----------------
+	ImGui::Text("Save Scene");
+
+	static char saveFileName[128] = "";
+	static bool openOverwritePopup = false;
+	ImGui::InputText("File Name", saveFileName, IM_ARRAYSIZE(saveFileName));
+
+	if (ImGui::Button("Save"))
+	{
+		HRESULT result =
+			CGameInstance::Get().Save(saveFileName, false);
+
+		if (result == E_FAIL)
+		{
+			openOverwritePopup = true;
+			ImGui::OpenPopup("Overwrite?");
+		}
+	}
+
+
+	if (ImGui::BeginPopupModal("Overwrite?", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text(u8"같은 파일이 존재함");
+		ImGui::Text(u8"덮어쓰나?");
+
+		if (ImGui::Button(u8"예"))
+		{
+			CGameInstance::Get().Save(saveFileName, true);
+
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+		
+		if (ImGui::Button(u8"아뇨"))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::End();
+
 }
 
 void MapEditor::MousePicking()

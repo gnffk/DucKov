@@ -29,6 +29,7 @@
     <ClInclude Include="..\Public\Collider_Manager.h" />
     <ClInclude Include="..\Public\Component.h" />
     <ClInclude Include="..\Public\Key_Manager.h" />
+    <ClInclude Include="..\Public\Map_Manager.h" />
     <ClInclude Include="..\Public\Material.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Model.h" />
@@ -105,6 +106,7 @@
     <ClCompile Include="..\Private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
     <ClCompile Include="..\Private\Key_Manager.cpp" />
+    <ClCompile Include="..\Private\Map_Manager.cpp" />
     <ClCompile Include="..\Private\Material.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\Model.cpp" />
@@ -185,12 +187,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>../Bin\</OutDir>
-    <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib\nlohmann_3.12.0\include;$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(ProjectDir)..\lib\DirectXToolKit;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>../Bin\</OutDir>
-    <IncludePath>$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\lib\nlohmann_3.12.0\include;$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(ProjectDir)..\lib\DirectXToolKit;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

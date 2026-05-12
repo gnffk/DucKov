@@ -19,6 +19,7 @@ public:
 	void	Update_Engine(_float fTimeDelta);
 	HRESULT Draw();
 	void Clear_Resource(uint32_t iClearLevelIndex);
+	void Clear_Resource_SameLevel(uint32_t iClearLevelIndex);
 	_float2 Get_ViewportSize() const {
 		return m_vViewportSize;
 	}
@@ -104,6 +105,13 @@ public:
 	bool Mouse_Down(MOUSEKEYSTATE eMouseState);
 #pragma endregion
 
+
+
+#pragma region Map_Manager
+	HRESULT Save(string _mapDataName, bool _overwrite);
+	HRESULT Load(string _mapDataName, uint32_t Levelindex);
+	vector<string>& GetMapNames();
+#pragma endregion
 private:
 	_float2											m_vViewportSize = {};
 private:
@@ -117,6 +125,7 @@ private:
 	unique_ptr<class Camera_Manager>				m_pCamera_Manager = { nullptr };
 	unique_ptr<class Key_Manager>					m_pKey_Manager = { nullptr };
 	unique_ptr<class Collider_Manager>				m_pCollider_Manager = { nullptr };
+	unique_ptr<class Map_Manager>					m_pMap_Manager = { nullptr };
 
 
 public:

@@ -44,8 +44,6 @@ HRESULT Client::CMainGame::Start_Level(LEVEL eStartLevelIndex)
 	return S_OK;
 }
 
-
-
 void Client::CMainGame::Update(float fTimeDelta)
 {
 	CGameInstance::Get().Update_Engine(fTimeDelta);
@@ -65,8 +63,6 @@ HRESULT Client::CMainGame::Render()
 
 	if (FAILED(CGameInstance::Get().Present()))
 		return E_FAIL;
-
-
 
 	return S_OK;
 }

@@ -92,3 +92,6 @@ unique_ptr<Camera_Manager> Camera_Manager::Create()
 
 	return pInstance;
 }
+void Camera_Manager::Clear() {
+	p_MainCamera.reset();
+}
