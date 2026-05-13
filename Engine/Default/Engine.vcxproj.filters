@@ -121,6 +121,9 @@
     <Filter Include="09.MapTool\Map_Manager">
       <UniqueIdentifier>{7e7f4fa0-302e-4be9-a966-450158688dc3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\VIBuffer\Terrain">
+      <UniqueIdentifier>{09eb3ad7-7b66-494d-96dc-e133cda168d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -264,6 +267,9 @@
     <ClCompile Include="..\Private\Map_Manager.cpp">
       <Filter>09.MapTool\Map_Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Terrain.cpp">
+      <Filter>06.Component\VIBuffer\Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -388,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Map_Manager.h">
       <Filter>09.MapTool\Map_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Terrain.h">
+      <Filter>06.Component\VIBuffer\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

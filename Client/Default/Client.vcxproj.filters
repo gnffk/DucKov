@@ -31,14 +31,17 @@
     <Filter Include="02. GameObject">
       <UniqueIdentifier>{f53b673a-829b-4eee-a8da-9ae4b4a48719}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\TestModel">
-      <UniqueIdentifier>{ed46eb8c-21f7-404f-8b34-0b7c251e6949}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Camera">
       <UniqueIdentifier>{b71c7a40-ea76-458c-b0fe-55f010003b28}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject\97. ShaderFiles">
       <UniqueIdentifier>{0ada410e-46fe-4a03-bc6e-d1b739f37aa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster">
+      <UniqueIdentifier>{ed46eb8c-21f7-404f-8b34-0b7c251e6949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Terrain">
+      <UniqueIdentifier>{22d48c23-cbc7-4db4-9af6-4a3fb5bf8ada}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -78,11 +81,14 @@
     <ClInclude Include="..\Public\MapEditor.h">
       <Filter>01. Levels\MapEditor</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestModel.h">
-      <Filter>02. GameObject\TestModel</Filter>
+    <ClInclude Include="..\Public\Monster.h">
+      <Filter>02. GameObject\Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PerspectiveCamera.h">
       <Filter>02. GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Terrain.h">
+      <Filter>02. GameObject\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -120,11 +126,14 @@
     <ClCompile Include="..\Private\MapEditor.cpp">
       <Filter>01. Levels\MapEditor</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TestModel.cpp">
-      <Filter>02. GameObject\TestModel</Filter>
+    <ClCompile Include="..\Private\Monster.cpp">
+      <Filter>02. GameObject\Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PerspectiveCamera.cpp">
       <Filter>02. GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Terrain.cpp">
+      <Filter>02. GameObject\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +141,9 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_AnimFbx.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Terrian.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

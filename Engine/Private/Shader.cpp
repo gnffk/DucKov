@@ -103,6 +103,20 @@ HRESULT Shader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix
     return pMatrixVariable->SetMatrix(reinterpret_cast<const _float*>(pMatrix));
 }
 
+HRESULT Shader::Bind_RawValue(const _char* pConstantName, const void* pValue, uint32_t iLength)
+{
+    if (nullptr == m_pEffect)
+        return E_FAIL;
+
+    ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+    if (nullptr == pVariable)
+        return E_FAIL;
+
+    return pVariable->SetRawValue(pValue, 0, iLength);
+
+
+}
+
 HRESULT Shader::Bind_Matrices(const _char* pConstantName, const _float4x4* pMatrices, uint32_t iNumMatrices)
 {
     if (nullptr == m_pEffect)

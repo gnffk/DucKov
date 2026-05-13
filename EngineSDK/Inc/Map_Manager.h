@@ -18,7 +18,7 @@ public:
 	vector<string>& GetMapNames(){
 		return m_MapNames;
 	}
-
+	HRESULT BinFileCheck();
 	void Clear();
 
 

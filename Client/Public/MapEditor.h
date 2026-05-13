@@ -20,6 +20,10 @@ public:
 	void	IMGUI_Render();
 	void	IMGUI_Level_Render();
 	void	IMGUI_OTHER_Render();
+	void	IMGUI_SaveLoad_Render();
+
+	void	IMGUI_MadeFunction();
+
 
 
 public:

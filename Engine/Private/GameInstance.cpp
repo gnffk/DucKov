@@ -89,6 +89,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
     m_pCollider_Manager->Update(fTimeDelta);
 
     m_pLevel_Manager->Update(fTimeDelta);
+
+
 }
 
 HRESULT CGameInstance::Draw()
@@ -119,7 +121,7 @@ void CGameInstance::Clear_Resource_SameLevel(uint32_t iClearLevelIndex)
     m_pCollider_Manager->Clear();
     m_pObject_Manager->Clear(iClearLevelIndex);
     m_pImGUI_Manager->Clear();
-
+   
 }
 
 
@@ -322,8 +324,13 @@ HRESULT CGameInstance::Save(string _mapDataName, bool _overwrite) {
 HRESULT CGameInstance::Load(string _mapDataName, uint32_t Levelindex) {
     return m_pMap_Manager->Load(_mapDataName, Levelindex);
 }
+
 vector<string>& CGameInstance::GetMapNames() {
     return m_pMap_Manager->GetMapNames();
+}
+
+HRESULT CGameInstance::BinFileCheck() {
+    return m_pMap_Manager->BinFileCheck();
 }
 #pragma endregion
 

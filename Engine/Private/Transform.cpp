@@ -1,5 +1,5 @@
 #include "Transform.h"
-
+#include "Shader.h"
 Transform::Transform(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
     : Component{ pDevice, pContext }
 {
@@ -225,7 +225,10 @@ shared_ptr<Transform> Transform::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3
     return pInstance;
 }
 
-
+HRESULT Transform::Bind_ShaderResource(shared_ptr<class Shader> pShader, const _char* pConstantName)
+{
+    return pShader->Bind_Matrix(pConstantName, &m_WorldMatrix);
+}
 
 shared_ptr<Prototype> Transform::Clone(void* pArg)
 {

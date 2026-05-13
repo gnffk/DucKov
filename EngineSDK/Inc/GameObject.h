@@ -8,8 +8,10 @@ class ENGINE_DLL GameObject abstract : public Prototype
 public:
 	typedef struct tagGameObjectDesc : public Transform::TRANSFORM_DESC
 	{
+		uint32_t	  ObjectType;
 		wstring		  m_strName;
-		wstring		  m_strPrototypeName;
+		wstring		  m_strPrototypeObjectName;
+		wstring		  m_strPrototypeBaseName;
 		uint32_t	  pCameraType;
 	}GAMEOBJECT_DESC;
 protected:
@@ -29,9 +31,8 @@ public:
 public:
 	Transform* GetTransform() { return m_pTransformCom.get(); }
 	GAMEOBJECT_DESC& GetObjectINFO() { return Object_INFO; }
+	map<const _wstring, shared_ptr<class Component>>& GetComponents() { return m_Components;}
 
-
-	map<const _wstring, shared_ptr<class Component>>& GetComponents() { return m_Components; }
 
 protected:
 	ComPtr<ID3D11Device>			m_pDevice = { nullptr };

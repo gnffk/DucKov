@@ -111,6 +111,7 @@ public:
 	HRESULT Save(string _mapDataName, bool _overwrite);
 	HRESULT Load(string _mapDataName, uint32_t Levelindex);
 	vector<string>& GetMapNames();
+	HRESULT BinFileCheck();
 #pragma endregion
 private:
 	_float2											m_vViewportSize = {};

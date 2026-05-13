@@ -35,9 +35,11 @@ HRESULT GameObject::Initialize(void* pArg)
         return S_OK;
 
     auto		pDesc = static_cast<GAMEOBJECT_DESC*>(pArg);
-
+ 
+    Object_INFO.ObjectType = pDesc->ObjectType;
     Object_INFO.m_strName = pDesc->m_strName;
-    Object_INFO.m_strPrototypeName = pDesc->m_strPrototypeName;
+    Object_INFO.m_strPrototypeObjectName = pDesc->m_strPrototypeObjectName;
+    Object_INFO.m_strPrototypeBaseName = pDesc->m_strPrototypeBaseName;
     Object_INFO.pCameraType = pDesc->pCameraType;
     Object_INFO.fSpeedPerSec = pDesc->fSpeedPerSec;
     Object_INFO.fRotationPerSec = pDesc->fRotationPerSec;

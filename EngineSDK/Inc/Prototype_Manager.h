@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Component.h"
 #include "Shader.h"
+#include "VIBuffer_Terrain.h"
 #include "VIBuffer_Fbx.h"
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Mesh.h"

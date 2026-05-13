@@ -34,7 +34,8 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 
-
+public:
+	HRESULT Bind_ShaderResource(shared_ptr<class Shader> pShader, const _char* pConstantName);
 public:
 	void Set_Scale(_float fScaleX, _float fScaleY, _float fScaleZ);
 	void Scaling(_float fScaleX, _float fScaleY, _float fScaleZ);
@@ -66,6 +67,7 @@ private:
 
 public:
 	static shared_ptr<Transform> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
+
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 
 };

@@ -1,32 +1,32 @@
 #include "Engine_Macro.h"
-#include "TestModel.h"
+#include "Monster.h"
 #include "GameInstance.h"
 #include "AABB_Collider.h"
 #include "OBB_Collider.h"
-TestModel::TestModel(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
+Monster::Monster(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: GameObject{ pDevice, pContext }
 
 {
 }
 
-TestModel::TestModel(const TestModel& Prototype)
+Monster::Monster(const Monster& Prototype)
 	: GameObject{ Prototype }
 {
 }
 
-TestModel::~TestModel()
+Monster::~Monster()
 {
 	int a = 10;
 }
 
 
-HRESULT TestModel::Initialize_Prototype()
+HRESULT Monster::Initialize_Prototype()
 {
 
 	return S_OK;
 }
 
-HRESULT TestModel::Initialize(void* pArg)
+HRESULT Monster::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -35,30 +35,33 @@ HRESULT TestModel::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_Scale(0.01f, 0.01f, 0.01f);
-	m_pAABBCom->SetOwner(SHARED_THIS(TestModel).get());
+	m_pAABBCom->SetOwner(SHARED_THIS(Monster).get());
 
-	m_pModelCom->Set_Animation(0, false);
+	//m_pModelCom->Set_Animation(0, false);
 	return S_OK;
 }
 
-void TestModel::Priority_Update(_float fTimeDelta)
+void Monster::Priority_Update(_float fTimeDelta)
 {
-	CGameInstance::Get().Add_RenderObject(RENDERGROUP::BLEND, SHARED_THIS(TestModel));
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::BLEND, SHARED_THIS(Monster));
 	CGameInstance::Get().Add_Collider(L"Player", m_pAABBCom.get());
 }
 
-void TestModel::Update(_float fTimeDelta)
+void Monster::Update(_float fTimeDelta)
 {
+	if (m_pModelCom == nullptr) {
+		return ;
+	}
 	m_pModelCom->Play_Animation(fTimeDelta);
 
 }
 
-void TestModel::Late_Update(_float fTimeDelta)
+void Monster::Late_Update(_float fTimeDelta)
 {
 
 }
 
-HRESULT TestModel::Render()
+HRESULT Monster::Render()
 {
 	
 	IMGUITEST();
@@ -79,7 +82,9 @@ HRESULT TestModel::Render()
 		return E_FAIL;
 
 
-
+	if (m_pModelCom == nullptr) {
+		return S_OK;
+	}
 	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (uint32_t i = 0; i < iNumMeshes; i++)
@@ -102,21 +107,27 @@ HRESULT TestModel::Render()
 	return S_OK;
 }
 
-HRESULT TestModel::Ready_Components()
+HRESULT Monster::Ready_Components()
 {
+	
+	// Prototype_Com_Model_SK_Monster_Palicus
+	if (Object_INFO.m_strPrototypeBaseName.size() != 0) {
+		m_ModelComponentName = TEXT("Prototype_Com_Model_") + Object_INFO.m_strPrototypeBaseName;
 
 
-	m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck")));
-	if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
-		return E_FAIL;
+		m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), m_ModelComponentName));
+		if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
+			return E_FAIL;
+	}
+	
 
-	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Shader_Vtx_AnimFbx")));
+	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Shader_Vtx_AnimFbx")));
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
+	
 
-
-	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_OBB_Collider")));
-	if (FAILED(__super::Add_Component(TEXT("Com_Collider"), m_pAABBCom)))
+	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_OBB_Collider")));
+	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pAABBCom)))
 		return E_FAIL;
 	
 
@@ -126,13 +137,25 @@ HRESULT TestModel::Ready_Components()
 	return S_OK;
 }
 
-unique_ptr<TestModel> TestModel::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
+HRESULT Monster::Set_Model(wstring m_strPrototypeBaseName) {
+	Object_INFO.m_strPrototypeBaseName = m_strPrototypeBaseName;
+	m_ModelComponentName = TEXT("Prototype_Com_Model_") + Object_INFO.m_strPrototypeBaseName;
+
+
+	m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), m_ModelComponentName));
+	if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+unique_ptr<Monster> Monster::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
-	auto	pInstance = unique_ptr<TestModel>(new TestModel(pDevice, pContext));
+	auto	pInstance = unique_ptr<Monster>(new Monster(pDevice, pContext));
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : TestModel");
+		MSG_BOX("Failed to Created : Monster");
 		return nullptr;
 	}
 
@@ -140,20 +163,26 @@ unique_ptr<TestModel> TestModel::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3
 }
 
 
-shared_ptr<Prototype> TestModel::Clone(void* pArg)
+shared_ptr<Prototype> Monster::Clone(void* pArg)
 {
-	auto	pInstance = shared_ptr<GameObject>(new TestModel(*this));
+	auto	pInstance = shared_ptr<GameObject>(new Monster(*this));
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : TestModel");
+		MSG_BOX("Failed to Cloned : Monster");
 		return nullptr;
 	}
 
 	return pInstance;
 }
-void TestModel::IMGUITEST()
+void Monster::IMGUITEST()
 {
+	if (CGameInstance::Get().GetSelectObject() != this) {
+		return;
+	}
+
+
+
 	uint32_t iNumAnim = m_pModelCom->Get_NumAnimation();
 
 	static int  currentAnim = 0;

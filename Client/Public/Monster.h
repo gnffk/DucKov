@@ -14,7 +14,7 @@ NS_END
 
 NS_BEGIN(Client)
 // 
-class TestModel final : public GameObject
+class Monster final : public GameObject
 {
 public:
 	typedef struct tagTestModelDesc : public GameObject::GAMEOBJECT_DESC
@@ -23,10 +23,10 @@ public:
 	}TestModelDec;
 
 private:
-	TestModel(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
-	TestModel(const TestModel& Prototype);
+	Monster(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+	Monster(const Monster& Prototype);
 public:
-	virtual ~TestModel();
+	virtual ~Monster();
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -37,8 +37,11 @@ public:
 	virtual HRESULT Render() override;
 	HRESULT Ready_Components();
 
+	HRESULT Set_Model(wstring m_strPrototypeBaseName);
+
 private:
 	uint32_t			m_iData = {};
+	_wstring			m_ModelComponentName;
 private:
 	//shared_ptr<VIBuffer_Fbx>	m_pVIBufferCom = { nullptr };
 	//shared_ptr<VIBuffer_Rect>	m_pVIBufferCom = { nullptr };
@@ -48,7 +51,7 @@ private:
 	shared_ptr<BaseCollider>	m_pAABBCom = { nullptr };
 
 public:
-	static unique_ptr<TestModel> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+	static unique_ptr<Monster> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 
 	void IMGUITEST();

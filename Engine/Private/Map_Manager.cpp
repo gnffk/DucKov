@@ -89,16 +89,23 @@ HRESULT Map_Manager::Save(string _mapDataName, bool _overwrite) {
             // ----------------------------
 
             auto& ObjectINfO = gameObject->GetObjectINFO();
+            
             json objectJson;
             
+            objectJson["ObjectType"] =
+                ObjectINfO.ObjectType;
+
             objectJson["Layer"] =
                 string(layerName.begin(), layerName.end());
 
-            objectJson["Prototype_Name"] =
+            objectJson["Prototype_Object_Name"] =
                 string(
-                    ObjectINfO.m_strPrototypeName.begin(),
-                    ObjectINfO.m_strPrototypeName.end());
-
+                    ObjectINfO.m_strPrototypeObjectName.begin(),
+                    ObjectINfO.m_strPrototypeObjectName.end());
+            objectJson["Prototype_Base_Name"] =
+                string(
+                    ObjectINfO.m_strPrototypeBaseName.begin(),
+                    ObjectINfO.m_strPrototypeBaseName.end());
             objectJson["Object_Name"] =
                 string(
                     ObjectINfO.m_strName.begin(),
@@ -156,8 +163,32 @@ HRESULT Map_Manager::Save(string _mapDataName, bool _overwrite) {
                 objectJson["WorldMatrix"] = matrixJson;
             }
             // Prototype 저장
+            auto& components =
+                gameObject->GetComponents();
+
+            json componentArray =
+                json::array();
+
+            for (auto& [componentTag, componentPtr] : components)
+            {
+                if (componentPtr == nullptr)
+                    continue;
+
+                json componentJson;
+
+                componentJson["ComponentTag"] =
+                    string(
+                        componentTag.begin(),
+                        componentTag.end());
+
+                componentArray.push_back(componentJson);
+            }
+
+            objectJson["Components"] =
+                componentArray;
+         
             // Component 저장
-            // ...
+            
 
             j["GameObjects"].push_back(objectJson);
 
@@ -174,7 +205,7 @@ HRESULT Map_Manager::Save(string _mapDataName, bool _overwrite) {
     file << j.dump(4);
 
     file.close();
-
+    
     // 메모리 json overwrite
     m_mapJsonFiles[_mapDataName] = j;
 
@@ -224,7 +255,11 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
             objectJson["Layer"];
 
         string prototypeStr =
-            objectJson["Prototype_Name"];
+            objectJson["Prototype_Object_Name"];
+
+        string prototypeBaseStr =
+            objectJson["Prototype_Base_Name"];
+
 
         string objectNameStr =
             objectJson["Object_Name"];
@@ -237,6 +272,10 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
             prototypeStr.begin(),
             prototypeStr.end());
 
+        wstring prototypeBaseName(
+            prototypeBaseStr.begin(),
+            prototypeBaseStr.end());
+
         wstring objectName(
             objectNameStr.begin(),
             objectNameStr.end());
@@ -246,8 +285,13 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
         // -------------------------------------------------
 
         GameObject::GAMEOBJECT_DESC desc{};
+        desc.ObjectType = objectJson["ObjectType"];
 
         desc.m_strName = objectName;
+
+        desc.m_strPrototypeObjectName = prototypeName;
+        desc.m_strPrototypeBaseName = prototypeBaseName;
+
 
         desc.pCameraType =
             objectJson["CameraType"];
@@ -258,84 +302,346 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
         desc.fRotationPerSec =
             objectJson["fRotationPerSec"];
 
-        // -------------------------------------------------
-        // GameObject 생성
-        // -------------------------------------------------
 
-        if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(
+        // -------------------------------------------------
+        // ObjectType 확인
+        // -------------------------------------------------
+        switch (desc.ObjectType) {
+        case ETOUI(OBJECTTYPE::OBJECT_CAMERA):
+        {
+            if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(
                 Levelindex,
                 prototypeName,
                 Levelindex,
                 layerName,
                 &desc)))
-        {
-            continue;
+            {
+                MSG_BOX("Map Load FAILED : GameObject");
+            }
+
+            auto gameObject =
+                CGameInstance::Get().Find_Object(
+                    Levelindex,
+                    layerName,
+                    objectName);
+
+            if (gameObject == nullptr)
+                MSG_BOX("Map Load FAILED : GameObject");
+
+
+            // -------------------------------------------------
+            // Matrix 복원
+            // -------------------------------------------------
+
+            auto& m =
+                objectJson["WorldMatrix"];
+
+            _float4x4 mat{};
+
+            mat._11 = m[0][0];
+            mat._12 = m[0][1];
+            mat._13 = m[0][2];
+            mat._14 = m[0][3];
+
+            mat._21 = m[1][0];
+            mat._22 = m[1][1];
+            mat._23 = m[1][2];
+            mat._24 = m[1][3];
+
+            mat._31 = m[2][0];
+            mat._32 = m[2][1];
+            mat._33 = m[2][2];
+            mat._34 = m[2][3];
+
+            mat._41 = m[3][0];
+            mat._42 = m[3][1];
+            mat._43 = m[3][2];
+            mat._44 = m[3][3];
+
+            gameObject->GetTransform()->Set_WorldMatrix(mat);
+            if (desc.pCameraType == 0)
+            {
+                CGameInstance::Get().Add_Camera(
+                    desc.pCameraType,
+                    dynamic_pointer_cast<Camera>(gameObject));
+
+
+            }
+
         }
 
-        // -------------------------------------------------
-        // 생성된 오브젝트 찾기
-        // -------------------------------------------------
+            break;
 
-        auto gameObject =
-            CGameInstance::Get().Find_Object(
+        case ETOUI(OBJECTTYPE::OBJECT_MONSTER):
+        {
+            if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(
+                Levelindex,
+                prototypeName,
                 Levelindex,
                 layerName,
-                objectName);
+                &desc)))
+            {
+                MSG_BOX("Map Load FAILED : GameObject");
+            }
 
-        if (gameObject == nullptr)
-            continue;
+            auto gameObject =
+                CGameInstance::Get().Find_Object(
+                    Levelindex,
+                    layerName,
+                    objectName);
 
-        // -------------------------------------------------
-        // Matrix 복원
-        // -------------------------------------------------
+            if (gameObject == nullptr)
+                MSG_BOX("Map Load FAILED : GameObject");
 
-        auto& m =
-            objectJson["WorldMatrix"];
 
-        _float4x4 mat{};
+            // -------------------------------------------------
+            // Matrix 복원
+            // -------------------------------------------------
 
-        mat._11 = m[0][0];
-        mat._12 = m[0][1];
-        mat._13 = m[0][2];
-        mat._14 = m[0][3];
+            auto& m =
+                objectJson["WorldMatrix"];
 
-        mat._21 = m[1][0];
-        mat._22 = m[1][1];
-        mat._23 = m[1][2];
-        mat._24 = m[1][3];
+            _float4x4 mat{};
 
-        mat._31 = m[2][0];
-        mat._32 = m[2][1];
-        mat._33 = m[2][2];
-        mat._34 = m[2][3];
+            mat._11 = m[0][0];
+            mat._12 = m[0][1];
+            mat._13 = m[0][2];
+            mat._14 = m[0][3];
 
-        mat._41 = m[3][0];
-        mat._42 = m[3][1];
-        mat._43 = m[3][2];
-        mat._44 = m[3][3];
+            mat._21 = m[1][0];
+            mat._22 = m[1][1];
+            mat._23 = m[1][2];
+            mat._24 = m[1][3];
 
-        gameObject->GetTransform()->Set_WorldMatrix(mat);
+            mat._31 = m[2][0];
+            mat._32 = m[2][1];
+            mat._33 = m[2][2];
+            mat._34 = m[2][3];
 
-        // -------------------------------------------------
-        // Camera 등록
-        // -------------------------------------------------
+            mat._41 = m[3][0];
+            mat._42 = m[3][1];
+            mat._43 = m[3][2];
+            mat._44 = m[3][3];
 
-        if (desc.pCameraType == 0)
+            gameObject->GetTransform()->Set_WorldMatrix(mat);
+        }
+           
+            break;
+        case ETOUI(OBJECTTYPE::OBJECT_TERRIAN):
         {
-            CGameInstance::Get().Add_Camera(
-                desc.pCameraType,
-                dynamic_pointer_cast<Camera>(gameObject));
+            if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(
+                Levelindex,
+                prototypeName,
+                Levelindex,
+                layerName,
+                &desc)))
+            {
+                MSG_BOX("Map Load FAILED : GameObject");
+            }
 
+            auto gameObject =
+                CGameInstance::Get().Find_Object(
+                    Levelindex,
+                    layerName,
+                    objectName);
+
+            if (gameObject == nullptr)
+                MSG_BOX("Map Load FAILED : GameObject");
+
+
+            // -------------------------------------------------
+            // Matrix 복원
+            // -------------------------------------------------
+
+            auto& m =
+                objectJson["WorldMatrix"];
+
+            _float4x4 mat{};
+
+            mat._11 = m[0][0];
+            mat._12 = m[0][1];
+            mat._13 = m[0][2];
+            mat._14 = m[0][3];
+
+            mat._21 = m[1][0];
+            mat._22 = m[1][1];
+            mat._23 = m[1][2];
+            mat._24 = m[1][3];
+
+            mat._31 = m[2][0];
+            mat._32 = m[2][1];
+            mat._33 = m[2][2];
+            mat._34 = m[2][3];
+
+            mat._41 = m[3][0];
+            mat._42 = m[3][1];
+            mat._43 = m[3][2];
+            mat._44 = m[3][3];
+
+            gameObject->GetTransform()->Set_WorldMatrix(mat);
+        }
+
+        break;
+        case ETOUI(OBJECTTYPE::OBJECT_PLAYER):
+
+
+            break;
+
+        case ETOUI(OBJECTTYPE::OBJECT_STATIC):
+
+
+            break;
 
         }
 
+
+
+
+
+
+        
         CGameInstance::Get().Change_Camera(0);
     }
 
     return S_OK;
 }
 
+HRESULT Map_Manager::BinFileCheck()
+{
+    namespace fs = std::filesystem;
 
+    static bool initialized = false;
+
+    // 카테고리별 파일 저장
+    static map<string, vector<fs::path>> groupedFiles;
+
+    // =====================================================
+    // 최초 스캔
+    // =====================================================
+
+    if (!initialized)
+    {
+        initialized = true;
+
+        fs::path rootPath =
+            "../../Resources/Model";
+
+        if (!fs::exists(rootPath))
+            return E_FAIL;
+
+        for (const auto& entry :
+            fs::recursive_directory_iterator(rootPath))
+        {
+            if (!entry.is_regular_file())
+                continue;
+
+            if (entry.path().extension() != ".bin")
+                continue;
+
+            fs::path relative =
+                fs::relative(entry.path(), rootPath);
+
+            // 최상위 폴더
+            string category =
+                relative.begin()->string();
+
+            groupedFiles[category]
+                .push_back(entry.path());
+        }
+    }
+
+    // =====================================================
+    // GUI
+    // =====================================================
+
+    ImGui::Begin("Model Browser");
+
+    if (ImGui::BeginTabBar("ModelTabs"))
+    {
+        for (auto& [category, files] : groupedFiles)
+        {
+            // ---------------------------------------------
+            // 탭 생성
+            // ---------------------------------------------
+
+            if (ImGui::BeginTabItem(category.c_str()))
+            {
+                ImGui::Separator();
+
+                for (auto& file : files)
+                {
+                    fs::path rootPath =
+                        "../../Resources/Model";
+
+                    fs::path relative =
+                        fs::relative(file, rootPath);
+
+                    // 파일 이름만
+                    string fileName =
+                        relative.filename().string();
+
+                    // =====================================================
+                    // AN_ 파일 제외
+                    // =====================================================
+
+                    if (fileName.rfind("AN_", 0) == 0)
+                        continue;
+
+                    // 전체 상대 경로
+                    string fullRelativePath =
+                        relative.string();
+
+                    // =====================================================
+                    // 파일 이름
+                    // =====================================================
+
+                    ImGui::Selectable(
+                        fileName.c_str(),
+                        false,
+                        ImGuiSelectableFlags_None,
+                        ImVec2(200.f, 30.f));
+
+                    // 마우스 올리면 전체 경로
+                    if (ImGui::IsItemHovered())
+                    {
+                        ImGui::SetTooltip(
+                            "%s",
+                            fullRelativePath.c_str());
+                    }
+
+                    // =====================================================
+                    // Create 버튼
+                    // =====================================================
+
+                    ImGui::SameLine();
+
+                    string buttonLabel =
+                        "Create##" + fullRelativePath;
+
+                    if (ImGui::Button(
+                        buttonLabel.c_str(),
+                        ImVec2(80.f, 30.f)))
+                    {
+                        string fullPath =
+                            file.string();
+
+                        // 생성 처리
+                        // Create_Model(fullPath);
+
+                    }
+                }
+
+                ImGui::EndTabItem();
+            }
+        }
+
+        ImGui::EndTabBar();
+    }
+
+    ImGui::End();
+
+    return S_OK;
+}
 unique_ptr<Map_Manager> Map_Manager::Create()
 {
 	auto		pInstance = unique_ptr<Map_Manager>(new Map_Manager());
