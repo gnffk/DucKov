@@ -120,8 +120,8 @@ void ImGUI_Manager::Render_Imgui()
 
     m_pDeviceContext->OMSetDepthStencilState(pOldDepthState.Get(), oldStencilRef);
 
-    if (pOldDepthState)
-        pOldDepthState->Release();
+    //if (pOldDepthState)
+    //    pOldDepthState->Release();
 }
 
 void ImGUI_Manager::Update_Guizmo()

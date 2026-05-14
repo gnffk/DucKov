@@ -51,6 +51,11 @@ void Camera::Set_View()
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixLookToLH(eye, look, up));
 }
 
+void Camera::GetPosition(_float4& position)
+{
+	XMStoreFloat4(&position, (m_pTransformCom->Get_State(STATE::POSITION)));
+}
+
 void Camera::Set_Proj(float fov, float aspect, float nearZ, float farZ)
 {
 	XMStoreFloat4x4(&m_ProjectionMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(fov), aspect, nearZ, farZ));

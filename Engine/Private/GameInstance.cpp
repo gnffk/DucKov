@@ -95,7 +95,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 HRESULT CGameInstance::Draw()
 {
-    m_pCollider_Manager->Render();
+
 
     if (FAILED(m_pRenderer->Draw()))
         return E_FAIL;
@@ -103,6 +103,8 @@ HRESULT CGameInstance::Draw()
     if (FAILED(m_pLevel_Manager->Render()))
         return E_FAIL;
 
+
+    m_pCollider_Manager->Render();
     m_pImGUI_Manager->Render_Imgui();
     return S_OK;
 }
@@ -301,6 +303,11 @@ HRESULT CGameInstance::Get_MainCameraWorldMatrix(_float4x4& WorldMatrix) {
     return m_pCamera_Manager->Get_MainCameraWorldMatrix(WorldMatrix);
 
 }
+
+HRESULT  CGameInstance::Get_MainCameraPosition(_float4& Position) {
+    return m_pCamera_Manager->Get_MainCameraPosition(Position);
+}
+
 HRESULT CGameInstance::Get_MainCamerwaViewMatrix(_float4x4& ViewMatrix) {
     return m_pCamera_Manager->Get_MainCamerwaViewMatrix(ViewMatrix);
 }

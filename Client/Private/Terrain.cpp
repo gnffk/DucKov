@@ -48,7 +48,7 @@ void Terrain::Update(_float fTimeDelta)
 void Terrain::Late_Update(_float fTimeDelta)
 {
 
-	CGameInstance::Get().Add_RenderObject(RENDERGROUP::PRIORITY, SHARED_THIS(Terrain));
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Terrain));
 
 	__super::Late_Update(fTimeDelta);
 }

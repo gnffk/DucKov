@@ -23,10 +23,13 @@ public:
 	HRESULT Get_MainCameraWorldMatrix(_float4x4& WorldMatrix);
 	HRESULT Get_MainCamerwaViewMatrix(_float4x4& ViewMatrix);
 	HRESULT Get_MainCamerwaProjectionMatrix(_float4x4& ProjectionMatrix);
+	HRESULT Get_MainCameraPosition(_float4& CameraPosition);
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
 	
-
+	
 	void	Clear();
+
+
 private:
 	map<uint32_t , weak_ptr<Camera>> p_Cameras;
 	weak_ptr<Camera> p_MainCamera;

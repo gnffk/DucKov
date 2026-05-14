@@ -69,6 +69,16 @@ HRESULT Camera_Manager::Get_MainCamerwaProjectionMatrix(_float4x4& ProjectionMat
 	return E_FAIL;
 }
 
+HRESULT Camera_Manager::Get_MainCameraPosition(_float4& CameraPosition)
+{
+	auto camera = p_MainCamera.lock();
+	if (camera) {
+		camera->GetPosition(CameraPosition);
+		return S_OK;
+	}
+	return E_FAIL;
+}
+
 weak_ptr<Camera> Camera_Manager::Find_Camera(uint32_t iCameraType)
 {
 

@@ -43,6 +43,9 @@
     <Filter Include="02. GameObject\Terrain">
       <UniqueIdentifier>{22d48c23-cbc7-4db4-9af6-4a3fb5bf8ada}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Sky">
+      <UniqueIdentifier>{c75a1e24-05de-4faa-845c-00c9b789d83e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -90,6 +93,9 @@
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02. GameObject\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Sky.h">
+      <Filter>02. GameObject\Sky</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -135,6 +141,9 @@
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02. GameObject\Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Sky.cpp">
+      <Filter>02. GameObject\Sky</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -146,5 +155,13 @@
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Terrian.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_VtxCube.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Resources\Shaders\Engine_Shader_Defines.hlsli">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

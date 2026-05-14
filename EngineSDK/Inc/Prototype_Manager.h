@@ -6,6 +6,7 @@
 #include "VIBuffer_Fbx.h"
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Mesh.h"
+#include "VIBuffer_Cube.h"
 #include "Model.h"
 #include "Texture.h"
 

@@ -5,7 +5,7 @@
 #include "Layer.h"
 #include "BaseCollider.h"
 
-#include <DirectXCollision.h>
+
 MapEditor::MapEditor(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -43,6 +43,20 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 
     if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Terrain"),
         ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTerrian)))
+        return E_FAIL;
+
+
+    GameObject::GAMEOBJECT_DESC descSKY{};
+    descSKY.ObjectType = ETOUI(OBJECTTYPE::OBJECT_SKYBOX);
+    descSKY.m_strName = L"SkyBox";
+    descSKY.m_strPrototypeObjectName = L"Prototype_GameObject_Sky";
+    descSKY.m_strPrototypeBaseName = L"SkyBox";
+    descSKY.pCameraType = ETOUI(CAMERA::NONE);
+    descSKY.fSpeedPerSec = 5.f;
+    descSKY.fRotationPerSec = 1.f;
+
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Sky"),
+        ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descSKY)))
         return E_FAIL;
 
 

@@ -9,6 +9,7 @@ public:
 	typedef struct tagGameObjectDesc : public Transform::TRANSFORM_DESC
 	{
 		uint32_t	  ObjectType;
+		uint32_t	  LevelIndex;
 		wstring		  m_strName;
 		wstring		  m_strPrototypeObjectName;
 		wstring		  m_strPrototypeBaseName;

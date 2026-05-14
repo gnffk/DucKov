@@ -21,12 +21,13 @@ public:
 	virtual HRESULT Render() override;
 
 	virtual void Set_View();
+
 	virtual void Set_Proj(float fov, float aspect, float nearZ, float farZ);
 
 	void GetShaderMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix);
 	void GetViewMatrix( _float4x4& ViewMatrix);
 	void GetProjectionMatrix( _float4x4& ProjectionMatrix);
-
+	void GetPosition(_float4& position);
 	void GetWorldMatrix(_float4x4& WorldMatrix);
 
 

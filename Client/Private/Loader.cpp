@@ -5,7 +5,7 @@
 #include "AABB_Collider.h"
 #include "OBB_Collider.h"
 #include "Terrain.h"
-
+#include "Sky.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -100,7 +100,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 #pragma region Texture Component Prototype
 
-
+		/* For.Prototype_Component_Texture_Sky */
+		if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Texture_Sky"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
+			return E_FAIL;
 
 
 
@@ -118,6 +121,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Shader_Vtx_Terrian"),
 		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Vtx_Terrian.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Shader_VtxCube"),
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
 		return E_FAIL;
 
 #pragma endregion
@@ -154,7 +161,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 		VIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Height.bmp")))))
 		return E_FAIL;
 
-
+	/* For.Prototype_Component_VIBuffer_Cube */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_VIBuffer_Cube"),
+		VIBuffer_Cube::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 #pragma endregion
 
 #pragma region Collider Component Prototype
@@ -187,6 +197,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Terrain"),
 		Terrain::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Sky"),
+		Sky::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 #pragma endregion
 
