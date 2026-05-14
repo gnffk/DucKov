@@ -18,7 +18,7 @@ protected:
 	GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	GameObject(const GameObject& Prototype);
 public:
-	virtual ~GameObject() = default;
+	virtual ~GameObject();
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -28,6 +28,10 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+
+public:
+	void Set_Dead() { m_bDead = true; }
+	_bool Get_Dead() { return m_bDead; }
 public:
 	Transform* GetTransform() { return m_pTransformCom.get(); }
 	GAMEOBJECT_DESC& GetObjectINFO() { return Object_INFO; }
@@ -48,7 +52,7 @@ protected:
 	map<const _wstring, shared_ptr<class Component>>		m_Components;
 	GAMEOBJECT_DESC Object_INFO;
 
-
+	_bool			m_bDead = false;
 
 protected:
 	HRESULT Add_Component(const _wstring& strComponentTag, shared_ptr<Component> pComponent);

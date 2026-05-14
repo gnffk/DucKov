@@ -180,6 +180,12 @@ void ImGUI_Manager::Update_Guizmo()
   
     m_pSelectObject->GetTransform()->Set_WorldMatrix(matrix);
 
+
+    if (CGameInstance::Get().Key_Down(DIK_DELETE)) {
+        m_pSelectObject->Set_Dead();
+        m_pSelectObject = nullptr;
+    }
+
 }
 void ImGUI_Manager::Clear() {
     m_pSelectObject = nullptr;

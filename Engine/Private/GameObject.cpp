@@ -17,7 +17,9 @@ GameObject::GameObject(const GameObject& Prototype)
 {
 }
 
+GameObject::~GameObject() {
 
+}
 HRESULT GameObject::Initialize_Prototype()
 {
 

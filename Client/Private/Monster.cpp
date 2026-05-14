@@ -16,7 +16,7 @@ Monster::Monster(const Monster& Prototype)
 
 Monster::~Monster()
 {
-	int a = 10;
+	//a.clear();
 }
 
 
@@ -28,6 +28,7 @@ HRESULT Monster::Initialize_Prototype()
 
 HRESULT Monster::Initialize(void* pArg)
 {
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -177,7 +178,7 @@ shared_ptr<Prototype> Monster::Clone(void* pArg)
 }
 void Monster::IMGUITEST()
 {
-	if (CGameInstance::Get().GetSelectObject() != this) {
+	if (CGameInstance::Get().GetSelectObject() != this || m_pModelCom== nullptr) {
 		return;
 	}
 

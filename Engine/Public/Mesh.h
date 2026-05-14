@@ -16,6 +16,12 @@ public:
 	uint32_t Get_MaterialIndex() const {
 		return m_iMaterialIndex;
 	}
+
+	shared_ptr<vector<VTXMESH>>& GetNonAnimMesh()  {return vertices;}
+	shared_ptr<vector<VTXANIMMESH>>& GetAnimMesh()  {return animvertices;}
+	shared_ptr<vector<uint32_t>>& GetIndices()  {return indices;}
+
+
 public:
 	virtual HRESULT Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex) ;
 	virtual HRESULT Initialize(shared_ptr<vector<VTXANIMMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex,

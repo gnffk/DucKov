@@ -18,7 +18,7 @@ public:
 	vector<string>& GetMapNames(){
 		return m_MapNames;
 	}
-	HRESULT BinFileCheck();
+	vector<string>& FindCategories(string _category) { return groupedFiles[_category]; }
 	void Clear();
 
 
@@ -28,6 +28,12 @@ public:
 private:
 	map<string, nlohmann::json> m_mapJsonFiles;
 	vector<string> m_MapNames;
+
+private:
+	bool initialized = false;
+
+	// 카테고리별 파일 저장
+	map<string, vector<string>> groupedFiles;
 public:
 	static unique_ptr<Map_Manager> Create();
 

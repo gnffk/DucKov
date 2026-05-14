@@ -23,7 +23,7 @@ public:
 	void	IMGUI_SaveLoad_Render();
 
 	void	IMGUI_MadeFunction();
-
+	void	IMGUI_ChoiceObject();
 
 
 public:

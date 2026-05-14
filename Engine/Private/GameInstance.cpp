@@ -124,7 +124,61 @@ void CGameInstance::Clear_Resource_SameLevel(uint32_t iClearLevelIndex)
    
 }
 
+string CGameInstance::WStringToString(const wstring& wstr)
+{
+    if (wstr.empty())
+        return "";
 
+    int sizeNeeded = WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        &wstr[0],
+        (int)wstr.size(),
+        nullptr,
+        0,
+        nullptr,
+        nullptr);
+
+    string str(sizeNeeded, 0);
+
+    WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        &wstr[0],
+        (int)wstr.size(),
+        &str[0],
+        sizeNeeded,
+        nullptr,
+        nullptr);
+
+    return str;
+}
+
+wstring CGameInstance::StringToWString(const string& str)
+{
+    if (str.empty())
+        return L"";
+
+    int sizeNeeded = MultiByteToWideChar(
+        CP_UTF8,
+        0,
+        &str[0],
+        (int)str.size(),
+        nullptr,
+        0);
+
+    wstring wstr(sizeNeeded, 0);
+
+    MultiByteToWideChar(
+        CP_UTF8,
+        0,
+        &str[0],
+        (int)str.size(),
+        &wstr[0],
+        sizeNeeded);
+
+    return wstr;
+}
 #pragma region TIMER_MANAGER
 _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
 {
@@ -275,6 +329,10 @@ std::vector<BaseCollider*>* CGameInstance::GetColliderGroups(wstring GroupTag) {
 std::unordered_map<wstring, std::vector<BaseCollider*>>& CGameInstance::GetAllCollders() {
     return m_pCollider_Manager->GetAllCollders();
 }
+
+void	CGameInstance::MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_t LevelIndex) {
+    return m_pCollider_Manager->MousePicking(rayOrigin,rayDir,LevelIndex);
+}
 #pragma endregion
 
 #pragma region Key_Manager
@@ -329,8 +387,8 @@ vector<string>& CGameInstance::GetMapNames() {
     return m_pMap_Manager->GetMapNames();
 }
 
-HRESULT CGameInstance::BinFileCheck() {
-    return m_pMap_Manager->BinFileCheck();
+vector<string>& CGameInstance::FindCategories(string _category) {
+    return m_pMap_Manager->FindCategories(_category);
 }
 #pragma endregion
 

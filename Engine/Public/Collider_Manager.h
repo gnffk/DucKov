@@ -30,7 +30,12 @@ public:
 	HRESULT Find_Collider(wstring GroupTag, class BaseCollider* pCollider);
 	void Update(float Timedelta);
 	void Render();
+
+
 	HRESULT Clear();
+
+public:
+	void	MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_t LevelIndex);
 private:
 
 	// 계속 빠르게 순회를 해야하기 떄문에 vector로 //  썼으면 비교하고 싶은 그룹을 바로 찾기 위해 hash 기반 unordered_map으로

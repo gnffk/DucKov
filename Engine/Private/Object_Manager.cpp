@@ -44,6 +44,7 @@ void Object_Manager::Late_Update(_float fTimeDelta)
 	{
 		for (auto& Pair : m_pLayers[i])
 		{
+
 			Pair.second->Late_Update(fTimeDelta);
 		}
 	}

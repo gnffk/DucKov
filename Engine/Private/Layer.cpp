@@ -31,10 +31,27 @@ void Layer::Update(_float fTimeDelta)
 
 void Layer::Late_Update(_float fTimeDelta)
 {
-    for (auto& pGameObject : m_GameObjects)
+    for (list<shared_ptr<GameObject>>::iterator iter =
+        m_GameObjects.begin();
+        iter != m_GameObjects.end();)
     {
-        if (nullptr != pGameObject)
+        shared_ptr<GameObject>& pGameObject = *iter;
+
+        if (pGameObject != nullptr)
+        {
+            if (pGameObject->Get_Dead())
+            {
+                pGameObject.reset();
+
+                iter = m_GameObjects.erase(iter);
+
+                continue;
+            }
+
             pGameObject->Late_Update(fTimeDelta);
+        }
+
+        ++iter;
     }
 }
 

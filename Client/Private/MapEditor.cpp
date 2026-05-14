@@ -4,6 +4,8 @@
 #include "Camera.h"
 #include "Layer.h"
 #include "BaseCollider.h"
+
+#include <DirectXCollision.h>
 MapEditor::MapEditor(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -15,7 +17,7 @@ MapEditor::~MapEditor()
 
 HRESULT MapEditor::Initialize()
 {
-	Ready_Layer_MapEditor(L"MapEditorLayer");
+	Ready_Layer_MapEditor(L"Base");
 
 	CGameInstance::Get().Change_Camera(ETOUI(CAMERA::MAIN));
 
@@ -30,31 +32,36 @@ void MapEditor::Update(_float fTimeDelta)
 
 HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 {
-   //GameObject::GAMEOBJECT_DESC descTerrian{};
-   //descTerrian.ObjectType = ETOUI(OBJECTTYPE::OBJECT_TERRIAN);
-   //descTerrian.m_strName =L"Terrian";
-   //descTerrian.m_strPrototypeObjectName = L"Prototype_GameObject_Terrain";
-   //descTerrian.m_strPrototypeBaseName =L"Terrian";
-   //descTerrian.pCameraType = ETOUI(CAMERA::NONE);
-   //descTerrian.fSpeedPerSec = 5.f;
-   //descTerrian.fRotationPerSec = 1.f;
+   GameObject::GAMEOBJECT_DESC descTerrian{};
+   descTerrian.ObjectType = ETOUI(OBJECTTYPE::OBJECT_TERRIAN);
+   descTerrian.m_strName =L"Terrian";
+   descTerrian.m_strPrototypeObjectName = L"Prototype_GameObject_Terrain";
+   descTerrian.m_strPrototypeBaseName =L"Terrian";
+   descTerrian.pCameraType = ETOUI(CAMERA::NONE);
+   descTerrian.fSpeedPerSec = 5.f;
+   descTerrian.fRotationPerSec = 1.f;
 
-   // if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Terrain"),
-   //     ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTerrian)))
-   //     return E_FAIL;
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Terrain"),
+        ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTerrian)))
+        return E_FAIL;
 
+
+ //  
 	//GameObject::GAMEOBJECT_DESC descTestModel0{};
  //   descTestModel0.ObjectType = ETOUI(OBJECTTYPE::OBJECT_MONSTER);
 	//descTestModel0.m_strName =L"TestMonster0";
  //   descTestModel0.m_strPrototypeObjectName = L"Prototype_GameObject_Monster";
-	//descTestModel0.m_strPrototypeBaseName =L"SK_CharacterModel_Duck_Jeff";
+	//descTestModel0.m_strPrototypeBaseName =L"SK_Monster_Palicus";
 	//descTestModel0.pCameraType = ETOUI(CAMERA::NONE);
 	//descTestModel0.fSpeedPerSec = 5.f;
 	//descTestModel0.fRotationPerSec = 1.f;
 
- //	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Monster"),
-	//	ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTestModel0) ))
-	//	return E_FAIL;
+ //   for (int i = 0; i < 100; ++i) {
+ //       if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Monster"),
+ //           ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTestModel0)))
+ //           return E_FAIL;
+ //   }
+
 
 
 
@@ -74,7 +81,7 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 		return E_FAIL;
 	
 	if(FAILED(CGameInstance::Get().Add_Camera(ETOUI(CAMERA::MAIN),
-		dynamic_pointer_cast<Camera>(CGameInstance::Get().Find_Object(ETOUI(LEVEL::MAPEDITOR), L"MapEditorLayer", L"Main_Camera")))))
+		dynamic_pointer_cast<Camera>(CGameInstance::Get().Find_Object(ETOUI(LEVEL::MAPEDITOR), strLayerTag, L"Main_Camera")))))
 		return E_FAIL;
 
 	return S_OK;
@@ -103,11 +110,11 @@ void MapEditor::IMGUI_Render() {
 #if _DEBUG
 
 	IMGUI_OTHER_Render();
-    
+
 	IMGUI_Level_Render();
     IMGUI_SaveLoad_Render();
     IMGUI_MadeFunction();
-	//CGameInstance::Get().BinFileCheck();
+
 #endif
 
 }
@@ -158,7 +165,7 @@ void MapEditor::IMGUI_Level_Render()
         // =================================================
         // 여기서 Layer 자체를 DropTarget로 사용
         // =================================================
-
+        _bool OpenDataObject = false;
         if (ImGui::BeginDragDropTarget())
         {
             if (const ImGuiPayload* payload =
@@ -175,13 +182,15 @@ void MapEditor::IMGUI_Level_Render()
                 // =========================================
                 // 생성
                 // =========================================
-
+                
                 if (className == "Monster")
                 {
-                    //CGameInstance::Get().BinFileCheck();
+                   OpenDataObject = true;
+                   ImGui::OpenPopup("Select Monster");
+
                 }
 
-
+             
              
             }
             ImGui::EndDragDropTarget();
@@ -198,6 +207,8 @@ void MapEditor::IMGUI_Level_Render()
 
             for (auto& object : gameObjects)
             {
+                if (object == nullptr)
+                    continue;
                 std::string objectName =
                     WStringToString(
                         object->GetObjectINFO().m_strName);
@@ -248,6 +259,8 @@ void MapEditor::IMGUI_Level_Render()
         }
     }
 
+
+    IMGUI_ChoiceObject();
     ImGui::End();
 }
 void MapEditor::IMGUI_OTHER_Render()
@@ -514,6 +527,154 @@ void MapEditor::IMGUI_MadeFunction()
 
 
 }
+void MapEditor::IMGUI_ChoiceObject()
+{
+   
+    if (ImGui::BeginPopupModal(
+        "Select Monster",
+        nullptr))
+    {
+        static char objectName[128] = "";
+        static char layerName[128] = "";
+        static float speed = 5.f;
+        static float rotation = 1.f;
+
+        static int selectedSkeletonIndex = -1;
+
+        auto& SkeletonNames =
+            CGameInstance::Get().FindCategories("Skeleton");
+
+        ImGui::Text("Create Monster");
+        ImGui::Separator();
+
+        // =====================================================
+        // 이름 입력
+        // =====================================================
+
+        ImGui::InputText(
+            "Object Name",
+            objectName,
+            IM_ARRAYSIZE(objectName));
+
+
+        ImGui::InputText(
+            "Layer Name",
+            layerName,
+            IM_ARRAYSIZE(layerName));
+        // =====================================================
+        // 이동 속도
+        // =====================================================
+
+        ImGui::DragFloat(
+            "Speed",
+            &speed,
+            0.1f,
+            0.f,
+            100.f);
+
+        // =====================================================
+        // 회전 속도
+        // =====================================================
+
+        ImGui::DragFloat(
+            "Rotation",
+            &rotation,
+            0.1f,
+            0.f,
+            100.f);
+
+        ImGui::Separator();
+
+        ImGui::Text("Select Skeleton");
+
+        // =====================================================
+        // Skeleton 선택
+        // =====================================================
+
+        for (int i = 0; i < SkeletonNames.size(); ++i)
+        {
+            bool selected =
+                selectedSkeletonIndex == i;
+
+            if (ImGui::Selectable(
+                SkeletonNames[i].c_str(),
+                selected, ImGuiSelectableFlags_DontClosePopups))
+            {
+                selectedSkeletonIndex = i;
+            }
+        }
+
+        ImGui::Separator();
+
+        // =====================================================
+        // 생성 버튼
+        // =====================================================
+
+        if (ImGui::Button(
+            "Create",
+            ImVec2(120.f, 35.f)))
+        {
+            if (selectedSkeletonIndex >= 0)
+            {
+                GameObject::GAMEOBJECT_DESC desc{};
+
+                wstring selectedSkeleton =
+                    CGameInstance::Get().StringToWString(
+                        SkeletonNames[selectedSkeletonIndex]);
+
+                desc.ObjectType =
+                    ETOUI(OBJECTTYPE::OBJECT_MONSTER);
+
+                desc.m_strName =
+                    CGameInstance::Get().StringToWString(
+                        objectName);
+
+                desc.m_strPrototypeObjectName =
+                    L"Prototype_GameObject_Monster";
+
+                desc.m_strPrototypeBaseName =
+                    selectedSkeleton;
+
+                desc.pCameraType =
+                    ETOUI(CAMERA::NONE);
+
+                desc.fSpeedPerSec =
+                    speed;
+
+                desc.fRotationPerSec =
+                    rotation;
+
+                CGameInstance::Get().Add_GameObject_toLayer(
+                    ETOUI(LEVEL::MAPEDITOR),
+                    TEXT("Prototype_GameObject_Monster"),
+                    ETOUI(LEVEL::MAPEDITOR),
+                    CGameInstance::Get().StringToWString(
+                        layerName),
+                    &desc);
+
+                selectedSkeletonIndex = -1;
+
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(
+            "Cancel",
+            ImVec2(120.f, 35.f)))
+        {
+            selectedSkeletonIndex = -1;
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+
+
+}
 void MapEditor::MousePicking()
 {
 
@@ -566,7 +727,10 @@ void MapEditor::MousePicking()
 
 
 		float minDist = FLT_MAX;
+        CGameInstance::Get().MousePicking(rayOrigin, rayDir, ETOUI(LEVEL::MAPEDITOR));
 
+
+        /*
 		for (auto& CollderGruops : CGameInstance::Get().GetAllCollders())
 		{
 			auto& vec = CollderGruops.second;
@@ -602,6 +766,109 @@ void MapEditor::MousePicking()
 				
 			}
 		}
+        */
+        /*
+        for (auto& Layer : CGameInstance::Get().Find_Layer_Lists(ETOUI(LEVEL::MAPEDITOR))) {
+            auto& gameObjects =
+                Layer.second->Get_GameObjects();
+
+            for (auto gameObject : gameObjects) {
+                auto& Components = gameObject->GetComponents();
+                if ((Components)[L"Com_Model"] != nullptr) {
+                    for (auto& Mesh : dynamic_pointer_cast<Model>((Components)[L"Com_Model"])->GetMeshes()) {
+                        auto& Meshnondata = Mesh->GetNonAnimMesh();
+                        auto& Meshanimdata = Mesh->GetAnimMesh();
+                        auto& indices = Mesh->GetIndices();
+                        if (Meshnondata->size() != 0) {
+                            for (size_t i = 0; i < indices->size(); i += 3)
+                            {
+                                XMVECTOR v0 =
+                                    XMLoadFloat3(
+                                        &(*Meshnondata)[(*indices)[i]].vPosition);
+
+                                XMVECTOR v1 =
+                                    XMLoadFloat3(
+                                        &(*Meshnondata)[(*indices)[i + 1]].vPosition);
+
+                                XMVECTOR v2 =
+                                    XMLoadFloat3(
+                                        &(*Meshnondata)[(*indices)[i + 2]].vPosition);
+
+                                _float4x4 matWord;
+                           
+                                CGameInstance::Get().GetWorldMatrix(matWord);
+                                v0 = XMVector3TransformCoord(v0, XMLoadFloat4x4(&matWord));
+                                v1 = XMVector3TransformCoord(v1, XMLoadFloat4x4(&matWord));
+                                v2 = XMVector3TransformCoord(v2, XMLoadFloat4x4(&matWord));
+
+                                float dist = 1000.f;
+
+                                if (TriangleTests::Intersects(
+                                    rayOrigin,
+                                    rayDir,
+                                    v0,
+                                    v1,
+                                    v2,
+                                    dist))
+                                {
+                                    if (dist < minDist)
+                                    {
+                                        minDist = dist;
+
+                                        CGameInstance::Get().SetSeletObject(gameObject.get());
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            for (size_t i = 0; i < indices->size(); i += 3)
+                            {
+                                XMVECTOR v0 =
+                                    XMLoadFloat3(
+                                        &(*Meshanimdata)[(*indices)[i]].vPosition);
+
+                                XMVECTOR v1 =
+                                    XMLoadFloat3(
+                                        &(*Meshanimdata)[(*indices)[i + 1]].vPosition);
+
+                                XMVECTOR v2 =
+                                    XMLoadFloat3(
+                                        &(*Meshanimdata)[(*indices)[i + 2]].vPosition);
+
+                                _float4x4 matWord;
+
+                                CGameInstance::Get().GetWorldMatrix(matWord);
+                                v0 = XMVector3TransformCoord(v0, XMLoadFloat4x4(&matWord));
+                                v1 = XMVector3TransformCoord(v1, XMLoadFloat4x4(&matWord));
+                                v2 = XMVector3TransformCoord(v2, XMLoadFloat4x4(&matWord));
+
+                                float dist = 1000.f;
+
+                                if (TriangleTests::Intersects(
+                                    rayOrigin,
+                                    rayDir,
+                                    v0,
+                                    v1,
+                                    v2,
+                                    dist))
+                                {
+                                    if (dist < minDist)
+                                    {
+                                        minDist = dist;
+
+                                        CGameInstance::Get().SetSeletObject(gameObject.get());
+                                    }
+                                }
+                            }
+                        }
+
+                
+                   }
+                }
+             
+            }
+        }
+        */
 	}
 	
 }

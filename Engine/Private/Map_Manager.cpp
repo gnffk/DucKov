@@ -43,8 +43,49 @@ HRESULT Map_Manager::Initialize()
         m_MapNames.emplace_back(key);
     }
 
+
+
+
+    filesystem::path rootPath =
+        "../../Resources/Model";
+
+    if (!filesystem::exists(rootPath))
+        return E_FAIL;
+
+    for (const auto& entry :
+        filesystem::recursive_directory_iterator(rootPath))
+    {
+        if (!entry.is_regular_file())
+            continue;
+
+        if (entry.path().extension() != ".bin")
+            continue;
+
+        filesystem::path relative =
+            filesystem::relative(entry.path(), rootPath);
+
+
+        string fileName =
+            relative.filename().string();
+
+        if (fileName.rfind("AN_", 0) == 0)
+        {
+            continue;
+        }
+        // 최상위 폴더
+        string category = 
+            relative.begin()->string();
+     
+
+        string folderName =
+            relative.parent_path().filename().string();
+
+        groupedFiles[category].emplace_back(folderName);
+
+    } 
+
     return S_OK;
-}
+} 
 
 HRESULT Map_Manager::Save(string _mapDataName, bool _overwrite) {
     using json = nlohmann::json;
@@ -506,142 +547,7 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
     return S_OK;
 }
 
-HRESULT Map_Manager::BinFileCheck()
-{
-    namespace fs = std::filesystem;
 
-    static bool initialized = false;
-
-    // 카테고리별 파일 저장
-    static map<string, vector<fs::path>> groupedFiles;
-
-    // =====================================================
-    // 최초 스캔
-    // =====================================================
-
-    if (!initialized)
-    {
-        initialized = true;
-
-        fs::path rootPath =
-            "../../Resources/Model";
-
-        if (!fs::exists(rootPath))
-            return E_FAIL;
-
-        for (const auto& entry :
-            fs::recursive_directory_iterator(rootPath))
-        {
-            if (!entry.is_regular_file())
-                continue;
-
-            if (entry.path().extension() != ".bin")
-                continue;
-
-            fs::path relative =
-                fs::relative(entry.path(), rootPath);
-
-            // 최상위 폴더
-            string category =
-                relative.begin()->string();
-
-            groupedFiles[category]
-                .push_back(entry.path());
-        }
-    }
-
-    // =====================================================
-    // GUI
-    // =====================================================
-
-    ImGui::Begin("Model Browser");
-
-    if (ImGui::BeginTabBar("ModelTabs"))
-    {
-        for (auto& [category, files] : groupedFiles)
-        {
-            // ---------------------------------------------
-            // 탭 생성
-            // ---------------------------------------------
-
-            if (ImGui::BeginTabItem(category.c_str()))
-            {
-                ImGui::Separator();
-
-                for (auto& file : files)
-                {
-                    fs::path rootPath =
-                        "../../Resources/Model";
-
-                    fs::path relative =
-                        fs::relative(file, rootPath);
-
-                    // 파일 이름만
-                    string fileName =
-                        relative.filename().string();
-
-                    // =====================================================
-                    // AN_ 파일 제외
-                    // =====================================================
-
-                    if (fileName.rfind("AN_", 0) == 0)
-                        continue;
-
-                    // 전체 상대 경로
-                    string fullRelativePath =
-                        relative.string();
-
-                    // =====================================================
-                    // 파일 이름
-                    // =====================================================
-
-                    ImGui::Selectable(
-                        fileName.c_str(),
-                        false,
-                        ImGuiSelectableFlags_None,
-                        ImVec2(200.f, 30.f));
-
-                    // 마우스 올리면 전체 경로
-                    if (ImGui::IsItemHovered())
-                    {
-                        ImGui::SetTooltip(
-                            "%s",
-                            fullRelativePath.c_str());
-                    }
-
-                    // =====================================================
-                    // Create 버튼
-                    // =====================================================
-
-                    ImGui::SameLine();
-
-                    string buttonLabel =
-                        "Create##" + fullRelativePath;
-
-                    if (ImGui::Button(
-                        buttonLabel.c_str(),
-                        ImVec2(80.f, 30.f)))
-                    {
-                        string fullPath =
-                            file.string();
-
-                        // 생성 처리
-                        // Create_Model(fullPath);
-
-                    }
-                }
-
-                ImGui::EndTabItem();
-            }
-        }
-
-        ImGui::EndTabBar();
-    }
-
-    ImGui::End();
-
-    return S_OK;
-}
 unique_ptr<Map_Manager> Map_Manager::Create()
 {
 	auto		pInstance = unique_ptr<Map_Manager>(new Map_Manager());

@@ -1,7 +1,8 @@
 #include "Collider_Manager.h"
 #include "BaseCollider.h"
-
-
+#include "GameInstance.h"
+#include "Layer.h"
+#include "Mesh.h"
 Collider_Manager::~Collider_Manager()
 {
 }
@@ -113,6 +114,104 @@ void Collider_Manager::Render() {
 
     m_batch->End();
     m_Colliders.clear();
+}
+
+void Collider_Manager::MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_t LevelIndex) {
+    for (auto& Layer : CGameInstance::Get().Find_Layer_Lists(LevelIndex)) {
+        auto& gameObjects = Layer.second->Get_GameObjects();
+        float minDist = FLT_MAX;
+        for (auto gameObject : gameObjects) {
+            auto& Components = gameObject->GetComponents();
+            if ((Components)[L"Com_Model"] != nullptr) {
+                for (auto& Mesh : dynamic_pointer_cast<Model>((Components)[L"Com_Model"])->GetMeshes()) {
+                    auto& Meshnondata = Mesh->GetNonAnimMesh();
+                    auto& Meshanimdata = Mesh->GetAnimMesh();
+                    auto& indices = Mesh->GetIndices();
+                    if (Meshnondata != nullptr) {
+                        for (size_t i = 0; i < indices->size(); i += 3)
+                        {
+                            XMVECTOR v0 =
+                                XMLoadFloat3(
+                                    &(*Meshnondata)[(*indices)[i]].vPosition);
+
+                            XMVECTOR v1 =
+                                XMLoadFloat3(
+                                    &(*Meshnondata)[(*indices)[i + 1]].vPosition);
+
+                            XMVECTOR v2 =
+                                XMLoadFloat3(
+                                    &(*Meshnondata)[(*indices)[i + 2]].vPosition);
+
+                            _float4x4 matWord;
+
+                            CGameInstance::Get().GetWorldMatrix(matWord);
+                            v0 = XMVector3TransformCoord(v0, XMLoadFloat4x4(&matWord));
+                            v1 = XMVector3TransformCoord(v1, XMLoadFloat4x4(&matWord));
+                            v2 = XMVector3TransformCoord(v2, XMLoadFloat4x4(&matWord));
+
+                            float dist = 1000.f;
+
+                            if (TriangleTests::Intersects(
+                                rayOrigin,
+                                rayDir,
+                                v0,
+                                v1,
+                                v2,
+                                dist))
+                            {
+                                if (dist < minDist)
+                                {
+                                    minDist = dist;
+
+                                    CGameInstance::Get().SetSeletObject(gameObject.get());
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        for (size_t i = 0; i < indices->size(); i += 3)
+                        {
+                            XMVECTOR v0 =XMLoadFloat3(&(*Meshanimdata)[(*indices)[i]].vPosition);
+
+                            XMVECTOR v1 =XMLoadFloat3(&(*Meshanimdata)[(*indices)[i + 1]].vPosition);
+
+                            XMVECTOR v2 =XMLoadFloat3(&(*Meshanimdata)[(*indices)[i + 2]].vPosition);
+
+                            _float4x4 matWord;
+                            matWord = gameObject->GetTransform()->GetWorldMatrix();
+                      
+                            v0 = XMVector3TransformCoord(v0, XMLoadFloat4x4(&matWord));
+                            v1 = XMVector3TransformCoord(v1, XMLoadFloat4x4(&matWord));
+                            v2 = XMVector3TransformCoord(v2, XMLoadFloat4x4(&matWord));
+
+                            float dist{100};
+
+                            if (TriangleTests::Intersects(
+                                rayOrigin,
+                                rayDir,
+                                v0,
+                                v1,
+                                v2,
+                                dist))
+                            {
+                                if (dist < minDist)
+                                {
+                                    minDist = dist;
+
+                                    CGameInstance::Get().SetSeletObject(gameObject.get());
+                                    break;
+                                }
+                            }
+                          
+                        }
+                    }
+
+
+                }
+            }
+
+        }
+    }
 }
 unique_ptr<Collider_Manager> Collider_Manager::Create(ComPtr<ID3D11Device> p_Device, ComPtr<ID3D11DeviceContext> p_DeviceContext) {
 	auto		pInstance = unique_ptr<Collider_Manager>(new Collider_Manager());

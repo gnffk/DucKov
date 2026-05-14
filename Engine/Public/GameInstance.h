@@ -23,6 +23,10 @@ public:
 	_float2 Get_ViewportSize() const {
 		return m_vViewportSize;
 	}
+
+
+	string WStringToString(const std::wstring& wstr);
+	wstring StringToWString(const string& str);
 public:
 #pragma region TIME_MANAGER
 	_float			Get_TimeDelta(const _wstring& strTimerTag);
@@ -84,6 +88,7 @@ public:
 	HRESULT Add_Collider(wstring GroupTag, class BaseCollider* pCollider);
 	std::vector<BaseCollider*>* GetColliderGroups(wstring GroupTag);
 	std::unordered_map<wstring, std::vector<BaseCollider*>>& GetAllCollders();
+	void	MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_t LevelIndex);
 #pragma endregion
 
 #pragma region KEY_MANAGER
@@ -111,7 +116,7 @@ public:
 	HRESULT Save(string _mapDataName, bool _overwrite);
 	HRESULT Load(string _mapDataName, uint32_t Levelindex);
 	vector<string>& GetMapNames();
-	HRESULT BinFileCheck();
+	vector<string>& FindCategories(string _category);
 #pragma endregion
 private:
 	_float2											m_vViewportSize = {};
