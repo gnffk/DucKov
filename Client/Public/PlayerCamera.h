@@ -4,14 +4,14 @@
 
 NS_BEGIN(Client)
 
-class PerspectiveCamera final : public Camera
+class PlayerCamera final : public Camera
 {
 
 private:
-	PerspectiveCamera(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
-	PerspectiveCamera(const PerspectiveCamera& Prototype);
+	PlayerCamera(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+	PlayerCamera(const PlayerCamera& Prototype);
 public:
-	virtual ~PerspectiveCamera();
+	virtual ~PlayerCamera();
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -21,10 +21,10 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	HRESULT Ready_Components();
-	void	KeyTestInput(_float fTimeDelta);
-
+	void   SetOwner(GameObject* _Owner) { m_Owner = _Owner; }
+	void   FollowCamera();
 	void	Rotate(_float fDeltaX, _float fDeltaY, _float fTimeDelta);
-	void    Zoom(_float fAmount);
+	void	Zoom(_float fAmount);
 private:
 	bool  m_bMouseLook = false;
 	uint32_t m_iCameraType{};
@@ -32,7 +32,7 @@ private:
 
 	GameObject* m_Owner = nullptr;
 public:
-	static unique_ptr<PerspectiveCamera> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+	static unique_ptr<PlayerCamera> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 
 };

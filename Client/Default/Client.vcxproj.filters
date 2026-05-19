@@ -49,6 +49,18 @@
     <Filter Include="02. GameObject\Obstacle">
       <UniqueIdentifier>{2bc654f8-06d3-45fe-9641-8a0c1b12d4b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player">
+      <UniqueIdentifier>{daf71cba-efb0-4324-a97b-546b49f9a2c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\Body_Player">
+      <UniqueIdentifier>{a1af1912-27a8-462d-9857-0fe4b8bbb6bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Camera\PerspectiveCamera">
+      <UniqueIdentifier>{268f25bd-f788-469d-adf9-c3e4cf39c456}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Camera\PlayerCamera">
+      <UniqueIdentifier>{ef8f8d6e-c460-496f-a850-af834518e4c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -90,9 +102,6 @@
     <ClInclude Include="..\Public\Monster.h">
       <Filter>02. GameObject\Monster</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\PerspectiveCamera.h">
-      <Filter>02. GameObject\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02. GameObject\Terrain</Filter>
     </ClInclude>
@@ -101,6 +110,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Obstacle.h">
       <Filter>02. GameObject\Obstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02. GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Body_Player.h">
+      <Filter>02. GameObject\Player\Body_Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PerspectiveCamera.h">
+      <Filter>02. GameObject\Camera\PerspectiveCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerCamera.h">
+      <Filter>02. GameObject\Camera\PlayerCamera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,9 +159,6 @@
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>02. GameObject\Monster</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\PerspectiveCamera.cpp">
-      <Filter>02. GameObject\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02. GameObject\Terrain</Filter>
     </ClCompile>
@@ -152,6 +170,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Obstacle.cpp">
       <Filter>02. GameObject\Obstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02. GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Body_Player.cpp">
+      <Filter>02. GameObject\Player\Body_Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PerspectiveCamera.cpp">
+      <Filter>02. GameObject\Camera\PerspectiveCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerCamera.cpp">
+      <Filter>02. GameObject\Camera\PlayerCamera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

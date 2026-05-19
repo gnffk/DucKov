@@ -353,6 +353,8 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
         switch (desc.ObjectType) {
         case ETOUI(OBJECTTYPE::OBJECT_CAMERA):
         {
+            if (desc.pCameraType == 0)
+            {
             if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(
                 Levelindex,
                 prototypeName,
@@ -403,8 +405,7 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
             mat._44 = m[3][3];
 
             gameObject->GetTransform()->Set_WorldMatrix(mat);
-            if (desc.pCameraType == 0)
-            {
+           
                 CGameInstance::Get().Add_Camera(
                     desc.pCameraType,
                     dynamic_pointer_cast<Camera>(gameObject));

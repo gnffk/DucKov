@@ -103,12 +103,16 @@ void Key_Manager::Update_InputDev(void)
 	{
 		ZeroMemory(m_bMouseUpState, sizeof(m_bMouseUpState));
 		ZeroMemory(m_bMouseDownState, sizeof(m_bMouseDownState));
-		DIMOUSESTATE mouseDevState;
-		m_pMouse->GetDeviceState(sizeof(mouseDevState), &mouseDevState);
+
+		// 여기 수정됨
+		m_pMouse->GetDeviceState(
+			sizeof(m_tMouseState),
+			&m_tMouseState);
 
 		for (int i = 0; i < DIM_END; ++i)
 		{
-			bool nowPressed = mouseDevState.rgbButtons[i] & 0x80;
+			bool nowPressed =
+				m_tMouseState.rgbButtons[i] & 0x80;
 
 			// 이전에 눌렸는데 지금 안눌렸으면 UP
 			if (m_bMousePressingState[i] && !nowPressed)
@@ -124,6 +128,9 @@ void Key_Manager::Update_InputDev(void)
 			m_bMousePressingState[i] = nowPressed;
 		}
 	}
+
+
+
 }
 
 

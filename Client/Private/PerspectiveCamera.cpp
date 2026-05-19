@@ -33,7 +33,9 @@ HRESULT PerspectiveCamera::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-
+	GAMEOBJECT_DESC* pDesc =
+		static_cast<GAMEOBJECT_DESC*>(pArg);
+	m_iCameraType = pDesc->pCameraType;
 	
 	return S_OK;
 }
@@ -45,8 +47,24 @@ void PerspectiveCamera::Priority_Update(_float fTimeDelta)
 
 void PerspectiveCamera::Update(_float fTimeDelta)
 {
+
 	__super::Set_View();
-	KeyTestInput(fTimeDelta);
+
+
+	if (m_iCameraType == ETOUI(CAMERA::MAIN)) {
+		KeyTestInput(fTimeDelta);
+		if (CGameInstance::Get().Get_DIMouseMove(MOUSEMOVESTATE::DIMS_Z) > 0)
+		{
+			Zoom(0.5f);
+		}
+
+		if (CGameInstance::Get().Get_DIMouseMove(MOUSEMOVESTATE::DIMS_Z) < 0)
+		{
+			Zoom(-0.5f);
+		}
+
+	}
+
 
 }
 
@@ -99,7 +117,7 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 
 
 	
-
+	
 
 	if (CGameInstance::Get().Mouse_Down(MOUSEKEYSTATE::DIM_RB)) {
 
@@ -143,6 +161,8 @@ void PerspectiveCamera::KeyTestInput(_float fTimeDelta) {
 
 }
 
+
+
 void PerspectiveCamera::Rotate(_float fDeltaX, _float fDeltaY, _float fTimeDelta)
 {
 	if (nullptr == m_pTransformCom)
@@ -158,4 +178,21 @@ void PerspectiveCamera::Rotate(_float fDeltaX, _float fDeltaY, _float fTimeDelta
 	m_pTransformCom->Turn(vRight, fDeltaY);
 
 	GetCursorPos(&m_OldCursorPos);
+}
+
+
+void PerspectiveCamera::Zoom(_float fAmount)
+{
+	_vector vLook =
+		XMVector3Normalize(
+			m_pTransformCom->Get_State(STATE::LOOK));
+
+	_vector vPos =
+		m_pTransformCom->Get_State(STATE::POSITION);
+
+	vPos += vLook * fAmount;
+
+	m_pTransformCom->Set_State(
+		STATE::POSITION,
+		vPos);
 }

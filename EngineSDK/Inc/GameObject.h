@@ -15,6 +15,7 @@ public:
 		wstring		  m_strPrototypeObjectName;
 		wstring		  m_strPrototypeBaseName;
 		uint32_t	  pCameraType;
+		_bool		  ContainerObject{false};
 	}GAMEOBJECT_DESC;
 protected:
 	GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

@@ -1,0 +1,189 @@
+#include "Player.h"
+
+
+#include "Body_Player.h"
+
+#include "GameInstance.h"
+
+Player::Player(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
+	: ContainerObject{ pDevice, pContext }
+{
+}
+
+Player::Player(const Player& Prototype)
+	: ContainerObject{ Prototype }
+{
+}
+
+Player::~Player()
+{
+}
+
+HRESULT Player::Initialize_Prototype()
+{
+	return S_OK;
+}
+
+HRESULT Player::Initialize(void* pArg)
+{
+
+	
+	GameObject::GAMEOBJECT_DESC Player{};
+	Player.ObjectType = ETOUI(OBJECTTYPE::OBJECT_PLAYER);
+	Player.m_strName = L"Player";
+	Player.ContainerObject = true;
+	Player.m_strPrototypeObjectName = L"Prototype_GameObject_Player";
+	Player.m_strPrototypeBaseName = L"SK_Player";
+	Player.pCameraType = ETOUI(CAMERA::NONE);
+	Player.fSpeedPerSec = 10.f;
+	Player.fRotationPerSec = 180.f;
+
+	if (FAILED(__super::Initialize(&Player)))
+		return E_FAIL;
+
+	if (FAILED(Ready_Components()))
+		return E_FAIL;
+
+	if (FAILED(Ready_PartObjects()))
+		return E_FAIL;
+
+
+
+	return S_OK;
+}
+
+void Player::Priority_Update(_float fTimeDelta)
+{
+	__super::Priority_Update(fTimeDelta);
+}
+
+void Player::Update(_float fTimeDelta)
+{
+
+	m_iState = PLAYER_STATE::IDLE;
+
+	// =====================================================
+	// 회전
+	// =====================================================
+
+	if (CGameInstance::Get().Key_Pressing(DIK_LEFT))
+	{
+		m_pTransformCom->Turn(
+			XMVectorSet(0.f, 1.f, 0.f, 0.f),
+			fTimeDelta * -1.f);
+	}
+
+	if (CGameInstance::Get().Key_Pressing(DIK_RIGHT))
+	{
+		m_pTransformCom->Turn(
+			XMVectorSet(0.f, 1.f, 0.f, 0.f),
+			fTimeDelta);
+	}
+
+	// =====================================================
+	// 전진
+	// =====================================================
+
+	if (CGameInstance::Get().Key_Pressing(DIK_UP))
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+
+		m_iState = PLAYER_STATE::RUN;
+	}
+
+	// =====================================================
+	// 후진
+	// =====================================================
+
+	if (CGameInstance::Get().Key_Pressing(DIK_DOWN))
+	{
+		m_pTransformCom->Go_Backward(fTimeDelta);
+
+		m_iState = PLAYER_STATE::WALK;
+	}
+
+
+	else
+	{
+		if (m_iState & PLAYER_STATE::RUN)
+			m_iState ^= PLAYER_STATE::RUN;
+
+		m_iState |= PLAYER_STATE::IDLE;
+	}
+	__super::Update(fTimeDelta);
+}
+
+void Player::Late_Update(_float fTimeDelta)
+{
+	__super::Late_Update(fTimeDelta);
+}
+
+HRESULT Player::Render()
+{
+	return S_OK;
+}
+
+HRESULT Player::Ready_Components()
+{
+	return S_OK;
+}
+
+HRESULT Player::Ready_PartObjects()
+{
+
+
+
+	Body_Player::BODY_PLAYER_DESC		BodyDesc{};
+	BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	BodyDesc.pParentState = &m_iState;
+	BodyDesc.ObjectType = ETOUI(OBJECTTYPE::OBEJCT_PART);
+	BodyDesc.m_strName =L"ObjectPart";
+	BodyDesc.m_strPrototypeObjectName = L"Prototype_GameObject_Body_Player";
+	BodyDesc.m_strPrototypeBaseName =L"SK_Player";
+	BodyDesc.pCameraType = ETOUI(CAMERA::NONE);
+	BodyDesc.fSpeedPerSec = 5.f;
+	BodyDesc.fRotationPerSec = 1.f;
+
+	if (FAILED(__super::Add_PartObject(CGameInstance::Get().Get_Level(), BodyDesc.m_strPrototypeObjectName,
+		TEXT("Part_Body"), &BodyDesc)))
+		return E_FAIL;
+
+	/*Weapon::WEAPON_DESC		WeaponDesc{};
+	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	WeaponDesc.pParentState = &m_iState;
+	WeaponDesc.pSocketMatrix = dynamic_pointer_cast<CBody_Player>(m_PartObjects[TEXT("Part_Body")])->Get_SocketMatrixPtr("SWORD");
+
+	if (FAILED(__super::Add_PartObject(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Weapon"),
+		TEXT("Part_Weapon"), &WeaponDesc)))
+		return E_FAIL;*/
+
+	return S_OK;
+}
+
+unique_ptr<Player> Player::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
+{
+	auto	pInstance = unique_ptr<Player>(new Player(pDevice, pContext));
+
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : Player");
+		return nullptr;
+	}
+
+	return pInstance;
+}
+
+
+shared_ptr<Prototype> Player::Clone(void* pArg)
+{
+	auto	pInstance = shared_ptr<GameObject>(new Player(*this));
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Cloned : Player");
+		return nullptr;
+	}
+
+	return pInstance;
+}
+

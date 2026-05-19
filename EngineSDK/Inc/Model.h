@@ -23,7 +23,7 @@ public:
 	uint32_t Get_NumAnimation() const {
 		return m_iNumAnimations;
 	}
-
+	const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName);
 public:
 	virtual HRESULT Initialize_Prototype(uint32_t m_iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName, _fmatrix PreTransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
@@ -38,7 +38,7 @@ public:
 		m_iCurrentAnimIndex = iIndex;
 		m_isAnimLoop = isLoop;
 	}
-
+	uint32_t Get_CurAnimationIndex() { return m_iCurrentAnimIndex; }
 
 public:
 	HRESULT Bind_BoneMatrices(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t iMeshIndex);

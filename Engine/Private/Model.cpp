@@ -73,6 +73,22 @@ HRESULT Model::Initialize(void* pArg)
     return S_OK;
 }
 
+const _float4x4* Model::Get_BoneMatrixPtr(const _char* pBoneName)
+{
+    auto    iter = find_if(m_Bones.begin(), m_Bones.end(), [&](shared_ptr<Bone> pBone)->_bool
+        {
+            if (true == pBone->Compare_Name(pBoneName))
+                return true;
+
+            return false;
+        });
+
+    if (iter == m_Bones.end())
+        return nullptr;
+
+    return (*iter)->Get_CombinedTransformationMatrixPtr();
+}
+
 unique_ptr<Model> Model::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName, _fmatrix PreTransformMatrix)
 {
      auto		pInstance = unique_ptr<Model>(new Model(pDevice, pContext));

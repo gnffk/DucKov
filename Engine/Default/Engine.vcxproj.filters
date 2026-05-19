@@ -127,6 +127,12 @@
     <Filter Include="06.Component\VIBuffer\Cube">
       <UniqueIdentifier>{c7132cad-5bf0-429f-a1ca-e65f67c7c5f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05.GameObject\ContainerObject">
+      <UniqueIdentifier>{1da376c8-b527-448b-8a9d-533a11c83422}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05.GameObject\ContainerObject\PartObject">
+      <UniqueIdentifier>{dd58cd3e-81f4-46eb-a503-69e6f116c27a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -276,6 +282,12 @@
     <ClCompile Include="..\Private\Camera_Manager.cpp">
       <Filter>05.GameObject\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\ContainerObject.cpp">
+      <Filter>05.GameObject\ContainerObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PartObject.cpp">
+      <Filter>05.GameObject\ContainerObject\PartObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -406,6 +418,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Camera_Manager.h">
       <Filter>05.GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ContainerObject.h">
+      <Filter>05.GameObject\ContainerObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PartObject.h">
+      <Filter>05.GameObject\ContainerObject\PartObject</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

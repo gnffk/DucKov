@@ -24,6 +24,9 @@ public:
 		return m_vViewportSize;
 	}
 
+	uint32_t	Get_Level() { return m_iCurrentLevel; }									
+	void		Set_Level(uint32_t _level) { m_iCurrentLevel = _level; }
+
 
 	string WStringToString(const std::wstring& wstr);
 	wstring StringToWString(const string& str);
@@ -121,6 +124,7 @@ public:
 #pragma endregion
 private:
 	_float2											m_vViewportSize = {};
+	uint32_t										m_iCurrentLevel = {};
 private:
 	unique_ptr<class Graphic_Device>				m_pGraphic_Device = { nullptr };
 	unique_ptr<class ImGUI_Manager>					m_pImGUI_Manager = { nullptr };

@@ -24,7 +24,7 @@ public:
 
 	void	IMGUI_MadeFunction();
 	void	IMGUI_ChoiceObject();
-
+	void	IMGUI_AddPlayer();
 
 public:
 	void	MousePicking();

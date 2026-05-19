@@ -41,8 +41,8 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
    descTerrian.fSpeedPerSec = 5.f;
    descTerrian.fRotationPerSec = 1.f;
 
-    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Terrain"),
-        ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTerrian)))
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Terrain"),
+        CGameInstance::Get().Get_Level(), strLayerTag, &descTerrian)))
         return E_FAIL;
 
 
@@ -55,75 +55,34 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
     descSKY.fSpeedPerSec = 5.f;
     descSKY.fRotationPerSec = 1.f;
 
-    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Sky"),
-        ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descSKY)))
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Sky"),
+        CGameInstance::Get().Get_Level(), strLayerTag, &descSKY)))
         return E_FAIL;
 
-	 //  GameObject::GAMEOBJECT_DESC descTestModel0{};
-     //  descTestModel0.ObjectType = ETOUI(OBJECTTYPE::OBJECT_MONSTER);
-	 //  descTestModel0.m_strName =L"TestMonster0";
-     //  descTestModel0.m_strPrototypeObjectName = L"Prototype_GameObject_Monster";
-	 //  descTestModel0.m_strPrototypeBaseName =L"SK_Monster_Palicus";
-	 //  descTestModel0.pCameraType = ETOUI(CAMERA::NONE);
-	 //  descTestModel0.fSpeedPerSec = 5.f;
-	 //  descTestModel0.fRotationPerSec = 1.f;
-
-     //   for (int i = 0; i < 100; ++i) {
-     //       if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Monster"),
-     //           ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTestModel0)))
-     //           return E_FAIL;
-     //   }
 
 
-    //GameObject::GAMEOBJECT_DESC descObstacle{};
-    //descObstacle.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
-    //descObstacle.m_strName = L"HOME";
-    //descObstacle.m_bCollider = false;
-    //descObstacle.m_strPrototypeObjectName = L"Prototype_GameObject_Obstacle";
-    //descObstacle.m_strPrototypeBaseName = L"SM_Indoors_Study_Shelf_04";
-    //descObstacle.pCameraType = ETOUI(CAMERA::NONE);
-    //descObstacle.fSpeedPerSec = 5.f;
-    //descObstacle.fRotationPerSec = 1.f;
 
-    //if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Obstacle"),
-    //    ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descObstacle)))
-    //    return E_FAIL;
-
-	GameObject::GAMEOBJECT_DESC descMain_Camera{};
+    GameObject::GAMEOBJECT_DESC descMain_Camera{};
 
     descMain_Camera.ObjectType = ETOUI(OBJECTTYPE::OBJECT_CAMERA);
-	descMain_Camera.m_strName = L"Main_Camera";
+    descMain_Camera.m_strName = L"Main_Camera";
     descMain_Camera.m_strPrototypeObjectName = L"Prototype_GameObject_PerspectiveCamera";
-	descMain_Camera.m_strPrototypeBaseName = L"Prototype_GameObject_PerspectiveCamera";
-	descMain_Camera.pCameraType = ETOUI(CAMERA::MAIN);
-	descMain_Camera.fSpeedPerSec = 10.f;
-	descMain_Camera.fRotationPerSec = 0.1f;
+    descMain_Camera.m_strPrototypeBaseName = L"Prototype_GameObject_PerspectiveCamera";
+    descMain_Camera.pCameraType = ETOUI(CAMERA::MAIN);
+    descMain_Camera.fSpeedPerSec = 10.f;
+    descMain_Camera.fRotationPerSec = 0.1f;
 
 
-	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_PerspectiveCamera"),
-		ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descMain_Camera)))
-		return E_FAIL;
-	
-	if(FAILED(CGameInstance::Get().Add_Camera(ETOUI(CAMERA::MAIN),
-		dynamic_pointer_cast<Camera>(CGameInstance::Get().Find_Object(ETOUI(LEVEL::MAPEDITOR), strLayerTag, L"Main_Camera")))))
-		return E_FAIL;
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_PerspectiveCamera"), CGameInstance::Get().Get_Level(), strLayerTag, &descMain_Camera)))
+        return E_FAIL;
+
+    if (FAILED(CGameInstance::Get().Add_Camera(ETOUI(CAMERA::MAIN),
+        dynamic_pointer_cast<Camera>(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), strLayerTag, L"Main_Camera")))))
+        return E_FAIL;
+
+
 
 	return S_OK;
-
-
-
-    //GameObject::GAMEOBJECT_DESC descObstacle{};
-    //descObstacle.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
-    //descObstacle.m_strName = L"HOME";
-    //descObstacle.m_strPrototypeObjectName = L"Prototype_GameObject_Obstacle";
-    //descObstacle.m_strPrototypeBaseName = L"SM_Study_Shelf_04";
-    //descObstacle.pCameraType = ETOUI(CAMERA::NONE);
-    //descObstacle.fSpeedPerSec = 5.f;
-    //descObstacle.fRotationPerSec = 1.f;
-
-    //if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Obstacle"),
-    //    ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descObstacle)))
-    //    return E_FAIL;
   
 }
 
@@ -154,7 +113,7 @@ void MapEditor::IMGUI_Render() {
 	IMGUI_Level_Render();
     IMGUI_SaveLoad_Render();
     IMGUI_MadeFunction();
-
+    IMGUI_AddPlayer();
 #endif
 
 }
@@ -190,7 +149,7 @@ void MapEditor::IMGUI_Level_Render()
 
     for (auto& layer :
         CGameInstance::Get().Find_Layer_Lists(
-            ETOUI(LEVEL::MAPEDITOR)))
+            CGameInstance::Get().Get_Level()))
     {
         std::string layerLabel =
             WStringToString(layer.first);
@@ -283,19 +242,26 @@ void MapEditor::IMGUI_Level_Render()
 
                 if (opened)
                 {
-                    auto& components =
-                        object->GetComponents();
+                 
 
-                    for (auto& component : components)
-                    {
-                        std::string compName =
-                            WStringToString(component.first);
+                    if (object->GetObjectINFO().ContainerObject) {
+                        
+                    }
+                    else {
+                        auto& components =
+                            object->GetComponents();
 
-                        OutputDebugStringA(
-                            ("[" + compName + "]\n").c_str());
-                        ImGui::BulletText(
-                            "%s",
-                            compName.c_str());
+                        for (auto& component : components)
+                        {
+                            std::string compName =
+                                WStringToString(component.first);
+
+                            OutputDebugStringA(
+                                ("[" + compName + "]\n").c_str());
+                            ImGui::BulletText(
+                                "%s",
+                                compName.c_str());
+                        }
                     }
 
                     ImGui::TreePop();
@@ -337,7 +303,7 @@ void MapEditor::IMGUI_OTHER_Render()
     {
         auto names =
             CGameInstance::Get().Get_PrototypeNames(
-                ETOUI(LEVEL::MAPEDITOR));
+                CGameInstance::Get().Get_Level());
 
         for (auto& name : names)
         {
@@ -470,7 +436,7 @@ void MapEditor::IMGUI_SaveLoad_Render()
 
                 CGameInstance::Get().Load(
                     name,
-                    ETOUI(LEVEL::MAPEDITOR));
+                    CGameInstance::Get().Get_Level());
             }
 
             ImGui::Spacing();
@@ -699,9 +665,9 @@ void MapEditor::IMGUI_ChoiceObject()
                     rotation;
 
                 CGameInstance::Get().Add_GameObject_toLayer(
-                    ETOUI(LEVEL::MAPEDITOR),
+                    CGameInstance::Get().Get_Level(),
                     TEXT("Prototype_GameObject_Monster"),
-                    ETOUI(LEVEL::MAPEDITOR),
+                    CGameInstance::Get().Get_Level(),
                     CGameInstance::Get().StringToWString(
                         monsterLayerName),
                     &desc);
@@ -809,9 +775,9 @@ void MapEditor::IMGUI_ChoiceObject()
                     ETOUI(CAMERA::NONE);
 
                 CGameInstance::Get().Add_GameObject_toLayer(
-                    ETOUI(LEVEL::MAPEDITOR),
+                    CGameInstance::Get().Get_Level(),
                     TEXT("Prototype_GameObject_Obstacle"),
-                    ETOUI(LEVEL::MAPEDITOR),
+                    CGameInstance::Get().Get_Level(),
                     CGameInstance::Get().StringToWString(
                         obstacleLayerName),
                     &desc);
@@ -836,6 +802,62 @@ void MapEditor::IMGUI_ChoiceObject()
         ImGui::EndPopup();
     }
 
+
+}
+void MapEditor::IMGUI_AddPlayer()
+{
+    ImGui::Begin("Player");
+
+    if (ImGui::Button(
+        "Create Player",
+        ImVec2(200.f, 40.f))) {
+        CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player"), CGameInstance::Get().Get_Level(), L"PlayerTag");
+
+
+        GameObject::GAMEOBJECT_DESC descPlayer_Camera{};
+
+        descPlayer_Camera.ObjectType = ETOUI(OBJECTTYPE::OBJECT_CAMERA);
+        descPlayer_Camera.m_strName = L"Player_Camera";
+        descPlayer_Camera.m_strPrototypeObjectName = L"Prototype_GameObject_PlayerCamera";
+        descPlayer_Camera.m_strPrototypeBaseName = L"Prototype_GameObject_PlayerCamera";
+        descPlayer_Camera.pCameraType = ETOUI(CAMERA::PLAYER);
+        descPlayer_Camera.fSpeedPerSec = 10.f;
+        descPlayer_Camera.fRotationPerSec = 0.1f;
+
+        CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_PlayerCamera"), CGameInstance::Get().Get_Level(), L"PlayerTag", &descPlayer_Camera);
+
+        CGameInstance::Get().Add_Camera(ETOUI(CAMERA::PLAYER), dynamic_pointer_cast<Camera>(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player_Camera")));
+
+
+    }
+      
+    ImGui::Separator();
+
+    // =====================================================
+    // Camera º¯°æ
+    // =====================================================
+    static int currentCamera =
+        (int)CAMERA::MAIN;
+
+    const char* cameraNames[] =
+    {
+        "MAIN",
+        "SUB",
+        "NONE",
+        "PLAYER"
+    };
+
+    if (ImGui::Combo(
+        "Camera Type",
+        &currentCamera,
+        cameraNames,
+        IM_ARRAYSIZE(cameraNames)))
+    {
+        CGameInstance::Get().Change_Camera(
+            (uint32_t)currentCamera);
+    }
+
+    ImGui::End();
 
 }
 void MapEditor::MousePicking()
@@ -890,7 +912,7 @@ void MapEditor::MousePicking()
 
 
 		float minDist = FLT_MAX;
-        CGameInstance::Get().MousePicking(rayOrigin, rayDir, ETOUI(LEVEL::MAPEDITOR));
+        CGameInstance::Get().MousePicking(rayOrigin, rayDir, CGameInstance::Get().Get_Level());
 
 
 	}

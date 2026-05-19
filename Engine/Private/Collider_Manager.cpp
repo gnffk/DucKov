@@ -123,8 +123,8 @@ void Collider_Manager::MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_
         for (auto gameObject : gameObjects) {
             auto& Components = gameObject->GetComponents();
             auto iter = Components.find(L"Com_Model");
-
-            if (iter != Components.end() && iter->second != nullptr)
+            auto iter2 = Components.find(L"Com_OBBCollider");
+            if (iter != Components.end() && iter->second != nullptr && iter2 != Components.end())
             {
                 auto model = dynamic_pointer_cast<Model>(iter->second);
                 for (auto& Mesh : model->GetMeshes()) {

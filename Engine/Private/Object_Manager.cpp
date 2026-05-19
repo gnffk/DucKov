@@ -109,6 +109,11 @@ Layer* Object_Manager::Find_Layer(uint32_t iLayerLevelIndex, const _wstring& str
 
 shared_ptr<GameObject> Object_Manager::Find_Object(uint32_t iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag)
 {
+	auto pLayer =Find_Layer(iLayerLevelIndex, strLayerTag);
+
+	if (pLayer == nullptr)
+		return nullptr;
+
 	for (auto obj : Find_Layer(iLayerLevelIndex, strLayerTag)->Get_GameObjects()) {
 		if (obj->GetObjectINFO().m_strName == strObjectTag) {
 			return obj;
