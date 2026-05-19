@@ -59,7 +59,7 @@ void Player::Priority_Update(_float fTimeDelta)
 
 void Player::Update(_float fTimeDelta)
 {
-
+	MouseLook( fTimeDelta);
 	m_iState = PLAYER_STATE::IDLE;
 
 	// =====================================================
@@ -88,7 +88,7 @@ void Player::Update(_float fTimeDelta)
 	{
 		m_pTransformCom->Go_Straight(fTimeDelta);
 
-		m_iState = PLAYER_STATE::RUN;
+		m_iState = PLAYER_STATE::WALK;
 	}
 
 	// =====================================================
@@ -118,6 +118,80 @@ void Player::Late_Update(_float fTimeDelta)
 	__super::Late_Update(fTimeDelta);
 }
 
+void Player::MouseLook(_float fTimeDelta) {
+
+	POINT pt{};
+	GetCursorPos(&pt);
+	ScreenToClient(g_hWnd, &pt);
+
+	float width = CGameInstance::Get().Get_ViewportSize().x;
+	float height = CGameInstance::Get().Get_ViewportSize().y;
+
+	// Screen -> NDC
+	float px = (2.f * pt.x / width) - 1.f;
+	float py = 1.f - (2.f * pt.y / height);
+
+	// View / Projection
+	_float4x4 view, proj;
+
+	CGameInstance::Get().Get_MainCamerwaViewMatrix(view);
+	CGameInstance::Get().Get_MainCamerwaProjectionMatrix(proj);
+
+	XMMATRIX matView = XMLoadFloat4x4(&view);
+	XMMATRIX matProj = XMLoadFloat4x4(&proj);
+
+	XMMATRIX invView = XMMatrixInverse(nullptr, matView);
+	XMMATRIX invProj = XMMatrixInverse(nullptr, matProj);
+
+	// Near
+	XMVECTOR vNear = XMVectorSet(px, py, 0.f, 1.f);
+	vNear = XMVector3TransformCoord(vNear, invProj);
+	vNear = XMVector3TransformCoord(vNear, invView);
+
+	// Far
+	XMVECTOR vFar = XMVectorSet(px, py, 1.f, 1.f);
+	vFar = XMVector3TransformCoord(vFar, invProj);
+	vFar = XMVector3TransformCoord(vFar, invView);
+
+	// Ray
+	XMVECTOR vRayOrigin = vNear;
+
+	XMVECTOR vRayDir =
+		XMVector3Normalize(vFar - vNear);
+
+	// y = 0 Plane
+	float dirY = XMVectorGetY(vRayDir);
+
+	if (fabs(dirY) < 0.0001f)
+		return;
+
+	float t =
+		-XMVectorGetY(vRayOrigin) / dirY;
+
+	XMVECTOR vHitPos =
+		vRayOrigin + vRayDir * t;
+
+	// Direction
+	XMVECTOR vPlayerPos =
+		m_pTransformCom->Get_State(STATE::POSITION);
+
+	XMVECTOR vDir =
+		XMVector3Normalize(vHitPos - vPlayerPos);
+
+	vDir = XMVectorSetY(vDir, 0.f);
+	vDir = XMVector3Normalize(vDir);
+
+	// Yaw
+	float yaw =
+		atan2f(
+			XMVectorGetX(vDir),
+			XMVectorGetZ(vDir));
+
+	yaw = XMConvertToDegrees(yaw);
+
+	// Rotation
+	m_pTransformCom->Rotation(0.f, yaw, 0.f);
+}
 HRESULT Player::Render()
 {
 	return S_OK;

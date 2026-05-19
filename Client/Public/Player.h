@@ -46,7 +46,8 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+public:
+	void		MouseLook(_float fTimeDelta);
 private:
 	uint32_t			m_iState = {};
 

@@ -40,6 +40,28 @@ HRESULT PlayerCamera::Initialize(void* pArg)
 
 
 	m_Owner = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player").get();
+
+
+
+	_vector vPlayerPos =m_Owner->GetTransform()->Get_State(STATE::POSITION);
+
+	_vector vOffset =XMVectorSet( 2.5f, 8.7f, -5.f ,0.f);
+
+	_vector vCamPos =vPlayerPos + vOffset;
+
+	_vector vLook =XMVector3Normalize(vPlayerPos - vCamPos);
+
+	_vector vRight =XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f),vLook));
+
+	_vector vUp =XMVector3Normalize(XMVector3Cross(vLook,vRight));
+
+	m_pTransformCom->Set_State(STATE::LOOK,vLook);
+
+	m_pTransformCom->Set_State(STATE::RIGHT,vRight);
+
+	m_pTransformCom->Set_State(STATE::UP,vUp);
+
+
 	return S_OK;
 }
 
@@ -52,6 +74,7 @@ void PlayerCamera::Priority_Update(_float fTimeDelta)
 
 void PlayerCamera::Update(_float fTimeDelta)
 {
+
 
 	__super::Set_View();
 
@@ -104,52 +127,37 @@ shared_ptr<Prototype> PlayerCamera::Clone(void* pArg)
 	return pInstance;
 }
 
+
 void PlayerCamera::FollowCamera()
 {
 	if (m_Owner == nullptr)
 		return;
 
-	// =====================================================
-	// 플레이어 위치
-	// =====================================================
+	_vector vPlayerPos = m_Owner->GetTransform()->Get_State(STATE::POSITION);
 
-	_vector vPlayerPos =m_Owner->GetTransform()->Get_State(STATE::POSITION);
+	POINT pt{};
 
-	// =====================================================
-	// 탑뷰 Offset
-	// =====================================================
+	GetCursorPos(&pt);
+	ScreenToClient(g_hWnd, &pt);
 
-	_vector vOffset =XMVectorSet( 5.f, 9.f, -10.f ,0.f);
+	float width = (float)g_iWinSizeX;
 
-	// =====================================================
-	// 카메라 위치
-	// =====================================================
+	float height = (float)g_iWinSizeY;
 
-	_vector vCamPos =vPlayerPos + vOffset;
+	float mouseX = (pt.x - width * 0.5f) / (width * 0.5f);
 
-	m_pTransformCom->Set_State(STATE::POSITION,vCamPos);
+	float mouseY = (pt.y - height * 0.5f) / (height * 0.5f);
 
-	_vector vLook =XMVector3Normalize(vPlayerPos - vCamPos);
+	float offsetX = mouseX * 2.f;
 
-	_vector vRight =
-		XMVector3Normalize(
-			XMVector3Cross(
-				XMVectorSet(0.f, 1.f, 0.f, 0.f),
-				vLook));
+	float offsetZ = mouseY * 1.f;
 
-	_vector vUp =
-		XMVector3Normalize(
-			XMVector3Cross(
-				vLook,
-				vRight));
+	_vector vOffset = XMVectorSet(2.5f + offsetX, 8.7f , -5.f - offsetZ, 0.f);
 
-	m_pTransformCom->Set_State(STATE::LOOK,vLook);
+	_vector vCamPos = vPlayerPos + vOffset;
 
-	m_pTransformCom->Set_State(STATE::RIGHT,vRight);
-
-	m_pTransformCom->Set_State(STATE::UP,vUp);
+	m_pTransformCom->Set_State(STATE::POSITION, vCamPos);
 }
-
 void PlayerCamera::Rotate(_float fDeltaX, _float fDeltaY, _float fTimeDelta)
 {
 	if (nullptr == m_pTransformCom)
