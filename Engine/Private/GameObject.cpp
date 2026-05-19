@@ -40,6 +40,7 @@ HRESULT GameObject::Initialize(void* pArg)
  
     Object_INFO.ObjectType = pDesc->ObjectType;
     Object_INFO.LevelIndex = pDesc->LevelIndex;
+    Object_INFO.m_bCollider = pDesc->m_bCollider;
     Object_INFO.m_strName = pDesc->m_strName;
     Object_INFO.m_strPrototypeObjectName = pDesc->m_strPrototypeObjectName;
     Object_INFO.m_strPrototypeBaseName = pDesc->m_strPrototypeBaseName;

@@ -10,6 +10,7 @@ public:
 	{
 		uint32_t	  ObjectType;
 		uint32_t	  LevelIndex;
+		_bool		  m_bCollider = true;
 		wstring		  m_strName;
 		wstring		  m_strPrototypeObjectName;
 		wstring		  m_strPrototypeBaseName;

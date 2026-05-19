@@ -133,6 +133,8 @@ HRESULT Map_Manager::Save(string _mapDataName, bool _overwrite) {
             objectJson["ObjectType"] =
                 ObjectINfO.ObjectType;
 
+            objectJson["bCollider"] =
+                ObjectINfO.m_bCollider;
 
             objectJson["LevelIndex"] =
                 ObjectINfO.LevelIndex;
@@ -330,7 +332,7 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
         desc.ObjectType = objectJson["ObjectType"];
         desc.LevelIndex = objectJson["LevelIndex"];
         desc.m_strName = objectName;
-
+        desc.m_bCollider = objectJson["bCollider"];
         desc.m_strPrototypeObjectName = prototypeName;
         desc.m_strPrototypeBaseName = prototypeBaseName;
 
@@ -531,6 +533,58 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
 
         case ETOUI(OBJECTTYPE::OBJECT_STATIC):
 
+        {
+            if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(
+                Levelindex,
+                prototypeName,
+                Levelindex,
+                layerName,
+                &desc)))
+            {
+                MSG_BOX("Map Load FAILED : GameObject");
+            }
+
+            auto gameObject =
+                CGameInstance::Get().Find_Object(
+                    Levelindex,
+                    layerName,
+                    objectName);
+
+            if (gameObject == nullptr)
+                MSG_BOX("Map Load FAILED : GameObject");
+
+
+            // -------------------------------------------------
+            // Matrix º¹¿ø
+            // -------------------------------------------------
+
+            auto& m =
+                objectJson["WorldMatrix"];
+
+            _float4x4 mat{};
+
+            mat._11 = m[0][0];
+            mat._12 = m[0][1];
+            mat._13 = m[0][2];
+            mat._14 = m[0][3];
+
+            mat._21 = m[1][0];
+            mat._22 = m[1][1];
+            mat._23 = m[1][2];
+            mat._24 = m[1][3];
+
+            mat._31 = m[2][0];
+            mat._32 = m[2][1];
+            mat._33 = m[2][2];
+            mat._34 = m[2][3];
+
+            mat._41 = m[3][0];
+            mat._42 = m[3][1];
+            mat._43 = m[3][2];
+            mat._44 = m[3][3];
+
+            gameObject->GetTransform()->Set_WorldMatrix(mat);
+        }
 
             break;
         case ETOUI(OBJECTTYPE::OBJECT_SKYBOX):

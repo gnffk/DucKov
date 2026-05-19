@@ -59,25 +59,35 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
         ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descSKY)))
         return E_FAIL;
 
+	 //  GameObject::GAMEOBJECT_DESC descTestModel0{};
+     //  descTestModel0.ObjectType = ETOUI(OBJECTTYPE::OBJECT_MONSTER);
+	 //  descTestModel0.m_strName =L"TestMonster0";
+     //  descTestModel0.m_strPrototypeObjectName = L"Prototype_GameObject_Monster";
+	 //  descTestModel0.m_strPrototypeBaseName =L"SK_Monster_Palicus";
+	 //  descTestModel0.pCameraType = ETOUI(CAMERA::NONE);
+	 //  descTestModel0.fSpeedPerSec = 5.f;
+	 //  descTestModel0.fRotationPerSec = 1.f;
 
- //  
-	//GameObject::GAMEOBJECT_DESC descTestModel0{};
- //   descTestModel0.ObjectType = ETOUI(OBJECTTYPE::OBJECT_MONSTER);
-	//descTestModel0.m_strName =L"TestMonster0";
- //   descTestModel0.m_strPrototypeObjectName = L"Prototype_GameObject_Monster";
-	//descTestModel0.m_strPrototypeBaseName =L"SK_Monster_Palicus";
-	//descTestModel0.pCameraType = ETOUI(CAMERA::NONE);
-	//descTestModel0.fSpeedPerSec = 5.f;
-	//descTestModel0.fRotationPerSec = 1.f;
-
- //   for (int i = 0; i < 100; ++i) {
- //       if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Monster"),
- //           ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTestModel0)))
- //           return E_FAIL;
- //   }
+     //   for (int i = 0; i < 100; ++i) {
+     //       if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Monster"),
+     //           ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descTestModel0)))
+     //           return E_FAIL;
+     //   }
 
 
+    //GameObject::GAMEOBJECT_DESC descObstacle{};
+    //descObstacle.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+    //descObstacle.m_strName = L"HOME";
+    //descObstacle.m_bCollider = false;
+    //descObstacle.m_strPrototypeObjectName = L"Prototype_GameObject_Obstacle";
+    //descObstacle.m_strPrototypeBaseName = L"SM_Indoors_Study_Shelf_04";
+    //descObstacle.pCameraType = ETOUI(CAMERA::NONE);
+    //descObstacle.fSpeedPerSec = 5.f;
+    //descObstacle.fRotationPerSec = 1.f;
 
+    //if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Obstacle"),
+    //    ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descObstacle)))
+    //    return E_FAIL;
 
 	GameObject::GAMEOBJECT_DESC descMain_Camera{};
 
@@ -86,7 +96,7 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
     descMain_Camera.m_strPrototypeObjectName = L"Prototype_GameObject_PerspectiveCamera";
 	descMain_Camera.m_strPrototypeBaseName = L"Prototype_GameObject_PerspectiveCamera";
 	descMain_Camera.pCameraType = ETOUI(CAMERA::MAIN);
-	descMain_Camera.fSpeedPerSec = 1.f;
+	descMain_Camera.fSpeedPerSec = 10.f;
 	descMain_Camera.fRotationPerSec = 0.1f;
 
 
@@ -99,6 +109,22 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 		return E_FAIL;
 
 	return S_OK;
+
+
+
+    //GameObject::GAMEOBJECT_DESC descObstacle{};
+    //descObstacle.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+    //descObstacle.m_strName = L"HOME";
+    //descObstacle.m_strPrototypeObjectName = L"Prototype_GameObject_Obstacle";
+    //descObstacle.m_strPrototypeBaseName = L"SM_Study_Shelf_04";
+    //descObstacle.pCameraType = ETOUI(CAMERA::NONE);
+    //descObstacle.fSpeedPerSec = 5.f;
+    //descObstacle.fRotationPerSec = 1.f;
+
+    //if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Obstacle"),
+    //    ETOUI(LEVEL::MAPEDITOR), strLayerTag, &descObstacle)))
+    //    return E_FAIL;
+  
 }
 
 
@@ -204,7 +230,12 @@ void MapEditor::IMGUI_Level_Render()
 
                 }
 
-             
+                else if (className == "Obstacle")
+                {
+                    OpenDataObject = true;
+                    ImGui::OpenPopup("Select Obstacle");
+
+                }
              
             }
             ImGui::EndDragDropTarget();
@@ -507,23 +538,20 @@ void MapEditor::IMGUI_MadeFunction()
 {
     ImGui::Begin("Object Browser");
 
+    ImGui::Text("Objects");
     ImGui::Separator();
 
+    const ImVec2 buttonSize(220.f, 50.f);
+
     // =====================================================
-    // Monster 파일
+    // Monster
     // =====================================================
 
-    if (ImGui::Selectable(
-        "Monster",
-        false,
-        ImGuiSelectableFlags_None,
-        ImVec2(200.f, 40.f)))
+    ImGui::PushID("Monster");
+
+    if (ImGui::Button("Monster", buttonSize))
     {
     }
-
-    // =====================================================
-    // Drag 시작
-    // =====================================================
 
     if (ImGui::BeginDragDropSource())
     {
@@ -534,13 +562,42 @@ void MapEditor::IMGUI_MadeFunction()
             className.c_str(),
             className.size() + 1);
 
-        ImGui::Text("Monster");
+        ImGui::Text("Create Monster");
 
         ImGui::EndDragDropSource();
     }
 
-    ImGui::End();
+    ImGui::PopID();
 
+    ImGui::Spacing();
+
+    // =====================================================
+    // Obstacle
+    // =====================================================
+
+    ImGui::PushID("Obstacle");
+
+    if (ImGui::Button("Obstacle", buttonSize))
+    {
+    }
+
+    if (ImGui::BeginDragDropSource())
+    {
+        string className = "Obstacle";
+
+        ImGui::SetDragDropPayload(
+            "GAME_OBJECT",
+            className.c_str(),
+            className.size() + 1);
+
+        ImGui::Text("Create Obstacle");
+
+        ImGui::EndDragDropSource();
+    }
+
+    ImGui::PopID();
+
+    ImGui::End();
 
 }
 void MapEditor::IMGUI_ChoiceObject()
@@ -550,8 +607,8 @@ void MapEditor::IMGUI_ChoiceObject()
         "Select Monster",
         nullptr))
     {
-        static char objectName[128] = "";
-        static char layerName[128] = "";
+        static char monsterObjectName[128] = "";
+        static char monsterLayerName[128] = "";
         static float speed = 5.f;
         static float rotation = 1.f;
 
@@ -563,23 +620,15 @@ void MapEditor::IMGUI_ChoiceObject()
         ImGui::Text("Create Monster");
         ImGui::Separator();
 
-        // =====================================================
-        // 이름 입력
-        // =====================================================
-
         ImGui::InputText(
             "Object Name",
-            objectName,
-            IM_ARRAYSIZE(objectName));
-
+            monsterObjectName,
+            IM_ARRAYSIZE(monsterObjectName));
 
         ImGui::InputText(
             "Layer Name",
-            layerName,
-            IM_ARRAYSIZE(layerName));
-        // =====================================================
-        // 이동 속도
-        // =====================================================
+            monsterLayerName,
+            IM_ARRAYSIZE(monsterLayerName));
 
         ImGui::DragFloat(
             "Speed",
@@ -587,10 +636,6 @@ void MapEditor::IMGUI_ChoiceObject()
             0.1f,
             0.f,
             100.f);
-
-        // =====================================================
-        // 회전 속도
-        // =====================================================
 
         ImGui::DragFloat(
             "Rotation",
@@ -603,10 +648,6 @@ void MapEditor::IMGUI_ChoiceObject()
 
         ImGui::Text("Select Skeleton");
 
-        // =====================================================
-        // Skeleton 선택
-        // =====================================================
-
         for (int i = 0; i < SkeletonNames.size(); ++i)
         {
             bool selected =
@@ -614,17 +655,14 @@ void MapEditor::IMGUI_ChoiceObject()
 
             if (ImGui::Selectable(
                 SkeletonNames[i].c_str(),
-                selected, ImGuiSelectableFlags_DontClosePopups))
+                selected,
+                ImGuiSelectableFlags_DontClosePopups))
             {
                 selectedSkeletonIndex = i;
             }
         }
 
         ImGui::Separator();
-
-        // =====================================================
-        // 생성 버튼
-        // =====================================================
 
         if (ImGui::Button(
             "Create",
@@ -643,7 +681,7 @@ void MapEditor::IMGUI_ChoiceObject()
 
                 desc.m_strName =
                     CGameInstance::Get().StringToWString(
-                        objectName);
+                        monsterObjectName);
 
                 desc.m_strPrototypeObjectName =
                     L"Prototype_GameObject_Monster";
@@ -665,7 +703,7 @@ void MapEditor::IMGUI_ChoiceObject()
                     TEXT("Prototype_GameObject_Monster"),
                     ETOUI(LEVEL::MAPEDITOR),
                     CGameInstance::Get().StringToWString(
-                        layerName),
+                        monsterLayerName),
                     &desc);
 
                 selectedSkeletonIndex = -1;
@@ -688,6 +726,115 @@ void MapEditor::IMGUI_ChoiceObject()
         ImGui::EndPopup();
     }
 
+    if (ImGui::BeginPopupModal(
+        "Select Obstacle",
+        nullptr))
+    {
+        static char obstacleObjectName[128] = "";
+        static char obstacleLayerName[128] = "";
+
+        static int selectedMeshIndex = -1;
+        static bool useCollider = false;
+
+   
+        auto& StaticMeshNames =
+            CGameInstance::Get().FindCategories("StaticMesh");
+
+        ImGui::Text("Create StaticMesh");
+        ImGui::Separator();
+
+        ImGui::InputText(
+            "Object Name",
+            obstacleObjectName,
+            IM_ARRAYSIZE(obstacleObjectName));
+
+        ImGui::InputText(
+            "Layer Name",
+            obstacleLayerName,
+            IM_ARRAYSIZE(obstacleLayerName));
+
+        ImGui::Separator();
+
+        ImGui::Text("Select StaticMesh");
+
+        for (int i = 0; i < StaticMeshNames.size(); ++i)
+        {
+            bool selected =
+                selectedMeshIndex == i;
+
+            if (ImGui::Selectable(
+                StaticMeshNames[i].c_str(),
+                selected,
+                ImGuiSelectableFlags_DontClosePopups))
+            {
+                selectedMeshIndex = i;
+            }
+        }
+
+        ImGui::Separator();
+
+        ImGui::Checkbox(
+            "Use Collider",
+            &useCollider);
+
+        ImGui::Separator();
+
+        if (ImGui::Button(
+            "Create",
+            ImVec2(120.f, 35.f)))
+        {
+            if (selectedMeshIndex >= 0)
+            {
+                GameObject::GAMEOBJECT_DESC desc{};
+
+                wstring selectedMesh =
+                    CGameInstance::Get().StringToWString(
+                        StaticMeshNames[selectedMeshIndex]);
+
+                desc.ObjectType =
+                    ETOUI(OBJECTTYPE::OBJECT_STATIC);
+
+                desc.m_strName =
+                    CGameInstance::Get().StringToWString(
+                        obstacleObjectName);
+
+                desc.m_strPrototypeObjectName =
+                    L"Prototype_GameObject_Obstacle";
+
+                desc.m_strPrototypeBaseName =
+                    selectedMesh;
+
+                desc.m_bCollider = useCollider;
+                desc.pCameraType =
+                    ETOUI(CAMERA::NONE);
+
+                CGameInstance::Get().Add_GameObject_toLayer(
+                    ETOUI(LEVEL::MAPEDITOR),
+                    TEXT("Prototype_GameObject_Obstacle"),
+                    ETOUI(LEVEL::MAPEDITOR),
+                    CGameInstance::Get().StringToWString(
+                        obstacleLayerName),
+                    &desc);
+
+                selectedMeshIndex = -1;
+
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(
+            "Cancel",
+            ImVec2(120.f, 35.f)))
+        {
+            selectedMeshIndex = -1;
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 
 
 }

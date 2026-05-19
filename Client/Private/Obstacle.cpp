@@ -1,32 +1,32 @@
 #include "Engine_Macro.h"
-#include "Monster.h"
+#include "Obstacle.h"
 #include "GameInstance.h"
 #include "AABB_Collider.h"
 #include "OBB_Collider.h"
-Monster::Monster(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
+Obstacle::Obstacle(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: GameObject{ pDevice, pContext }
 
 {
 }
 
-Monster::Monster(const Monster& Prototype)
+Obstacle::Obstacle(const Obstacle& Prototype)
 	: GameObject{ Prototype }
 {
 }
 
-Monster::~Monster()
+Obstacle::~Obstacle()
 {
 	//a.clear();
 }
 
 
-HRESULT Monster::Initialize_Prototype()
+HRESULT Obstacle::Initialize_Prototype()
 {
 
 	return S_OK;
 }
 
-HRESULT Monster::Initialize(void* pArg)
+HRESULT Obstacle::Initialize(void* pArg)
 {
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -35,38 +35,44 @@ HRESULT Monster::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scale(0.01f, 0.01f, 0.01f);
-	m_pAABBCom->SetOwner(SHARED_THIS(Monster).get());
+	if (m_pAABBCom != nullptr) {
+		m_pAABBCom->SetOwner(SHARED_THIS(Obstacle).get());
+	}
+
 
 	//m_pModelCom->Set_Animation(0, false);
 	return S_OK;
 }
 
-void Monster::Priority_Update(_float fTimeDelta)
+void Obstacle::Priority_Update(_float fTimeDelta)
 {
-	CGameInstance::Get().Add_RenderObject(RENDERGROUP::BLEND, SHARED_THIS(Monster));
-	CGameInstance::Get().Add_Collider(L"Monster", m_pAABBCom.get());
-}
-
-void Monster::Update(_float fTimeDelta)
-{
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Obstacle));
 	
-	m_pModelCom->Play_Animation(fTimeDelta);
+	if (m_pAABBCom != nullptr) {
+		CGameInstance::Get().Add_Collider(L"Obstacle", m_pAABBCom.get());
+	}
+		
+}
+
+void Obstacle::Update(_float fTimeDelta)
+{
+
+
 
 }
 
-void Monster::Late_Update(_float fTimeDelta)
+void Obstacle::Late_Update(_float fTimeDelta)
 {
 
 }
 
-HRESULT Monster::Render()
+HRESULT Obstacle::Render()
 {
-	
+
 	IMGUITEST();
 
 	_float4x4 View, Proj;
-	CGameInstance::Get().Get_MainCameraMatrix(View,Proj);
+	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
 	_float4x4 World = m_pTransformCom->GetWorldMatrix();
 
@@ -81,7 +87,7 @@ HRESULT Monster::Render()
 		return E_FAIL;
 
 
-	
+
 	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (uint32_t i = 0; i < iNumMeshes; i++)
@@ -104,7 +110,7 @@ HRESULT Monster::Render()
 	return S_OK;
 }
 
-HRESULT Monster::Ready_Components()
+HRESULT Obstacle::Ready_Components()
 {
 	__super::Clear_Compnent();
 
@@ -114,43 +120,35 @@ HRESULT Monster::Ready_Components()
 	m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), m_ModelComponentName));
 	if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
 		return E_FAIL;
-	
 
-	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Shader_Vtx_AnimFbx")));
+
+	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Shader_Vtx_FBX_Tex")));
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
-	
 
-	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_OBB_Collider")));
-	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pAABBCom)))
-		return E_FAIL;
-	
-
-
-	
-
-	return S_OK;
-}
-
-HRESULT Monster::Set_Model(wstring m_strPrototypeBaseName) {
-	//Object_INFO.m_strPrototypeBaseName = m_strPrototypeBaseName;
-	//m_ModelComponentName = TEXT("Prototype_Com_Model_") + Object_INFO.m_strPrototypeBaseName;
+	if (Object_INFO.m_bCollider) {
+		m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_OBB_Collider")));
+		if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pAABBCom)))
+			return E_FAIL;
+	}
 
 
-	//m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), m_ModelComponentName));
-	//if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
-	//	return E_FAIL;
+
+
+
+
 
 	return S_OK;
 }
 
-unique_ptr<Monster> Monster::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
+
+unique_ptr<Obstacle> Obstacle::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
-	auto	pInstance = unique_ptr<Monster>(new Monster(pDevice, pContext));
+	auto	pInstance = unique_ptr<Obstacle>(new Obstacle(pDevice, pContext));
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : Monster");
+		MSG_BOX("Failed to Created : Obstacle");
 		return nullptr;
 	}
 
@@ -158,21 +156,21 @@ unique_ptr<Monster> Monster::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11D
 }
 
 
-shared_ptr<Prototype> Monster::Clone(void* pArg)
+shared_ptr<Prototype> Obstacle::Clone(void* pArg)
 {
-	auto	pInstance = shared_ptr<GameObject>(new Monster(*this));
+	auto	pInstance = shared_ptr<GameObject>(new Obstacle(*this));
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : Monster");
+		MSG_BOX("Failed to Cloned : Obstacle");
 		return nullptr;
 	}
 
 	return pInstance;
 }
-void Monster::IMGUITEST()
+void Obstacle::IMGUITEST()
 {
-	if (CGameInstance::Get().GetSelectObject() != this || m_pModelCom== nullptr) {
+	if (CGameInstance::Get().GetSelectObject() != this || m_pModelCom == nullptr) {
 		return;
 	}
 

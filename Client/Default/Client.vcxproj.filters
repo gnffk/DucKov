@@ -46,6 +46,9 @@
     <Filter Include="02. GameObject\Sky">
       <UniqueIdentifier>{c75a1e24-05de-4faa-845c-00c9b789d83e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Obstacle">
+      <UniqueIdentifier>{2bc654f8-06d3-45fe-9641-8a0c1b12d4b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -96,6 +99,9 @@
     <ClInclude Include="..\Public\Sky.h">
       <Filter>02. GameObject\Sky</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Obstacle.h">
+      <Filter>02. GameObject\Obstacle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -143,6 +149,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MapEditor.cpp">
       <Filter>01. Levels\MapEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Obstacle.cpp">
+      <Filter>02. GameObject\Obstacle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

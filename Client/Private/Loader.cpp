@@ -6,6 +6,7 @@
 #include "OBB_Collider.h"
 #include "Terrain.h"
 #include "Sky.h"
+#include "Obstacle.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -151,7 +152,21 @@ HRESULT CLoader::Loading_For_MapEditor()
 		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"MONSTER_DUCK2", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Fiona/SK_Fiona.bin", PreTransformMatrix))))
 		return E_FAIL;
 
+	_matrix HomeTransformMatrix =
+		XMMatrixScaling(0.001f, 0.001f, 0.001f) *
+		XMMatrixTranslation(0.f, 0.f, -6.5f);
+	// static Mesh
+   	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Model_SM_MeshV2"),
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_MeshV2/SM_MeshV2.bin", HomeTransformMatrix))))
+		return E_FAIL;
 
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Model_SM_Indoors_Study_Shelf_04"),
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_Indoors_Study_Shelf_04/SM_Indoors_Study_Shelf_04.bin", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Model_SM_ForkLift"),
+		Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_ForkLift/SM_ForkLift.bin", PreTransformMatrix))))
+		return E_FAIL;
 #pragma endregion
 
 
@@ -201,6 +216,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Sky"),
 		Sky::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_GameObject_Obstacle"),
+		Obstacle::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 #pragma endregion
 

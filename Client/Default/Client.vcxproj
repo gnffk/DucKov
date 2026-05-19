@@ -158,6 +158,7 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MapEditor.h" />
+    <ClInclude Include="..\Public\Obstacle.h" />
     <ClInclude Include="..\Public\PerspectiveCamera.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Sky.h" />
@@ -175,6 +176,7 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MapEditor.cpp" />
+    <ClCompile Include="..\Private\Obstacle.cpp" />
     <ClCompile Include="..\Private\PerspectiveCamera.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />

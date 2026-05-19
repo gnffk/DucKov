@@ -23,7 +23,7 @@ public:
 
 
 public:
-	virtual HRESULT Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex) ;
+	virtual HRESULT Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex, _fmatrix PreTransformMatrix) ;
 	virtual HRESULT Initialize(shared_ptr<vector<VTXANIMMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex,
 		uint32_t m_iNumBones, vector<uint32_t>	BoneIndices, vector<_float4x4>	BoneMatrices, vector<_float4x4>	OffsetMatrices) ;
 	
@@ -31,7 +31,7 @@ public:
 	HRESULT Bind_BoneMatrices(const vector<shared_ptr<class Bone>>& Bones, shared_ptr<class Shader> pShader, const _char* pConstantName);
 public:
 	static unique_ptr<Mesh> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 
-		shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex);
+		shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex, _fmatrix PreTransformMatrix);
 
 
 	static unique_ptr<Mesh> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, 

@@ -16,7 +16,7 @@ Mesh::~Mesh()
 
 
 
-HRESULT Mesh::Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex)
+HRESULT Mesh::Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices, uint32_t materialIndex, _fmatrix PreTransformMatrix)
 {
 	vertices = pvertices;
 	indices = pindices;
@@ -32,6 +32,14 @@ HRESULT Mesh::Initialize(shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vecto
 	m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 
+	for (size_t i = 0; i < m_iNumVertices; i++)
+	{
+
+		XMStoreFloat3(&(*vertices)[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&(*vertices)[i].vPosition), PreTransformMatrix));
+
+		XMStoreFloat3(&(*vertices)[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&(*vertices)[i].vNormal), PreTransformMatrix));
+
+	}
 
 
 
@@ -153,11 +161,11 @@ HRESULT Mesh::Bind_BoneMatrices(const vector<shared_ptr<Bone>>& Bones, shared_pt
 	return S_OK;
 }
 
-unique_ptr<Mesh> Mesh::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices,uint32_t materialIndex)
+unique_ptr<Mesh> Mesh::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, shared_ptr<vector<VTXMESH>> pvertices, shared_ptr<vector<uint32_t>> pindices,uint32_t materialIndex, _fmatrix PreTransformMatrix)
 {
     auto		pInstance = unique_ptr<Mesh>(new Mesh(pDevice, pContext));
 
-    if (FAILED(pInstance->Initialize(pvertices, pindices, materialIndex)))
+    if (FAILED(pInstance->Initialize(pvertices, pindices, materialIndex, PreTransformMatrix)))
     {
         MSG_BOX("Failed to Created : Mesh");
         return nullptr;

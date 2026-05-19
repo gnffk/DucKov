@@ -34,6 +34,10 @@ void Importer::LoadFolder(const char* ModelFilePath, MODEL modelType)
             else if (modelName.rfind("SK_", 0) == 0) {
                 basePath += "Skeleton/";
             }
+            else if (modelName.rfind("SM_", 0) == 0) {
+                basePath += "StaticMesh/";
+            }
+
             else
             {
                 basePath += "Bin/";

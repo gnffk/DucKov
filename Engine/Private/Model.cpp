@@ -24,18 +24,22 @@ Model::Model(const Model& Prototype)
     , m_eModelType{ Prototype.m_eModelType }
     , m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
 {
-    m_Bones.reserve(Prototype.m_iBoneCount);
+   // enum class MODELTYPE { NONANIM, ANIM, END };
+    if (Prototype.m_eModelType == 1) {
+        m_Bones.reserve(Prototype.m_iBoneCount);
 
-    for (auto& pPrototypeBone : Prototype.m_Bones)
-    {
-        m_Bones.emplace_back(pPrototypeBone->Clone());
-    }
+        for (auto& pPrototypeBone : Prototype.m_Bones)
+        {
+            m_Bones.emplace_back(pPrototypeBone->Clone());
+        }
 
-    m_Animations.reserve(Prototype.m_iNumAnimations);
-    for (auto& pPrototypeAnim : Prototype.m_Animations)
-    {
-        m_Animations.emplace_back(pPrototypeAnim->Clone());
+        m_Animations.reserve(Prototype.m_iNumAnimations);
+        for (auto& pPrototypeAnim : Prototype.m_Animations)
+        {
+            m_Animations.emplace_back(pPrototypeAnim->Clone());
+        }
     }
+   
 
 
 }
@@ -293,7 +297,7 @@ HRESULT Model::Ready_NonAnimMesh(ifstream& _file, const char* modelFileName)
         _file.read((char*)vertexes->data(), sizeof(VTXMESH) * vCount);
         _file.read((char*)indices->data(), sizeof(uint32_t) * iCount);
 
-        m_Meshes.emplace_back(Mesh::Create(m_pDevice, m_pContext, vertexes, indices, materialIndex));
+        m_Meshes.emplace_back(Mesh::Create(m_pDevice, m_pContext, vertexes, indices, materialIndex, XMLoadFloat4x4(&m_PreTransformMatrix)));
     }
 
     return S_OK;

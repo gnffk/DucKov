@@ -27,6 +27,7 @@ public:
 	wstring StringToWString(const string& str);
 private:
 	map<string, nlohmann::json> m_mapJsonFiles;
+
 	vector<string> m_MapNames;
 
 private:
