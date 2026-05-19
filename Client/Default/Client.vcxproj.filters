@@ -129,9 +129,6 @@
     <ClCompile Include="..\Private\Level_Logo.cpp">
       <Filter>01. Levels\Logo</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MapEditor.cpp">
-      <Filter>01. Levels\MapEditor</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>02. GameObject\Monster</Filter>
     </ClCompile>
@@ -143,6 +140,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Sky.cpp">
       <Filter>02. GameObject\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapEditor.cpp">
+      <Filter>01. Levels\MapEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

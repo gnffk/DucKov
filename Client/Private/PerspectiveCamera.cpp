@@ -63,6 +63,7 @@ HRESULT PerspectiveCamera::Render()
 
 HRESULT PerspectiveCamera::Ready_Components()
 {
+	__super::Clear_Compnent();
 
 	return S_OK;
 }

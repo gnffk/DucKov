@@ -70,6 +70,13 @@ HRESULT GameObject::Render()
     return S_OK;
 }
 
+map<const _wstring, shared_ptr<class Component>>& GameObject::GetComponents()
+{
+
+
+    return m_Components;
+}
+
 HRESULT GameObject::Add_Component(const _wstring& strComponentTag, shared_ptr<Component> pComponent)
 {
     if (nullptr != Find_Component(strComponentTag))
@@ -79,6 +86,13 @@ HRESULT GameObject::Add_Component(const _wstring& strComponentTag, shared_ptr<Co
 
     return S_OK;
 }
+
+HRESULT GameObject::Clear_Compnent()
+{
+    m_Components.clear();
+    return S_OK;
+}
+
 
 shared_ptr<class Component> GameObject::Find_Component(const _wstring& strComponentTag)
 {

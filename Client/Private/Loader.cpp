@@ -105,7 +105,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 			return E_FAIL;
 
-
+		
 
 #pragma endregion
 

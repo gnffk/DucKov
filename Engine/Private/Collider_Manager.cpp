@@ -122,8 +122,12 @@ void Collider_Manager::MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_
         float minDist = FLT_MAX;
         for (auto gameObject : gameObjects) {
             auto& Components = gameObject->GetComponents();
-            if ((Components)[L"Com_Model"] != nullptr) {
-                for (auto& Mesh : dynamic_pointer_cast<Model>((Components)[L"Com_Model"])->GetMeshes()) {
+            auto iter = Components.find(L"Com_Model");
+
+            if (iter != Components.end() && iter->second != nullptr)
+            {
+                auto model = dynamic_pointer_cast<Model>(iter->second);
+                for (auto& Mesh : model->GetMeshes()) {
                     auto& Meshnondata = Mesh->GetNonAnimMesh();
                     auto& Meshanimdata = Mesh->GetAnimMesh();
                     auto& indices = Mesh->GetIndices();

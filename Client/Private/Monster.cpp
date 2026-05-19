@@ -50,9 +50,7 @@ void Monster::Priority_Update(_float fTimeDelta)
 
 void Monster::Update(_float fTimeDelta)
 {
-	if (m_pModelCom == nullptr) {
-		return ;
-	}
+	
 	m_pModelCom->Play_Animation(fTimeDelta);
 
 }
@@ -83,9 +81,7 @@ HRESULT Monster::Render()
 		return E_FAIL;
 
 
-	if (m_pModelCom == nullptr) {
-		return S_OK;
-	}
+	
 	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (uint32_t i = 0; i < iNumMeshes; i++)
@@ -110,16 +106,14 @@ HRESULT Monster::Render()
 
 HRESULT Monster::Ready_Components()
 {
-	
-	// Prototype_Com_Model_SK_Monster_Palicus
-	if (Object_INFO.m_strPrototypeBaseName.size() != 0) {
-		m_ModelComponentName = TEXT("Prototype_Com_Model_") + Object_INFO.m_strPrototypeBaseName;
+	__super::Clear_Compnent();
+
+	m_ModelComponentName = TEXT("Prototype_Com_Model_") + Object_INFO.m_strPrototypeBaseName;
 
 
-		m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), m_ModelComponentName));
-		if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
-			return E_FAIL;
-	}
+	m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), m_ModelComponentName));
+	if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
+		return E_FAIL;
 	
 
 	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Com_Shader_Vtx_AnimFbx")));
@@ -139,13 +133,13 @@ HRESULT Monster::Ready_Components()
 }
 
 HRESULT Monster::Set_Model(wstring m_strPrototypeBaseName) {
-	Object_INFO.m_strPrototypeBaseName = m_strPrototypeBaseName;
-	m_ModelComponentName = TEXT("Prototype_Com_Model_") + Object_INFO.m_strPrototypeBaseName;
+	//Object_INFO.m_strPrototypeBaseName = m_strPrototypeBaseName;
+	//m_ModelComponentName = TEXT("Prototype_Com_Model_") + Object_INFO.m_strPrototypeBaseName;
 
 
-	m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), m_ModelComponentName));
-	if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
-		return E_FAIL;
+	//m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), m_ModelComponentName));
+	//if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
+	//	return E_FAIL;
 
 	return S_OK;
 }

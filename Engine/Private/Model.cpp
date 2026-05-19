@@ -71,7 +71,7 @@ HRESULT Model::Initialize(void* pArg)
 
 unique_ptr<Model> Model::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, uint32_t iLevelIndex, wstring modelName, uint32_t modeltype, const char* modelFileName, _fmatrix PreTransformMatrix)
 {
-    auto		pInstance = unique_ptr<Model>(new Model(pDevice, pContext));
+     auto		pInstance = unique_ptr<Model>(new Model(pDevice, pContext));
 
     if (FAILED(pInstance->Initialize_Prototype(iLevelIndex, modelName, modeltype, modelFileName, PreTransformMatrix)))
     {

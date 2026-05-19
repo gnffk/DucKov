@@ -36,7 +36,7 @@ public:
 public:
 	Transform* GetTransform() { return m_pTransformCom.get(); }
 	GAMEOBJECT_DESC& GetObjectINFO() { return Object_INFO; }
-	map<const _wstring, shared_ptr<class Component>>& GetComponents() { return m_Components;}
+	map<const _wstring, shared_ptr<class Component>>& GetComponents();
 
 
 protected:
@@ -57,6 +57,8 @@ protected:
 
 protected:
 	HRESULT Add_Component(const _wstring& strComponentTag, shared_ptr<Component> pComponent);
+
+	HRESULT Clear_Compnent();
 
 	template<typename T>
 	HRESULT Add_Component(uint32_t iPrototypeLevelIndex, const _wstring& strPrototypeTag,

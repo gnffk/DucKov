@@ -83,6 +83,8 @@ HRESULT Terrain::Render()
 
 HRESULT Terrain::Ready_Components()
 {
+	__super::Clear_Compnent();
+
 	m_pVIBufferCom = dynamic_pointer_cast<VIBuffer_Terrain>(CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_VIBuffer_Terrain")));
 	if (FAILED(__super::Add_Component(TEXT("Com_VIBuffer"), m_pVIBufferCom)))
 		return E_FAIL;

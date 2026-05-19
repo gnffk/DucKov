@@ -260,6 +260,8 @@ void MapEditor::IMGUI_Level_Render()
                         std::string compName =
                             WStringToString(component.first);
 
+                        OutputDebugStringA(
+                            ("[" + compName + "]\n").c_str());
                         ImGui::BulletText(
                             "%s",
                             compName.c_str());
@@ -744,145 +746,6 @@ void MapEditor::MousePicking()
         CGameInstance::Get().MousePicking(rayOrigin, rayDir, ETOUI(LEVEL::MAPEDITOR));
 
 
-        /*
-		for (auto& CollderGruops : CGameInstance::Get().GetAllCollders())
-		{
-			auto& vec = CollderGruops.second;
-
-			for (auto collider : vec)
-			{
-				float dist;
-				if (collider->Intersect(rayOrigin, rayDir, dist))
-				{
-					if (dist < minDist)
-					{
-						minDist = dist;
-
-						if (CGameInstance::Get().Mouse_Up(MOUSEKEYSTATE::DIM_LB)) {
-							CGameInstance::Get().SetSeletObject(nullptr);
-							break;
-						}
-
-						if (CGameInstance::Get().GetSelectObject() != collider->GetOwner()) {
-
-							CGameInstance::Get().SetSeletObject(collider->GetOwner());
-						}
-						else if (CGameInstance::Get().GetSelectObject() == collider->GetOwner()) {
-						
-
-						}
-					
-						break;
-					}
-					
-
-				}
-				
-			}
-		}
-        */
-        /*
-        for (auto& Layer : CGameInstance::Get().Find_Layer_Lists(ETOUI(LEVEL::MAPEDITOR))) {
-            auto& gameObjects =
-                Layer.second->Get_GameObjects();
-
-            for (auto gameObject : gameObjects) {
-                auto& Components = gameObject->GetComponents();
-                if ((Components)[L"Com_Model"] != nullptr) {
-                    for (auto& Mesh : dynamic_pointer_cast<Model>((Components)[L"Com_Model"])->GetMeshes()) {
-                        auto& Meshnondata = Mesh->GetNonAnimMesh();
-                        auto& Meshanimdata = Mesh->GetAnimMesh();
-                        auto& indices = Mesh->GetIndices();
-                        if (Meshnondata->size() != 0) {
-                            for (size_t i = 0; i < indices->size(); i += 3)
-                            {
-                                XMVECTOR v0 =
-                                    XMLoadFloat3(
-                                        &(*Meshnondata)[(*indices)[i]].vPosition);
-
-                                XMVECTOR v1 =
-                                    XMLoadFloat3(
-                                        &(*Meshnondata)[(*indices)[i + 1]].vPosition);
-
-                                XMVECTOR v2 =
-                                    XMLoadFloat3(
-                                        &(*Meshnondata)[(*indices)[i + 2]].vPosition);
-
-                                _float4x4 matWord;
-                           
-                                CGameInstance::Get().GetWorldMatrix(matWord);
-                                v0 = XMVector3TransformCoord(v0, XMLoadFloat4x4(&matWord));
-                                v1 = XMVector3TransformCoord(v1, XMLoadFloat4x4(&matWord));
-                                v2 = XMVector3TransformCoord(v2, XMLoadFloat4x4(&matWord));
-
-                                float dist = 1000.f;
-
-                                if (TriangleTests::Intersects(
-                                    rayOrigin,
-                                    rayDir,
-                                    v0,
-                                    v1,
-                                    v2,
-                                    dist))
-                                {
-                                    if (dist < minDist)
-                                    {
-                                        minDist = dist;
-
-                                        CGameInstance::Get().SetSeletObject(gameObject.get());
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            for (size_t i = 0; i < indices->size(); i += 3)
-                            {
-                                XMVECTOR v0 =
-                                    XMLoadFloat3(
-                                        &(*Meshanimdata)[(*indices)[i]].vPosition);
-
-                                XMVECTOR v1 =
-                                    XMLoadFloat3(
-                                        &(*Meshanimdata)[(*indices)[i + 1]].vPosition);
-
-                                XMVECTOR v2 =
-                                    XMLoadFloat3(
-                                        &(*Meshanimdata)[(*indices)[i + 2]].vPosition);
-
-                                _float4x4 matWord;
-
-                                CGameInstance::Get().GetWorldMatrix(matWord);
-                                v0 = XMVector3TransformCoord(v0, XMLoadFloat4x4(&matWord));
-                                v1 = XMVector3TransformCoord(v1, XMLoadFloat4x4(&matWord));
-                                v2 = XMVector3TransformCoord(v2, XMLoadFloat4x4(&matWord));
-
-                                float dist = 1000.f;
-
-                                if (TriangleTests::Intersects(
-                                    rayOrigin,
-                                    rayDir,
-                                    v0,
-                                    v1,
-                                    v2,
-                                    dist))
-                                {
-                                    if (dist < minDist)
-                                    {
-                                        minDist = dist;
-
-                                        CGameInstance::Get().SetSeletObject(gameObject.get());
-                                    }
-                                }
-                            }
-                        }
-
-                
-                   }
-                }
-             
-            }
-        }
-        */
 	}
 	
 }
