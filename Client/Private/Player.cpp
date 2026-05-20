@@ -59,49 +59,35 @@ void Player::Priority_Update(_float fTimeDelta)
 
 void Player::Update(_float fTimeDelta)
 {
+	
 	MouseLook( fTimeDelta);
 	m_iState = PLAYER_STATE::IDLE;
 
-	// =====================================================
-	// 회전
-	// =====================================================
 
-	if (CGameInstance::Get().Key_Pressing(DIK_LEFT))
+
+	if (CGameInstance::Get().Key_Pressing(DIK_A))
 	{
-		m_pTransformCom->Turn(
-			XMVectorSet(0.f, 1.f, 0.f, 0.f),
-			fTimeDelta * -1.f);
+		m_pTransformCom->Go_Left(fTimeDelta);
 	}
 
-	if (CGameInstance::Get().Key_Pressing(DIK_RIGHT))
+	else if (CGameInstance::Get().Key_Pressing(DIK_D))
 	{
-		m_pTransformCom->Turn(
-			XMVectorSet(0.f, 1.f, 0.f, 0.f),
-			fTimeDelta);
+		m_pTransformCom->Go_Right(fTimeDelta);
 	}
 
-	// =====================================================
-	// 전진
-	// =====================================================
-
-	if (CGameInstance::Get().Key_Pressing(DIK_UP))
+	else if (CGameInstance::Get().Key_Pressing(DIK_W))
 	{
 		m_pTransformCom->Go_Straight(fTimeDelta);
 
 		m_iState = PLAYER_STATE::WALK;
 	}
 
-	// =====================================================
-	// 후진
-	// =====================================================
-
-	if (CGameInstance::Get().Key_Pressing(DIK_DOWN))
+	else if (CGameInstance::Get().Key_Pressing(DIK_S))
 	{
 		m_pTransformCom->Go_Backward(fTimeDelta);
 
 		m_iState = PLAYER_STATE::WALK;
 	}
-
 
 	else
 	{

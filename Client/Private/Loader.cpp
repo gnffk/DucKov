@@ -161,18 +161,58 @@ HRESULT CLoader::Loading_For_MapEditor()
 	_matrix HomeTransformMatrix =
 		XMMatrixScaling(0.001f, 0.001f, 0.001f) *
 		XMMatrixTranslation(0.f, 0.f, -6.5f);
-   	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_MeshV2"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_MeshV2/SM_MeshV2.bin", HomeTransformMatrix))))
-		return E_FAIL;
+  // 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_MeshV2"),
+		//Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_MeshV2/SM_MeshV2.bin", HomeTransformMatrix))))
+		//return E_FAIL;
 
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_Indoors_Study_Shelf_04"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_Indoors_Study_Shelf_04/SM_Indoors_Study_Shelf_04.bin", PreTransformMatrix))))
-		return E_FAIL;
 
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_ForkLift"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_ForkLift/SM_ForkLift.bin", PreTransformMatrix))))
-		return E_FAIL;
 
+	namespace fs = std::filesystem;
+
+	const fs::path basePath = "../../Resources/Model/StaticMesh/";
+
+	for (const auto& dirEntry : fs::directory_iterator(basePath))
+	{
+		if (!dirEntry.is_directory())
+			continue;
+
+		const fs::path folderPath = dirEntry.path();
+
+		// 폴더 이름
+		std::wstring folderName = folderPath.filename().wstring();
+
+		// bin 파일 경로 자동 생성
+		fs::path binPath = folderPath / (folderName + L".bin");
+
+		if (!fs::exists(binPath))
+			continue;
+
+		// Prototype 이름 자동 생성
+		std::wstring prototypeTag =
+			L"Prototype_Com_Model_" + folderName;
+
+		// Home만 다른 Transform 사용
+		_matrix transformMatrix =
+			(folderName == L"SM_MeshV2")
+			? HomeTransformMatrix
+			: PreTransformMatrix;
+
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),prototypeTag.c_str(),Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(),folderName.c_str(),ETOUI(MODELTYPE::NONANIM),binPath.string().c_str(),transformMatrix))))
+		{
+			return E_FAIL;
+		}
+	}
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_Indoors_Study_Shelf_04"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"SM_Indoors_Study_Shelf_04", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_Indoors_Study_Shelf_04/SM_Indoors_Study_Shelf_04.bin", PreTransformMatrix))))
+	//	return E_FAIL;
+
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_ForkLift"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"SM_ForkLift", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_ForkLift/SM_ForkLift.bin", PreTransformMatrix))))
+	//	return E_FAIL;
+
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_WashStand"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"SM_WashStand", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_WashStand/SM_WashStand.bin", PreTransformMatrix))))
+	//	return E_FAIL;
 
 
 
