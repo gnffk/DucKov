@@ -61,6 +61,7 @@ public:
 	void LookAt(_fvector vAt);
 	void Chase(_fvector vGoal, _float fTimeDelta, _float fLimit = 0.f);
 
+	void Move(_fvector vDir, _float fTimeDelta);
 
 private:
 	_float			m_fSpeedPerSec = {};
@@ -69,6 +70,7 @@ private:
 	_float4x4		m_WorldMatrix = {};
 
 public:
+
 	static shared_ptr<Transform> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
 
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;

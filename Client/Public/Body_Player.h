@@ -43,7 +43,7 @@ private:
 
 private:
 	const uint32_t* m_pParentState = { nullptr };
-
+	uint32_t nextAnim = 0;
 private:
 	HRESULT Ready_Components();
 

@@ -154,6 +154,8 @@
     <ClInclude Include="..\Public\Body_Player.h" />
     <ClInclude Include="..\Public\CMainGame.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Player_Idle_State.h" />
+    <ClInclude Include="..\Public\Player_FSM.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -164,6 +166,7 @@
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerCamera.h" />
+    <ClInclude Include="..\Public\Player_Walk_State.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="Client.h" />
@@ -175,6 +178,8 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Body_Player.cpp" />
     <ClCompile Include="..\Private\CMainGame.cpp" />
+    <ClCompile Include="..\Private\Player_Idle_State.cpp" />
+    <ClCompile Include="..\Private\Player_FSM.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
@@ -185,6 +190,7 @@
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerCamera.cpp" />
+    <ClCompile Include="..\Private\Player_Walk_State.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="Client.cpp" />

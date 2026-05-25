@@ -5,6 +5,7 @@
 #include "BaseCollider.h"
 #include "OBB_Collider.h"
 #include "AABB_Collider.h"
+#include "Player_FSM.h"
 #include "GameInstance.h"
 
 Player::Player(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
@@ -29,7 +30,6 @@ HRESULT Player::Initialize_Prototype()
 HRESULT Player::Initialize(void* pArg)
 {
 
-	
 	GameObject::GAMEOBJECT_DESC desPlayer{};
 	desPlayer.ObjectType = ETOUI(OBJECTTYPE::OBJECT_PLAYER);
 	desPlayer.m_strName = L"Player";
@@ -37,7 +37,7 @@ HRESULT Player::Initialize(void* pArg)
 	desPlayer.m_strPrototypeObjectName = L"Prototype_GameObject_Player";
 	desPlayer.m_strPrototypeBaseName = L"SK_Player";
 	desPlayer.pCameraType = ETOUI(CAMERA::NONE);
-	desPlayer.fSpeedPerSec = 10.f;
+	desPlayer.fSpeedPerSec = 5.f;
 	desPlayer.fRotationPerSec = 180.f;
 
 	if (FAILED(__super::Initialize(&desPlayer)))
@@ -60,54 +60,62 @@ void Player::Priority_Update(_float fTimeDelta)
 	__super::Priority_Update(fTimeDelta);
 	
 	CGameInstance::Get().Add_Collider(L"Player", m_pCollider.get());
+	
+	m_pPlayerFSM->Priority_Update(fTimeDelta);
+
 }
 
 void Player::Update(_float fTimeDelta)
 {
 	
 	MouseLook( fTimeDelta);
-	m_iState = PLAYER_STATE::IDLE;
 
-
+	_vector vMoveDir = XMVectorZero();
 
 	if (CGameInstance::Get().Key_Pressing(DIK_A))
 	{
-		m_pTransformCom->Go_Left(fTimeDelta);
+		vMoveDir += XMVectorSet(-1.f, 0.f, -1.f, 0.f);
 	}
 
-	else if (CGameInstance::Get().Key_Pressing(DIK_D))
+	if (CGameInstance::Get().Key_Pressing(DIK_D))
 	{
-		m_pTransformCom->Go_Right(fTimeDelta);
+		vMoveDir += XMVectorSet(1.f, 0.f, 0.f, 0.f);
 	}
 
-	else if (CGameInstance::Get().Key_Pressing(DIK_W))
+	if (CGameInstance::Get().Key_Pressing(DIK_W))
 	{
-		m_pTransformCom->Go_Straight(fTimeDelta);
-
-		m_iState = PLAYER_STATE::WALK;
+		vMoveDir += XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	}
 
-	else if (CGameInstance::Get().Key_Pressing(DIK_S))
+	if (CGameInstance::Get().Key_Pressing(DIK_S))
 	{
-		m_pTransformCom->Go_Backward(fTimeDelta);
-
-		m_iState = PLAYER_STATE::WALK;
+		vMoveDir += XMVectorSet(0.f, 0.f, -1.f, 0.f);
 	}
 
+	if (!XMVector3Equal(vMoveDir, XMVectorZero()))
+	{
+		m_pTransformCom->Move(vMoveDir, fTimeDelta);
+
+		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)
+			->Change_State(Player_FSM::WALK);
+	}
 	else
 	{
-		if (m_iState & PLAYER_STATE::RUN)
-			m_iState ^= PLAYER_STATE::RUN;
-
-		m_iState |= PLAYER_STATE::IDLE;
+		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)
+			->Change_State(Player_FSM::IDLE);
 	}
 	__super::Update(fTimeDelta);
+
+
+
+	m_pPlayerFSM->Update(fTimeDelta);
 }
 
 void Player::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 	Collider_Obstacle(fTimeDelta);
+	m_pPlayerFSM->Late_Update(fTimeDelta);
 }
 
 void Player::MouseLook(_float fTimeDelta) {
@@ -196,19 +204,26 @@ HRESULT Player::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pCollider)))
 		return E_FAIL;
 
+
 	return S_OK;
 }
 
 HRESULT Player::Ready_PartObjects()
 {
 
+	// FSM---------------------------------------------------------------------------
 
+
+	if ((m_pPlayerFSM = Player_FSM::Create(&m_iState)) == nullptr) {
+		return E_FAIL;
+	}
 
 	Body_Player::BODY_PLAYER_DESC		BodyDesc{};
 	BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-	BodyDesc.pParentState = &m_iState;
+
 	BodyDesc.ObjectType = ETOUI(OBJECTTYPE::OBEJCT_PART);
 	BodyDesc.m_strName =L"ObjectPart";
+	BodyDesc.pParentState = &m_iState;
 	BodyDesc.m_strPrototypeObjectName = L"Prototype_GameObject_Body_Player";
 	BodyDesc.m_strPrototypeBaseName =L"SK_Player";
 	BodyDesc.pCameraType = ETOUI(CAMERA::NONE);
@@ -227,6 +242,11 @@ HRESULT Player::Ready_PartObjects()
 	if (FAILED(__super::Add_PartObject(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Weapon"),
 		TEXT("Part_Weapon"), &WeaponDesc)))
 		return E_FAIL;*/
+
+
+
+
+
 
 	return S_OK;
 }

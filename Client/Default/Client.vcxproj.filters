@@ -61,6 +61,18 @@
     <Filter Include="02. GameObject\Camera\PlayerCamera">
       <UniqueIdentifier>{ef8f8d6e-c460-496f-a850-af834518e4c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\FSM">
+      <UniqueIdentifier>{48ad9106-6844-468a-8e07-b50975a1232c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State">
+      <UniqueIdentifier>{8075fe52-f3b4-4d74-9f4c-bf2223550c0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\IDLE">
+      <UniqueIdentifier>{aed7f89d-248e-480c-8446-f112f8193c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\WALK">
+      <UniqueIdentifier>{389be3d1-df14-4fb8-89e6-785b1bd75e3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -123,6 +135,15 @@
     <ClInclude Include="..\Public\PlayerCamera.h">
       <Filter>02. GameObject\Camera\PlayerCamera</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player_FSM.h">
+      <Filter>02. GameObject\Player\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_Idle_State.h">
+      <Filter>02. GameObject\Player\State\IDLE</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_Walk_State.h">
+      <Filter>02. GameObject\Player\State\WALK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -182,6 +203,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerCamera.cpp">
       <Filter>02. GameObject\Camera\PlayerCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_FSM.cpp">
+      <Filter>02. GameObject\Player\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_Idle_State.cpp">
+      <Filter>02. GameObject\Player\State\IDLE</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_Walk_State.cpp">
+      <Filter>02. GameObject\Player\State\WALK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

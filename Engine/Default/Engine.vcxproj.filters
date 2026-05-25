@@ -133,6 +133,9 @@
     <Filter Include="05.GameObject\ContainerObject\PartObject">
       <UniqueIdentifier>{dd58cd3e-81f4-46eb-a503-69e6f116c27a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="10. FSM">
+      <UniqueIdentifier>{8fe1a21d-a0e8-4fb4-9026-3ab3081dc800}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -288,6 +291,9 @@
     <ClCompile Include="..\Private\PartObject.cpp">
       <Filter>05.GameObject\ContainerObject\PartObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\FSM.cpp">
+      <Filter>10. FSM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -424,6 +430,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\PartObject.h">
       <Filter>05.GameObject\ContainerObject\PartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FSM.h">
+      <Filter>10. FSM</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

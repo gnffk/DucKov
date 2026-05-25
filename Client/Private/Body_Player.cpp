@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "OBB_Collider.h"
 #include "GameInstance.h"
+#include "Player_FSM.h"
 
 Body_Player::Body_Player(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: PartObject{ pDevice, pContext }
@@ -51,21 +52,20 @@ void Body_Player::Priority_Update(_float fTimeDelta)
 
 void Body_Player::Update(_float fTimeDelta)
 {
-	uint32_t nextAnim = 0;
 
-	if (*m_pParentState & Player::PLAYER_STATE::IDLE)
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::IDLE)
 		nextAnim = 0;
 
-	if (*m_pParentState & Player::PLAYER_STATE::RUN)
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::RUN)
 		nextAnim = 1;
 
-	if (*m_pParentState & Player::PLAYER_STATE::WALK)
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::WALK)
 		nextAnim = 2;
 
-	if (*m_pParentState & Player::PLAYER_STATE::RIGHT_WALK)
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::RIGHT_WALK)
 		nextAnim = 3;
 
-	if (*m_pParentState & Player::PLAYER_STATE::LEFT_WALK)
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::LEFT_WALK)
 		nextAnim = 4;
 
 	if (m_pModelCom->Get_CurAnimationIndex() != nextAnim)
