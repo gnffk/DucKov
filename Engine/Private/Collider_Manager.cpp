@@ -1,5 +1,8 @@
 #include "Collider_Manager.h"
 #include "BaseCollider.h"
+#include "AABB_Collider.h"
+#include "OBB_Collider.h"
+
 #include "GameInstance.h"
 #include "Layer.h"
 #include "Mesh.h"
@@ -35,12 +38,117 @@ HRESULT Collider_Manager::Initialize(ComPtr<ID3D11Device> p_Device, ComPtr<ID3D1
 
 HRESULT Collider_Manager::Add_Collider(wstring GroupTag, BaseCollider* pCollider)
 {
-    if(FAILED(Find_Collider(GroupTag, pCollider)))
-        return E_FAIL;
+    m_Colliders[GroupTag].emplace_back(pCollider);
+    //if(FAILED(Find_Collider(GroupTag, pCollider)))
+    //    return E_FAIL;
 
 	return S_OK;
 }
 
+_bool Collider_Manager::Intersect(BaseCollider* pCollider, BaseCollider* sCollider)
+{
+    if (pCollider == nullptr || sCollider == nullptr)
+        return false;
+
+
+    // pCollider AABB
+    if (pCollider->Get_Tag() == COLLIDER::COLLIDER_AABB) {
+        auto pAABB = dynamic_cast<AABB_Collider*>(pCollider);
+        switch (sCollider->Get_Tag())
+        {
+            case COLLIDER::COLLIDER_AABB:
+            {
+           
+                auto sAABB =dynamic_cast<AABB_Collider*>(sCollider);
+
+                if (pAABB == nullptr || sAABB == nullptr)
+                    return false;
+
+                if (pAABB->Get_BoudingBox().Intersects(
+                    sAABB->Get_BoudingBox()))
+                {
+                    return true;
+                }
+            }
+            break;
+
+            case COLLIDER::COLLIDER_OBB:
+            {
+                auto sOBB =
+                    dynamic_cast<OBB_Collider*>(sCollider);
+
+                if (pAABB == nullptr || sOBB == nullptr)
+                    return false;
+
+                if (pAABB->Get_BoudingBox().Intersects(
+                    sOBB->Get_BoudingBox()))
+                {
+                    return true;
+                }
+            }
+            break;
+
+            case COLLIDER::COLLIDER_SPHERE:
+            {
+           
+            }
+            break;
+        }
+    }
+    
+
+    // pCollider OBB
+    if (pCollider->Get_Tag() == COLLIDER::COLLIDER_OBB) {
+        auto pOBB = dynamic_cast<OBB_Collider*>(pCollider);
+        switch (sCollider->Get_Tag())
+        {
+        case COLLIDER::COLLIDER_AABB:
+        {
+
+            auto sAABB = dynamic_cast<AABB_Collider*>(sCollider);
+
+            if (pOBB == nullptr || sAABB == nullptr)
+                return false;
+
+            if (pOBB->Get_BoudingBox().Intersects(
+                sAABB->Get_BoudingBox()))
+            {
+                return true;
+            }
+        }
+        break;
+
+        case COLLIDER::COLLIDER_OBB:
+        {
+            auto sOBB =
+                dynamic_cast<OBB_Collider*>(sCollider);
+
+            if (pOBB == nullptr || sOBB == nullptr)
+                return false;
+
+            if (pOBB->Get_BoudingBox().Intersects(sOBB->Get_BoudingBox()))
+            {
+                return true;
+            }
+        }
+        break;
+
+        case COLLIDER::COLLIDER_SPHERE:
+        {
+      
+        }
+        break;
+        }
+    }
+
+
+    // pCollider SPhere
+    if (pCollider->Get_Tag() == COLLIDER::COLLIDER_AABB) {
+      
+    }
+
+    return false;
+}
 HRESULT Collider_Manager::Find_Collider(wstring GroupTag, BaseCollider* pCollider)
 {
     if (pCollider == nullptr)
@@ -60,15 +168,25 @@ HRESULT Collider_Manager::Find_Collider(wstring GroupTag, BaseCollider* pCollide
     if (it != vec.end())
         return E_FAIL; 
 
-    m_Colliders[GroupTag].push_back(pCollider);
+
     return S_OK;
+}
+
+void Collider_Manager::Primitive_Update(float Timedelta)
+{
+
+    for (auto& ColliderGroup : m_Colliders) {
+        for (auto& Collider : ColliderGroup.second) {
+            Collider->SetColliderColor(ColliderColor::GREEN);
+        }
+    }
 }
 
 void Collider_Manager::Update(float Timedelta)
 {
     for (auto& ColliderGroup : m_Colliders) {
         for (auto& Collider : ColliderGroup.second) {
-
+         
             Collider->Update(Timedelta);
         }
     }
@@ -83,6 +201,19 @@ HRESULT Collider_Manager::Clear()
 
 void Collider_Manager::Render() {
 
+    m_pDeviceContext->RSSetState(nullptr);
+
+    m_pDeviceContext->OMSetBlendState(
+        nullptr,
+        nullptr,
+        0xFFFFFFFF);
+
+    m_pDeviceContext->OMSetDepthStencilState(
+        nullptr,
+        0);
+
+    m_pDeviceContext->IASetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
     _float4x4  View, Proj;
     CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
@@ -116,44 +247,136 @@ void Collider_Manager::Render() {
     m_Colliders.clear();
 }
 
-void Collider_Manager::MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_t LevelIndex) {
-    for (auto& Layer : CGameInstance::Get().Find_Layer_Lists(LevelIndex)) {
-        auto& gameObjects = Layer.second->Get_GameObjects();
-        float minDist = FLT_MAX;
-        for (auto gameObject : gameObjects) {
-            auto& Components = gameObject->GetComponents();
-            auto iter = Components.find(L"Com_Model");
-            auto iter2 = Components.find(L"Com_OBBCollider");
-            if (iter != Components.end() && iter->second != nullptr && iter2 != Components.end())
+void Collider_Manager::MousePicking(
+    XMVECTOR rayOrigin,
+    XMVECTOR rayDir,
+    uint32_t LevelIndex)
+{
+    float globalMinDist = FLT_MAX;
+    GameObject* pickedObject = nullptr;
+
+    auto& layers =
+        CGameInstance::Get().Find_Layer_Lists(LevelIndex);
+
+    for (auto& layer : layers)
+    {
+        auto& gameObjects =
+            layer.second->Get_GameObjects();
+
+        for (auto& gameObject : gameObjects)
+        {
+            auto& components =
+                gameObject->GetComponents();
+
+            // =====================================================
+            // Broad Phase
+            // =====================================================
+
+            bool broadHit = false;
+
+            auto aabbIter = components.find(L"Com_AABBCollider");
+
+            if (aabbIter != components.end() &&aabbIter->second != nullptr)
             {
-                auto model = dynamic_pointer_cast<Model>(iter->second);
-                for (auto& Mesh : model->GetMeshes()) {
-                    auto& Meshnondata = Mesh->GetNonAnimMesh();
-                    auto& Meshanimdata = Mesh->GetAnimMesh();
-                    auto& indices = Mesh->GetIndices();
-                    if (Meshnondata != nullptr) {
+                auto collider =
+                    dynamic_pointer_cast<AABB_Collider>(aabbIter->second);
+
+                float dist = 0.f;
+
+                if (collider &&
+                    collider->Intersect(rayOrigin, rayDir, dist))
+                {
+                    broadHit = true;
+                }
+            }
+
+            auto obbIter =
+                components.find(L"Com_OBBCollider");
+
+            if (!broadHit &&
+                obbIter != components.end() &&
+                obbIter->second != nullptr)
+            {
+                auto collider =
+                    dynamic_pointer_cast<OBB_Collider>(obbIter->second);
+
+                float dist = 0.f;
+
+                if (collider &&
+                    collider->Intersect(rayOrigin, rayDir, dist))
+                {
+                    broadHit = true;
+                }
+            }
+
+            auto sphereIter =
+                components.find(L"Com_SphereCollider");
+
+ /*           if (!broadHit &&
+                sphereIter != components.end() &&
+                sphereIter->second != nullptr)
+            {
+                auto collider =
+                    dynamic_pointer_cast<SphereCollider>(sphereIter->second);
+
+                if (collider &&
+                    collider->Intersects(rayOrigin, rayDir))
+                {
+                    broadHit = true;
+                }
+            }*/
+
+            if (!broadHit)
+                continue;
+
+            // =====================================================
+            // Narrow Phase
+            // =====================================================
+
+            auto modelIter =
+                components.find(L"Com_Model");
+
+            if (modelIter == components.end() ||
+                modelIter->second == nullptr)
+                continue;
+
+            auto model =
+                dynamic_pointer_cast<Model>(modelIter->second);
+
+            if (!model)
+                continue;
+
+            _float4x4 worldMatrix =
+                gameObject->GetTransform()->GetWorldMatrix();
+
+            XMMATRIX matWorld =
+                XMLoadFloat4x4(&worldMatrix);
+
+            for (auto& mesh : model->GetMeshes())
+            {
+                auto& indices = mesh->GetIndices();
+
+                auto TestTriangles = [&](auto& vertices)
+                    {
                         for (size_t i = 0; i < indices->size(); i += 3)
                         {
                             XMVECTOR v0 =
                                 XMLoadFloat3(
-                                    &(*Meshnondata)[(*indices)[i]].vPosition);
+                                    &vertices[(*indices)[i]].vPosition);
 
                             XMVECTOR v1 =
                                 XMLoadFloat3(
-                                    &(*Meshnondata)[(*indices)[i + 1]].vPosition);
+                                    &vertices[(*indices)[i + 1]].vPosition);
 
                             XMVECTOR v2 =
                                 XMLoadFloat3(
-                                    &(*Meshnondata)[(*indices)[i + 2]].vPosition);
+                                    &vertices[(*indices)[i + 2]].vPosition);
 
-                            _float4x4 matWord;
+                            v0 = XMVector3TransformCoord(v0, matWorld);
+                            v1 = XMVector3TransformCoord(v1, matWorld);
+                            v2 = XMVector3TransformCoord(v2, matWorld);
 
-                            CGameInstance::Get().GetWorldMatrix(matWord);
-                            v0 = XMVector3TransformCoord(v0, XMLoadFloat4x4(&matWord));
-                            v1 = XMVector3TransformCoord(v1, XMLoadFloat4x4(&matWord));
-                            v2 = XMVector3TransformCoord(v2, XMLoadFloat4x4(&matWord));
-
-                            float dist = 1000.f;
+                            float dist = 0.f;
 
                             if (TriangleTests::Intersects(
                                 rayOrigin,
@@ -163,59 +386,37 @@ void Collider_Manager::MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_
                                 v2,
                                 dist))
                             {
-                                if (dist < minDist)
+                                if (dist < globalMinDist)
                                 {
-                                    minDist = dist;
-
-                                    CGameInstance::Get().SetSeletObject(gameObject.get());
+                                    globalMinDist = dist;
+                                    pickedObject = gameObject.get();
                                 }
                             }
                         }
+                    };
+
+                auto& nonAnimMesh =
+                    mesh->GetNonAnimMesh();
+
+                if (nonAnimMesh)
+                {
+                    TestTriangles(*nonAnimMesh);
+                }
+                else
+                {
+                    auto& animMesh =
+                        mesh->GetAnimMesh();
+
+                    if (animMesh)
+                    {
+                        TestTriangles(*animMesh);
                     }
-                    else {
-                        for (size_t i = 0; i < indices->size(); i += 3)
-                        {
-                            XMVECTOR v0 =XMLoadFloat3(&(*Meshanimdata)[(*indices)[i]].vPosition);
-
-                            XMVECTOR v1 =XMLoadFloat3(&(*Meshanimdata)[(*indices)[i + 1]].vPosition);
-
-                            XMVECTOR v2 =XMLoadFloat3(&(*Meshanimdata)[(*indices)[i + 2]].vPosition);
-
-                            _float4x4 matWord;
-                            matWord = gameObject->GetTransform()->GetWorldMatrix();
-                      
-                            v0 = XMVector3TransformCoord(v0, XMLoadFloat4x4(&matWord));
-                            v1 = XMVector3TransformCoord(v1, XMLoadFloat4x4(&matWord));
-                            v2 = XMVector3TransformCoord(v2, XMLoadFloat4x4(&matWord));
-
-                            float dist{100};
-
-                            if (TriangleTests::Intersects(
-                                rayOrigin,
-                                rayDir,
-                                v0,
-                                v1,
-                                v2,
-                                dist))
-                            {
-                                if (dist < minDist)
-                                {
-                                    minDist = dist;
-
-                                    CGameInstance::Get().SetSeletObject(gameObject.get());
-                                    break;
-                                }
-                            }
-                          
-                        }
-                    }
-
-
                 }
             }
-
         }
     }
+
+    CGameInstance::Get().SetSeletObject(pickedObject);
 }
 unique_ptr<Collider_Manager> Collider_Manager::Create(ComPtr<ID3D11Device> p_Device, ComPtr<ID3D11DeviceContext> p_DeviceContext) {
 	auto		pInstance = unique_ptr<Collider_Manager>(new Collider_Manager());

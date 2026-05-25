@@ -93,6 +93,7 @@ public:
 	std::vector<BaseCollider*>* GetColliderGroups(wstring GroupTag);
 	std::unordered_map<wstring, std::vector<BaseCollider*>>& GetAllCollders();
 	void	MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_t LevelIndex);
+	_bool Intersect(class BaseCollider* pCollider, class BaseCollider* sCollider);
 #pragma endregion
 
 #pragma region KEY_MANAGER

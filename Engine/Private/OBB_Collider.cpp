@@ -10,10 +10,6 @@ OBB_Collider::~OBB_Collider()
 {
 }
 
-HRESULT OBB_Collider::Intersect(BaseCollider* pCollider)
-{
-    return true;
-}
 
 HRESULT OBB_Collider::Intersect(_vector vPos, _vector vDir, float& pOutDist)
 {
@@ -43,8 +39,6 @@ HRESULT OBB_Collider::Initialize(void* pArg) {
 }
 void OBB_Collider::Update(float Timedelta) {
 
-    
-
 
     XMFLOAT4X4 worldFloat = m_Owner->GetTransform()->GetWorldMatrix();
     XMMATRIX world = XMLoadFloat4x4(&worldFloat);
@@ -65,6 +59,26 @@ void OBB_Collider::Update(float Timedelta) {
 HRESULT OBB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch) {
     __super::Render(m_batch);
 
+
+    switch (m_eColor) {
+    case  ColliderColor::GREEN:
+    {
+        XMStoreFloat4(&m_color, { 0.f, 255.f, 0.f, 0.f });
+    }
+    break;
+    case  ColliderColor::RED:
+    {
+        XMStoreFloat4(&m_color, { 255.f, 0.f, 0.f, 0.f });
+
+    }
+    break;
+    case  ColliderColor::BLACK:
+    {
+        XMStoreFloat4(&m_color, { 0.f, 0.f, 0.f, 0.f });
+
+    }
+    break;
+    }
 
     XMFLOAT3 corners[8];
     m_boudingBox.GetCorners(corners);
@@ -97,7 +111,7 @@ HRESULT OBB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_b
     m_batch->DrawLine(v[3], v[7]);
 
 
-    GUI_ColliderExtend();
+    //GUI_ColliderExtend();
 
 
     return S_OK;

@@ -13,7 +13,7 @@ public:
 
 
 public:
-	virtual HRESULT Intersect(BaseCollider* pCollider);
+
 	virtual HRESULT Intersect(_vector vPos, _vector vDir, float& pOutDist);
 
 public:
@@ -24,6 +24,8 @@ public:
 	virtual void Update(float Timedelta);
 	virtual HRESULT Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch);
 
+
+	BoundingBox Get_BoudingBox() { return m_boudingBox; }
 private:
 	BoundingBox m_boudingBox;
 

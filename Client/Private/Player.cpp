@@ -2,7 +2,9 @@
 
 
 #include "Body_Player.h"
-
+#include "BaseCollider.h"
+#include "OBB_Collider.h"
+#include "AABB_Collider.h"
 #include "GameInstance.h"
 
 Player::Player(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
@@ -28,17 +30,17 @@ HRESULT Player::Initialize(void* pArg)
 {
 
 	
-	GameObject::GAMEOBJECT_DESC Player{};
-	Player.ObjectType = ETOUI(OBJECTTYPE::OBJECT_PLAYER);
-	Player.m_strName = L"Player";
-	Player.ContainerObject = true;
-	Player.m_strPrototypeObjectName = L"Prototype_GameObject_Player";
-	Player.m_strPrototypeBaseName = L"SK_Player";
-	Player.pCameraType = ETOUI(CAMERA::NONE);
-	Player.fSpeedPerSec = 10.f;
-	Player.fRotationPerSec = 180.f;
+	GameObject::GAMEOBJECT_DESC desPlayer{};
+	desPlayer.ObjectType = ETOUI(OBJECTTYPE::OBJECT_PLAYER);
+	desPlayer.m_strName = L"Player";
+	desPlayer.ContainerObject = true;
+	desPlayer.m_strPrototypeObjectName = L"Prototype_GameObject_Player";
+	desPlayer.m_strPrototypeBaseName = L"SK_Player";
+	desPlayer.pCameraType = ETOUI(CAMERA::NONE);
+	desPlayer.fSpeedPerSec = 10.f;
+	desPlayer.fRotationPerSec = 180.f;
 
-	if (FAILED(__super::Initialize(&Player)))
+	if (FAILED(__super::Initialize(&desPlayer)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
@@ -47,6 +49,7 @@ HRESULT Player::Initialize(void* pArg)
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
 
+	m_pCollider->SetOwner(SHARED_THIS(Player).get());
 
 
 	return S_OK;
@@ -55,6 +58,8 @@ HRESULT Player::Initialize(void* pArg)
 void Player::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
+	
+	CGameInstance::Get().Add_Collider(L"Player", m_pCollider.get());
 }
 
 void Player::Update(_float fTimeDelta)
@@ -102,6 +107,7 @@ void Player::Update(_float fTimeDelta)
 void Player::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
+	Collider_Obstacle(fTimeDelta);
 }
 
 void Player::MouseLook(_float fTimeDelta) {
@@ -185,6 +191,11 @@ HRESULT Player::Render()
 
 HRESULT Player::Ready_Components()
 {
+	m_pCollider = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
+	m_pCollider->Set_Tag(COLLIDER::COLLIDER_OBB);
+	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pCollider)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -218,6 +229,32 @@ HRESULT Player::Ready_PartObjects()
 		return E_FAIL;*/
 
 	return S_OK;
+}
+
+_bool Player::Collider_Obstacle(_float fTimeDelta)
+{
+
+	auto ColliderGroup = CGameInstance::Get().GetColliderGroups(L"Obstacle");
+	if (ColliderGroup != nullptr) {
+		for (auto Collider : *ColliderGroup)
+		{
+			if (CGameInstance::Get().Intersect(m_pCollider.get(),Collider))
+			{
+				auto a = static_cast<OBB_Collider*>(m_pCollider.get())->Get_BoudingBox();
+
+				auto b =static_cast<OBB_Collider*>(Collider)->Get_BoudingBox();
+
+			
+				Collider->SetColliderColor(
+					ColliderColor::RED);
+
+				m_pCollider->SetColliderColor(
+					ColliderColor::RED);
+			}
+		}
+	}
+
+	return _bool();
 }
 
 unique_ptr<Player> Player::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)

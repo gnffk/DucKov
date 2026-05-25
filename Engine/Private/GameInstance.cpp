@@ -80,13 +80,17 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
     m_pImGUI_Manager->Update_Imgui(fTimeDelta);
 
+
+
     m_pObject_Manager->Priority_Update(fTimeDelta);
+
+    m_pCollider_Manager->Primitive_Update(fTimeDelta);
 
     m_pObject_Manager->Update(fTimeDelta);
 
-    m_pObject_Manager->Late_Update(fTimeDelta);
-
     m_pCollider_Manager->Update(fTimeDelta);
+
+    m_pObject_Manager->Late_Update(fTimeDelta);
 
     m_pLevel_Manager->Update(fTimeDelta);
 
@@ -339,6 +343,10 @@ std::unordered_map<wstring, std::vector<BaseCollider*>>& CGameInstance::GetAllCo
 
 void	CGameInstance::MousePicking(XMVECTOR rayOrigin, XMVECTOR rayDir, uint32_t LevelIndex) {
     return m_pCollider_Manager->MousePicking(rayOrigin,rayDir,LevelIndex);
+}
+
+_bool CGameInstance::Intersect(class BaseCollider* pCollider, BaseCollider* sCollider) {
+    return m_pCollider_Manager->Intersect(pCollider, sCollider);
 }
 #pragma endregion
 

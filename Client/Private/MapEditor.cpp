@@ -778,9 +778,7 @@ void MapEditor::IMGUI_ChoiceObject()
                     CGameInstance::Get().Get_Level(),
                     TEXT("Prototype_GameObject_Obstacle"),
                     CGameInstance::Get().Get_Level(),
-                    CGameInstance::Get().StringToWString(
-                        obstacleLayerName),
-                    &desc);
+                    CGameInstance::Get().StringToWString(obstacleLayerName),&desc);
 
                 selectedMeshIndex = -1;
 
@@ -863,7 +861,7 @@ void MapEditor::IMGUI_AddPlayer()
 void MapEditor::MousePicking()
 {
 
-	if (CGameInstance::Get().Mouse_Down(MOUSEKEYSTATE::DIM_LB))
+	if (CGameInstance::Get().Mouse_Down(MOUSEKEYSTATE::DIM_LB) && CGameInstance::Get().Key_Pressing(DIK_LCONTROL))
 	{
 		
 		POINT pt;

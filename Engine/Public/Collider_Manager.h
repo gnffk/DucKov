@@ -25,9 +25,12 @@ public:
 	std::unordered_map<wstring, std::vector<BaseCollider*>>& GetAllCollders() {
 		return m_Colliders;
 	}
-	
+
+
+	_bool Intersect(BaseCollider* pCollider, BaseCollider* sCollider);
 public:
 	HRESULT Find_Collider(wstring GroupTag, class BaseCollider* pCollider);
+	void Primitive_Update(float Timedelta);
 	void Update(float Timedelta);
 	void Render();
 

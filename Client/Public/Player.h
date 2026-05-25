@@ -50,11 +50,14 @@ public:
 	void		MouseLook(_float fTimeDelta);
 private:
 	uint32_t			m_iState = {};
-
+	shared_ptr<BaseCollider>	m_pCollider = { nullptr };
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();
 
+
+private:
+	_bool Collider_Obstacle(_float fTimeDelta);
 public:
 	static unique_ptr<Player> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;

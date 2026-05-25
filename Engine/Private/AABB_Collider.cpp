@@ -10,10 +10,6 @@ AABB_Collider::~AABB_Collider()
 {
 }
 
-HRESULT AABB_Collider::Intersect(BaseCollider* pCollider)
-{
-	return true;
-}
 
 HRESULT AABB_Collider::Intersect(_vector vPos, _vector vDir, float& pOutDist)
 {
@@ -41,26 +37,6 @@ HRESULT AABB_Collider::Initialize(void* pArg) {
 }
 void AABB_Collider::Update(float Timedelta) {
 
-    switch (m_eColor) {
-    case  ColliderColor::GREEN:
-    {
-        XMStoreFloat4(&m_color, { 0.f, 255.f, 0.f, 0.f });
-    }
-    break;
-    case  ColliderColor::RED:
-    {
-        XMStoreFloat4(&m_color, { 255.f, 0.f, 0.f, 0.f });
-  
-    }
-    break;
-    case  ColliderColor::BLACK:
-    {
-        XMStoreFloat4(&m_color, { 0.f, 0.f, 0.f, 0.f });
-     
-    }
-    break;
-    }
-
     XMFLOAT4X4 worldFloat = m_Owner->GetTransform()->GetWorldMatrix();
     XMMATRIX world = XMLoadFloat4x4(&worldFloat);
 
@@ -74,7 +50,25 @@ void AABB_Collider::Update(float Timedelta) {
 }
 HRESULT AABB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_batch) {
 	__super::Render(m_batch);
+    switch (m_eColor) {
+    case  ColliderColor::GREEN:
+    {
+        XMStoreFloat4(&m_color, { 0.f, 255.f, 0.f, 0.f });
+    }
+    break;
+    case  ColliderColor::RED:
+    {
+        XMStoreFloat4(&m_color, { 255.f, 0.f, 0.f, 0.f });
 
+    }
+    break;
+    case  ColliderColor::BLACK:
+    {
+        XMStoreFloat4(&m_color, { 0.f, 0.f, 0.f, 0.f });
+
+    }
+    break;
+    }
 
     _vector world = XMVectorSet(0.f,0.f,0.f,1.f);
 
@@ -114,7 +108,7 @@ HRESULT AABB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_
     m_batch->DrawLine(v[3], v[7]);
 
 
-    GUI_ColliderExtend();
+   
     return S_OK;
 }
 

@@ -35,9 +35,9 @@ HRESULT Obstacle::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (m_pAABBCom != nullptr) {
-		m_pAABBCom->SetOwner(SHARED_THIS(Obstacle).get());
-	}
+	//if (m_pAABBCom != nullptr) {
+	//	m_pAABBCom->SetOwner(SHARED_THIS(Obstacle).get());
+	//}
 
 
 	//m_pModelCom->Set_Animation(0, false);
@@ -48,9 +48,18 @@ void Obstacle::Priority_Update(_float fTimeDelta)
 {
 	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Obstacle));
 	
-	if (m_pAABBCom != nullptr) {
-		CGameInstance::Get().Add_Collider(L"Obstacle", m_pAABBCom.get());
+	for (int type = 0; type < (int)COLLIDER::COLLIDER_END; ++type)
+	{
+		auto& colliderList = m_pColliderComs[type];
+
+		for (size_t i = 0; i < colliderList.size(); ++i)
+		{
+	
+			CGameInstance::Get().Add_Collider(L"Obstacle", colliderList[i].get());
+
+		}
 	}
+
 		
 }
 
@@ -126,11 +135,11 @@ HRESULT Obstacle::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
 
-	if (Object_INFO.m_bCollider) {
-		m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
-		if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pAABBCom)))
-			return E_FAIL;
-	}
+	//if (Object_INFO.m_bCollider) {
+	//	m_pAABBCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
+	//	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pAABBCom)))
+	//		return E_FAIL;
+	//}
 
 
 
@@ -247,4 +256,157 @@ void Obstacle::IMGUITEST()
 	}
 
 	ImGui::End();
+
+	//-----------------------------------------------Collider-------------------------------------------------
+	ImGui::Begin("Collider");
+
+	static int selectedCollider = -1;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.f);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.f, 10.f));
+
+	ImGui::SeparatorText("Create Collider");
+
+	auto CreateUniqueColliderName = [&](const wstring& baseName)
+		{
+			wstring finalName = baseName;
+
+			int index = 1;
+
+			while (true)
+			{
+				auto iter =
+					m_Components.find(finalName);
+
+				if (iter == m_Components.end())
+					break;
+
+				finalName =
+					baseName + L"_" + to_wstring(index);
+
+				++index;
+			}
+
+			return finalName;
+		};
+
+	if (ImGui::Selectable("AABB Collider", selectedCollider == 0))
+	{
+		selectedCollider = 0;
+
+		auto pAABBCom =
+			dynamic_pointer_cast<BaseCollider>(
+				CGameInstance::Get().Clone_Prototype(
+					CGameInstance::Get().Get_Level(),
+					TEXT("Prototype_Com_AABB_Collider")));
+		pAABBCom->Set_Tag(COLLIDER::COLLIDER_AABB);
+		wstring componentName =
+			CreateUniqueColliderName(L"Com_AABBCollider");
+
+
+		__super::Add_Component(
+			componentName,
+			pAABBCom);
+
+		pAABBCom->SetOwner(
+			SHARED_THIS(Obstacle).get());
+
+		m_pColliderComs[(int)COLLIDER::COLLIDER_AABB]
+			.push_back(pAABBCom);
+	}
+
+	if (ImGui::Selectable("OBB Collider", selectedCollider == 1))
+	{
+		selectedCollider = 1;
+
+		auto pOBBCom =
+			dynamic_pointer_cast<BaseCollider>(
+				CGameInstance::Get().Clone_Prototype(
+					CGameInstance::Get().Get_Level(),
+					TEXT("Prototype_Com_OBB_Collider")));
+
+		pOBBCom->Set_Tag(COLLIDER::COLLIDER_OBB);
+
+		wstring componentName =
+			CreateUniqueColliderName(L"Com_OBBCollider");
+
+		__super::Add_Component(
+			componentName,
+			pOBBCom);
+
+		pOBBCom->SetOwner(
+			SHARED_THIS(Obstacle).get());
+
+		m_pColliderComs[(int)COLLIDER::COLLIDER_OBB]
+			.push_back(pOBBCom);
+	}
+
+
+	if (ImGui::Selectable("Sphere Collider", selectedCollider == 2))
+	{
+		selectedCollider = 2;
+
+		// m_pColliderCom.push_back(make_shared<SphereCollider>());
+	}
+
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	ImGui::TextDisabled("Click a collider type to add it.");
+
+
+	// =====================================================
+// Collider Settings
+// =====================================================
+
+	ImGui::Spacing();
+	ImGui::SeparatorText("Collider Settings");
+	for (int type = 0; type < (int)COLLIDER::COLLIDER_END; ++type)
+	{
+		auto& colliderList = m_pColliderComs[type];
+
+		for (size_t i = 0; i < colliderList.size(); ++i)
+		{
+			ImGui::PushID(type * 1000 + (int)i);
+
+			auto& collider = colliderList[i];
+
+			if (collider == nullptr)
+			{
+				ImGui::PopID();
+				continue;
+			}
+
+			string colliderTypeName;
+
+			switch ((COLLIDER)type)
+			{
+			case COLLIDER::COLLIDER_AABB:
+				colliderTypeName = "AABB";
+				break;
+
+			case COLLIDER::COLLIDER_OBB:
+				colliderTypeName = "OBB";
+				break;
+
+			case COLLIDER::COLLIDER_SPHERE:
+				colliderTypeName = "Sphere";
+				break;
+			}
+
+			string headerName =
+				colliderTypeName + " Collider " + std::to_string(i);
+
+			if (ImGui::CollapsingHeader(headerName.c_str()))
+			{
+				collider->GUI_ColliderExtend();
+			}
+
+			ImGui::PopID();
+		}
+	}
+	ImGui::PopStyleVar(2);
+
+	ImGui::End();
+
 }
