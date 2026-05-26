@@ -247,7 +247,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 #pragma region VIBuffer Component Prototype
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_VIBuffer_Terrain"),
-		VIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Height.bmp")))))
+		VIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/terrain.raw")))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_VIBuffer_Cube */
