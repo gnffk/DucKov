@@ -43,10 +43,7 @@ void Sky::Priority_Update(_float fTimeDelta)
 void Sky::Update(_float fTimeDelta)
 {
 
-	_float4 position;
-	CGameInstance::Get().Get_MainCameraPosition(position);
-	m_pTransformCom->Set_State(STATE::POSITION,
-		XMLoadFloat4(&position));
+
 
 	__super::Update(fTimeDelta);
 }
@@ -57,6 +54,10 @@ void Sky::Late_Update(_float fTimeDelta)
 	CGameInstance::Get().Add_RenderObject(RENDERGROUP::PRIORITY, SHARED_THIS(Sky));
 
 	__super::Late_Update(fTimeDelta);
+	_float4 position;
+	CGameInstance::Get().Get_MainCameraPosition(position);
+	m_pTransformCom->Set_State(STATE::POSITION,
+		XMLoadFloat4(&position));
 }
 
 HRESULT Sky::Render()

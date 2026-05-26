@@ -1,43 +1,45 @@
-#include "Player_Walk_State.h"
+#include "Player_WALK_State.h"
+#include "Player_FSM.h"
+#include "GameInstance.h"
 
-
-Player_Walk_State::Player_Walk_State() {
-
-}
-Player_Walk_State::~Player_Walk_State() {
+Player_WALK_State::Player_WALK_State() {
 
 }
+Player_WALK_State::~Player_WALK_State() {
 
-HRESULT Player_Walk_State::Initialize() {
+}
+
+HRESULT Player_WALK_State::Initialize() {
 	return S_OK;
 }
-void Player_Walk_State::Enter(FSM* pFSM) {
+void Player_WALK_State::Enter(FSM* pFSM) {
 
 
 }
-void Player_Walk_State::Exit(FSM* pFSM) {
+void Player_WALK_State::Exit(FSM* pFSM) {
 
 }
 
-void Player_Walk_State::Priority_Update(FSM* pFSM, float fDeltaTime) {
+void Player_WALK_State::Priority_Update(FSM* pFSM, float fDeltaTime) {
 
 }
 
-void Player_Walk_State::Update(FSM* pFSM, float fDeltaTime) {
+void Player_WALK_State::Update(FSM* pFSM, float fDeltaTime) {
+
 
 }
 
-void Player_Walk_State::Late_Update(FSM* pFSM, float fDeltaTime) {
+void Player_WALK_State::Late_Update(FSM* pFSM, float fDeltaTime) {
 
 }
 
-shared_ptr<Player_Walk_State> Player_Walk_State::Create()
+shared_ptr<Player_WALK_State> Player_WALK_State::Create()
 {
-	auto	pInstance = shared_ptr<Player_Walk_State>(new Player_Walk_State());
+	auto	pInstance = shared_ptr<Player_WALK_State>(new Player_WALK_State());
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX("Failed to Created : Player_Walk_State");
+		MSG_BOX("Failed to Created : Player_WALK_State");
 		return nullptr;
 	}
 

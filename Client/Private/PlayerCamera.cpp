@@ -75,15 +75,16 @@ void PlayerCamera::Priority_Update(_float fTimeDelta)
 void PlayerCamera::Update(_float fTimeDelta)
 {
 
-
+	FollowCamera();
 	__super::Set_View();
 
-	FollowCamera();
+
 
 }
 
 void PlayerCamera::Late_Update(_float fTimeDelta)
 {
+
 
 }
 
@@ -132,7 +133,7 @@ void PlayerCamera::FollowCamera()
 {
 	if (m_Owner == nullptr)
 		return;
-
+	_vector vCamCurPos = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vPlayerPos = m_Owner->GetTransform()->Get_State(STATE::POSITION);
 
 	POINT pt{};

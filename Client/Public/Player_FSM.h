@@ -47,7 +47,8 @@ public:
 
 private:
 	PLAYER_STATE m_eCurrentState = PLAYER_STATE::END;
-	 uint32_t * m_eModelState;
+	uint32_t * m_eModelState;
+	_bool				m_bShift = { false };
 public:
     static  shared_ptr<Player_FSM> Create(uint32_t* eModelState);
 };

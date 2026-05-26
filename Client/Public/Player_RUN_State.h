@@ -4,12 +4,12 @@
 
 NS_BEGIN(Client)
 
-class Player_WALK_State : public State
+class Player_RUN_State : public State
 {
 private:
-    Player_WALK_State();
+    Player_RUN_State();
 public:
-    virtual ~Player_WALK_State();
+    virtual ~Player_RUN_State();
 public:
     HRESULT Initialize();
 public:
@@ -24,7 +24,7 @@ public:
 
 
 public:
-    static  shared_ptr<Player_WALK_State> Create();
+    static  shared_ptr<Player_RUN_State> Create();
 
 };
 

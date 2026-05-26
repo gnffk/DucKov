@@ -25,13 +25,18 @@ public:
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
+
 	virtual HRESULT Render() override;
 public:
 	void		MouseLook(_float fTimeDelta);
+	void		KeyBoardLook(_float fTimeDelta);
 private:
 	uint32_t			m_iState = {};
 	shared_ptr<class BaseCollider>	m_pCollider = { nullptr };
 	shared_ptr<class FSM> m_pPlayerFSM = { nullptr };
+
+	_bool				m_bShift = {false};
+	float			m_fSpeedFloat{0.f};
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();

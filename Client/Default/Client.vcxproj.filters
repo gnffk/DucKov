@@ -70,8 +70,32 @@
     <Filter Include="02. GameObject\Player\State\IDLE">
       <UniqueIdentifier>{aed7f89d-248e-480c-8446-f112f8193c5c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Player\State\WALK">
+    <Filter Include="02. GameObject\Player\State\HAND_UP_AND_WALK">
       <UniqueIdentifier>{389be3d1-df14-4fb8-89e6-785b1bd75e3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\HAND_UP_AND_RIGHT">
+      <UniqueIdentifier>{ae625f48-5b16-4a3c-8179-fd9665cd9e4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\HAND_UP_AND_LEFT">
+      <UniqueIdentifier>{647bd6a0-265a-4915-aa6c-15037756d5a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\HAND_UP">
+      <UniqueIdentifier>{2359219a-ba4c-40bc-bb3c-f8e6a9c63c29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\RUN">
+      <UniqueIdentifier>{816eb416-ae9a-4c11-b6a6-4c2fedba6f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\WALK">
+      <UniqueIdentifier>{74c44f29-6121-4969-9aa8-8fbcf52b794c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\RIGHT_WALK">
+      <UniqueIdentifier>{86c3f7d7-1ab6-46cf-a186-b2951f1091e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\LEFT_WALK">
+      <UniqueIdentifier>{0d699248-593d-4d9d-837e-22eaa55e9aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\ROLL">
+      <UniqueIdentifier>{1abdb8c4-0c65-4a3d-a1b9-1b0948322f62}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -141,8 +165,32 @@
     <ClInclude Include="..\Public\Player_Idle_State.h">
       <Filter>02. GameObject\Player\State\IDLE</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Player_Walk_State.h">
+    <ClInclude Include="..\Public\Player_HAND_UP_AND_WALK_State.h">
+      <Filter>02. GameObject\Player\State\HAND_UP_AND_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_HAND_UP_AND_RIGHT_State.h">
+      <Filter>02. GameObject\Player\State\HAND_UP_AND_RIGHT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_HAND_UP_AND_LEFT_State.h">
+      <Filter>02. GameObject\Player\State\HAND_UP_AND_LEFT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_HAND_UP_State.h">
+      <Filter>02. GameObject\Player\State\HAND_UP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_RUN_State.h">
+      <Filter>02. GameObject\Player\State\RUN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_WALK_State.h">
       <Filter>02. GameObject\Player\State\WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_RIGHT_WALK_State.h">
+      <Filter>02. GameObject\Player\State\RIGHT_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_LEFT_WALK_State.h">
+      <Filter>02. GameObject\Player\State\LEFT_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_ROLL_State.h">
+      <Filter>02. GameObject\Player\State\ROLL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -210,8 +258,32 @@
     <ClCompile Include="..\Private\Player_Idle_State.cpp">
       <Filter>02. GameObject\Player\State\IDLE</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Player_Walk_State.cpp">
+    <ClCompile Include="..\Private\Player_HAND_UP_AND_WALK_State.cpp">
+      <Filter>02. GameObject\Player\State\HAND_UP_AND_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_HAND_UP_AND_RIGHT_State.cpp">
+      <Filter>02. GameObject\Player\State\HAND_UP_AND_RIGHT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_HAND_UP_AND_LEFT_State.cpp">
+      <Filter>02. GameObject\Player\State\HAND_UP_AND_LEFT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_HAND_UP_State.cpp">
+      <Filter>02. GameObject\Player\State\HAND_UP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_RUN_State.cpp">
+      <Filter>02. GameObject\Player\State\RUN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_WALK_State.cpp">
       <Filter>02. GameObject\Player\State\WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_RIGHT_WALK_State.cpp">
+      <Filter>02. GameObject\Player\State\RIGHT_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_LEFT_WALK_State.cpp">
+      <Filter>02. GameObject\Player\State\LEFT_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_ROLL_State.cpp">
+      <Filter>02. GameObject\Player\State\ROLL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

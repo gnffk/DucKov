@@ -68,6 +68,22 @@ void Body_Player::Update(_float fTimeDelta)
 	if (*m_pParentState & Player_FSM::PLAYER_STATE::LEFT_WALK)
 		nextAnim = 4;
 
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::HAND_UP)
+		nextAnim = 6;
+
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::HAND_UP_AND_WALK)
+		nextAnim = 8;
+
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::HAND_UP_AND_RIGHT)
+		nextAnim = 9;
+
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::HAND_UP_AND_LEFT)
+		nextAnim = 10;
+
+	if (*m_pParentState & Player_FSM::PLAYER_STATE::ROLL)
+		nextAnim = 11;
+
+
 	if (m_pModelCom->Get_CurAnimationIndex() != nextAnim)
 	{
 		m_pModelCom->Set_Animation(nextAnim);

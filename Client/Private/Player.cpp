@@ -51,7 +51,7 @@ HRESULT Player::Initialize(void* pArg)
 
 	m_pCollider->SetOwner(SHARED_THIS(Player).get());
 
-
+	m_pPlayerFSM->SetOwner(SHARED_THIS(Player));
 	return S_OK;
 }
 
@@ -68,47 +68,73 @@ void Player::Priority_Update(_float fTimeDelta)
 void Player::Update(_float fTimeDelta)
 {
 	
-	MouseLook( fTimeDelta);
+	if (CGameInstance::Get().Key_Down(DIK_LSHIFT))
+		m_bShift = !m_bShift;
 
-	_vector vMoveDir = XMVectorZero();
+	if (!m_bShift) {
+		
+		m_fSpeedFloat = 1.f;
+		_vector vMoveDir = XMVectorZero();
+		_float4 fCameraPos;
+		CGameInstance::Get().Get_MainCameraPosition(fCameraPos);
 
-	if (CGameInstance::Get().Key_Pressing(DIK_A))
-	{
-		vMoveDir += XMVectorSet(-1.f, 0.f, -1.f, 0.f);
+		_vector	vPlayerPos, vCameraPos, vCameraDir;
+		vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+		vCameraPos = XMLoadFloat4(&fCameraPos);
+		vCameraPos = XMVectorSetY(vCameraPos, 0.0f);
+		vCameraDir = vCameraPos - vPlayerPos;
+
+		vCameraDir = XMVector3Normalize(vCameraDir);
+
+		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+		_vector vRight = XMVector3Cross(vUp, vCameraDir);
+		vRight = XMVector3Normalize(vRight);
+
+		if (CGameInstance::Get().Key_Pressing(DIK_A))
+		{
+			vMoveDir += vRight;
+		}
+
+		if (CGameInstance::Get().Key_Pressing(DIK_D))
+		{
+			vMoveDir -= vRight;
+		}
+
+		if (CGameInstance::Get().Key_Pressing(DIK_W))
+		{
+			vMoveDir -= vCameraDir;
+		}
+
+		if (CGameInstance::Get().Key_Pressing(DIK_S))
+		{
+			vMoveDir += vCameraDir;
+		}
+
+		if (!XMVector3Equal(vMoveDir, XMVectorZero()))
+		{
+			m_pTransformCom->Move(vMoveDir, fTimeDelta);
+			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::HAND_UP_AND_WALK);
+		}
+		else
+		{
+			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
+		}
+
+		MouseLook(fTimeDelta);
 	}
-
-	if (CGameInstance::Get().Key_Pressing(DIK_D))
-	{
-		vMoveDir += XMVectorSet(1.f, 0.f, 0.f, 0.f);
+	else if(m_bShift&&(CGameInstance::Get().Key_Pressing(DIK_A) || CGameInstance::Get().Key_Pressing(DIK_S) || CGameInstance::Get().Key_Pressing(DIK_D) || CGameInstance::Get().Key_Pressing(DIK_W))){
+		KeyBoardLook(fTimeDelta);
 	}
-
-	if (CGameInstance::Get().Key_Pressing(DIK_W))
-	{
-		vMoveDir += XMVectorSet(0.f, 0.f, 1.f, 0.f);
+	else {
+		m_bShift = false;
+		m_fSpeedFloat = 1.f;
 	}
+	m_pPlayerFSM->Update(fTimeDelta);
 
-	if (CGameInstance::Get().Key_Pressing(DIK_S))
-	{
-		vMoveDir += XMVectorSet(0.f, 0.f, -1.f, 0.f);
-	}
-
-	if (!XMVector3Equal(vMoveDir, XMVectorZero()))
-	{
-		m_pTransformCom->Move(vMoveDir, fTimeDelta);
-
-		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)
-			->Change_State(Player_FSM::WALK);
-	}
-	else
-	{
-		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)
-			->Change_State(Player_FSM::IDLE);
-	}
 	__super::Update(fTimeDelta);
 
 
-
-	m_pPlayerFSM->Update(fTimeDelta);
 }
 
 void Player::Late_Update(_float fTimeDelta)
@@ -181,16 +207,152 @@ void Player::MouseLook(_float fTimeDelta) {
 	vDir = XMVectorSetY(vDir, 0.f);
 	vDir = XMVector3Normalize(vDir);
 
-	// Yaw
-	float yaw =
-		atan2f(
-			XMVectorGetX(vDir),
-			XMVectorGetZ(vDir));
 
-	yaw = XMConvertToDegrees(yaw);
+	_vector TurnAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
-	// Rotation
-	m_pTransformCom->Rotation(0.f, yaw, 0.f);
+
+	_vector vCurrentLook = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
+
+
+	_vector cross = XMVector3Cross(vCurrentLook, vDir);
+	_float dot = XMVectorGetX(XMVector3Dot(vCurrentLook, vDir));
+
+	if (dot < 0.98f) {
+		if (XMVectorGetY(cross) < 0.f) {
+			m_pTransformCom->Turn(-TurnAxis, fTimeDelta * 3.f);
+		}
+		else {
+			m_pTransformCom->Turn(TurnAxis, fTimeDelta * 3.f);
+		}
+		
+	}
+	else if (dot < 0.999f)
+	{
+		if (XMVectorGetY(cross) < 0.f) {
+			m_pTransformCom->Turn(-TurnAxis, fTimeDelta );
+		}
+		else {
+			m_pTransformCom->Turn(TurnAxis, fTimeDelta );
+		}
+	}
+	
+}
+
+void Player::KeyBoardLook(_float fTimeDelta) {
+	
+
+	_vector vMoveDir = XMVectorZero();
+	_float4 fCameraPos;
+	CGameInstance::Get().Get_MainCameraPosition(fCameraPos);
+
+	_vector	vPlayerPos, vCameraPos, vCameraDir;
+	vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+	vCameraPos = XMLoadFloat4(&fCameraPos);
+	vCameraPos = XMVectorSetY(vCameraPos, 0.0f);
+	vCameraDir = vCameraPos - vPlayerPos;
+
+	vCameraDir = XMVector3Normalize(vCameraDir);
+
+	_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+	_vector vRight = XMVector3Cross(vUp, vCameraDir);
+	vRight = XMVector3Normalize(vRight);
+
+	if (CGameInstance::Get().Key_Pressing(DIK_A))
+	{
+		vMoveDir += vRight;
+	}
+
+	if (CGameInstance::Get().Key_Pressing(DIK_D))
+	{
+		vMoveDir -= vRight;
+	}
+
+	if (CGameInstance::Get().Key_Pressing(DIK_W))
+	{
+		vMoveDir -= vCameraDir;
+	}
+
+	if (CGameInstance::Get().Key_Pressing(DIK_S))
+	{
+		vMoveDir += vCameraDir;
+	}
+
+	_vector TurnAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+
+
+	vMoveDir = XMVector3Normalize(vMoveDir);
+
+
+	_vector vCurrentLook = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
+
+	_vector cross = XMVector3Cross(vCurrentLook, vMoveDir);
+	_float dot = XMVectorGetX(XMVector3Dot(vCurrentLook, vMoveDir));
+
+
+	if (dot < 0.98f) {
+
+		if (m_fSpeedFloat < 0.f)
+		{
+			m_fSpeedFloat = 0.f;
+
+		}
+		else {
+			m_fSpeedFloat -= 0.001f;
+		}
+
+		if (XMVectorGetY(cross) < 0.f) {
+			m_pTransformCom->Turn(-TurnAxis, fTimeDelta * 3.f);
+		}
+		else {
+			m_pTransformCom->Turn(TurnAxis, fTimeDelta * 3.f);
+		}
+
+	}
+	else if (dot < 0.999f)
+	{
+		if (m_fSpeedFloat < 0.f)
+		{
+			m_fSpeedFloat = 0.f;
+
+		}
+		else {
+			m_fSpeedFloat -= 0.001f;
+		}
+
+		if (XMVectorGetY(cross) < 0.f) {
+			m_pTransformCom->Turn(-TurnAxis, fTimeDelta);
+		}
+		else {
+			m_pTransformCom->Turn(TurnAxis, fTimeDelta);
+		}
+	}
+	else {
+		if (m_fSpeedFloat > 2.f)
+		{
+			m_fSpeedFloat = 2.f;
+
+		}
+		else {
+			m_fSpeedFloat += 0.1f;
+		}
+	}
+
+
+	if (!XMVector3Equal(vMoveDir, XMVectorZero()))
+	{
+		m_pTransformCom->Move(vMoveDir, fTimeDelta * m_fSpeedFloat);
+
+		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::WALK);
+	}
+	else
+	{
+		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
+	}
+
+
+	
 }
 HRESULT Player::Render()
 {

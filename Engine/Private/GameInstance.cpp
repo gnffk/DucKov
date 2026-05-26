@@ -80,8 +80,6 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
     m_pImGUI_Manager->Update_Imgui(fTimeDelta);
 
-
-
     m_pObject_Manager->Priority_Update(fTimeDelta);
 
     m_pCollider_Manager->Primitive_Update(fTimeDelta);

@@ -48,7 +48,7 @@ void PerspectiveCamera::Priority_Update(_float fTimeDelta)
 void PerspectiveCamera::Update(_float fTimeDelta)
 {
 
-	__super::Set_View();
+
 
 
 	if (m_iCameraType == ETOUI(CAMERA::MAIN)) {
@@ -64,7 +64,7 @@ void PerspectiveCamera::Update(_float fTimeDelta)
 		}
 
 	}
-
+	__super::Set_View();
 
 }
 
