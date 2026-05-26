@@ -34,10 +34,7 @@ public:
 	_bool	Play_Animation(_float fTimeDelta);
 
 public:
-	void Set_Animation(uint32_t iIndex, _bool isLoop = true) {
-		m_iCurrentAnimIndex = iIndex;
-		m_isAnimLoop = isLoop;
-	}
+	void Set_Animation(uint32_t iIndex, _bool isLoop = true, _float fBlendDuration = 0.2f);
 	uint32_t Get_CurAnimationIndex() { return m_iCurrentAnimIndex; }
 
 public:
@@ -76,6 +73,8 @@ private:
 	HRESULT Ready_AnimMaterial(ifstream& _file, const char* modelFileName);
 
 
+
+	void Apply_AnimationBlend(_float fTimeDelta);
 private:
 	vector<shared_ptr<class Bone>> m_Bones;
 	_float4x4				m_PreTransformMatrix = {};
@@ -94,8 +93,12 @@ private:
 
 private:
 	_bool							m_isAnimLoop = { true };
+	_bool							m_isAnimationBlending = { false };
+	_float						m_fAnimationBlendTime = {};
+	_float						m_fAnimationBlendDuration = {};
 	uint32_t						m_iCurrentAnimIndex = {};
 	uint32_t						m_iNumAnimations = {};
+	vector<_float4x4>			m_BlendStartTransformationMatrices;
 	vector<shared_ptr<class Animation>>	m_Animations;
 };
 

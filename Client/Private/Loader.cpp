@@ -142,19 +142,9 @@ HRESULT CLoader::Loading_For_MapEditor()
 	//	Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC",ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Monster_Palicus/SK_Monster_Palicus.bin", PreTransformMatrix))))
 	//	return E_FAIL;
 
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Monster_Palicus"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK",ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Monster_Palicus/SK_Monster_Palicus.bin", PreTransformMatrix))))
-		return E_FAIL;
-
-
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CharacterModel_Duck_Jeff"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK1", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CharacterModel_Duck_Jeff/SK_CharacterModel_Duck_Jeff.bin", PreTransformMatrix))))
-		return E_FAIL;
-
-
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Fiona"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK2", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Fiona/SK_Fiona.bin", PreTransformMatrix))))
-		return E_FAIL;
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Monster_Palicus"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK",ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Monster_Palicus/SK_Monster_Palicus.bin", PreTransformMatrix))))
+	//	return E_FAIL;
 
 
 
@@ -162,17 +152,27 @@ HRESULT CLoader::Loading_For_MapEditor()
 		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
 		XMMatrixRotationY(XMConvertToRadians(180.f));
 
-
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomBody"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomBody/SK_CustomBody.bin", CustomMatrix))))
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CharacterModel_Duck_Jeff"),
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK1", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CharacterModel_Duck_Jeff/SK_CharacterModel_Duck_Jeff.bin", CustomMatrix))))
 		return E_FAIL;
 
 
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Fiona"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK2", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Fiona/SK_Fiona.bin", PreTransformMatrix))))
+	//	return E_FAIL;
 
 
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomFaceInstance"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomFaceInstance/SK_CustomFaceInstance.bin", CustomMatrix))))
-		return E_FAIL;
+
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomBody"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomBody/SK_CustomBody.bin", CustomMatrix))))
+	//	return E_FAIL;
+
+
+
+
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomFaceInstance"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomFaceInstance/SK_CustomFaceInstance.bin", CustomMatrix))))
+	//	return E_FAIL;
 
 
 	// static Mesh
@@ -235,12 +235,12 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 
 	// player Mesh
-	_matrix PlayerTransformMatrix =
-		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
-		XMMatrixRotationY(XMConvertToRadians(180.f));
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Player"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Player", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Player/SK_Player.bin", PlayerTransformMatrix))))
-		return E_FAIL;
+	//_matrix PlayerTransformMatrix =
+	//	XMMatrixScaling(0.01f, 0.01f, 0.01f) *
+	//	XMMatrixRotationY(XMConvertToRadians(180.f));
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Player"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Player", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Player/SK_Player.bin", PlayerTransformMatrix))))
+	//	return E_FAIL;
 #pragma endregion
 
 

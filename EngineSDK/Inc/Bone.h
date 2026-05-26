@@ -14,6 +14,10 @@ public:
 	~Bone();
 
 public:
+	_matrix Get_TransformationMatrix() {
+		return XMLoadFloat4x4(&m_TransformationMatrix);
+	}
+
 	_matrix Get_CombinedTransformationMatrix() {
 		return XMLoadFloat4x4(&m_CombinedTransformationMatrix);
 	}

@@ -63,6 +63,7 @@ public:
 
 	void Move(_fvector vDir, _float fTimeDelta);
 
+	void Move(_fvector vDir, _float fTimeDelta, _float plusSpeed);
 private:
 	_float			m_fSpeedPerSec = {};
 	_float			m_fRotationPerSec = {};
@@ -70,6 +71,7 @@ private:
 	_float4x4		m_WorldMatrix = {};
 
 public:
+
 
 	static shared_ptr<Transform> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
 

@@ -67,8 +67,75 @@ void Player::Priority_Update(_float fTimeDelta)
 
 void Player::Update(_float fTimeDelta)
 {
-	
-	if (CGameInstance::Get().Key_Down(DIK_LSHIFT))
+	if (CGameInstance::Get().Key_Down(DIK_SPACE) && false == m_isRolling)
+	{
+		_vector vMoveDir = XMVectorZero();
+
+		_float4 fCameraPos;
+		CGameInstance::Get().Get_MainCameraPosition(fCameraPos);
+
+		_vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+		_vector vCameraPos = XMLoadFloat4(&fCameraPos);
+		vCameraPos = XMVectorSetY(vCameraPos, 0.f);
+
+		_vector vCameraDir = XMVector3Normalize(vCameraPos - vPlayerPos);
+
+		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+		_vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vCameraDir));
+
+		if (CGameInstance::Get().Key_Pressing(DIK_A))
+			vMoveDir += vRight;
+
+		if (CGameInstance::Get().Key_Pressing(DIK_D))
+			vMoveDir -= vRight;
+
+		if (CGameInstance::Get().Key_Pressing(DIK_W))
+			vMoveDir -= vCameraDir;
+
+		if (CGameInstance::Get().Key_Pressing(DIK_S))
+			vMoveDir += vCameraDir;
+
+		// 키 안 누르고 구르면 현재 바라보는 방향으로
+		if (XMVector3Equal(vMoveDir, XMVectorZero()))
+			vMoveDir = m_pTransformCom->Get_State(STATE::LOOK);
+
+
+		m_vRollDir = XMVector3Normalize(vMoveDir);
+
+		// Roll 방향으로 즉시 바라보게 만들기
+		_float fX = XMVectorGetX(m_vRollDir);
+		_float fZ = XMVectorGetZ(m_vRollDir);
+
+		// 기본 Look이 +Z라면 이 공식
+		_float fYaw = XMConvertToDegrees(atan2f(fX, fZ));
+
+		m_pTransformCom->Rotation(0.f, fYaw, 0.f);
+
+		m_isRolling = true;
+		m_fRollTimer = m_fRollDuration;
+
+		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::ROLL);
+
+
+	}
+	if (true == m_isRolling)
+	{
+		m_fRollTimer -= fTimeDelta;
+
+		if (m_fRollTimer <= 0.f)
+		{
+			m_isRolling = false;
+			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
+		}
+		else
+		{
+			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::ROLL);
+			m_pPlayerFSM->Update(fTimeDelta);
+			__super::Update(fTimeDelta);
+			return;
+		}
+	}
+if (CGameInstance::Get().Key_Down(DIK_LSHIFT))
 		m_bShift = !m_bShift;
 
 	if (!m_bShift) {
@@ -219,10 +286,10 @@ void Player::MouseLook(_float fTimeDelta) {
 
 	if (dot < 0.98f) {
 		if (XMVectorGetY(cross) < 0.f) {
-			m_pTransformCom->Turn(-TurnAxis, fTimeDelta * 3.f);
+			m_pTransformCom->Turn(-TurnAxis, fTimeDelta * 5.f);
 		}
 		else {
-			m_pTransformCom->Turn(TurnAxis, fTimeDelta * 3.f);
+			m_pTransformCom->Turn(TurnAxis, fTimeDelta * 5.f);
 		}
 		
 	}
@@ -388,7 +455,7 @@ HRESULT Player::Ready_PartObjects()
 	BodyDesc.pParentState = &m_iState;
 	BodyDesc.m_strPrototypeObjectName = L"Prototype_GameObject_Body_Player";
 	//BodyDesc.m_strPrototypeBaseName =L"SK_Player";
-	BodyDesc.m_strPrototypeBaseName =L"SK_CustomBody";
+	BodyDesc.m_strPrototypeBaseName =L"SK_CharacterModel_Duck_Jeff";
 	BodyDesc.pCameraType = ETOUI(CAMERA::NONE);
 	BodyDesc.fSpeedPerSec = 5.f;
 	BodyDesc.fRotationPerSec = 1.f;

@@ -22,7 +22,8 @@ public:
 
     virtual void Late_Update(FSM* pFSM, float fDeltaTime);
 
-
+private:
+    _float m_fCurrentSpeed = 0.f;
 public:
     static  shared_ptr<Player_ROLL_State> Create();
 

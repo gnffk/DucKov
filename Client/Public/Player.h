@@ -30,13 +30,21 @@ public:
 public:
 	void		MouseLook(_float fTimeDelta);
 	void		KeyBoardLook(_float fTimeDelta);
+	_vector		Get_RollDir() const
+	{
+		return m_vRollDir;
+	}
 private:
 	uint32_t			m_iState = {};
 	shared_ptr<class BaseCollider>	m_pCollider = { nullptr };
 	shared_ptr<class FSM> m_pPlayerFSM = { nullptr };
 
-	_bool				m_bShift = {false};
-	float			m_fSpeedFloat{0.f};
+	_bool				m_bShift = { false };
+	_bool				m_isRolling = { false };
+	_float				m_fRollTimer = {};
+	_float				m_fRollDuration = { 0.45f };
+	_vector				m_vRollDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+	float			m_fSpeedFloat{ 0.f };
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();

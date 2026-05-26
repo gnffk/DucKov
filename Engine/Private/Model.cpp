@@ -134,12 +134,90 @@ HRESULT Model::Render(uint32_t iMeshIndex)
     return S_OK;
 }
 
+void Model::Set_Animation(uint32_t iIndex, _bool isLoop, _float fBlendDuration)
+{
+    if (iIndex >= m_iNumAnimations)
+        return;
+
+    if (m_iCurrentAnimIndex == iIndex)
+    {
+        m_isAnimLoop = isLoop;
+        return;
+    }
+
+    m_BlendStartTransformationMatrices.clear();
+    m_BlendStartTransformationMatrices.reserve(m_Bones.size());
+
+    for (auto& pBone : m_Bones)
+    {
+        _float4x4 TransformationMatrix = {};
+        XMStoreFloat4x4(&TransformationMatrix, pBone->Get_TransformationMatrix());
+        m_BlendStartTransformationMatrices.emplace_back(TransformationMatrix);
+    }
+
+    m_iCurrentAnimIndex = iIndex;
+    m_isAnimLoop = isLoop;
+    m_Animations[m_iCurrentAnimIndex]->Reset();
+
+    m_fAnimationBlendTime = 0.f;
+    m_fAnimationBlendDuration = max(fBlendDuration, 0.f);
+    m_isAnimationBlending =
+        m_fAnimationBlendDuration > 0.f &&
+        m_BlendStartTransformationMatrices.size() == m_Bones.size();
+}
+
+void Model::Apply_AnimationBlend(_float fTimeDelta)
+{
+    if (false == m_isAnimationBlending)
+        return;
+
+    m_fAnimationBlendTime += fTimeDelta;
+
+    _float fRatio = m_fAnimationBlendDuration > 0.f ?
+        m_fAnimationBlendTime / m_fAnimationBlendDuration : 1.f;
+
+    fRatio = min(max(fRatio, 0.f), 1.f);
+
+    for (size_t i = 0; i < m_Bones.size(); ++i)
+    {
+        _matrix StartMatrix = XMLoadFloat4x4(&m_BlendStartTransformationMatrices[i]);
+        _matrix EndMatrix = m_Bones[i]->Get_TransformationMatrix();
+
+        _vector StartScale, StartRotation, StartTranslation;
+        _vector EndScale, EndRotation, EndTranslation;
+
+        if (FALSE == XMMatrixDecompose(&StartScale, &StartRotation, &StartTranslation, StartMatrix) ||
+            FALSE == XMMatrixDecompose(&EndScale, &EndRotation, &EndTranslation, EndMatrix))
+        {
+            continue;
+        }
+
+        _vector BlendScale = XMVectorLerp(StartScale, EndScale, fRatio);
+        _vector BlendRotation = XMQuaternionSlerp(StartRotation, EndRotation, fRatio);
+        _vector BlendTranslation = XMVectorLerp(StartTranslation, EndTranslation, fRatio);
+
+        _matrix BlendMatrix = XMMatrixAffineTransformation(
+            BlendScale,
+            XMVectorSet(0.f, 0.f, 0.f, 1.f),
+            BlendRotation,
+            XMVectorSetW(BlendTranslation, 1.f));
+
+        m_Bones[i]->Set_TransformationMatrix(BlendMatrix);
+    }
+
+    if (fRatio >= 1.f)
+    {
+        m_isAnimationBlending = false;
+        m_BlendStartTransformationMatrices.clear();
+    }
+}
 _bool Model::Play_Animation(_float fTimeDelta)
 {
     _bool           isFinished = { false };
 
     /* 뼈들의 m_TransformationMatrix를 갱신해준다. */
     isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(fTimeDelta, m_Bones, m_isAnimLoop);
+    Apply_AnimationBlend(fTimeDelta);
 
     for (auto& pBone : m_Bones)
     {
@@ -147,7 +225,6 @@ _bool Model::Play_Animation(_float fTimeDelta)
     }
 
     return isFinished;
-
 }
 
 HRESULT Model::Bind_BoneMatrices(shared_ptr<class Shader> pShader, const _char* pConstantName, uint32_t iMeshIndex)

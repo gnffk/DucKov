@@ -223,6 +223,18 @@ void Transform::Move(_fvector vDir, _float fTimeDelta)
     Set_State(STATE::POSITION, vPosition);
 
 }
+
+void Transform::Move(_fvector vDir, _float fTimeDelta,_float plusSpeed)
+{
+    _vector vPosition = Get_State(STATE::POSITION);
+
+    _vector vMoveDir = XMVector3Normalize(vDir);
+
+    vPosition += vMoveDir * (m_fSpeedPerSec+ plusSpeed) * fTimeDelta;
+
+    Set_State(STATE::POSITION, vPosition);
+
+}
 shared_ptr<Transform> Transform::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
     auto		pInstance = shared_ptr<Transform>(new Transform(pDevice, pContext));

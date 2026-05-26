@@ -65,6 +65,12 @@ _bool Animation::Update_TransformationMatrices(_float fTimeDelta, const vector<s
     return false;
 }
 
+void Animation::Reset()
+{
+    m_fCurrentTrackPosition = 0.f;
+    fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);
+}
+
 shared_ptr<Animation> Animation::Create()
 {
     auto		pInstance = shared_ptr<Animation>(new Animation());

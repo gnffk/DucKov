@@ -15,6 +15,7 @@ public:
 	HRESULT Initialize();
 	HRESULT Initialize(ifstream& _file);
 	_bool Update_TransformationMatrices(_float fTimeDelta, const vector<shared_ptr<class Bone>>& Bones, _bool isLoop);
+	void Reset();
 private:
 	/* 이 애니메이션의 총 길이. */
 	_float				m_fDuration = {};
