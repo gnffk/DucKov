@@ -387,7 +387,8 @@ HRESULT Player::Ready_PartObjects()
 	BodyDesc.m_strName =L"ObjectPart";
 	BodyDesc.pParentState = &m_iState;
 	BodyDesc.m_strPrototypeObjectName = L"Prototype_GameObject_Body_Player";
-	BodyDesc.m_strPrototypeBaseName =L"SK_Player";
+	//BodyDesc.m_strPrototypeBaseName =L"SK_Player";
+	BodyDesc.m_strPrototypeBaseName =L"SK_CustomBody";
 	BodyDesc.pCameraType = ETOUI(CAMERA::NONE);
 	BodyDesc.fSpeedPerSec = 5.f;
 	BodyDesc.fRotationPerSec = 1.f;

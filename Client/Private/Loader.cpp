@@ -157,6 +157,24 @@ HRESULT CLoader::Loading_For_MapEditor()
 		return E_FAIL;
 
 
+
+	_matrix CustomMatrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
+		XMMatrixRotationY(XMConvertToRadians(180.f));
+
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomBody"),
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomBody/SK_CustomBody.bin", CustomMatrix))))
+		return E_FAIL;
+
+
+
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomFaceInstance"),
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomFaceInstance/SK_CustomFaceInstance.bin", CustomMatrix))))
+		return E_FAIL;
+
+
 	// static Mesh
 	_matrix HomeTransformMatrix =
 		XMMatrixScaling(0.001f, 0.001f, 0.001f) *

@@ -54,6 +54,10 @@ public:
 
 	vector<shared_ptr<Mesh>>& GetMeshes() { return m_Meshes; }
 
+	// Customize
+public:
+	HRESULT Set_AnimMaterial(uint32_t materialNum, const char* modelFileName);
+
 private:
 	HRESULT Ready_BinaryModelFile(const char* modelFileName);
 	

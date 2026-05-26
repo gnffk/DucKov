@@ -557,3 +557,38 @@ HRESULT Model::Ready_AnimMaterial(ifstream& _file, const char* modelFileName)
     return S_OK;
 }
 
+HRESULT Model::Set_AnimMaterial(uint32_t materialNum, const char* modelFileName)
+{
+    for (size_t i = 0; i < m_iNumMaterials; i++)
+    {
+        uint32_t textureTypeCnt = 0;
+        vector<vector<TEXTUREINFO>> textureTypes;
+
+        textureTypes.clear();
+        textureTypes.reserve(TextureType_END);
+        for (uint32_t j = 0; j < textureTypeCnt; ++j) {
+            vector<TEXTUREINFO> texes;
+            uint32_t len;
+            uint32_t textureCnt = 0;
+            texes.resize(textureCnt);
+
+            for (uint32_t o = 0; o < textureCnt; ++o) {
+                texes[o].m_textureType;
+                texes[o].m_textureNum;
+                texes[o].File;
+                texes[o].Ext;
+            }
+            textureTypes.emplace_back(texes);
+        }
+
+
+        auto  pMaterial = Material::Create(m_pDevice, m_pContext, textureTypes, modelFileName);
+        m_Materials[materialNum] = (pMaterial);
+
+
+    }
+
+
+    return S_OK;
+}
+

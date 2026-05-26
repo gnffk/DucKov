@@ -83,7 +83,7 @@ void Body_Player::Update(_float fTimeDelta)
 	if (*m_pParentState & Player_FSM::PLAYER_STATE::ROLL)
 		nextAnim = 11;
 
-
+	nextAnim = 0;
 	if (m_pModelCom->Get_CurAnimationIndex() != nextAnim)
 	{
 		m_pModelCom->Set_Animation(nextAnim);
