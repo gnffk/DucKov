@@ -10,6 +10,7 @@
 #include "Key_Manager.h"
 #include "Collider_Manager.h"
 #include "Map_Manager.h"
+#include "Font_Manager.h"
 
 CGameInstance::CGameInstance()
 {
@@ -70,6 +71,9 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pLevel_Manager)
         return E_FAIL;
 
+    m_pFont_Manager = Font_Manager::Create(pOutDevice, pOutDeviceContext);
+    if (nullptr == m_pFont_Manager)
+        return E_FAIL;
 
     return S_OK;
 }
@@ -387,6 +391,17 @@ bool CGameInstance::Mouse_Down(MOUSEKEYSTATE eMouseState) {
 
 #pragma endregion
 
+#pragma region FONT_MANAGER
+HRESULT CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath)
+{
+    return m_pFont_Manager->Add_Font(strFontTag, pFontFilePath);
+}
+void CGameInstance::Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, float fScale, _fvector vColor, _float fRotation, const _float2& vOrigin)
+{
+    m_pFont_Manager->Draw(strFontTag, pText, vPosition, fScale, vColor, fRotation, vOrigin);
+}
+
+#pragma endregion
 
 #pragma region Map_Manager
 HRESULT CGameInstance::Save(string _mapDataName, bool _overwrite) {
@@ -409,6 +424,8 @@ vector<string>& CGameInstance::FindCategories(string _category) {
 
 void CGameInstance::Release_Engine()
 {
+    m_pFont_Manager.reset();
+
     m_pCamera_Manager.reset();
 
     m_pCollider_Manager.reset();

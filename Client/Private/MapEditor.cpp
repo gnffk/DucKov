@@ -91,7 +91,7 @@ HRESULT MapEditor::Render()
 {
 	IMGUI_Render();
 
-
+    CGameInstance::Get().Draw_Text(TEXT("Font_Default"), TEXT("Map Editor"), _float2(1100.f, 0.f));
 	return S_OK;
 }
 

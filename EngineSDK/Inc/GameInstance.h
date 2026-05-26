@@ -115,7 +115,10 @@ public:
 	bool Mouse_Down(MOUSEKEYSTATE eMouseState);
 #pragma endregion
 
-
+#pragma region FONT_MANAGER
+	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath);
+	void Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, float fScale = 1.f, _fvector vColor = XMVectorSet(0.f, 0.f, 0.f, 1.f), _float fRotation = 0.f, const _float2& vOrigin = { 0.f, 0.f });
+#pragma endregion
 
 #pragma region Map_Manager
 	HRESULT Save(string _mapDataName, bool _overwrite);
@@ -138,7 +141,7 @@ private:
 	unique_ptr<class Key_Manager>					m_pKey_Manager = { nullptr };
 	unique_ptr<class Collider_Manager>				m_pCollider_Manager = { nullptr };
 	unique_ptr<class Map_Manager>					m_pMap_Manager = { nullptr };
-
+	unique_ptr<class Font_Manager>					m_pFont_Manager = { nullptr };
 
 public:
 	void			Release_Engine();

@@ -26,6 +26,10 @@ HRESULT Client::CMainGame::Initialize()
 	if (FAILED(CGameInstance::Get().Initialize_Engine(EngineDesc, m_pDevice, m_pContext)))
 		return E_FAIL;
 
+	if (FAILED(Ready_Fonts()))
+		return E_FAIL;
+
+
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;
 
@@ -66,6 +70,21 @@ HRESULT Client::CMainGame::Render()
 
 	return S_OK;
 }
+
+
+HRESULT CMainGame::Ready_Fonts()
+{
+	/*
+	MakeSpriteFont "³Ø½¼lv1°íµñ Bold" /FontSize:20 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 160ex.spritefont
+	*/
+
+
+	if (FAILED(CGameInstance::Get().Add_Font(TEXT("Font_Default"), TEXT("../../Resources/Fonts/160ex.spriteFont"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 
 unique_ptr<CMainGame> Client::CMainGame::Create()
 {

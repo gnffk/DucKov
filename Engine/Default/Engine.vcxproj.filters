@@ -133,8 +133,14 @@
     <Filter Include="05.GameObject\ContainerObject\PartObject">
       <UniqueIdentifier>{dd58cd3e-81f4-46eb-a503-69e6f116c27a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="10. FSM">
+    <Filter Include="10.FSM">
       <UniqueIdentifier>{8fe1a21d-a0e8-4fb4-9026-3ab3081dc800}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="11.Font">
+      <UniqueIdentifier>{1028154d-4b9f-4ca5-9120-d6f86b36fa13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="11.Font\Font_Manager">
+      <UniqueIdentifier>{638681a8-cd54-4610-a857-8aef4fb80cd7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -292,7 +298,13 @@
       <Filter>05.GameObject\ContainerObject\PartObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FSM.cpp">
-      <Filter>10. FSM</Filter>
+      <Filter>10.FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Font_Manager.cpp">
+      <Filter>11.Font\Font_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CustomFont.cpp">
+      <Filter>11.Font</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -432,7 +444,13 @@
       <Filter>05.GameObject\ContainerObject\PartObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FSM.h">
-      <Filter>10. FSM</Filter>
+      <Filter>10.FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Font_Manager.h">
+      <Filter>11.Font\Font_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CustomFont.h">
+      <Filter>11.Font</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

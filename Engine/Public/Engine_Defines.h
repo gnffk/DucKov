@@ -14,6 +14,9 @@
 #include "DirectXTK/PrimitiveBatch.h"
 #include "DirectXTK/CommonStates.h"
 #include "DirectXTK/Effects.h"
+
+#include "DirectXTK/SpriteFont.h"
+#include "DirectXTK/SpriteBatch.h"
 #include <DirectXCollision.h>
 
 using namespace DirectX;
