@@ -30,6 +30,8 @@ public:
 public:
 	void		MouseLook(_float fTimeDelta);
 	void		KeyBoardLook(_float fTimeDelta);
+	HRESULT		Roll(_float fTimeDelta);
+	void		Shift(_float fTimeDelta);
 	_vector		Get_RollDir() const
 	{
 		return m_vRollDir;

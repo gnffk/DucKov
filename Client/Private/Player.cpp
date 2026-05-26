@@ -67,136 +67,10 @@ void Player::Priority_Update(_float fTimeDelta)
 
 void Player::Update(_float fTimeDelta)
 {
-	if (CGameInstance::Get().Key_Down(DIK_SPACE) && false == m_isRolling)
-	{
-		_vector vMoveDir = XMVectorZero();
-
-		_float4 fCameraPos;
-		CGameInstance::Get().Get_MainCameraPosition(fCameraPos);
-
-		_vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
-		_vector vCameraPos = XMLoadFloat4(&fCameraPos);
-		vCameraPos = XMVectorSetY(vCameraPos, 0.f);
-
-		_vector vCameraDir = XMVector3Normalize(vCameraPos - vPlayerPos);
-
-		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-		_vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vCameraDir));
-
-		if (CGameInstance::Get().Key_Pressing(DIK_A))
-			vMoveDir += vRight;
-
-		if (CGameInstance::Get().Key_Pressing(DIK_D))
-			vMoveDir -= vRight;
-
-		if (CGameInstance::Get().Key_Pressing(DIK_W))
-			vMoveDir -= vCameraDir;
-
-		if (CGameInstance::Get().Key_Pressing(DIK_S))
-			vMoveDir += vCameraDir;
-
-		// 키 안 누르고 구르면 현재 바라보는 방향으로
-		if (XMVector3Equal(vMoveDir, XMVectorZero()))
-			vMoveDir = m_pTransformCom->Get_State(STATE::LOOK);
-
-
-		m_vRollDir = XMVector3Normalize(vMoveDir);
-
-		// Roll 방향으로 즉시 바라보게 만들기
-		_float fX = XMVectorGetX(m_vRollDir);
-		_float fZ = XMVectorGetZ(m_vRollDir);
-
-		// 기본 Look이 +Z라면 이 공식
-		_float fYaw = XMConvertToDegrees(atan2f(fX, fZ));
-
-		m_pTransformCom->Rotation(0.f, fYaw, 0.f);
-
-		m_isRolling = true;
-		m_fRollTimer = m_fRollDuration;
-
-		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::ROLL);
-
-
+	if (FAILED(Roll(fTimeDelta))) {
+		return;
 	}
-	if (true == m_isRolling)
-	{
-		m_fRollTimer -= fTimeDelta;
-
-		if (m_fRollTimer <= 0.f)
-		{
-			m_isRolling = false;
-			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
-		}
-		else
-		{
-			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::ROLL);
-			m_pPlayerFSM->Update(fTimeDelta);
-			__super::Update(fTimeDelta);
-			return;
-		}
-	}
-if (CGameInstance::Get().Key_Down(DIK_LSHIFT))
-		m_bShift = !m_bShift;
-
-	if (!m_bShift) {
-		
-		m_fSpeedFloat = 1.f;
-		_vector vMoveDir = XMVectorZero();
-		_float4 fCameraPos;
-		CGameInstance::Get().Get_MainCameraPosition(fCameraPos);
-
-		_vector	vPlayerPos, vCameraPos, vCameraDir;
-		vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
-		vCameraPos = XMLoadFloat4(&fCameraPos);
-		vCameraPos = XMVectorSetY(vCameraPos, 0.0f);
-		vCameraDir = vCameraPos - vPlayerPos;
-
-		vCameraDir = XMVector3Normalize(vCameraDir);
-
-		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-
-		_vector vRight = XMVector3Cross(vUp, vCameraDir);
-		vRight = XMVector3Normalize(vRight);
-
-		if (CGameInstance::Get().Key_Pressing(DIK_A))
-		{
-			vMoveDir += vRight;
-		}
-
-		if (CGameInstance::Get().Key_Pressing(DIK_D))
-		{
-			vMoveDir -= vRight;
-		}
-
-		if (CGameInstance::Get().Key_Pressing(DIK_W))
-		{
-			vMoveDir -= vCameraDir;
-		}
-
-		if (CGameInstance::Get().Key_Pressing(DIK_S))
-		{
-			vMoveDir += vCameraDir;
-		}
-
-		if (!XMVector3Equal(vMoveDir, XMVectorZero()))
-		{
-			m_pTransformCom->Move(vMoveDir, fTimeDelta);
-			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::HAND_UP_AND_WALK);
-		}
-		else
-		{
-			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
-		}
-
-		MouseLook(fTimeDelta);
-	}
-	else if(m_bShift&&(CGameInstance::Get().Key_Pressing(DIK_A) || CGameInstance::Get().Key_Pressing(DIK_S) || CGameInstance::Get().Key_Pressing(DIK_D) || CGameInstance::Get().Key_Pressing(DIK_W))){
-		KeyBoardLook(fTimeDelta);
-	}
-	else {
-		m_bShift = false;
-		m_fSpeedFloat = 1.f;
-	}
+	Shift(fTimeDelta);
 	m_pPlayerFSM->Update(fTimeDelta);
 
 	__super::Update(fTimeDelta);
@@ -370,10 +244,10 @@ void Player::KeyBoardLook(_float fTimeDelta) {
 		}
 
 		if (XMVectorGetY(cross) < 0.f) {
-			m_pTransformCom->Turn(-TurnAxis, fTimeDelta * 3.f);
+			m_pTransformCom->Turn(-TurnAxis, fTimeDelta * 1.5f);
 		}
 		else {
-			m_pTransformCom->Turn(TurnAxis, fTimeDelta * 3.f);
+			m_pTransformCom->Turn(TurnAxis, fTimeDelta * 1.5f);
 		}
 
 	}
@@ -421,6 +295,147 @@ void Player::KeyBoardLook(_float fTimeDelta) {
 
 	
 }
+
+HRESULT Player::Roll(_float fTimeDelta)
+{
+	if (CGameInstance::Get().Key_Down(DIK_SPACE) && false == m_isRolling)
+	{
+		_vector vMoveDir = XMVectorZero();
+
+		_float4 fCameraPos;
+		CGameInstance::Get().Get_MainCameraPosition(fCameraPos);
+
+		_vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+		_vector vCameraPos = XMLoadFloat4(&fCameraPos);
+		vCameraPos = XMVectorSetY(vCameraPos, 0.f);
+
+		_vector vCameraDir = XMVector3Normalize(vCameraPos - vPlayerPos);
+
+		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+		_vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vCameraDir));
+
+		if (CGameInstance::Get().Key_Pressing(DIK_A))
+			vMoveDir += vRight;
+
+		if (CGameInstance::Get().Key_Pressing(DIK_D))
+			vMoveDir -= vRight;
+
+		if (CGameInstance::Get().Key_Pressing(DIK_W))
+			vMoveDir -= vCameraDir;
+
+		if (CGameInstance::Get().Key_Pressing(DIK_S))
+			vMoveDir += vCameraDir;
+
+		// 키 안 누르고 구르면 현재 바라보는 방향으로
+		if (XMVector3Equal(vMoveDir, XMVectorZero()))
+			vMoveDir = m_pTransformCom->Get_State(STATE::LOOK);
+
+
+		m_vRollDir = XMVector3Normalize(vMoveDir);
+
+		// Roll 방향으로 즉시 바라보게 만들기
+		_float fX = XMVectorGetX(m_vRollDir);
+		_float fZ = XMVectorGetZ(m_vRollDir);
+
+		// 기본 Look이 +Z라면 이 공식
+		_float fYaw = XMConvertToDegrees(atan2f(fX, fZ));
+
+		m_pTransformCom->Rotation(0.f, fYaw, 0.f);
+
+		m_isRolling = true;
+		m_fRollTimer = m_fRollDuration;
+
+		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::ROLL);
+
+
+	}
+	if (true == m_isRolling)
+	{
+		m_fRollTimer -= fTimeDelta;
+
+		if (m_fRollTimer <= 0.f)
+		{
+			m_isRolling = false;
+			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
+		}
+		else
+		{
+			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::ROLL);
+			m_pPlayerFSM->Update(fTimeDelta);
+			__super::Update(fTimeDelta);
+			return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+void Player::Shift(_float fTimeDelta)
+{
+	if (CGameInstance::Get().Key_Down(DIK_LSHIFT))
+		m_bShift = !m_bShift;
+
+	if (!m_bShift) {
+
+		m_fSpeedFloat = 1.f;
+		_vector vMoveDir = XMVectorZero();
+		_float4 fCameraPos;
+		CGameInstance::Get().Get_MainCameraPosition(fCameraPos);
+
+		_vector	vPlayerPos, vCameraPos, vCameraDir;
+		vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+		vCameraPos = XMLoadFloat4(&fCameraPos);
+		vCameraPos = XMVectorSetY(vCameraPos, 0.0f);
+		vCameraDir = vCameraPos - vPlayerPos;
+
+		vCameraDir = XMVector3Normalize(vCameraDir);
+
+		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+		_vector vRight = XMVector3Cross(vUp, vCameraDir);
+		vRight = XMVector3Normalize(vRight);
+
+		if (CGameInstance::Get().Key_Pressing(DIK_A))
+		{
+			vMoveDir += vRight;
+		}
+
+		if (CGameInstance::Get().Key_Pressing(DIK_D))
+		{
+			vMoveDir -= vRight;
+		}
+
+		if (CGameInstance::Get().Key_Pressing(DIK_W))
+		{
+			vMoveDir -= vCameraDir;
+		}
+
+		if (CGameInstance::Get().Key_Pressing(DIK_S))
+		{
+			vMoveDir += vCameraDir;
+		}
+
+		if (!XMVector3Equal(vMoveDir, XMVectorZero()))
+		{
+			m_pTransformCom->Move(vMoveDir, fTimeDelta);
+			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::HAND_UP_AND_WALK);
+		}
+		else
+		{
+			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
+		}
+
+		MouseLook(fTimeDelta);
+	}
+	else if (m_bShift && (CGameInstance::Get().Key_Pressing(DIK_A) || CGameInstance::Get().Key_Pressing(DIK_S) || CGameInstance::Get().Key_Pressing(DIK_D) || CGameInstance::Get().Key_Pressing(DIK_W))) {
+		KeyBoardLook(fTimeDelta);
+	}
+	else {
+		m_bShift = false;
+		m_fSpeedFloat = 1.f;
+	}
+}
+
 HRESULT Player::Render()
 {
 	return S_OK;
