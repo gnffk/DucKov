@@ -181,7 +181,7 @@ void Importer::Ready_Bones(const aiNode* pAINode, int32_t iParentBoneIndex)
 
     memcpy(&(pBone->m_TransformationMatrix), &pAINode->mTransformation, sizeof(XMFLOAT4X4));
 
-    pBone->m_patrentBoneIndex = iParentBoneIndex;
+    pBone->m_patrentBoneIndex = iParentBoneIndex; 
 
     Bones.push_back(pBone);
 

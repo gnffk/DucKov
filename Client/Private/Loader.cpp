@@ -148,24 +148,24 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 
 
-	_matrix CustomMatrix =
-		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
-		XMMatrixRotationY(XMConvertToRadians(180.f));
 
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CharacterModel_Duck_Jeff"),
-		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK1", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CharacterModel_Duck_Jeff/SK_CharacterModel_Duck_Jeff.bin", CustomMatrix))))
-		return E_FAIL;
+
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CharacterModel_Duck_Jeff"),
+	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK1", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CharacterModel_Duck_Jeff/SK_CharacterModel_Duck_Jeff.bin", CustomMatrix))))
+	//	return E_FAIL;
 
 
 	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Fiona"),
 	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK2", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Fiona/SK_Fiona.bin", PreTransformMatrix))))
 	//	return E_FAIL;
 
+		_matrix CustomMatrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
+		XMMatrixRotationY(XMConvertToRadians(180.f));
 
-
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomBody"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomBody/SK_CustomBody.bin", CustomMatrix))))
-	//	return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomBody"),
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomBody/SK_CustomBody.bin", CustomMatrix))))
+		return E_FAIL;
 
 
 

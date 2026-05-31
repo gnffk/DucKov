@@ -8,25 +8,31 @@ NS_BEGIN(Client)
 class Player_FSM final : public FSM
 {
 public:
-	enum PLAYER_STATE
-	{
-		IDLE = 0x00000001,
-		RUN = 0x00000002,
-		WALK = 0x00000004,
-		RIGHT_WALK = 0x00000008,
-		LEFT_WALK = 0x00000010,
-		TPOSE = 0x00000020,
-		HAND_UP = 0x00000040,
-		HAND_UP_AND_RUN = 0x00000080,
-		HAND_UP_AND_WALK = 0x00000100,
-		HAND_UP_AND_RIGHT = 0x00000200,
-		HAND_UP_AND_LEFT = 0x00000400,
-		ROLL = 0x00000800,
-		HIT = 0x00001000,
-		HIT_REVERSE = 0x00002000,
+    enum PLAYER_STATE
+    {
+        IDLE = 1 << 0,
+        HAND_UP = 1 << 1,
 
-		END = 0xffffffff
-	};
+        WALK = 1 << 2,
+        LEFT_WALK = 1 << 3,
+        RIGHT_WALK = 1 << 4,
+        WALK_BACKWARD = 1 << 5,
+
+        HAND_UP_AND_WALK = 1 << 6,
+        HAND_UP_AND_LEFT = 1 << 7,
+        HAND_UP_AND_BACKWARD = 1 << 8,
+        HAND_UP_AND_RIGHT = 1 << 9,
+
+        TPOSE = 1 << 10,
+        ROLL = 1 << 11,
+
+        HIT = 1 << 12,
+        HIT_REVERSE = 1 << 13,
+
+        RUN = 1 << 14,
+        END = 1 << 15,
+    };
+
 private:
     Player_FSM();
 

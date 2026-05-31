@@ -285,7 +285,7 @@ void Player::KeyBoardLook(_float fTimeDelta) {
 	{
 		m_pTransformCom->Move(vMoveDir, fTimeDelta * m_fSpeedFloat);
 
-		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::WALK);
+		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::RUN);
 	}
 	else
 	{
@@ -418,11 +418,16 @@ void Player::Shift(_float fTimeDelta)
 		if (!XMVector3Equal(vMoveDir, XMVectorZero()))
 		{
 			m_pTransformCom->Move(vMoveDir, fTimeDelta);
+
 			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::HAND_UP_AND_WALK);
+				
 		}
 		else
 		{
-			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
+			if (CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_RB))
+				dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::HAND_UP);
+			else
+				dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
 		}
 
 		MouseLook(fTimeDelta);
@@ -470,7 +475,7 @@ HRESULT Player::Ready_PartObjects()
 	BodyDesc.pParentState = &m_iState;
 	BodyDesc.m_strPrototypeObjectName = L"Prototype_GameObject_Body_Player";
 	//BodyDesc.m_strPrototypeBaseName =L"SK_Player";
-	BodyDesc.m_strPrototypeBaseName =L"SK_CharacterModel_Duck_Jeff";
+	BodyDesc.m_strPrototypeBaseName =L"SK_CustomBody";
 	BodyDesc.pCameraType = ETOUI(CAMERA::NONE);
 	BodyDesc.fSpeedPerSec = 5.f;
 	BodyDesc.fRotationPerSec = 1.f;

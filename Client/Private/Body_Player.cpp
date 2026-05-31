@@ -63,79 +63,101 @@ void Body_Player::Update(_float fTimeDelta)
 		case Player_FSM::PLAYER_STATE::IDLE:
 			targetAnim = 0;
 			blendDuration = 0.18f;
-			break;
-
-		case Player_FSM::PLAYER_STATE::RUN:
-			targetAnim = 1;
-			blendDuration = 0.12f;
-			break;
-
-		case Player_FSM::PLAYER_STATE::WALK:
-			targetAnim = 2;
-			blendDuration = 0.12f;
-			break;
-
-		case Player_FSM::PLAYER_STATE::RIGHT_WALK:
-			targetAnim = 3;
-			blendDuration = 0.12f;
-			break;
-
-		case Player_FSM::PLAYER_STATE::LEFT_WALK:
-			targetAnim = 4;
-			blendDuration = 0.12f;
-			break;
-
-		case Player_FSM::PLAYER_STATE::TPOSE:
-			targetAnim = 5;
-			blendDuration = 0.1f;
+			nextAnimPlus = 1.f;
 			break;
 
 		case Player_FSM::PLAYER_STATE::HAND_UP:
-			targetAnim = 6;
-			blendDuration = 0.15f;
+			targetAnim = 1;
+			blendDuration = 0.12f;
+			nextAnimPlus = 1.f;
 			break;
 
-		case Player_FSM::PLAYER_STATE::HAND_UP_AND_RUN:
+		case Player_FSM::PLAYER_STATE::RIGHT_WALK:
+			targetAnim = 2;
+			blendDuration = 0.12f;
+			nextAnimPlus = 1.f;
+			break;
+
+		case Player_FSM::PLAYER_STATE::LEFT_WALK:
+			targetAnim = 3;
+			blendDuration = 0.12f;
+			nextAnimPlus = 1.f;
+			break;
+
+		case Player_FSM::PLAYER_STATE::WALK:
+			targetAnim = 4;
+			blendDuration = 0.12f;
+			nextAnimPlus = 0.5f;
+			break;
+
+		case Player_FSM::PLAYER_STATE::WALK_BACKWARD:
+			targetAnim = 5;
+			blendDuration = 0.1f;
+			nextAnimPlus = 1.f;
+			break;
+
+		case Player_FSM::PLAYER_STATE::TPOSE:
+			targetAnim = 6;
+			blendDuration = 0.15f;
+			nextAnimPlus = 1.f;
+			break;
+
+		case Player_FSM::PLAYER_STATE::HAND_UP_AND_BACKWARD:
 			targetAnim = 7;
 			blendDuration = 0.12f;
+			nextAnimPlus = 1.f;
 			break;
 
 		case Player_FSM::PLAYER_STATE::HAND_UP_AND_WALK:
 			targetAnim = 8;
 			blendDuration = 0.12f;
+			nextAnimPlus = 0.7f;
 			break;
 
 		case Player_FSM::PLAYER_STATE::HAND_UP_AND_RIGHT:
 			targetAnim = 9;
 			blendDuration = 0.12f;
+			nextAnimPlus = 1.f;
 			break;
 
 		case Player_FSM::PLAYER_STATE::HAND_UP_AND_LEFT:
 			targetAnim = 10;
 			blendDuration = 0.12f;
+			nextAnimPlus = 1.f;
 			break;
 
 		case Player_FSM::PLAYER_STATE::ROLL:
 			targetAnim = 11;
 			isLoop = false;
 			blendDuration = 0.06f;
+			nextAnimPlus = 2.f;
 			break;
 
 		case Player_FSM::PLAYER_STATE::HIT:
 			targetAnim = 12;
 			isLoop = false;
 			blendDuration = 0.05f;
+			nextAnimPlus = 1.f;
 			break;
 
 		case Player_FSM::PLAYER_STATE::HIT_REVERSE:
 			targetAnim = 13;
 			isLoop = false;
 			blendDuration = 0.05f;
+			nextAnimPlus = 1.f;
+			break;
+
+
+		case Player_FSM::PLAYER_STATE::RUN:
+			targetAnim = 4;
+			blendDuration = 0.05f;
+			nextAnimPlus = 1.f;
 			break;
 
 		default:
 			targetAnim = 0;
 			blendDuration = 0.18f;
+			nextAnimPlus = 1.f;
 			break;
 		}
 	}
@@ -146,11 +168,9 @@ void Body_Player::Update(_float fTimeDelta)
 	{
 		m_pModelCom->Set_Animation(nextAnim, isLoop, blendDuration);
 	}
-	if (targetAnim == 11) {
-		m_pModelCom->Play_Animation(fTimeDelta * 2.f);
-	}
+
 	else {
-		m_pModelCom->Play_Animation(fTimeDelta);
+		m_pModelCom->Play_Animation(fTimeDelta* nextAnimPlus);
 	}
 
 
