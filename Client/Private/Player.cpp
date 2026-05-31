@@ -49,7 +49,7 @@ HRESULT Player::Initialize(void* pArg)
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
 
-	m_pCollider->SetOwner(SHARED_THIS(Player).get());
+	
 
 	m_pPlayerFSM->SetOwner(SHARED_THIS(Player));
 	return S_OK;
@@ -59,8 +59,17 @@ void Player::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 	
-	CGameInstance::Get().Add_Collider(L"Player", m_pCollider.get());
-	
+	for (int type = 0; type < (int)COLLIDER::COLLIDER_END; ++type)
+	{
+		auto& colliderList = m_pColliderComs[type];
+
+		for (size_t i = 0; i < colliderList.size(); ++i)
+		{
+
+			CGameInstance::Get().Add_Collider(colliderList[i]->Get_GroupTag(), colliderList[i].get());
+
+		}
+	}
 	m_pPlayerFSM->Priority_Update(fTimeDelta);
 
 }
@@ -333,11 +342,11 @@ HRESULT Player::Roll(_float fTimeDelta)
 
 		m_vRollDir = XMVector3Normalize(vMoveDir);
 
-		// Roll 방향으로 즉시 바라보게 만들기
+
 		_float fX = XMVectorGetX(m_vRollDir);
 		_float fZ = XMVectorGetZ(m_vRollDir);
 
-		// 기본 Look이 +Z라면 이 공식
+	
 		_float fYaw = XMConvertToDegrees(atan2f(fX, fZ));
 
 		m_pTransformCom->Rotation(0.f, fYaw, 0.f);
@@ -448,12 +457,12 @@ HRESULT Player::Render()
 
 HRESULT Player::Ready_Components()
 {
-	m_pCollider = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
-	m_pCollider->Set_Tag(COLLIDER::COLLIDER_OBB);
+	auto m_pCollider = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
+	m_pCollider->SetOwner(SHARED_THIS(Player).get());
 	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pCollider)))
 		return E_FAIL;
-
-
+	m_pCollider->Set_GroupTag(L"Player");
+	m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].push_back(m_pCollider);
 	return S_OK;
 }
 
@@ -505,23 +514,23 @@ _bool Player::Collider_Obstacle(_float fTimeDelta)
 {
 
 	auto ColliderGroup = CGameInstance::Get().GetColliderGroups(L"Obstacle");
-	if (ColliderGroup != nullptr) {
-		for (auto Collider : *ColliderGroup)
-		{
-			if (CGameInstance::Get().Intersect(m_pCollider.get(),Collider))
+	auto ColliderPlayer= CGameInstance::Get().GetColliderGroups(L"Player");
+	if (ColliderGroup != nullptr && ColliderPlayer != nullptr) {
+		for (auto _PlayerCollider : *ColliderPlayer) {
+			for (auto Collider : *ColliderGroup)
 			{
-				auto a = static_cast<OBB_Collider*>(m_pCollider.get())->Get_BoudingBox();
+				if (CGameInstance::Get().Intersect(_PlayerCollider, Collider))
+				{
 
-				auto b =static_cast<OBB_Collider*>(Collider)->Get_BoudingBox();
+					Collider->SetColliderColor(ColliderColor::RED);
 
-			
-				Collider->SetColliderColor(
-					ColliderColor::RED);
+					_PlayerCollider->SetColliderColor(ColliderColor::RED);
+				}
 
-				m_pCollider->SetColliderColor(
-					ColliderColor::RED);
+
 			}
 		}
+	
 	}
 
 	return _bool();

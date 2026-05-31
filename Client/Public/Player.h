@@ -38,7 +38,7 @@ public:
 	}
 private:
 	uint32_t			m_iState = {};
-	shared_ptr<class BaseCollider>	m_pCollider = { nullptr };
+	
 	shared_ptr<class FSM> m_pPlayerFSM = { nullptr };
 
 	_bool				m_bShift = { false };

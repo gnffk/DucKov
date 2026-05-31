@@ -2,7 +2,7 @@
 #include "BaseCollider.h"
 #include "AABB_Collider.h"
 #include "OBB_Collider.h"
-
+#include "Sphere_Collider.h"
 #include "GameInstance.h"
 #include "Layer.h"
 #include "Mesh.h"
@@ -90,7 +90,17 @@ _bool Collider_Manager::Intersect(BaseCollider* pCollider, BaseCollider* sCollid
 
             case COLLIDER::COLLIDER_SPHERE:
             {
-           
+                auto sSpehre =
+                    dynamic_cast<Sphere_Collider*>(sCollider);
+
+                if (pAABB == nullptr || sSpehre == nullptr)
+                    return false;
+
+                if (pAABB->Get_BoudingBox().Intersects(
+                    sSpehre->Get_BoudingSphere()))
+                {
+                    return true;
+                }
             }
             break;
         }
@@ -135,7 +145,17 @@ _bool Collider_Manager::Intersect(BaseCollider* pCollider, BaseCollider* sCollid
 
         case COLLIDER::COLLIDER_SPHERE:
         {
-      
+            auto sSpehre =
+                dynamic_cast<Sphere_Collider*>(sCollider);
+
+            if (pOBB == nullptr || sSpehre == nullptr)
+                return false;
+
+            if (pOBB->Get_BoudingBox().Intersects(
+                sSpehre->Get_BoudingSphere()))
+            {
+                return true;
+            }
         }
         break;
         }
@@ -143,8 +163,57 @@ _bool Collider_Manager::Intersect(BaseCollider* pCollider, BaseCollider* sCollid
 
 
     // pCollider SPhere
-    if (pCollider->Get_Tag() == COLLIDER::COLLIDER_AABB) {
-      
+    if (pCollider->Get_Tag() == COLLIDER::COLLIDER_SPHERE) {
+        auto pSphere = dynamic_cast<Sphere_Collider*>(pCollider);
+        switch (sCollider->Get_Tag())
+        {
+        case COLLIDER::COLLIDER_AABB:
+        {
+
+            auto sAABB = dynamic_cast<AABB_Collider*>(sCollider);
+
+            if (pSphere == nullptr || sAABB == nullptr)
+                return false;
+
+            if (pSphere->Get_BoudingSphere().Intersects(
+                sAABB->Get_BoudingBox()))
+            {
+                return true;
+            }
+        }
+        break;
+
+        case COLLIDER::COLLIDER_OBB:
+        {
+            auto sOBB =
+                dynamic_cast<OBB_Collider*>(sCollider);
+
+            if (pSphere == nullptr || sOBB == nullptr)
+                return false;
+
+            if (pSphere->Get_BoudingSphere().Intersects(sOBB->Get_BoudingBox()))
+            {
+                return true;
+            }
+        }
+        break;
+
+        case COLLIDER::COLLIDER_SPHERE:
+        {
+            auto sSpehre =
+                dynamic_cast<Sphere_Collider*>(sCollider);
+
+            if (pSphere == nullptr || sSpehre == nullptr)
+                return false;
+
+            if (pSphere->Get_BoudingSphere().Intersects(
+                sSpehre->Get_BoudingSphere()))
+            {
+                return true;
+            }
+        }
+        break;
+        }
     }
 
     return false;

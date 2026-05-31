@@ -4,6 +4,7 @@
 #include "PerspectiveCamera.h"
 #include "AABB_Collider.h"
 #include "OBB_Collider.h"
+#include "Sphere_Collider.h"
 #include "Terrain.h"
 #include "Sky.h"
 #include "Obstacle.h"
@@ -265,6 +266,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider"),
 		OBB_Collider::Create(m_pDevice, m_pContext)))) {
+		return E_FAIL;
+	}
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Sphere_Collider"),
+		Sphere_Collider::Create(m_pDevice, m_pContext)))) {
 		return E_FAIL;
 	}
 

@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "AABB_Collider.h"
 #include "OBB_Collider.h"
+#include "Sphere_Collider.h"
 Obstacle::Obstacle(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: GameObject{ pDevice, pContext }
 
@@ -54,8 +55,8 @@ void Obstacle::Priority_Update(_float fTimeDelta)
 
 		for (size_t i = 0; i < colliderList.size(); ++i)
 		{
-	
-			CGameInstance::Get().Add_Collider(L"Obstacle", colliderList[i].get());
+
+			CGameInstance::Get().Add_Collider(colliderList[i]->Get_GroupTag(), colliderList[i].get());
 
 		}
 	}
@@ -304,15 +305,11 @@ void Obstacle::IMGUITEST()
 			CreateUniqueColliderName(L"Com_AABBCollider");
 
 
-		__super::Add_Component(
-			componentName,
-			pAABBCom);
+		__super::Add_Component(componentName,pAABBCom);
 
-		pAABBCom->SetOwner(
-			SHARED_THIS(Obstacle).get());
-
-		m_pColliderComs[(int)COLLIDER::COLLIDER_AABB]
-			.push_back(pAABBCom);
+		pAABBCom->SetOwner(SHARED_THIS(Obstacle).get());
+		pAABBCom->Set_GroupTag(L"Obstacle");
+		m_pColliderComs[(int)COLLIDER::COLLIDER_AABB].push_back(pAABBCom);
 	}
 
 	if (ImGui::Selectable("OBB Collider", selectedCollider == 1))
@@ -326,7 +323,7 @@ void Obstacle::IMGUITEST()
 					TEXT("Prototype_Com_OBB_Collider")));
 
 		pOBBCom->Set_Tag(COLLIDER::COLLIDER_OBB);
-
+		pOBBCom->Set_GroupTag(L"Obstacle");
 		wstring componentName =
 			CreateUniqueColliderName(L"Com_OBBCollider");
 
@@ -346,7 +343,25 @@ void Obstacle::IMGUITEST()
 	{
 		selectedCollider = 2;
 
-		// m_pColliderCom.push_back(make_shared<SphereCollider>());
+		auto pSphereCom =
+			dynamic_pointer_cast<BaseCollider>(
+				CGameInstance::Get().Clone_Prototype(
+					CGameInstance::Get().Get_Level(),
+					TEXT("Prototype_Com_Sphere_Collider")));
+		pSphereCom->Set_Tag(COLLIDER::COLLIDER_SPHERE);
+		wstring componentName =
+			CreateUniqueColliderName(L"Com_Sphere_Collider");
+
+
+		__super::Add_Component(
+			componentName,
+			pSphereCom);
+
+		pSphereCom->SetOwner(
+			SHARED_THIS(Obstacle).get());
+		pSphereCom->Set_GroupTag(L"Obstacle");
+		m_pColliderComs[(int)COLLIDER::COLLIDER_SPHERE]
+			.push_back(pSphereCom);
 	}
 
 	ImGui::Spacing();
@@ -390,7 +405,7 @@ void Obstacle::IMGUITEST()
 				break;
 
 			case COLLIDER::COLLIDER_SPHERE:
-				colliderTypeName = "Sphere";
+				colliderTypeName = "SPHERE";
 				break;
 			}
 

@@ -43,7 +43,7 @@ private:
 
 	shared_ptr<Model>			m_pModelCom = { nullptr };
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
-	vector<shared_ptr<BaseCollider>>	m_pColliderComs[COLLIDER::COLLIDER_END];
+
 
 
 public:

@@ -2,6 +2,7 @@
 
 AABB_Collider::AABB_Collider(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext) : BaseCollider{pDevice, pContext}
 {
+    m_sTag = COLLIDER::COLLIDER_AABB;
 	m_eColliderID = ColliderType::AABB;
 	m_eColor = ColliderColor::GREEN;
 }

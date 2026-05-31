@@ -40,13 +40,15 @@ public:
 	GAMEOBJECT_DESC& GetObjectINFO() { return Object_INFO; }
 	map<const _wstring, shared_ptr<class Component>>& GetComponents();
 
+public:
+	void Add_ColliderComGroup(shared_ptr<class BaseCollider> base, COLLIDER e_Collider) { m_pColliderComs[e_Collider].push_back(base); }
 
 protected:
 	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
 	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
 
 	shared_ptr<class Transform>	m_pTransformCom = { nullptr };
-
+	vector<shared_ptr<class BaseCollider>>	m_pColliderComs[COLLIDER::COLLIDER_END];
 	
 
 
@@ -57,8 +59,10 @@ protected:
 
 	_bool			m_bDead = false;
 
-protected:
+public:
 	HRESULT Add_Component(const _wstring& strComponentTag, shared_ptr<Component> pComponent);
+protected:
+	
 
 	HRESULT Clear_Compnent();
 

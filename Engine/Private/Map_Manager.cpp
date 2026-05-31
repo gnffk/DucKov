@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "Layer.h"
 #include "Camera.h"
+#include "BaseCollider.h"
 Map_Manager::Map_Manager()
 {
 }
@@ -219,11 +220,40 @@ HRESULT Map_Manager::Save(string _mapDataName, bool _overwrite) {
                     continue;
 
                 json componentJson;
+                string componentTagStr(
+                    componentTag.begin(),
+                    componentTag.end());
+                componentJson["ComponentTag"] = componentTagStr;
 
-                componentJson["ComponentTag"] =
-                    string(
-                        componentTag.begin(),
-                        componentTag.end());
+           
+                if (componentTag.find(L"Collider") != wstring::npos)
+                {
+                    auto collider =
+                        dynamic_pointer_cast<BaseCollider>(componentPtr);
+
+                    if (collider != nullptr)
+                    {
+                        const XMFLOAT3& center = collider->Get_Center();
+                        const XMFLOAT3& extend = collider->Get_Extend();
+                    
+                        componentJson[componentTagStr]["Center"] =
+                        {
+                            center.x,
+                            center.y,
+                            center.z
+                        };
+
+                        componentJson[componentTagStr]["Extend"] =
+                        {
+                            extend.x,
+                            extend.y,
+                            extend.z
+                        };
+
+                        componentJson[componentTagStr]["ColliderGroupTag"] = collider->Get_GroupTag();
+                    }
+                }
+
 
                 componentArray.push_back(componentJson);
             }
@@ -648,9 +678,85 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
             break;
         }
 
-        CGameInstance::Get().Change_Camera(0);
-    }
+        auto gameObject =
+            CGameInstance::Get().Find_Object(
+                Levelindex,
+                layerName,
+                objectName);
+        if (gameObject)
+        {
+            auto& components = objectJson["Components"];
 
+            for (auto& componentJson : components)
+            {
+                for (auto& [componentTag, componentData] : componentJson.items())
+                {
+                    if (componentTag.find("Collider") == string::npos)
+                        continue;
+
+                    shared_ptr<BaseCollider> collider;
+
+                    if (componentTag.find("AABB") != string::npos)
+                    {
+                        collider =
+                            dynamic_pointer_cast<BaseCollider>(
+                                CGameInstance::Get().Clone_Prototype(
+                                    Levelindex,
+                                    TEXT("Prototype_Com_AABB_Collider")));
+                        gameObject->Add_ColliderComGroup(collider,COLLIDER::COLLIDER_AABB);
+                    }
+                    else if (componentTag.find("OBB") != string::npos)
+                    {
+                        collider =
+                            dynamic_pointer_cast<BaseCollider>(
+                                CGameInstance::Get().Clone_Prototype(
+                                    Levelindex,
+                                    TEXT("Prototype_Com_OBB_Collider")));
+                        gameObject->Add_ColliderComGroup(collider, COLLIDER::COLLIDER_OBB);
+                    }
+                    else if (componentTag.find("Sphere") != string::npos )
+                    {
+                        collider =
+                            dynamic_pointer_cast<BaseCollider>(
+                                CGameInstance::Get().Clone_Prototype(
+                                    Levelindex,
+                                    TEXT("Prototype_Com_Sphere_Collider")));
+                        gameObject->Add_ColliderComGroup(collider, COLLIDER::COLLIDER_SPHERE);
+                    }
+
+                    if (collider == nullptr)
+                        continue;
+
+                    _float3 center =
+                    {
+                        componentData["Center"][0],
+                        componentData["Center"][1],
+                        componentData["Center"][2]
+                    };
+
+                    _float3 extend =
+                    {
+                        componentData["Extend"][0],
+                        componentData["Extend"][1],
+                        componentData["Extend"][2]
+                    };
+
+                    collider->Set_Center(center);
+                    collider->Set_Extend(extend);
+
+                    gameObject->Add_Component(
+                        wstring(componentTag.begin(), componentTag.end()),
+                        collider);
+
+                    collider->SetOwner(gameObject.get());
+                    collider->Set_GroupTag(componentData["ColliderGroupTag"]);
+
+                
+                }
+            }
+        }
+    }
+    CGameInstance::Get().Change_Camera(0);
     return S_OK;
 }
 

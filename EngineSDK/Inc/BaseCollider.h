@@ -47,17 +47,29 @@ public:
 		return m_Owner;
 	}
 	void SetColliderColor(ColliderColor _eColor) { m_eColor = _eColor; }
+
+
+	_float3 Get_Extend() { return m_Extend; }
+	_float3 Get_Center() { return m_Center; }
+
+	void Set_Extend(const _float3& extend) { m_Extend = extend; }
+	void Set_Center(const _float3& center) { m_Center = center; }
+
+
+	wstring& Get_GroupTag() { return m_GroupTag; }
+	void	 Set_GroupTag(wstring _GroupTag) { m_GroupTag = _GroupTag; }
 public:
 	void	GUI_ColliderExtend();
 protected:
 	ColliderType m_eColliderID;
 	ColliderColor m_eColor;
 	int32_t m_sTag;
+	wstring m_GroupTag;
 	GameObject* m_Owner{ nullptr };
-	XMFLOAT4 m_color;
+	_float4 m_color;
 protected:
-	XMFLOAT3	m_Extend{};
-	XMFLOAT3	m_Center{};
+	_float3	m_Extend{};
+	_float3	m_Center{};
 protected:
 	bool m_bRenderInitialized;
 

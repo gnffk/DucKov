@@ -2,6 +2,7 @@
 
 OBB_Collider::OBB_Collider(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext) : BaseCollider{ pDevice, pContext }
 {
+    m_sTag = COLLIDER::COLLIDER_OBB;
     m_eColliderID = ColliderType::OBB;
     m_eColor = ColliderColor::GREEN;
 }

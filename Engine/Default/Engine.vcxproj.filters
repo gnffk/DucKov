@@ -142,6 +142,9 @@
     <Filter Include="11.Font\Font_Manager">
       <UniqueIdentifier>{638681a8-cd54-4610-a857-8aef4fb80cd7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\Collider\Sphere">
+      <UniqueIdentifier>{1719c276-84d0-4d70-8f52-6289b32524de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -306,6 +309,9 @@
     <ClCompile Include="..\Private\CustomFont.cpp">
       <Filter>11.Font</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Sphere_Collider.cpp">
+      <Filter>06.Component\Collider\Sphere</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -451,6 +457,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\CustomFont.h">
       <Filter>11.Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sphere_Collider.h">
+      <Filter>06.Component\Collider\Sphere</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

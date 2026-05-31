@@ -2,7 +2,7 @@
 
 #include "Transform.h"
 #include "GameInstance.h"
-
+#include "BaseCollider.h"
 
 GameObject::GameObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
     : m_pDevice{ pDevice }
@@ -57,6 +57,7 @@ HRESULT GameObject::Initialize(void* pArg)
 
 void GameObject::Priority_Update(_float fTimeDelta)
 {
+
 }
 
 void GameObject::Update(_float fTimeDelta)
