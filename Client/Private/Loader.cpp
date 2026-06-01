@@ -110,7 +110,23 @@ HRESULT CLoader::Loading_For_MapEditor()
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 			return E_FAIL;
 
-		
+		/* For.Prototype_Com_Texture_Terrain_Grass */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Grass"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/T_Tile_Grass.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_Terrain_Mud */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Mud"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/T_Tile_DryMud.png"), 1))))
+			return E_FAIL;
+
+
+		/* For.Prototype_Com_Texture_Terrain_Splat */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Splat"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/Terrain_Splat.png"), 1))))
+			return E_FAIL;
+
+
 
 #pragma endregion
 
@@ -125,7 +141,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 		return E_FAIL;
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_Vtx_Terrian"),
-		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Vtx_Terrian.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Vtx_Terrian.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
 		return E_FAIL;
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_VtxCube"),
@@ -188,7 +204,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	namespace fs = std::filesystem;
 
-	const fs::path basePath = "../../Resources/Model/StaticMesh/";
+	const fs::path basePath = "../../Resources/Model/StaticMesh/Home/";
 
 	for (const auto& dirEntry : fs::directory_iterator(basePath))
 	{
@@ -221,27 +237,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 			return E_FAIL;
 		}
 	}
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_Indoors_Study_Shelf_04"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"SM_Indoors_Study_Shelf_04", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_Indoors_Study_Shelf_04/SM_Indoors_Study_Shelf_04.bin", PreTransformMatrix))))
-	//	return E_FAIL;
 
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_ForkLift"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"SM_ForkLift", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_ForkLift/SM_ForkLift.bin", PreTransformMatrix))))
-	//	return E_FAIL;
-
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_WashStand"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"SM_WashStand", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_WashStand/SM_WashStand.bin", PreTransformMatrix))))
-	//	return E_FAIL;
-
-
-
-	// player Mesh
-	//_matrix PlayerTransformMatrix =
-	//	XMMatrixScaling(0.01f, 0.01f, 0.01f) *
-	//	XMMatrixRotationY(XMConvertToRadians(180.f));
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Player"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Player", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Player/SK_Player.bin", PlayerTransformMatrix))))
-	//	return E_FAIL;
 #pragma endregion
 
 
@@ -250,6 +246,9 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_VIBuffer_Terrain"),
 		VIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/terrain.raw")))))
 		return E_FAIL;
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_VIBuffer_Terrain"),
+	//	VIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Height.bmp")))))
+	//	return E_FAIL;
 
 	/* For.Prototype_Component_VIBuffer_Cube */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Cube"),

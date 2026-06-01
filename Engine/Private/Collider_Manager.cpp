@@ -314,6 +314,8 @@ void Collider_Manager::Render() {
 
     m_batch->End();
     m_Colliders.clear();
+
+
 }
 
 void Collider_Manager::MousePicking(

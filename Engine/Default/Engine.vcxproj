@@ -41,6 +41,8 @@
     <ClInclude Include="..\Public\PartObject.h" />
     <ClInclude Include="..\Public\Shader.h" />
     <ClInclude Include="..\Public\Sphere_Collider.h" />
+    <ClInclude Include="..\Public\stb_image.h" />
+    <ClInclude Include="..\Public\stb_image_write.h" />
     <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\VIBuffer_Cube.h" />
     <ClInclude Include="..\Public\VIBuffer_Fbx.h" />

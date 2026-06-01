@@ -461,5 +461,11 @@
     <ClInclude Include="..\Public\Sphere_Collider.h">
       <Filter>06.Component\Collider\Sphere</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\stb_image_write.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\stb_image.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
