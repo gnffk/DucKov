@@ -219,6 +219,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_AnimFbx.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

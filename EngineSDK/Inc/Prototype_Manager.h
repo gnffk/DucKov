@@ -7,6 +7,7 @@
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Mesh.h"
 #include "VIBuffer_Cube.h"
+#include "VIBuffer_Cell.h"
 #include "Model.h"
 #include "Texture.h"
 #include "FSM.h"

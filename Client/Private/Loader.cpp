@@ -11,6 +11,7 @@
 #include "Body_Player.h"
 #include "Player.h"
 #include "PlayerCamera.h"
+#include "Navigation.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -147,6 +148,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_VtxCube"),
 		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
 		return E_FAIL;
+
 
 #pragma endregion
 
@@ -314,7 +316,12 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 #pragma endregion
 
-
+#pragma region Navigation
+	/* For.Prototype_Component_Navigation */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_Navigation"),
+		Navigation::Create(m_pDevice, m_pContext, TEXT("../../Resources/Data/Navigation/Navigation_Terrain.dat"), TEXT("../../Resources/Data/Navigation/Navigation_Neighbors.dat")))))
+		return E_FAIL;
+#pragma endregion
 
 
 	m_isFinished = true;

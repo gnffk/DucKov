@@ -25,6 +25,7 @@
     <ClInclude Include="..\Public\Bone.h" />
     <ClInclude Include="..\Public\Camera.h" />
     <ClInclude Include="..\Public\Camera_Manager.h" />
+    <ClInclude Include="..\Public\Cell.h" />
     <ClInclude Include="..\Public\Channel.h" />
     <ClInclude Include="..\Public\Collider_Manager.h" />
     <ClInclude Include="..\Public\Component.h" />
@@ -37,6 +38,7 @@
     <ClInclude Include="..\Public\Material.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Model.h" />
+    <ClInclude Include="..\Public\Navigation.h" />
     <ClInclude Include="..\Public\OBB_Collider.h" />
     <ClInclude Include="..\Public\PartObject.h" />
     <ClInclude Include="..\Public\Shader.h" />
@@ -44,6 +46,7 @@
     <ClInclude Include="..\Public\stb_image.h" />
     <ClInclude Include="..\Public\stb_image_write.h" />
     <ClInclude Include="..\Public\Texture.h" />
+    <ClInclude Include="..\Public\VIBuffer_Cell.h" />
     <ClInclude Include="..\Public\VIBuffer_Cube.h" />
     <ClInclude Include="..\Public\VIBuffer_Fbx.h" />
     <ClInclude Include="..\Public\ImGUI_Manager.h" />
@@ -111,6 +114,7 @@
     <ClCompile Include="..\Private\Bone.cpp" />
     <ClCompile Include="..\Private\Camera.cpp" />
     <ClCompile Include="..\Private\Camera_Manager.cpp" />
+    <ClCompile Include="..\Private\Cell.cpp" />
     <ClCompile Include="..\Private\Channel.cpp" />
     <ClCompile Include="..\Private\CLevel.cpp" />
     <ClCompile Include="..\Private\Collider_Manager.cpp" />
@@ -124,11 +128,13 @@
     <ClCompile Include="..\Private\Material.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\Model.cpp" />
+    <ClCompile Include="..\Private\Navigation.cpp" />
     <ClCompile Include="..\Private\OBB_Collider.cpp" />
     <ClCompile Include="..\Private\PartObject.cpp" />
     <ClCompile Include="..\Private\Shader.cpp" />
     <ClCompile Include="..\Private\Sphere_Collider.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
+    <ClCompile Include="..\Private\VIBuffer_Cell.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Cube.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Fbx.cpp" />
     <ClCompile Include="..\Private\ImGUI_Manager.cpp" />
@@ -255,6 +261,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../Public\;../Test\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -280,6 +287,7 @@ call Copy.bat</Command>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../Public\;../Test\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

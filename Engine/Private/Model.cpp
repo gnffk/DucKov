@@ -645,7 +645,7 @@ HRESULT Model::Set_AnimMaterial(uint32_t materialNum, const char* modelFileName)
         textureTypes.reserve(TextureType_END);
         for (uint32_t j = 0; j < textureTypeCnt; ++j) {
             vector<TEXTUREINFO> texes;
-            uint32_t len;
+            uint32_t len = 0;
             uint32_t textureCnt = 0;
             texes.resize(textureCnt);
 
