@@ -24,11 +24,10 @@ void Importer::LoadFolder(const char* ModelFilePath, MODEL modelType)
         {
             string inputPath = path.string();
             std::string modelName = path.stem().string();
-
+            string modelfilepathstring = ModelFilePath;
             std::string basePath = "../../Resources/Model/";
-
-            if (modelName.rfind("CH_", 0) == 0)  
-            {
+            string mapName, animnoanim;
+            if (modelName.rfind("CH_", 0) == 0)  {
                 basePath += "Character/";
             }
             else if (modelName.rfind("SK_", 0) == 0) {
@@ -36,15 +35,27 @@ void Importer::LoadFolder(const char* ModelFilePath, MODEL modelType)
             }
             else if (modelName.rfind("SM_", 0) == 0) {
                 basePath += "StaticMesh/";
+                animnoanim = "NonAnim/";
             }
-
+            else if (modelName.rfind("SMANIM_", 0) == 0) {
+                basePath += "StaticMesh/";
+                animnoanim = "Anim/";
+            }
             else
             {
                 basePath += "Bin/";
             }
-
+  
+            if (modelfilepathstring.find("Static_Stage1") != string::npos)
+            {
+                mapName = "Stage1/";
+            }
+            else if (modelfilepathstring.find("Home") != string::npos)
+            {
+                mapName = "Home/";
+            }
             // 최종 디렉토리
-            std::string dirPath = basePath + modelName;
+            std::string dirPath = basePath + mapName + animnoanim+ modelName;
 
             // 폴더 생성
             std::filesystem::create_directories(dirPath);
@@ -73,6 +84,11 @@ void Importer::LoadFolder(const char* ModelFilePath, MODEL modelType)
                 if (filename.rfind("SK_", 0) == 0)
                 {
                     filename.replace(0, 3, "AN_");
+                }
+
+                if (filename.rfind("SMANIM_", 0) == 0)
+                {
+                    filename.replace(0, 7, "AN_");
                 }
 
                 std::string newPath = directory + filename;

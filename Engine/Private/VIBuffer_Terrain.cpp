@@ -67,8 +67,13 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath)
 
         m_vertices = make_shared<vector<VTXNORTEX>>();
         m_vertices->resize(m_iNumVertices);
-     
-        const float fHeightScale = 128.f;
+
+        const float fTerrainWidth = 1024.f;
+        const float fTerrainLength = 1024.f;
+        const float fTerrainHeight = 600.f;
+
+        const float fSpacingX = fTerrainWidth / (float)(m_iNumVerticesX - 1);
+        const float fSpacingZ = fTerrainLength / (float)(m_iNumVerticesZ - 1);
 
         for (uint32_t i = 0; i < m_iNumVerticesZ; ++i)
         {
@@ -76,21 +81,24 @@ HRESULT VIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath)
             {
                 uint32_t iIndex = i * m_iNumVerticesX + j;
 
-                float fHeight =
-                    pHeights[iIndex] / 65535.f;
+                float fHeight = (float)pHeights[iIndex] / 65535.f;
+                fHeight *= fTerrainHeight;
 
-                fHeight *= fHeightScale;
+                (*m_vertices)[iIndex].vPosition =
+                    _float3(
+                        (float)j * fSpacingX,
+                        fHeight,
+                        (float)i * fSpacingZ);
 
-                (*m_vertices)[iIndex].vPosition = _float3((float)j, fHeight, (float)i);
+                (*m_vertices)[iIndex].vNormal =
+                    _float3(0.f, 0.f, 0.f);
 
-                (*m_vertices)[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
-
-                (*m_vertices)[iIndex].vTexcoord = _float2(
-                 (float)j / (float)(m_iNumVerticesX - 1),
+                (*m_vertices)[iIndex].vTexcoord =
+                    _float2(
+                        (float)j / (float)(m_iNumVerticesX - 1),
                         (float)i / (float)(m_iNumVerticesZ - 1));
             }
         }
-
 #pragma endregion
 
 #pragma region INDEX_BUFFER

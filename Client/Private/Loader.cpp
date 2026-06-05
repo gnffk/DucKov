@@ -157,58 +157,67 @@ HRESULT CLoader::Loading_For_MapEditor()
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
 
-	//if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::MAPEDITOR), TEXT("Prototype_Component_Model_Duck"),
-	//	Model::Create(m_pDevice, m_pContext, ETOUI(LEVEL::MAPEDITOR), L"DUCK_NPC",ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Monster_Palicus/SK_Monster_Palicus.bin", PreTransformMatrix))))
-	//	return E_FAIL;
 
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Monster_Palicus"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK",ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Monster_Palicus/SK_Monster_Palicus.bin", PreTransformMatrix))))
-	//	return E_FAIL;
-
-
-
-
-
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CharacterModel_Duck_Jeff"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK1", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CharacterModel_Duck_Jeff/SK_CharacterModel_Duck_Jeff.bin", CustomMatrix))))
-	//	return E_FAIL;
-
-
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Fiona"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"MONSTER_DUCK2", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Fiona/SK_Fiona.bin", PreTransformMatrix))))
-	//	return E_FAIL;
-
-		_matrix CustomMatrix =
-		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
-		XMMatrixRotationY(XMConvertToRadians(180.f));
+	_matrix CustomMatrix =
+	XMMatrixScaling(0.01f, 0.01f, 0.01f) *
+	XMMatrixRotationY(XMConvertToRadians(180.f));
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomBody"),
 		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomBody/SK_CustomBody.bin", CustomMatrix))))
 		return E_FAIL;
-
-
-
-
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomFaceInstance"),
-	//	Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomFaceInstance/SK_CustomFaceInstance.bin", CustomMatrix))))
-	//	return E_FAIL;
-
 
 	// static Mesh
 	_matrix HomeTransformMatrix =
 		XMMatrixScaling(0.001f, 0.001f, 0.001f) *
 		XMMatrixTranslation(0.f, 0.f, -6.5f);
   // 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SM_MeshV2"),
-		//Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/SM_MeshV2/SM_MeshV2.bin", HomeTransformMatrix))))
+		//Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Home", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/Home/SM_MeshV2/SM_MeshV2.bin", HomeTransformMatrix))))
 		//return E_FAIL;
 
 
 
 	namespace fs = std::filesystem;
 
-	const fs::path basePath = "../../Resources/Model/StaticMesh/Home/";
+	//const fs::path basePath = "../../Resources/Model/StaticMesh/Home/";
 
-	for (const auto& dirEntry : fs::directory_iterator(basePath))
+	//for (const auto& dirEntry : fs::directory_iterator(basePath))
+	//{
+	//	if (!dirEntry.is_directory())
+	//		continue;
+
+	//	const fs::path folderPath = dirEntry.path();
+
+	//	// 폴더 이름
+	//	std::wstring folderName = folderPath.filename().wstring();
+
+	//	// bin 파일 경로 자동 생성
+	//	fs::path binPath = folderPath / (folderName + L".bin");
+
+	//	if (!fs::exists(binPath))
+	//		continue;
+
+	//	// Prototype 이름 자동 생성
+	//	std::wstring prototypeTag =
+	//		L"Prototype_Com_Model_" + folderName;
+
+	//	// Home만 다른 Transform 사용
+	//	_matrix transformMatrix =
+	//		(folderName == L"SM_MeshV2")
+	//		? HomeTransformMatrix
+	//		: PreTransformMatrix;
+
+	//	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),prototypeTag.c_str(),
+	//		Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(),folderName.c_str(),ETOUI(MODELTYPE::NONANIM),binPath.string().c_str(),transformMatrix))))
+	//	{
+	//		return E_FAIL;
+	//	}
+	//}
+
+
+
+	const fs::path basePath1 = "../../Resources/Model/StaticMesh/Stage1/Anim/";
+
+	for (const auto& dirEntry : fs::directory_iterator(basePath1))
 	{
 		if (!dirEntry.is_directory())
 			continue;
@@ -228,13 +237,38 @@ HRESULT CLoader::Loading_For_MapEditor()
 		std::wstring prototypeTag =
 			L"Prototype_Com_Model_" + folderName;
 
-		// Home만 다른 Transform 사용
-		_matrix transformMatrix =
-			(folderName == L"SM_MeshV2")
-			? HomeTransformMatrix
-			: PreTransformMatrix;
+  		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), prototypeTag.c_str(), 
+			Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), folderName.c_str(), ETOUI(MODELTYPE::ANIM), binPath.string().c_str(), PreTransformMatrix))))
+		{
+			return E_FAIL;
+		}
+	}
 
-		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),prototypeTag.c_str(),Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(),folderName.c_str(),ETOUI(MODELTYPE::NONANIM),binPath.string().c_str(),transformMatrix))))
+
+	const fs::path basePath2 = "../../Resources/Model/StaticMesh/Stage1/NonAnim/";
+
+	for (const auto& dirEntry : fs::directory_iterator(basePath2))
+	{
+		if (!dirEntry.is_directory())
+			continue;
+
+		const fs::path folderPath = dirEntry.path();
+
+		// 폴더 이름
+		std::wstring folderName = folderPath.filename().wstring();
+
+		// bin 파일 경로 자동 생성
+		fs::path binPath = folderPath / (folderName + L".bin");
+
+		if (!fs::exists(binPath))
+			continue;
+
+		// Prototype 이름 자동 생성
+		std::wstring prototypeTag =
+			L"Prototype_Com_Model_" + folderName;
+
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), prototypeTag.c_str(),
+			Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), folderName.c_str(), ETOUI(MODELTYPE::NONANIM), binPath.string().c_str(), PreTransformMatrix))))
 		{
 			return E_FAIL;
 		}
@@ -248,9 +282,6 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_VIBuffer_Terrain"),
 		VIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/terrain.raw")))))
 		return E_FAIL;
-	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_VIBuffer_Terrain"),
-	//	VIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Height.bmp")))))
-	//	return E_FAIL;
 
 	/* For.Prototype_Component_VIBuffer_Cube */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Cube"),

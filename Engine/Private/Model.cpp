@@ -243,10 +243,10 @@ HRESULT Model::Ready_BinaryModelFile(const char* modelFileName)
     ifstream file(modelFileName, ios::binary);
 
     if (!file.is_open())
-        return E_FAIL;
+         return E_FAIL;
 
     FileHeader fh{};
-    file.read((char*)&fh, sizeof(fh));
+    file.read((char*)&fh, sizeof(fh)); 
 
      if (fh.magic != ETOUI(FILEHEADERTYPE::FILEHEADER_MODEL))
         return E_FAIL;
@@ -313,6 +313,9 @@ HRESULT Model::Ready_BinaryAnimationFile(const char* modelFileName)
     if (filename.rfind("SK_", 0) == 0)
     {
         filename.replace(0, 3, "AN_");
+    }
+    else if (filename.rfind("SMANIM_", 0) == 0) {
+        filename.replace(0, 7, "AN_");
     }
 
     std::string newPath = directory + filename;

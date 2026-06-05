@@ -129,16 +129,18 @@ void MapEditor::IMGUI_Level_Render()
     ImGui::SetNextWindowPos(
         ImVec2(
             viewport->WorkPos.x,
-            viewport->WorkPos.y));
+            viewport->WorkPos.y),
+        ImGuiCond_Always);
 
     ImGui::SetNextWindowSize(
         ImVec2(
             leftPanelWidth,
             viewport->WorkSize.y),
-        ImGuiCond_Once);
+        ImGuiCond_Always);
 
     ImGuiWindowFlags flags =
         ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoCollapse;
 
     ImGui::Begin("Level", nullptr, flags);
@@ -392,8 +394,8 @@ void MapEditor::IMGUI_SaveLoad_Render()
     ImGui::Begin("SaveLoad Editor");
 
     // =====================================================
-// Save Load
-// =====================================================
+    // Save Load
+    // =====================================================
 
     if (ImGui::CollapsingHeader(u8"Save Load",
         ImGuiTreeNodeFlags_DefaultOpen))
@@ -699,12 +701,15 @@ void MapEditor::IMGUI_ChoiceObject()
         static char obstacleObjectName[128] = "";
         static char obstacleLayerName[128] = "";
 
-        static int selectedMeshIndex = -1;
         static bool useCollider = false;
 
-   
-        auto& StaticMeshNames =
-            CGameInstance::Get().FindCategories("StaticMesh");
+        static wstring selectedMeshName = L"";
+        static wstring selectedMeshPath = L"";
+        static string selectedDisplayName = "";
+
+        
+        filesystem::path rootPath =
+            L"../../Resources/Model/StaticMesh";
 
         ImGui::Text("Create StaticMesh");
         ImGui::Separator();
@@ -722,19 +727,30 @@ void MapEditor::IMGUI_ChoiceObject()
         ImGui::Separator();
 
         ImGui::Text("Select StaticMesh");
+        ImGui::Separator();
 
-        for (int i = 0; i < StaticMeshNames.size(); ++i)
+        ImGui::BeginChild(
+            "StaticMeshTree",
+            ImVec2(0.f, 300.f),
+            true);
+
+        ShowStaticMeshTree(
+            rootPath,
+            selectedMeshName,
+            selectedMeshPath,
+            selectedDisplayName);
+
+        ImGui::EndChild();
+
+        ImGui::Separator();
+
+        if (selectedMeshName.empty())
         {
-            bool selected =
-                selectedMeshIndex == i;
-
-            if (ImGui::Selectable(
-                StaticMeshNames[i].c_str(),
-                selected,
-                ImGuiSelectableFlags_DontClosePopups))
-            {
-                selectedMeshIndex = i;
-            }
+            ImGui::TextDisabled("Selected : None");
+        }
+        else
+        {
+            ImGui::Text("Selected : %s", selectedDisplayName.c_str());
         }
 
         ImGui::Separator();
@@ -745,46 +761,66 @@ void MapEditor::IMGUI_ChoiceObject()
 
         ImGui::Separator();
 
+        bool canCreate =
+            !selectedMeshName.empty()
+            && strlen(obstacleObjectName) > 0
+            && strlen(obstacleLayerName) > 0;
+
+        if (!canCreate)
+            ImGui::BeginDisabled();
+
         if (ImGui::Button(
             "Create",
             ImVec2(120.f, 35.f)))
         {
-            if (selectedMeshIndex >= 0)
-            {
-                GameObject::GAMEOBJECT_DESC desc{};
+            GameObject::GAMEOBJECT_DESC desc{};
 
-                wstring selectedMesh =
-                    CGameInstance::Get().StringToWString(
-                        StaticMeshNames[selectedMeshIndex]);
+            desc.ObjectType =
+                ETOUI(OBJECTTYPE::OBJECT_STATIC);
 
-                desc.ObjectType =
-                    ETOUI(OBJECTTYPE::OBJECT_STATIC);
+            wstring inputName =
+                CGameInstance::Get().StringToWString(
+                    obstacleObjectName);
+            wstring inputLayer =
+                CGameInstance::Get().StringToWString(
+                    obstacleLayerName);
 
-                desc.m_strName =
-                    CGameInstance::Get().StringToWString(
-                        obstacleObjectName);
+            if (inputName.empty())
+                inputName = selectedMeshName;
 
-                desc.m_strPrototypeObjectName =
-                    L"Prototype_GameObject_Obstacle";
+            desc.m_strName =
+                Make_UniqueObjectName(inputLayer, inputName);
 
-                desc.m_strPrototypeBaseName =
-                    selectedMesh;
+            desc.m_strPrototypeObjectName =
+                L"Prototype_GameObject_Obstacle";
 
-                desc.m_bCollider = useCollider;
-                desc.pCameraType =
-                    ETOUI(CAMERA::NONE);
+            desc.m_strPrototypeBaseName =
+                selectedMeshName;
 
-                CGameInstance::Get().Add_GameObject_toLayer(
-                    CGameInstance::Get().Get_Level(),
-                    TEXT("Prototype_GameObject_Obstacle"),
-                    CGameInstance::Get().Get_Level(),
-                    CGameInstance::Get().StringToWString(obstacleLayerName),&desc);
+            desc.m_bCollider =
+                useCollider;
 
-                selectedMeshIndex = -1;
+            desc.pCameraType =
+                ETOUI(CAMERA::NONE);
 
-                ImGui::CloseCurrentPopup();
-            }
+            CGameInstance::Get().Add_GameObject_toLayer(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_GameObject_Obstacle"),
+                CGameInstance::Get().Get_Level(),
+                CGameInstance::Get().StringToWString(obstacleLayerName),
+                &desc);
+    
+            CGameInstance::Get().SetSeletObject(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), inputLayer, desc.m_strName).get());
+
+            selectedMeshName.clear();
+            selectedMeshPath.clear();
+            selectedDisplayName.clear();
+
+            ImGui::CloseCurrentPopup();
         }
+
+        if (!canCreate)
+            ImGui::EndDisabled();
 
         ImGui::SameLine();
 
@@ -792,14 +828,15 @@ void MapEditor::IMGUI_ChoiceObject()
             "Cancel",
             ImVec2(120.f, 35.f)))
         {
-            selectedMeshIndex = -1;
+            selectedMeshName.clear();
+            selectedMeshPath.clear();
+            selectedDisplayName.clear();
 
             ImGui::CloseCurrentPopup();
         }
 
         ImGui::EndPopup();
     }
-
 
 }
 void MapEditor::IMGUI_AddPlayer()
@@ -917,3 +954,233 @@ void MapEditor::MousePicking()
 	
 }
 
+void MapEditor::FindStaticMeshFiles(
+    vector<string>& outDisplayNames,
+    vector<wstring>& outMeshNames)
+{
+    outDisplayNames.clear();
+    outMeshNames.clear();
+    namespace fs = std::filesystem;
+    fs::path rootPath = L"../../Resources/Model/StaticMesh";
+
+    if (!fs::exists(rootPath))
+        return;
+
+    for (const auto& entry : fs::recursive_directory_iterator(rootPath))
+    {
+        if (!entry.is_regular_file())
+            continue;
+
+        if (entry.path().extension() != L".bin")
+            continue;
+
+        bool isNonAnim = false;
+
+        for (const auto& part : entry.path())
+        {
+            if (part == L"NonAnim")
+            {
+                isNonAnim = true;
+                break;
+            }
+        }
+
+        if (!isNonAnim)
+            continue;
+
+        fs::path relativePath = fs::relative(entry.path(), rootPath);
+
+        wstring categoryName = L"";
+        if (!relativePath.empty())
+            categoryName = (*relativePath.begin()).wstring();
+
+        wstring meshName = entry.path().stem().wstring();
+
+        string displayName =
+            CGameInstance::Get().WStringToString(categoryName)
+            + " / "
+            + CGameInstance::Get().WStringToString(meshName);
+
+        outDisplayNames.push_back(displayName);
+        outMeshNames.push_back(meshName);
+    }
+}
+
+void  MapEditor::ShowStaticMeshTree(
+    const std::filesystem::path& rootPath,
+    wstring& selectedMeshName,
+    wstring& selectedMeshPath,
+    string& selectedDisplayName)
+{
+    namespace fs = std::filesystem;
+    if (!fs::exists(rootPath))
+    {
+        ImGui::TextDisabled("StaticMesh folder not found.");
+        return;
+    }
+
+    vector<fs::path> categoryFolders;
+
+    for (const auto& categoryEntry : fs::directory_iterator(rootPath))
+    {
+        if (categoryEntry.is_directory())
+            categoryFolders.push_back(categoryEntry.path());
+    }
+
+    sort(
+        categoryFolders.begin(),
+        categoryFolders.end(),
+        [](const fs::path& a, const fs::path& b)
+        {
+            return a.filename().wstring() < b.filename().wstring();
+        });
+
+    for (const auto& categoryPath : categoryFolders)
+    {
+        wstring categoryNameW = categoryPath.filename().wstring();
+        string categoryName =
+            CGameInstance::Get().WStringToString(categoryNameW);
+
+        if (ImGui::TreeNodeEx(
+            categoryName.c_str(),
+            ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            vector<fs::path> typeFolders;
+
+            for (const auto& typeEntry : fs::directory_iterator(categoryPath))
+            {
+                if (typeEntry.is_directory())
+                    typeFolders.push_back(typeEntry.path());
+            }
+
+            sort(
+                typeFolders.begin(),
+                typeFolders.end(),
+                [](const fs::path& a, const fs::path& b)
+                {
+                    return a.filename().wstring() < b.filename().wstring();
+                });
+
+            for (const auto& typePath : typeFolders)
+            {
+                wstring typeNameW = typePath.filename().wstring();
+                string typeName =
+                    CGameInstance::Get().WStringToString(typeNameW);
+
+                if (ImGui::TreeNodeEx(
+                    typeName.c_str(),
+                    ImGuiTreeNodeFlags_DefaultOpen))
+                {
+                    vector<fs::path> modelFolders;
+
+                    for (const auto& modelEntry : fs::directory_iterator(typePath))
+                    {
+                        if (modelEntry.is_directory())
+                            modelFolders.push_back(modelEntry.path());
+                    }
+
+                    sort(
+                        modelFolders.begin(),
+                        modelFolders.end(),
+                        [](const fs::path& a, const fs::path& b)
+                        {
+                            return a.filename().wstring() < b.filename().wstring();
+                        });
+
+                    if (modelFolders.empty())
+                    {
+                        ImGui::TextDisabled("No model folders");
+                    }
+
+                    for (const auto& modelPath : modelFolders)
+                    {
+                        wstring modelNameW = modelPath.filename().wstring();
+                        string modelName =
+                            CGameInstance::Get().WStringToString(modelNameW);
+
+                        fs::path binPath = modelPath / (modelNameW + L".bin");
+
+                        bool hasBin = fs::exists(binPath);
+
+                        string itemName = modelName;
+
+                        if (!hasBin)
+                            itemName += "  [bin missing]";
+
+                        string displayName =
+                            categoryName
+                            + " / "
+                            + typeName
+                            + " / "
+                            + modelName;
+
+                        bool selected =
+                            selectedMeshPath == binPath.wstring();
+
+                        if (!hasBin)
+                            ImGui::BeginDisabled();
+
+                        if (ImGui::Selectable(
+                            itemName.c_str(),
+                            selected,
+                            ImGuiSelectableFlags_DontClosePopups))
+                        {
+                            selectedMeshName = modelNameW;
+                            selectedMeshPath = binPath.wstring();
+                            selectedDisplayName = displayName;
+                        }
+
+                        if (!hasBin)
+                            ImGui::EndDisabled();
+
+                        if (ImGui::IsItemHovered())
+                        {
+                            ImGui::BeginTooltip();
+
+                            ImGui::Text("Model : %s", modelName.c_str());
+                            ImGui::Text("Type  : %s", typeName.c_str());
+                            ImGui::Text("Group : %s", categoryName.c_str());
+
+                            string pathText =
+                                CGameInstance::Get().WStringToString(
+                                    binPath.wstring());
+
+                            ImGui::Separator();
+                            ImGui::TextWrapped("%s", pathText.c_str());
+
+                            ImGui::EndTooltip();
+                        }
+                    }
+
+                    ImGui::TreePop();
+                }
+            }
+
+            ImGui::TreePop();
+        }
+    }
+}
+
+wstring MapEditor::Make_UniqueObjectName(const wstring& LayerName, const wstring& baseName)
+{
+    wstring finalName = baseName;
+
+    if (finalName.empty())
+        finalName = L"Object";
+
+    if (!CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), LayerName,finalName))
+        return finalName;
+
+    for (uint32_t i = 1; i < 10000; ++i)
+    {
+        wchar_t szNumber[32] = {};
+        swprintf_s(szNumber, L"_%03d", i);
+
+        wstring newName = finalName + szNumber;
+
+        if (!CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), LayerName, newName))
+            return newName;
+    }
+
+    return finalName;
+}

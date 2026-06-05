@@ -7,6 +7,8 @@ NS_BEGIN(Client)
 
 class MapEditor final : public CLevel
 {
+public:
+	
 private:
 	MapEditor(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 public:
@@ -29,9 +31,16 @@ public:
 public:
 	void	MousePicking();
 
+	void	FindStaticMeshFiles(vector<string>& outDisplayNames, vector<wstring>& outMeshNames);
+
+	void	ShowStaticMeshTree(const std::filesystem::path& rootPath, wstring& selectedMeshName, wstring& selectedMeshPath, string& selectedDisplayName);
+
+	wstring Make_UniqueObjectName(const wstring& LayerName, const wstring& baseName);
 
 public:
 	static unique_ptr<MapEditor> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
 };
 
 NS_END
+
+

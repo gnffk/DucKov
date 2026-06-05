@@ -174,6 +174,29 @@ void ImGUI_Manager::Update_Guizmo()
     ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, reinterpret_cast<float*>(&matrix));
 
 
+
+    if (ImGui::Button("Set To Camera Center"))
+    {
+        _matrix matView = XMLoadFloat4x4(&view);
+        _matrix matCamWorld = XMMatrixInverse(nullptr, matView);
+
+        _vector vCamPos = matCamWorld.r[3];
+
+        _vector vCamLook = XMVector3Normalize(matCamWorld.r[2]);
+
+        float fDistance = 10.f;
+
+        _vector vNewPos = vCamPos + vCamLook * fDistance;
+
+        m_pSelectObject->GetTransform()->Set_State(
+            STATE::POSITION,
+            vNewPos);
+
+        matrix = m_pSelectObject->GetTransform()->GetWorldMatrix();
+    }
+
+
+
     ImGui::End();
 
     ImGuizmo::Manipulate( reinterpret_cast<float*>(&view), reinterpret_cast<float*>(&proj), mCurrentGizmoOperation, mCurrentGizmoMode,reinterpret_cast<float*>(&matrix));
