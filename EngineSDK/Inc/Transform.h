@@ -63,6 +63,8 @@ public:
 
 	void Move(_fvector vDir, _float fTimeDelta);
 
+	void Go_Direction(_fvector vDirection, _float fTimeDelta, shared_ptr<class Navigation> pNavigation, _float fSpeedScale);
+
 	void Move(_fvector vDir, _float fTimeDelta, _float plusSpeed);
 private:
 	_float			m_fSpeedPerSec = {};

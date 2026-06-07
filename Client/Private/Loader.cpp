@@ -11,7 +11,7 @@
 #include "Body_Player.h"
 #include "Player.h"
 #include "PlayerCamera.h"
-#include "Navigation.h"
+
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -113,14 +113,18 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 		/* For.Prototype_Com_Texture_Terrain_Grass */
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Grass"),
-			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/T_Tile_Grass.png"), 1))))
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/T_Tile_Grass.dds"), 1))))
 			return E_FAIL;
 
 		/* For.Prototype_Com_Texture_Terrain_Mud */
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Mud"),
-			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/T_Tile_DryMud.png"), 1))))
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/T_Tile_DryMud.dds"), 1))))
 			return E_FAIL;
 
+		/* For.Prototype_Com_Texture_Terrain_Road */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Road"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/T_Tile_AsphaltRoad_01_C.dds"), 1))))
+			return E_FAIL;
 
 		/* For.Prototype_Com_Texture_Terrain_Splat */
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Splat"),
@@ -350,7 +354,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 #pragma region Navigation
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_Navigation"),
-		Navigation::Create(m_pDevice, m_pContext, TEXT("../../Resources/Data/Navigation/Navigation_Terrain.dat"), TEXT("../../Resources/Data/Navigation/Navigation_Neighbors.dat")))))
+		Navigation::Create(m_pDevice, m_pContext, TEXT("../../Resources/DataFiles/Navigation.dat"), TEXT("../../Resources/DataFiles/Navigation_Neighbors.dat")))))
 		return E_FAIL;
 #pragma endregion
 

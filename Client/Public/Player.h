@@ -40,7 +40,7 @@ private:
 	uint32_t			m_iState = {};
 	
 	shared_ptr<class FSM> m_pPlayerFSM = { nullptr };
-
+	shared_ptr<class Navigation> m_pNavigationCom = { nullptr };
 	_bool				m_bShift = { false };
 	_bool				m_isRolling = { false };
 	_float				m_fRollTimer = {};

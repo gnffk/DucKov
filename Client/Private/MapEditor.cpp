@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Layer.h"
 #include "BaseCollider.h"
+#include "NavMeshEditor.h"
 
 
 MapEditor::MapEditor(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
@@ -19,6 +20,11 @@ HRESULT MapEditor::Initialize()
 {
 	Ready_Layer_MapEditor(L"Base");
 
+    m_pNavMeshEditor = NavMeshEditor::Create(m_pDevice, m_pDeviceContext);
+
+    if (nullptr == m_pNavMeshEditor)
+        return E_FAIL;
+
 	CGameInstance::Get().Change_Camera(ETOUI(CAMERA::MAIN));
 
 	return S_OK;
@@ -28,6 +34,9 @@ void MapEditor::Update(_float fTimeDelta)
 {
 
 	MousePicking();
+
+    if (m_pNavMeshEditor)
+        m_pNavMeshEditor->Update();
 }
 
 HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
@@ -91,6 +100,9 @@ HRESULT MapEditor::Render()
 {
 	IMGUI_Render();
 
+    if (m_pNavMeshEditor)
+        m_pNavMeshEditor->Render();
+
     CGameInstance::Get().Draw_Text(TEXT("Font_Default"), TEXT("Map Editor"), _float2(1100.f, 0.f));
 	return S_OK;
 }
@@ -114,6 +126,8 @@ void MapEditor::IMGUI_Render() {
     IMGUI_SaveLoad_Render();
     IMGUI_MadeFunction();
     IMGUI_AddPlayer();
+    if (m_pNavMeshEditor)
+        m_pNavMeshEditor->IMGUI_Render();
 #endif
 
 }
@@ -908,8 +922,14 @@ void MapEditor::MousePicking()
 		float mouseX = (float)pt.x;
 		float mouseY = (float)pt.y;
 
-		float width = CGameInstance::Get().Get_ViewportSize().x;
-		float height = CGameInstance::Get().Get_ViewportSize().y;
+		RECT rcClient = {};
+		GetClientRect(g_hWnd, &rcClient);
+
+		float width = (float)(rcClient.right - rcClient.left);
+		float height = (float)(rcClient.bottom - rcClient.top);
+
+		if (width <= 0.f || height <= 0.f)
+			return;
 	
 		float px = mouseX / (width *0.5f)- 1.0f;
 		float py = mouseY / -(height*0.5f) + 1.0f;

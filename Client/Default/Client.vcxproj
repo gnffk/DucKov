@@ -165,6 +165,7 @@
     <ClInclude Include="..\Public\Obstacle.h" />
     <ClInclude Include="..\Public\PerspectiveCamera.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\NavMeshEditor.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerCamera.h" />
     <ClInclude Include="..\Public\Player_HAND_UP_AND_LEFT_State.h" />
@@ -197,6 +198,7 @@
     <ClCompile Include="..\Private\Obstacle.cpp" />
     <ClCompile Include="..\Private\PerspectiveCamera.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\NavMeshEditor.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerCamera.cpp" />
     <ClCompile Include="..\Private\Player_HAND_UP_AND_LEFT_State.cpp" />

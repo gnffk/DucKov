@@ -18,10 +18,13 @@ public:
 	void Late_Update(_float fTimeDelta);
 
 	list<shared_ptr<GameObject>>& Get_GameObjects(){ return m_GameObjects; }
+	_bool Is_Empty() const{
+		return m_GameObjects.empty();}
+
 private:
 	list<shared_ptr<GameObject>>			m_GameObjects;
 
-
+	
 public:
 	static unique_ptr<Layer> Create();
 

@@ -31,6 +31,7 @@ private:
 	shared_ptr<VIBuffer_Terrain>	m_pVIBufferCom = { nullptr };
 	shared_ptr<Texture>				m_pGrassTex = { nullptr };
 	shared_ptr<Texture>				m_pMudTex = { nullptr };
+	shared_ptr<Texture>				m_pRoadTex = { nullptr };
 	shared_ptr<Texture>				m_pSplatTex = { nullptr };
 
 	shared_ptr<Shader>				m_pShaderCom = { nullptr };
@@ -57,7 +58,10 @@ private:
 	_bool Load_SplatPNG(const char* pFilePath);
 private:
 	void GUI_TerrainPaint();
-private:
+public:
+	_bool Picking_Terrain_ForNavMesh(_float3& vPickingPoint);
+
+public:
 
 	HRESULT Create_SplatTexture();
 	_bool Picking_Terrain(_float3& vPickingPoint);

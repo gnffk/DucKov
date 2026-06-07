@@ -42,10 +42,26 @@ void Object_Manager::Late_Update(_float fTimeDelta)
 {
 	for (uint32_t i = 0; i < m_iNumLevels; i++)
 	{
-		for (auto& Pair : m_pLayers[i])
+		for (auto iter = m_pLayers[i].begin();
+			iter != m_pLayers[i].end();)
 		{
+			Layer* pLayer = iter->second.get();
 
-			Pair.second->Late_Update(fTimeDelta);
+			if (pLayer == nullptr)
+			{
+				iter = m_pLayers[i].erase(iter);
+				continue;
+			}
+
+			pLayer->Late_Update(fTimeDelta);
+
+			if (pLayer->Is_Empty())
+			{
+				iter = m_pLayers[i].erase(iter);
+				continue;
+			}
+
+			++iter;
 		}
 	}
 }

@@ -135,6 +135,9 @@
     <ClInclude Include="..\Public\MapEditor.h">
       <Filter>01. Levels\MapEditor</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\NavMeshEditor.h">
+      <Filter>01. Levels\MapEditor</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
       <Filter>02. GameObject\Monster</Filter>
     </ClInclude>
@@ -235,6 +238,9 @@
       <Filter>02. GameObject\Sky</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MapEditor.cpp">
+      <Filter>01. Levels\MapEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NavMeshEditor.cpp">
       <Filter>01. Levels\MapEditor</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Obstacle.cpp">

@@ -49,9 +49,24 @@ HRESULT Player::Initialize(void* pArg)
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
 
-	
+	_vector vPos = XMVectorSet(455.f, 33.f, 104.f, 1.f);
+	m_pTransformCom->Set_State(STATE::POSITION, vPos);
 
 	m_pPlayerFSM->SetOwner(SHARED_THIS(Player));
+
+	if (nullptr != m_pNavigationCom)
+	{
+		m_pNavigationCom->Set_CurrentCell(
+			m_pTransformCom->Get_State(STATE::POSITION)
+		);
+
+		m_pTransformCom->Set_State(
+			STATE::POSITION,
+			m_pNavigationCom->SetUp_OnNavigation(
+				m_pTransformCom->Get_State(STATE::POSITION)
+			)
+		);
+	}
 	return S_OK;
 }
 
@@ -82,20 +97,23 @@ void Player::Update(_float fTimeDelta)
 	Shift(fTimeDelta);
 	m_pPlayerFSM->Update(fTimeDelta);
 
-	__super::Update(fTimeDelta);
+	m_pTransformCom->Set_State(STATE::POSITION,
+		m_pNavigationCom->SetUp_OnNavigation(m_pTransformCom->Get_State(STATE::POSITION)));
 
+	__super::Update(fTimeDelta);
 
 }
 
 void Player::Late_Update(_float fTimeDelta)
 {
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Player));
 	__super::Late_Update(fTimeDelta);
 	Collider_Obstacle(fTimeDelta);
 	m_pPlayerFSM->Late_Update(fTimeDelta);
 }
 
-void Player::MouseLook(_float fTimeDelta) {
-
+void Player::MouseLook(_float fTimeDelta)
+{
 	POINT pt{};
 	GetCursorPos(&pt);
 	ScreenToClient(g_hWnd, &pt);
@@ -103,11 +121,12 @@ void Player::MouseLook(_float fTimeDelta) {
 	float width = CGameInstance::Get().Get_ViewportSize().x;
 	float height = CGameInstance::Get().Get_ViewportSize().y;
 
-	// Screen -> NDC
+	if (width <= 0.f || height <= 0.f)
+		return;
+
 	float px = (2.f * pt.x / width) - 1.f;
 	float py = 1.f - (2.f * pt.y / height);
 
-	// View / Projection
 	_float4x4 view, proj;
 
 	CGameInstance::Get().Get_MainCamerwaViewMatrix(view);
@@ -119,192 +138,178 @@ void Player::MouseLook(_float fTimeDelta) {
 	XMMATRIX invView = XMMatrixInverse(nullptr, matView);
 	XMMATRIX invProj = XMMatrixInverse(nullptr, matProj);
 
-	// Near
 	XMVECTOR vNear = XMVectorSet(px, py, 0.f, 1.f);
 	vNear = XMVector3TransformCoord(vNear, invProj);
 	vNear = XMVector3TransformCoord(vNear, invView);
 
-	// Far
 	XMVECTOR vFar = XMVectorSet(px, py, 1.f, 1.f);
 	vFar = XMVector3TransformCoord(vFar, invProj);
 	vFar = XMVector3TransformCoord(vFar, invView);
 
-	// Ray
 	XMVECTOR vRayOrigin = vNear;
+	XMVECTOR vRayDir = XMVector3Normalize(vFar - vNear);
 
-	XMVECTOR vRayDir =
-		XMVector3Normalize(vFar - vNear);
-
-	// y = 0 Plane
 	float dirY = XMVectorGetY(vRayDir);
-
-	if (fabs(dirY) < 0.0001f)
+	if (fabsf(dirY) < 0.0001f)
 		return;
 
-	float t =
-		-XMVectorGetY(vRayOrigin) / dirY;
+	XMVECTOR vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
 
-	XMVECTOR vHitPos =
-		vRayOrigin + vRayDir * t;
+	// 핵심:
+	// 기존에는 y = 0 평면에 ray를 쐈음.
+	// 이제는 Player 현재 Y 높이의 평면에 ray를 쏜다.
+	float fPlayerY = XMVectorGetY(vPlayerPos);
 
-	// Direction
-	XMVECTOR vPlayerPos =
-		m_pTransformCom->Get_State(STATE::POSITION);
+	float t = (fPlayerY - XMVectorGetY(vRayOrigin)) / dirY;
 
-	XMVECTOR vDir =
-		XMVector3Normalize(vHitPos - vPlayerPos);
+	if (t < 0.f)
+		return;
 
+	XMVECTOR vHitPos = vRayOrigin + vRayDir * t;
+
+	XMVECTOR vDir = vHitPos - vPlayerPos;
 	vDir = XMVectorSetY(vDir, 0.f);
+
+	if (XMVector3Equal(vDir, XMVectorZero()))
+		return;
+
 	vDir = XMVector3Normalize(vDir);
 
+	XMVECTOR vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK);
+	vCurrentLook = XMVectorSetY(vCurrentLook, 0.f);
 
-	_vector TurnAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	if (XMVector3Equal(vCurrentLook, XMVectorZero()))
+		return;
 
+	vCurrentLook = XMVector3Normalize(vCurrentLook);
 
-	_vector vCurrentLook = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
+	XMVECTOR TurnAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
+	XMVECTOR cross = XMVector3Cross(vCurrentLook, vDir);
+	float dot = XMVectorGetX(XMVector3Dot(vCurrentLook, vDir));
 
-	_vector cross = XMVector3Cross(vCurrentLook, vDir);
-	_float dot = XMVectorGetX(XMVector3Dot(vCurrentLook, vDir));
+	dot = std::clamp(dot, -1.f, 1.f);
 
-	if (dot < 0.98f) {
-		if (XMVectorGetY(cross) < 0.f) {
+	if (dot < 0.98f)
+	{
+		if (XMVectorGetY(cross) < 0.f)
 			m_pTransformCom->Turn(-TurnAxis, fTimeDelta * 5.f);
-		}
-		else {
+		else
 			m_pTransformCom->Turn(TurnAxis, fTimeDelta * 5.f);
-		}
-		
 	}
 	else if (dot < 0.999f)
 	{
-		if (XMVectorGetY(cross) < 0.f) {
-			m_pTransformCom->Turn(-TurnAxis, fTimeDelta );
-		}
-		else {
-			m_pTransformCom->Turn(TurnAxis, fTimeDelta );
-		}
+		if (XMVectorGetY(cross) < 0.f)
+			m_pTransformCom->Turn(-TurnAxis, fTimeDelta);
+		else
+			m_pTransformCom->Turn(TurnAxis, fTimeDelta);
 	}
-	
 }
-
-void Player::KeyBoardLook(_float fTimeDelta) {
-	
-
+void Player::KeyBoardLook(_float fTimeDelta)
+{
 	_vector vMoveDir = XMVectorZero();
-	_float4 fCameraPos;
+
+	_float4 fCameraPos{};
 	CGameInstance::Get().Get_MainCameraPosition(fCameraPos);
 
-	_vector	vPlayerPos, vCameraPos, vCameraDir;
-	vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
-	vCameraPos = XMLoadFloat4(&fCameraPos);
-	vCameraPos = XMVectorSetY(vCameraPos, 0.0f);
-	vCameraDir = vCameraPos - vPlayerPos;
+	_vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vCameraPos = XMLoadFloat4(&fCameraPos);
+
+	// 이동 방향은 XZ 평면 기준
+	vPlayerPos = XMVectorSetY(vPlayerPos, 0.f);
+	vCameraPos = XMVectorSetY(vCameraPos, 0.f);
+
+	_vector vCameraDir = vCameraPos - vPlayerPos;
+
+	if (XMVector3Equal(vCameraDir, XMVectorZero()))
+		return;
 
 	vCameraDir = XMVector3Normalize(vCameraDir);
 
 	_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
 	_vector vRight = XMVector3Cross(vUp, vCameraDir);
+
+	if (XMVector3Equal(vRight, XMVectorZero()))
+		return;
+
 	vRight = XMVector3Normalize(vRight);
 
 	if (CGameInstance::Get().Key_Pressing(DIK_A))
-	{
 		vMoveDir += vRight;
-	}
 
 	if (CGameInstance::Get().Key_Pressing(DIK_D))
-	{
 		vMoveDir -= vRight;
-	}
 
 	if (CGameInstance::Get().Key_Pressing(DIK_W))
-	{
 		vMoveDir -= vCameraDir;
-	}
 
 	if (CGameInstance::Get().Key_Pressing(DIK_S))
-	{
 		vMoveDir += vCameraDir;
+
+	// 여기서 먼저 검사해야 함
+	if (XMVector3Equal(vMoveDir, XMVectorZero()))
+	{
+		m_fSpeedFloat = 1.f;
+		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
+		return;
 	}
 
-	_vector TurnAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-
-
-
+	// TURN 계산 전에 반드시 Normalize
 	vMoveDir = XMVector3Normalize(vMoveDir);
 
+	_vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK);
 
-	_vector vCurrentLook = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
+	// 현재 Look도 XZ 평면 기준으로 맞춤
+	vCurrentLook = XMVectorSetY(vCurrentLook, 0.f);
+
+	if (XMVector3Equal(vCurrentLook, XMVectorZero()))
+		vCurrentLook = vMoveDir;
+	else
+		vCurrentLook = XMVector3Normalize(vCurrentLook);
+
+	_vector vTurnAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+	_float dot = XMVectorGetX(XMVector3Dot(vCurrentLook, vMoveDir));
+	dot = std::clamp(dot, -1.f, 1.f);
 
 	_vector cross = XMVector3Cross(vCurrentLook, vMoveDir);
-	_float dot = XMVectorGetX(XMVector3Dot(vCurrentLook, vMoveDir));
+	float fCrossY = XMVectorGetY(cross);
 
-
-	if (dot < 0.98f) {
-
-		if (m_fSpeedFloat < 0.f)
-		{
-			m_fSpeedFloat = 0.f;
-
-		}
-		else {
-			m_fSpeedFloat -= 0.001f;
-		}
-
-		if (XMVectorGetY(cross) < 0.f) {
-			m_pTransformCom->Turn(-TurnAxis, fTimeDelta * 1.5f);
-		}
-		else {
-			m_pTransformCom->Turn(TurnAxis, fTimeDelta * 1.5f);
-		}
-
-	}
-	else if (dot < 0.999f)
+	// 거의 반대 방향이면 cross가 0에 가까워져서 회전 방향 판단이 안 됨
+	// 이때는 임의로 오른쪽 방향으로 돌림
+	if (dot < -0.999f)
 	{
-		if (m_fSpeedFloat < 0.f)
-		{
-			m_fSpeedFloat = 0.f;
-
-		}
-		else {
-			m_fSpeedFloat -= 0.001f;
-		}
-
-		if (XMVectorGetY(cross) < 0.f) {
-			m_pTransformCom->Turn(-TurnAxis, fTimeDelta);
-		}
-		else {
-			m_pTransformCom->Turn(TurnAxis, fTimeDelta);
-		}
+		m_pTransformCom->Turn(vTurnAxis, fTimeDelta * 1.f);
+		m_fSpeedFloat = 0.5f;
 	}
-	else {
-		if (m_fSpeedFloat > 2.f)
-		{
-			m_fSpeedFloat = 2.f;
-
-		}
-		else {
-			m_fSpeedFloat += 0.1f;
-		}
-	}
-
-
-	if (!XMVector3Equal(vMoveDir, XMVectorZero()))
+	else if (dot < 0.98f)
 	{
-		m_pTransformCom->Move(vMoveDir, fTimeDelta * m_fSpeedFloat);
+		if (fCrossY < 0.f)
+			m_pTransformCom->Turn(-vTurnAxis, fTimeDelta * 1.5f);
+		else
+			m_pTransformCom->Turn(vTurnAxis, fTimeDelta * 1.5f);
 
-		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::RUN);
+		m_fSpeedFloat -= 0.01f;
+		if (m_fSpeedFloat < 0.5f)
+			m_fSpeedFloat = 0.5f;
 	}
 	else
 	{
-		dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::IDLE);
+		m_fSpeedFloat += 0.1f;
+		if (m_fSpeedFloat > 2.f)
+			m_fSpeedFloat = 2.f;
 	}
 
+	m_pTransformCom->Go_Direction(
+		vMoveDir,
+		fTimeDelta,
+		m_pNavigationCom,
+		m_fSpeedFloat
+	);
 
-	
+	dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::RUN);
 }
-
 HRESULT Player::Roll(_float fTimeDelta)
 {
 	if (CGameInstance::Get().Key_Down(DIK_SPACE) && false == m_isRolling)
@@ -316,9 +321,12 @@ HRESULT Player::Roll(_float fTimeDelta)
 
 		_vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
 		_vector vCameraPos = XMLoadFloat4(&fCameraPos);
+
+		vPlayerPos = XMVectorSetY(vPlayerPos, 0.f);
 		vCameraPos = XMVectorSetY(vCameraPos, 0.f);
 
 		_vector vCameraDir = XMVector3Normalize(vCameraPos - vPlayerPos);
+
 
 		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 		_vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vCameraDir));
@@ -394,9 +402,11 @@ void Player::Shift(_float fTimeDelta)
 		_vector	vPlayerPos, vCameraPos, vCameraDir;
 		vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
 		vCameraPos = XMLoadFloat4(&fCameraPos);
-		vCameraPos = XMVectorSetY(vCameraPos, 0.0f);
-		vCameraDir = vCameraPos - vPlayerPos;
 
+		vPlayerPos = XMVectorSetY(vPlayerPos, 0.f);
+		vCameraPos = XMVectorSetY(vCameraPos, 0.f);
+
+		vCameraDir = vCameraPos - vPlayerPos;
 		vCameraDir = XMVector3Normalize(vCameraDir);
 
 		_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
@@ -426,7 +436,12 @@ void Player::Shift(_float fTimeDelta)
 
 		if (!XMVector3Equal(vMoveDir, XMVectorZero()))
 		{
-			m_pTransformCom->Move(vMoveDir, fTimeDelta);
+			m_pTransformCom->Go_Direction(
+				vMoveDir,
+				fTimeDelta,
+				m_pNavigationCom,
+				m_fSpeedFloat
+			);
 
 			dynamic_pointer_cast<Player_FSM>(m_pPlayerFSM)->Change_State(Player_FSM::HAND_UP_AND_WALK);
 				
@@ -452,6 +467,10 @@ void Player::Shift(_float fTimeDelta)
 
 HRESULT Player::Render()
 {
+#ifdef _DEBUG
+	m_pNavigationCom->Render();
+
+#endif
 	return S_OK;
 }
 
@@ -463,6 +482,13 @@ HRESULT Player::Ready_Components()
 		return E_FAIL;
 	m_pCollider->Set_GroupTag(L"Player");
 	m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].push_back(m_pCollider);
+
+	Navigation::NAVIGATION_DESC		NaviDesc{ 1 };
+
+	m_pNavigationCom = dynamic_pointer_cast<Navigation>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_Navigation"), &NaviDesc));
+	if (FAILED(__super::Add_Component(TEXT("Com_Navigation"), m_pNavigationCom)))
+		return E_FAIL;
+
 	return S_OK;
 }
 

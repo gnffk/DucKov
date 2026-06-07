@@ -37,6 +37,9 @@ public:
 
 	wstring Make_UniqueObjectName(const wstring& LayerName, const wstring& baseName);
 
+private:
+	unique_ptr<class NavMeshEditor> m_pNavMeshEditor = nullptr;
+
 public:
 	static unique_ptr<MapEditor> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
 };

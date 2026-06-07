@@ -87,9 +87,18 @@ HRESULT Navigation::Initialize(void* pArg)
 
 _vector Navigation::SetUp_OnNavigation(_fvector vPosition)
 {
-    return XMVectorSetY(vPosition, m_Cells[m_iCurrentCellIndex]->Compute_Height(vPosition));
-}
+    if (m_iCurrentCellIndex < 0 ||
+        m_iCurrentCellIndex >= static_cast<int32_t>(m_Cells.size()))
+    {
+        if (false == Set_CurrentCell(vPosition))
+            return vPosition;
+    }
 
+    return XMVectorSetY(
+        vPosition,
+        m_Cells[m_iCurrentCellIndex]->Compute_Height(vPosition)
+    );
+}
 HRESULT Navigation::Ready_Neighbors()
 {
     for (auto& pSourCell : m_Cells)
@@ -199,7 +208,7 @@ HRESULT Navigation::Render()
     if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &Proj)))
         return E_FAIL;
 
-    _float4     vColor = _float4(1.f, 0.f, 0.f, 1.f);
+    _float4     vColor = _float4(1.f, 1.f, 0.f, 1.f);
 
     if (FAILED(m_pShader->Bind_RawValue("g_vColor", &vColor, sizeof vColor)))
         return E_FAIL;
@@ -218,6 +227,32 @@ HRESULT Navigation::Render()
 }
 #endif
 
+int32_t Navigation::Find_CellIndex(_fvector vPosition)
+{
+    for (int32_t i = 0; i < static_cast<int32_t>(m_Cells.size()); ++i)
+    {
+        if (nullptr == m_Cells[i])
+            continue;
+
+        int32_t iNeighborIndex = -1;
+
+        if (true == m_Cells[i]->isIn(vPosition, &iNeighborIndex))
+            return i;
+    }
+
+    return -1;
+}
+_bool Navigation::Set_CurrentCell(_fvector vPosition)
+{
+    const int32_t iCellIndex = Find_CellIndex(vPosition);
+
+    if (-1 == iCellIndex)
+        return false;
+
+    m_iCurrentCellIndex = iCellIndex;
+
+    return true;
+}
 unique_ptr<Navigation> Navigation::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, const _tchar* pNavigationDataFilePath, const _tchar* pNavigationNeighborsFilePath)
 {
     auto		pInstance = unique_ptr<Navigation>(new Navigation(pDevice, pContext));

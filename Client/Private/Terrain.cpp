@@ -105,6 +105,9 @@ HRESULT Terrain::Render()
 	if (FAILED(m_pMudTex->Bind_ShaderResource(m_pShaderCom, "g_MudTexture", 0)))
 		return E_FAIL;
 
+	if (FAILED(m_pRoadTex->Bind_ShaderResource(m_pShaderCom, "g_RoadTexture", 0)))
+		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &World, sizeof(_float4))))
 		return E_FAIL;
 
@@ -155,6 +158,11 @@ HRESULT Terrain::Ready_Components()
 	m_pMudTex = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Texture_Terrain_Mud")));
 
 	if (FAILED(__super::Add_Component(TEXT("Com_Texture_Mud"), m_pMudTex)))
+		return E_FAIL;
+
+	m_pRoadTex = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Texture_Terrain_Road")));
+
+	if (FAILED(__super::Add_Component(TEXT("Com_Texture_Raod"), m_pRoadTex)))
 		return E_FAIL;
 
 
@@ -240,6 +248,9 @@ void Terrain::GUI_TerrainPaint()
 
 	if (ImGui::RadioButton("Mud", m_iPaintChannel == 1))
 		m_iPaintChannel = 1;
+
+	if (ImGui::RadioButton("Road", m_iPaintChannel == 2))
+		m_iPaintChannel = 2;
 
 	ImGui::Separator();
 
@@ -449,11 +460,11 @@ _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 }
 void Terrain::Paint_Splat(_float3 vWorldPos)
 {
-	float terrainSizeX = (float)m_pVIBufferCom->GetNumVerticesX();
-	float terrainSizeZ = (float)m_pVIBufferCom->GetNumVerticesZ();
+	float terrainSizeX = (float)(m_pVIBufferCom->GetNumVerticesX() - 1);
+	float terrainSizeZ = (float)(m_pVIBufferCom->GetNumVerticesZ() - 1);
 
-	int centerX = (int)(vWorldPos.x / terrainSizeX * m_iSplatWidth);
-	int centerY = (int)(vWorldPos.z / terrainSizeZ * m_iSplatHeight);
+	int centerX = (int)(vWorldPos.x / terrainSizeX * (m_iSplatWidth - 1));
+	int centerY = (int)(vWorldPos.z / terrainSizeZ * (m_iSplatHeight - 1));
 
 	int radius = (int)m_fBrushRadius;
 
@@ -473,40 +484,132 @@ void Terrain::Paint_Splat(_float3 vWorldPos)
 
 			float falloff = 1.f - dist / m_fBrushRadius;
 			float power = m_fBrushPower * falloff;
+			power = std::clamp(power, 0.f, 1.f);
 
 			_float4& pixel = m_SplatPixels[y * m_iSplatWidth + x];
 
-			float r = pixel.x;
-			float g = pixel.y;
+			float r = pixel.x; // Grass
+			float g = pixel.y; // Mud
+			float b = pixel.z; // Road
 
-			if (m_iPaintChannel == 0) // Grass
-			{
-				r += power;
-				g -= power;
-			}
-			else if (m_iPaintChannel == 1) // Mud
-			{
-				g += power;
-				r -= power;
-			}
+			// 선택한 채널 쪽으로 부드럽게 보간
+			float targetR = (m_iPaintChannel == 0) ? 1.f : 0.f;
+			float targetG = (m_iPaintChannel == 1) ? 1.f : 0.f;
+			float targetB = (m_iPaintChannel == 2) ? 1.f : 0.f;
+
+			r = r * (1.f - power) + targetR * power;
+			g = g * (1.f - power) + targetG * power;
+			b = b * (1.f - power) + targetB * power;
 
 			r = std::clamp(r, 0.f, 1.f);
 			g = std::clamp(g, 0.f, 1.f);
+			b = std::clamp(b, 0.f, 1.f);
 
-			float total = max(r + g, 0.0001f);
-			r /= total;
-			g /= total;
+			float total = (std::max)(r + g + b, 0.0001f);
 
-			pixel.x = r;
-			pixel.y = g;
-			pixel.z = 0.f;
-			pixel.w = 0.f;
+			pixel.x = r / total; // R = Grass
+			pixel.y = g / total; // G = Mud
+			pixel.z = b / total; // B = Road
+			pixel.w = 1.f;
 		}
 	}
 
 	Update_SplatTexture();
 }
+_bool Terrain::Picking_Terrain_ForNavMesh(_float3& vPickingPoint)
+{
+	POINT pt = {};
+	GetCursorPos(&pt);
+	ScreenToClient(g_hWnd, &pt);
 
+	float mouseX = static_cast<float>(pt.x);
+	float mouseY = static_cast<float>(pt.y);
+
+	float width = CGameInstance::Get().Get_ViewportSize().x;
+	float height = CGameInstance::Get().Get_ViewportSize().y;
+
+	if (width <= 0.f || height <= 0.f)
+		return false;
+
+	float px = mouseX / (width * 0.5f) - 1.0f;
+	float py = mouseY / -(height * 0.5f) + 1.0f;
+
+	_float4x4 proj, view, world;
+	CGameInstance::Get().Get_MainCamerwaViewMatrix(view);
+	CGameInstance::Get().Get_MainCamerwaProjectionMatrix(proj);
+	world = m_pTransformCom->GetWorldMatrix();
+
+	XMMATRIX matProj = XMLoadFloat4x4(&proj);
+	XMMATRIX matView = XMLoadFloat4x4(&view);
+	XMMATRIX matWorld = XMLoadFloat4x4(&world);
+
+	XMMATRIX invProj = XMMatrixInverse(nullptr, matProj);
+	XMMATRIX invView = XMMatrixInverse(nullptr, matView);
+	XMMATRIX invWorld = XMMatrixInverse(nullptr, matWorld);
+
+	XMVECTOR nearPoint = XMVectorSet(px, py, 0.f, 1.f);
+	nearPoint = XMVector3TransformCoord(nearPoint, invProj);
+	nearPoint = XMVector3TransformCoord(nearPoint, invView);
+
+	XMVECTOR farPoint = XMVectorSet(px, py, 1.f, 1.f);
+	farPoint = XMVector3TransformCoord(farPoint, invProj);
+	farPoint = XMVector3TransformCoord(farPoint, invView);
+
+	XMVECTOR rayOrigin = nearPoint;
+	XMVECTOR rayDir = XMVector3Normalize(farPoint - nearPoint);
+
+	// World Ray -> Terrain Local Ray
+	rayOrigin = XMVector3TransformCoord(rayOrigin, invWorld);
+	rayDir = XMVector3TransformNormal(rayDir, invWorld);
+	rayDir = XMVector3Normalize(rayDir);
+
+	auto& indices = m_pVIBufferCom->GetIndices();
+	auto& vertices = m_pVIBufferCom->Getvertices();
+
+	float nearestDist = FLT_MAX;
+	bool bHit = false;
+
+	XMVECTOR nearestHitLocal = XMVectorZero();
+
+	// NavMesh 찍을 때는 캐시 쓰지 말고 전체 Terrain 검사
+	for (size_t i = 0; i < indices->size(); i += 3)
+	{
+		XMVECTOR v0 = XMLoadFloat3(&(*vertices)[(*indices)[i]].vPosition);
+		XMVECTOR v1 = XMLoadFloat3(&(*vertices)[(*indices)[i + 1]].vPosition);
+		XMVECTOR v2 = XMLoadFloat3(&(*vertices)[(*indices)[i + 2]].vPosition);
+
+		float dist = 0.f;
+
+		if (TriangleTests::Intersects(rayOrigin, rayDir, v0, v1, v2, dist))
+		{
+			if (dist < nearestDist)
+			{
+				nearestDist = dist;
+				nearestHitLocal = rayOrigin + rayDir * dist;
+				bHit = true;
+			}
+		}
+	}
+
+	if (!bHit)
+		return false;
+
+	float x = XMVectorGetX(nearestHitLocal);
+	float z = XMVectorGetZ(nearestHitLocal);
+
+	float terrainSizeX = static_cast<float>(m_pVIBufferCom->GetNumVerticesX() - 1);
+	float terrainSizeZ = static_cast<float>(m_pVIBufferCom->GetNumVerticesZ() - 1);
+
+	if (x < 0.f || z < 0.f || x > terrainSizeX || z > terrainSizeZ)
+		return false;
+
+	// Terrain Local Hit -> World Hit
+	XMVECTOR nearestHitWorld = XMVector3TransformCoord(nearestHitLocal, matWorld);
+
+	XMStoreFloat3(&vPickingPoint, nearestHitWorld);
+
+	return true;
+}
 void Terrain::Update_SplatTexture()
 {
 	D3D11_MAPPED_SUBRESOURCE mapped{};

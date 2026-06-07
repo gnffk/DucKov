@@ -28,6 +28,10 @@ public:
 	HRESULT Ready_Neighbors(const _tchar* pNeighbors);
 	_bool isMove(_fvector vResultPos);
 
+public:
+	int32_t Find_CellIndex(_fvector vPosition);
+	_bool Set_CurrentCell(_fvector vPosition);
+
 #ifdef _DEBUG
 public:
 	HRESULT Render();

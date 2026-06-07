@@ -1,5 +1,6 @@
 #include "Transform.h"
 #include "Shader.h"
+#include "Navigation.h"
 Transform::Transform(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
     : Component{ pDevice, pContext }
 {
@@ -222,6 +223,44 @@ void Transform::Move(_fvector vDir, _float fTimeDelta)
 
     Set_State(STATE::POSITION, vPosition);
 
+}
+
+void Transform::Go_Direction(
+    _fvector vDirection,
+    _float fTimeDelta,
+    shared_ptr<Navigation> pNavigation,
+    _float fSpeedScale)
+{
+    _vector vMoveDir = vDirection;
+
+    // 이동은 XZ 평면 기준
+    vMoveDir = XMVectorSetY(vMoveDir, 0.f);
+
+    if (XMVector3Equal(vMoveDir, XMVectorZero()))
+        return;
+
+    vMoveDir = XMVector3Normalize(vMoveDir);
+
+    _vector vPosition = Get_State(STATE::POSITION);
+
+    _vector vNextPosition =
+        vPosition + vMoveDir * m_fSpeedPerSec * fTimeDelta * fSpeedScale;
+
+    vNextPosition = XMVectorSetW(vNextPosition, 1.f);
+
+    if (nullptr == pNavigation)
+    {
+        Set_State(STATE::POSITION, vNextPosition);
+        return;
+    }
+
+    if (true == pNavigation->isMove(vNextPosition))
+    {
+        
+        vNextPosition = pNavigation->SetUp_OnNavigation(vNextPosition);
+
+        Set_State(STATE::POSITION, vNextPosition);
+    }
 }
 
 void Transform::Move(_fvector vDir, _float fTimeDelta,_float plusSpeed)
