@@ -49,6 +49,26 @@ public:
 
 	uint32_t Get_TreeCount() const;
 
+private:
+	_bool   m_bTreeBrushMode = false;
+	_bool   m_bEraseMode = false;
+
+	_float  m_fBrushRadius = 3.f;
+	_float  m_fBrushInterval = 0.08f;
+	_float  m_fBrushTimeAcc = 0.f;
+
+	int    m_iBrushCount = 1;
+
+	_float  m_fScaleMin = 0.8f;
+	_float  m_fScaleMax = 1.3f;
+
+	_float3 m_vBrushPickingPoint = {};
+	_bool   m_bBrushPicked = false;
+
+public:
+	void GUI_TreeBrush();
+	void Update_TreeBrush(_float fTimeDelta);
+
 
 public:
 	static unique_ptr<Tree> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

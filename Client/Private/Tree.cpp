@@ -1,7 +1,7 @@
 #include "Engine_Macro.h"
 #include "Tree.h"
 #include "GameInstance.h"
-
+#include "Terrain.h"
 Tree::Tree(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: GameObject{ pDevice, pContext }
 
@@ -34,11 +34,7 @@ HRESULT Tree::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	// 테스트용: 원점에 나무 하나 찍기
-	Add_Tree(
-		_float3{ 0.f, 0.f, 0.f },
-		_float3{ 1.f, 1.f, 1.f },
-		0.f);
+
 
 	return S_OK;
 
@@ -55,8 +51,8 @@ void Tree::Priority_Update(_float fTimeDelta)
 void Tree::Update(_float fTimeDelta)
 {
 
-
-
+	Update_TreeBrush(fTimeDelta);
+	
 }
 
 void Tree::Late_Update(_float fTimeDelta)
@@ -185,4 +181,123 @@ uint32_t Tree::Get_TreeCount() const
 		return 0;
 
 	return m_pModelCom->Get_InstanceCount();
+}
+void Tree::GUI_TreeBrush()
+{
+	ImGui::Begin("Tree Brush");
+
+	ImGui::Checkbox("Tree Brush Mode", &m_bTreeBrushMode);
+
+	if (ImGui::RadioButton("Paint", m_bEraseMode == false))
+	{
+		m_bEraseMode = false;
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::RadioButton("Erase", m_bEraseMode == true))
+	{
+		m_bEraseMode = true;
+	}
+
+	ImGui::DragFloat("Brush Radius", &m_fBrushRadius, 0.1f, 0.1f, 100.f);
+	ImGui::DragInt("Brush Count", &m_iBrushCount, 1, 1, 50);
+
+	ImGui::DragFloat("Scale Min", &m_fScaleMin, 0.01f, 0.01f, 10.f);
+	ImGui::DragFloat("Scale Max", &m_fScaleMax, 0.01f, 0.01f, 10.f);
+
+	if (ImGui::Button("Clear Trees"))
+	{
+		Clear_Trees();
+	}
+
+	ImGui::Text("Tree Count : %d", Get_TreeCount());
+
+	ImGui::End();
+}
+void Tree::Update_TreeBrush(_float fTimeDelta)
+{
+	if (m_bTreeBrushMode == false)
+ 		return;
+
+	ImGuiIO& io = ImGui::GetIO();
+
+
+	m_fBrushTimeAcc += fTimeDelta;
+
+	_float3 vPickingPoint = {};
+
+	// 여기서 Terrain Picking 필요
+	// 네 엔진에 Terrain 객체 가져오는 방식에 맞춰서 수정해야 함
+	
+	auto pTerrain = dynamic_pointer_cast<Terrain>(
+		CGameInstance::Get().Find_Object(
+			CGameInstance::Get().Get_Level(),
+			L"Base",
+			L"Terrian"
+		)
+	);
+
+	if (pTerrain == nullptr)
+		return;
+
+	if (pTerrain->Picking_Terrain(vPickingPoint) == false)
+	{
+		m_bBrushPicked = false;
+		return;
+	}
+
+	m_bBrushPicked = true;
+	m_vBrushPickingPoint = vPickingPoint;
+
+	// 좌클릭 : Paint
+	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
+	{
+		if (m_fBrushTimeAcc < m_fBrushInterval)
+			return;
+
+		m_fBrushTimeAcc = 0.f;
+
+		if (m_bEraseMode == false)
+		{
+			for (int i = 0; i < m_iBrushCount; ++i)
+			{
+				_float3 vTreePos = vPickingPoint;
+
+				float fRandomX = ((float)rand() / RAND_MAX) * 2.f - 1.f;
+				float fRandomZ = ((float)rand() / RAND_MAX) * 2.f - 1.f;
+
+				vTreePos.x += fRandomX * m_fBrushRadius;
+				vTreePos.z += fRandomZ * m_fBrushRadius;
+
+				float fScale =
+					m_fScaleMin +
+					((float)rand() / RAND_MAX) * (m_fScaleMax - m_fScaleMin);
+
+				float fYaw =
+					((float)rand() / RAND_MAX) * XM_2PI;
+
+				Add_Tree(
+					vTreePos,
+					_float3{ fScale, fScale, fScale },
+					fYaw
+				);
+			}
+		}
+		else
+		{
+			Erase_Tree(vPickingPoint, m_fBrushRadius);
+		}
+	}
+
+	// 우클릭은 강제 Erase로 써도 됨
+	if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
+	{
+		if (m_fBrushTimeAcc < m_fBrushInterval)
+			return;
+
+		m_fBrushTimeAcc = 0.f;
+
+		Erase_Tree(vPickingPoint, m_fBrushRadius);
+	}
 }

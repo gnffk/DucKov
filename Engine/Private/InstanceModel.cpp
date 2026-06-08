@@ -31,9 +31,7 @@ InstanceModel::InstanceModel(const InstanceModel& Prototype)
         if (pPrototypeMesh == nullptr)
             continue;
 
-        auto pClonedMesh =
-            static_pointer_cast<VIBuffer_Mesh_Instance>(
-                pPrototypeMesh->Clone(&m_iInstanceCapacity));
+        auto pClonedMesh =static_pointer_cast<VIBuffer_Mesh_Instance>(pPrototypeMesh->Clone(&m_iInstanceCapacity));
 
         if (pClonedMesh == nullptr)
             continue;
@@ -304,22 +302,13 @@ HRESULT InstanceModel::Add_Instance(const _float3& vPosition)
         0.f);
 }
 
-HRESULT InstanceModel::Add_Instance(
-    const _float3& vPosition,
-    const _float3& vScale,
-    _float fYaw)
+HRESULT InstanceModel::Add_Instance(const _float3& vPosition,const _float3& vScale,_float fYaw)
 {
-    _matrix matScale = XMMatrixScaling(
-        vScale.x,
-        vScale.y,
-        vScale.z);
+    _matrix matScale = XMMatrixScaling(vScale.x,vScale.y,vScale.z);
 
     _matrix matRot = XMMatrixRotationY(fYaw);
 
-    _matrix matTrans = XMMatrixTranslation(
-        vPosition.x,
-        vPosition.y,
-        vPosition.z);
+    _matrix matTrans = XMMatrixTranslation(vPosition.x,vPosition.y,vPosition.z);
 
     _float4x4 World{};
     XMStoreFloat4x4(&World, matScale * matRot * matTrans);
@@ -330,9 +319,7 @@ HRESULT InstanceModel::Add_Instance(
     return S_OK;
 }
 
-HRESULT InstanceModel::Remove_Instance_InRadius(
-    const _float3& vCenter,
-    _float fRadius)
+HRESULT InstanceModel::Remove_Instance_InRadius(const _float3& vCenter,_float fRadius)
 {
     const _float fRadiusSq = fRadius * fRadius;
 

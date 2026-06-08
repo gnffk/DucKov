@@ -10,13 +10,12 @@ Client::CMainGame::CMainGame()
 
 Client::CMainGame::~CMainGame()
 {
-
 	CGameInstance::Get().Release_Engine();
 }
 
 HRESULT Client::CMainGame::Initialize()
 {
-	/* 엔진을 사용할 준비를 한다. */
+	/* 엔진을 사용할 준비를 한다.*/
 	ENGINE_DESC EngineDesc{};
 	EngineDesc.hWnd = g_hWnd;
 	EngineDesc.eWinMode = WINMODE::WIN;
@@ -32,8 +31,6 @@ HRESULT Client::CMainGame::Initialize()
 
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;
-
-
 
 
 	return S_OK;

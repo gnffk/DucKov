@@ -27,7 +27,7 @@ public:
 	void	IMGUI_MadeFunction();
 	void	IMGUI_ChoiceObject();
 	void	IMGUI_AddPlayer();
-
+	void	IMGUI_TreeBrush_Render();
 public:
 	void	MousePicking();
 
@@ -36,6 +36,8 @@ public:
 	void	ShowStaticMeshTree(const std::filesystem::path& rootPath, wstring& selectedMeshName, wstring& selectedMeshPath, string& selectedDisplayName);
 
 	wstring Make_UniqueObjectName(const wstring& LayerName, const wstring& baseName);
+
+
 
 private:
 	unique_ptr<class NavMeshEditor> m_pNavMeshEditor = nullptr;

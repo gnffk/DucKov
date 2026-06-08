@@ -97,7 +97,7 @@ HRESULT VIBuffer_Mesh_Instance::Initialize(shared_ptr<vector<VTXMESH>> pvertices
     }
 
     // 처음에는 최소 1개짜리 Instance Buffer를 만들어둠.
-    if (FAILED(Create_InstanceBuffer(1)))
+    if (FAILED(Create_InstanceBuffer(2000)))
         return E_FAIL;
 
     return S_OK;

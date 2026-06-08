@@ -163,6 +163,9 @@
     <Filter Include="06.Component\VIBuffer\Instancing\Model\InstanceModel">
       <UniqueIdentifier>{7c375746-789a-4bc6-95cd-2c754cd1d7c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\VIBuffer\Rect">
+      <UniqueIdentifier>{5a5176f2-d2d1-4970-9291-571c4985dc9f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">

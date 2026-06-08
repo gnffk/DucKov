@@ -313,30 +313,43 @@ HRESULT Terrain::Create_SplatTexture()
 }
 _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 {
-	POINT pt;
+	if (m_pVIBufferCom == nullptr || m_pTransformCom == nullptr)
+		return false;
+
+	POINT pt{};
 	GetCursorPos(&pt);
 	ScreenToClient(g_hWnd, &pt);
 
-	float mouseX = (float)pt.x;
-	float mouseY = (float)pt.y;
+	float mouseX = static_cast<float>(pt.x);
+	float mouseY = static_cast<float>(pt.y);
 
 	float width = CGameInstance::Get().Get_ViewportSize().x;
 	float height = CGameInstance::Get().Get_ViewportSize().y;
 
+	if (width <= 0.f || height <= 0.f)
+		return false;
+
 	float px = mouseX / (width * 0.5f) - 1.0f;
 	float py = mouseY / -(height * 0.5f) + 1.0f;
 
-	_float4x4 proj, view, world;
+	_float4x4 proj{}, view{}, world{};
+
 	CGameInstance::Get().Get_MainCamerwaViewMatrix(view);
 	CGameInstance::Get().Get_MainCamerwaProjectionMatrix(proj);
+
 	world = m_pTransformCom->GetWorldMatrix();
 
 	XMMATRIX matProj = XMLoadFloat4x4(&proj);
 	XMMATRIX matView = XMLoadFloat4x4(&view);
 	XMMATRIX matWorld = XMLoadFloat4x4(&world);
+
 	XMMATRIX invProj = XMMatrixInverse(nullptr, matProj);
 	XMMATRIX invView = XMMatrixInverse(nullptr, matView);
 	XMMATRIX invWorld = XMMatrixInverse(nullptr, matWorld);
+
+	// =====================================================
+	// 1. Screen -> World Ray
+	// =====================================================
 
 	XMVECTOR nearPoint = XMVectorSet(px, py, 0.f, 1.f);
 	nearPoint = XMVector3TransformCoord(nearPoint, invProj);
@@ -349,7 +362,10 @@ _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 	XMVECTOR rayOrigin = nearPoint;
 	XMVECTOR rayDir = XMVector3Normalize(farPoint - nearPoint);
 
-	// World -> Local
+	// =====================================================
+	// 2. World Ray -> Terrain Local Ray
+	// =====================================================
+
 	rayOrigin = XMVector3TransformCoord(rayOrigin, invWorld);
 	rayDir = XMVector3TransformNormal(rayDir, invWorld);
 	rayDir = XMVector3Normalize(rayDir);
@@ -357,105 +373,182 @@ _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 	auto& indices = m_pVIBufferCom->GetIndices();
 	auto& vertices = m_pVIBufferCom->Getvertices();
 
+	if (indices == nullptr || vertices == nullptr)
+		return false;
+
+	if (indices->empty() || vertices->empty())
+		return false;
+
 	float nearestDist = FLT_MAX;
 	bool bHit = false;
 
 	XMVECTOR nearestHit = XMVectorZero();
 
-	if (m_CheckPickTerrainNum.x == 0 && m_CheckPickTerrainNum.y == 0 && m_CheckPickTerrainNum.z == 0) {
-		for (size_t i = 0; i < indices->size(); i += 3)
+	const uint32_t terrainWidth = m_pVIBufferCom->GetNumVerticesX();
+	const uint32_t terrainHeight = m_pVIBufferCom->GetNumVerticesZ();
+
+	if (terrainWidth < 2 || terrainHeight < 2)
+		return false;
+
+	// =====================================================
+	// Triangle 검사 Lambda
+	// =====================================================
+
+	auto TestTriangle = [&](
+		uint32_t i0,
+		uint32_t i1,
+		uint32_t i2)
 		{
-			XMVECTOR v0 = XMLoadFloat3(&(*vertices)[(*indices)[i]].vPosition);
-			XMVECTOR v1 = XMLoadFloat3(&(*vertices)[(*indices)[i + 1]].vPosition);
-			XMVECTOR v2 = XMLoadFloat3(&(*vertices)[(*indices)[i + 2]].vPosition);
+			if (i0 >= vertices->size() ||
+				i1 >= vertices->size() ||
+				i2 >= vertices->size())
+				return;
+
+			XMVECTOR v0 = XMLoadFloat3(&(*vertices)[i0].vPosition);
+			XMVECTOR v1 = XMLoadFloat3(&(*vertices)[i1].vPosition);
+			XMVECTOR v2 = XMLoadFloat3(&(*vertices)[i2].vPosition);
 
 			float dist = 0.f;
 
-			if (TriangleTests::Intersects(rayOrigin, rayDir, v0, v1, v2, dist))
+			if (TriangleTests::Intersects(
+				rayOrigin,
+				rayDir,
+				v0,
+				v1,
+				v2,
+				dist))
 			{
 				if (dist < nearestDist)
 				{
 					nearestDist = dist;
 					nearestHit = rayOrigin + rayDir * dist;
-					bHit = true; 
-					XMStoreFloat4(&m_CheckPickTerrainNum, nearestHit);
+					bHit = true;
 				}
 			}
+		};
+
+	// =====================================================
+	// 전체 Terrain 검사 Lambda
+	// =====================================================
+
+	auto TestAllTerrain = [&]()
+		{
+			nearestDist = FLT_MAX;
+			bHit = false;
+			nearestHit = XMVectorZero();
+
+			for (size_t i = 0; i + 2 < indices->size(); i += 3)
+			{
+				uint32_t i0 = (*indices)[i];
+				uint32_t i1 = (*indices)[i + 1];
+				uint32_t i2 = (*indices)[i + 2];
+
+				TestTriangle(i0, i1, i2);
+			}
+		};
+
+	// =====================================================
+	// 주변 Terrain 검사 Lambda
+	// =====================================================
+
+	auto TestAroundLastPick = [&]() -> bool
+		{
+			nearestDist = FLT_MAX;
+			bHit = false;
+			nearestHit = XMVectorZero();
+
+			int centerX = static_cast<int>(m_CheckPickTerrainNum.x);
+			int centerZ = static_cast<int>(m_CheckPickTerrainNum.z);
+
+			const int Range = 30;
+
+			for (int z = centerZ - Range; z <= centerZ + Range; ++z)
+			{
+				for (int x = centerX - Range; x <= centerX + Range; ++x)
+				{
+					if (x < 0 || z < 0)
+						continue;
+
+					if (x >= static_cast<int>(terrainWidth) - 1)
+						continue;
+
+					if (z >= static_cast<int>(terrainHeight) - 1)
+						continue;
+
+					uint32_t i0 = z * terrainWidth + x;
+					uint32_t i1 = i0 + 1;
+					uint32_t i2 = i0 + terrainWidth;
+					uint32_t i3 = i2 + 1;
+
+					// 기존 코드 기준 삼각형 방향 유지
+					TestTriangle(i2, i3, i1);
+					TestTriangle(i2, i1, i0);
+				}
+			}
+
+			return bHit;
+		};
+
+	// =====================================================
+	// 3. Picking 검사
+	// =====================================================
+
+	bool bHasPreviousPick = false;
+
+	if (!(m_CheckPickTerrainNum.x == 0.f &&
+		m_CheckPickTerrainNum.y == 0.f &&
+		m_CheckPickTerrainNum.z == 0.f))
+	{
+		bHasPreviousPick = true;
+	}
+
+	if (bHasPreviousPick)
+	{
+		TestAroundLastPick();
+
+		// 주변 검사 실패하면 전체 Terrain 검사로 fallback
+		if (!bHit)
+		{
+			TestAllTerrain();
 		}
 	}
 	else
 	{
-		int centerX = (int)m_CheckPickTerrainNum.x;
-		int centerZ = (int)m_CheckPickTerrainNum.z;
-
-		const int Range = 20;
-
-		uint32_t terrainWidth = m_pVIBufferCom->GetNumVerticesX();
-		uint32_t terrainHeight = m_pVIBufferCom->GetNumVerticesZ();
-
-		for (int z = centerZ - Range; z <= centerZ + Range; ++z)
-		{
-			for (int x = centerX - Range; x <= centerX + Range; ++x)
-			{
-				if (x < 0 || z < 0)
-					continue;
-
-				if (x >= (int)terrainWidth - 1)
-					continue;
-
-				if (z >= (int)terrainHeight - 1)
-					continue;
-
-				uint32_t i0 = z * terrainWidth + x;
-				uint32_t i1 = i0 + 1;
-				uint32_t i2 = i0 + terrainWidth;
-				uint32_t i3 = i2 + 1;
-
-				XMVECTOR v0 = XMLoadFloat3(&(*vertices)[i2].vPosition);
-				XMVECTOR v1 = XMLoadFloat3(&(*vertices)[i3].vPosition);
-				XMVECTOR v2 = XMLoadFloat3(&(*vertices)[i1].vPosition);
-				XMVECTOR v3 = XMLoadFloat3(&(*vertices)[i0].vPosition);
-
-				float dist = 0.f;
-
-				if (TriangleTests::Intersects(rayOrigin, rayDir, v0, v1, v2, dist))
-				{
-					if (dist < nearestDist)
-					{
-						nearestDist = dist;
-						nearestHit = rayOrigin + rayDir * dist;
-						bHit = true;
-					}
-				}
-
-				if (TriangleTests::Intersects(rayOrigin, rayDir, v0, v2, v3, dist))
-				{
-					if (dist < nearestDist)
-					{
-						nearestDist = dist;
-						nearestHit = rayOrigin + rayDir * dist;
-						bHit = true;
-					}
-				}
-			}
-		}
+		TestAllTerrain();
 	}
 
 	if (!bHit)
 		return false;
 
-	float x = XMVectorGetX(nearestHit);
-	float z = XMVectorGetZ(nearestHit);
+	// =====================================================
+	// 4. Local Terrain 범위 체크
+	// =====================================================
 
-	float terrainSizeX = (float)(m_pVIBufferCom->GetNumVerticesX() - 1);
-	float terrainSizeZ = (float)(m_pVIBufferCom->GetNumVerticesZ() - 1);
+	float localX = XMVectorGetX(nearestHit);
+	float localZ = XMVectorGetZ(nearestHit);
 
-	if (x < 0.f || z < 0.f || x > terrainSizeX || z > terrainSizeZ)
+	float terrainSizeX = static_cast<float>(terrainWidth - 1);
+	float terrainSizeZ = static_cast<float>(terrainHeight - 1);
+
+	if (localX < 0.f || localZ < 0.f)
 		return false;
 
-	XMStoreFloat3(&vPickingPoint, nearestHit);
+	if (localX > terrainSizeX || localZ > terrainSizeZ)
+		return false;
+
+	// =====================================================
+	// 5. 캐시는 Local 좌표로 저장
+	// =====================================================
 
 	XMStoreFloat4(&m_CheckPickTerrainNum, nearestHit);
+
+	// =====================================================
+	// 6. 반환은 World 좌표로 반환
+	// =====================================================
+
+	XMVECTOR worldHit = XMVector3TransformCoord(nearestHit, matWorld);
+	XMStoreFloat3(&vPickingPoint, worldHit);
+
 	return true;
 }
 void Terrain::Paint_Splat(_float3 vWorldPos)

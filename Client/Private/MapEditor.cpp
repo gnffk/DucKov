@@ -5,7 +5,7 @@
 #include "Layer.h"
 #include "BaseCollider.h"
 #include "NavMeshEditor.h"
-
+#include "Tree.h"
 
 MapEditor::MapEditor(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
@@ -140,6 +140,9 @@ void MapEditor::IMGUI_Render() {
     IMGUI_SaveLoad_Render();
     IMGUI_MadeFunction();
     IMGUI_AddPlayer();
+
+    IMGUI_TreeBrush_Render();
+
     if (m_pNavMeshEditor)
         m_pNavMeshEditor->IMGUI_Render();
 #endif
@@ -1217,4 +1220,20 @@ wstring MapEditor::Make_UniqueObjectName(const wstring& LayerName, const wstring
     }
 
     return finalName;
+}
+
+void MapEditor::IMGUI_TreeBrush_Render()
+{
+    auto pTree = dynamic_pointer_cast<Tree>(
+        CGameInstance::Get().Find_Object(
+            CGameInstance::Get().Get_Level(),
+            L"Instance",
+            L"Tree_Instance_Manager"
+        )
+    );
+
+    if (pTree == nullptr)
+        return;
+
+    pTree->GUI_TreeBrush();
 }

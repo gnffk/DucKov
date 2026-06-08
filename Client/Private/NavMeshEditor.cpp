@@ -303,7 +303,7 @@ void NavMeshEditor::Rebuild_Neighbors()
 
 	auto SamePoint = [](const _float3& A, const _float3& B)
 		{
-			constexpr float EPSILON = 0.001f;
+			constexpr float EPSILON = 0.0001f;
 
 			return fabsf(A.x - B.x) < EPSILON &&
 				fabsf(A.y - B.y) < EPSILON &&
