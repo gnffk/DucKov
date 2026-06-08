@@ -11,6 +11,7 @@
 #include "Body_Player.h"
 #include "Player.h"
 #include "PlayerCamera.h"
+#include "Tree.h"
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
@@ -153,7 +154,9 @@ HRESULT CLoader::Loading_For_MapEditor()
 		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
 		return E_FAIL;
 
-
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_Vtx_Instance_Tex"),
+		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_Vtx_Instance_Tex.hlsl"),VTXMESHINSTANCE::Elements,VTXMESHINSTANCE::iNumElements))))
+		return E_FAIL;
 #pragma endregion
 
 #pragma region Model Component Prototype
@@ -278,6 +281,15 @@ HRESULT CLoader::Loading_For_MapEditor()
 		}
 	}
 
+	_matrix Treematrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Tree",
+		InstanceModel::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(), L"Tree",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/Stage1/NonAnim/SM_Tree/SM_Tree.bin", Treematrix))))
+	{
+		return E_FAIL;
+	}
+
+
 #pragma endregion
 
 
@@ -347,6 +359,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player"),
 		Player::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Tree"),
+		Tree::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 #pragma endregion

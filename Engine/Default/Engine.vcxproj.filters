@@ -154,6 +154,15 @@
     <Filter Include="06.Component\VIBuffer\Cell">
       <UniqueIdentifier>{a567168b-8a94-4e83-9753-95ea3bdea74b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="06.Component\VIBuffer\Instancing">
+      <UniqueIdentifier>{0693bbde-9f0d-474a-9208-345518f38c1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="06.Component\VIBuffer\Instancing\Model">
+      <UniqueIdentifier>{2844403c-5d92-4533-a69b-02892ae8cbb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="06.Component\VIBuffer\Instancing\Model\InstanceModel">
+      <UniqueIdentifier>{7c375746-789a-4bc6-95cd-2c754cd1d7c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -330,6 +339,15 @@
     <ClCompile Include="..\Private\VIBuffer_Cell.cpp">
       <Filter>06.Component\VIBuffer\Cell</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Instance.cpp">
+      <Filter>06.Component\VIBuffer\Instancing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Mesh_Instance.cpp">
+      <Filter>06.Component\VIBuffer\Instancing\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InstanceModel.cpp">
+      <Filter>06.Component\VIBuffer\Instancing\Model\InstanceModel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -493,6 +511,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_Cell.h">
       <Filter>06.Component\VIBuffer\Cell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Instance.h">
+      <Filter>06.Component\VIBuffer\Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Mesh_Instance.h">
+      <Filter>06.Component\VIBuffer\Instancing\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InstanceModel.h">
+      <Filter>06.Component\VIBuffer\Instancing\Model\InstanceModel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

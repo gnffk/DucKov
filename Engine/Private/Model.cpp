@@ -267,7 +267,6 @@ HRESULT Model::Ready_BinaryModelFile(const char* modelFileName)
              return E_FAIL;
          }
      }
-      
          break;
 
      case ETOUI(MODELTYPE::ANIM):

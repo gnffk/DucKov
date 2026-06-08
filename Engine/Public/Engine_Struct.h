@@ -20,6 +20,14 @@ namespace Engine
 		float		fTrackPosition;
 	}KEYFRAME;
 
+	typedef struct tagInstanceMeshData
+	{
+		_float4 vRight;
+		_float4 vUp;
+		_float4 vLook;
+		_float4 vTranslation;
+	} INSTANCE_MESH_DATA;
+
 	typedef struct tagVertexPosition
 	{
 		XMFLOAT3	vPosition;
@@ -128,7 +136,47 @@ namespace Engine
 		};
 	}VTXMESH;
 
+	typedef struct tagVertexMeshInstance
+	{
+		static constexpr uint32_t iNumElements = { 9 };
 
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[iNumElements] =
+		{
+			// =====================================================
+			// Slot 0 : VTXMESH
+			// =====================================================
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,
+				D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 12,
+				D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 24,
+				D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 36,
+				D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 48,
+				D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+				// =====================================================
+				// Slot 1 : INSTANCE_MESH_DATA
+				// =====================================================
+				{ "TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0,
+					D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+				{ "TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16,
+					D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+				{ "TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32,
+					D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+				{ "TEXCOORD", 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48,
+					D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		};
+
+	} VTXMESHINSTANCE;
 	/* 애니메이션이 있는 메시용 정점. */
 	typedef struct tagVertexAnimMesh
 	{

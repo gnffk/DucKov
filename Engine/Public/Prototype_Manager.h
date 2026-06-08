@@ -8,6 +8,8 @@
 #include "VIBuffer_Mesh.h"
 #include "VIBuffer_Cube.h"
 #include "VIBuffer_Cell.h"
+#include "VIBuffer_Mesh_Instance.h"
+#include "InstanceModel.h"
 #include "Model.h"
 #include "Texture.h"
 #include "FSM.h"

@@ -90,6 +90,20 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
         return E_FAIL;
 
 
+    GameObject::GAMEOBJECT_DESC descTree{};
+
+    descTree.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+    descTree.m_strName = L"Tree_Instance_Manager";
+    descTree.m_strPrototypeObjectName = L"Prototype_GameObject_Tree";
+    descTree.m_strPrototypeBaseName = L"Tree";
+    descTree.pCameraType = ETOUI(CAMERA::NONE);
+    descTree.fSpeedPerSec = 0.f;
+    descTree.fRotationPerSec = 0.f;
+
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),  TEXT("Prototype_GameObject_Tree"),  CGameInstance::Get().Get_Level(),  L"Instance", &descTree)))
+    {
+        return E_FAIL;
+    }
 
 	return S_OK;
   
