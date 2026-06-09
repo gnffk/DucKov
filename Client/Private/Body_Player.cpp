@@ -61,7 +61,7 @@ void Body_Player::Update(_float fTimeDelta)
 		switch (*m_pParentState)
 		{
 		case Player_FSM::PLAYER_STATE::IDLE:
-			targetAnim = 1;
+			targetAnim = 0;
 			blendDuration = 0.18f;
 			nextAnimPlus = 1.f;
 			break;

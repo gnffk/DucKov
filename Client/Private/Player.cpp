@@ -82,7 +82,7 @@ HRESULT Player::Initialize(void* pArg)
 	DesUI.fRotationPerSec = 1.f;
 	DesUI.fSizeX = 1.f;
 	DesUI.fSizeY = 1.f;
-	DesUI.fX = 1.f;
+	DesUI.fX = 1.f; 
 	DesUI.fY = 1.f;
 
 	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"), CGameInstance::Get().Get_Level(), L"PlayerTag", &DesUI))

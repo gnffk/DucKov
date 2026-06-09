@@ -2,6 +2,7 @@
 #include "OBB_Collider.h"
 #include "GameInstance.h"
 #include "BaseCollider.h"
+#include "Bullet.h"
 Player_Weapon::Player_Weapon(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: PartObject{ pDevice, pContext }
 
@@ -30,13 +31,12 @@ HRESULT Player_Weapon::Initialize(void* pArg)
 
 	m_pParentState = pDesc->pParentState;
 	m_pSocketMatrix = pDesc->pSocketMatrix;
-
+	
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
-	        
 
 	//m_pTransformCom->Rotation(360.f, -148.5f, -14.5);
 	//m_pTransformCom->Set_State(STATE::POSITION, {-0.06f, 0.15f,0.27f});
@@ -53,12 +53,12 @@ void Player_Weapon::Priority_Update(_float fTimeDelta)
 void Player_Weapon::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
+
 #ifdef _DEBUG
 	GUI_PlayerWeapon();
 #endif
+
 	_matrix SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
-
-
 
 	_vector vSocketPos = SocketMatrix.r[3];
 
@@ -72,11 +72,31 @@ void Player_Weapon::Update(_float fTimeDelta)
 			XMConvertToRadians(m_vLocalRot.y),
 			XMConvertToRadians(m_vLocalRot.z)
 		) *
-		XMMatrixTranslation(m_vLocalPos.x, m_vLocalPos.y, m_vLocalPos.z);
+		XMMatrixTranslation(
+			m_vLocalPos.x,
+			m_vLocalPos.y,
+			m_vLocalPos.z
+		);
 
 	_matrix ChildMatrix = LocalWeaponMatrix * SocketPosMatrix;
 
 	Make_CombinedWorldMatrix(ChildMatrix);
+
+	_float4x4 WeaponWorldFloat4x4 = __super::GetCombined();
+	_matrix WeaponWorld = XMLoadFloat4x4(&WeaponWorldFloat4x4);
+
+	_vector vMuzzleLocal = XMVectorSet(
+		m_vMuzzleLocalPos.x,
+		m_vMuzzleLocalPos.y,
+		m_vMuzzleLocalPos.z,
+		1.f
+	);
+
+	_vector vMuzzleWorld =XMVector3TransformCoord(vMuzzleLocal, WeaponWorld);
+
+	XMStoreFloat3(&m_vMuzzleWorldPos, vMuzzleWorld);
+
+
 
 }
 
@@ -168,46 +188,83 @@ shared_ptr<Prototype> Player_Weapon::Clone(void* pArg)
 
 	return pInstance;
 }
+void Player_Weapon::Fire_Bullet()
+{
 
+	_matrix ParentMatrix = XMLoadFloat4x4(m_pParentMatrix);
+
+	_vector vDir = ParentMatrix.r[2];
+
+	vDir = XMVectorSetY(vDir, 0.f);
+	vDir = XMVector3Normalize(vDir);
+
+	XMStoreFloat3(&m_vBulletDir, vDir);
+
+	Bullet::BULLET_DESC Desc{};
+	Desc.vStartPos = m_vMuzzleWorldPos;
+	Desc.vDir = m_vBulletDir;
+	Desc.fSpeed = 20.f;
+
+	Desc.m_bCollider =false;
+	Desc.ContainerObject =true;
+	Desc.m_strName = TEXT("Bullet");
+	Desc.m_strPrototypeObjectName = TEXT("Prototype_GameObject_Bullet");
+	Desc.m_strPrototypeBaseName = TEXT("Prototype_GameObject_Bullet");
+	Desc.pCameraType = 0;
+	Desc.fSpeedPerSec = 20.f;
+	Desc.fRotationPerSec = 20.f;
+
+	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Bullet"), CGameInstance::Get().Get_Level(), TEXT("Layer_Bullet"), &Desc))) {
+		return;
+	}
+}
 #ifdef _DEBUG
 
 void Player_Weapon::GUI_PlayerWeapon()
 {
 	if (ImGui::Begin("Player Weapon Editor"))
 	{
-		static _float3 vPos = { 0.f, 0.f, 0.f };
-		static _float3 vRot = { 90.f, 0.f, 0.f };
-		static _float3 vScale = { 1.f, 1.f, 1.f };
-
 		ImGui::SeparatorText("Weapon Local Transform");
 
-		ImGui::DragFloat3("Local Position", reinterpret_cast<float*>(&vPos), 0.01f, -100.f, 100.f);
-		ImGui::DragFloat3("Local Rotation", reinterpret_cast<float*>(&vRot), 0.5f, -360.f, 360.f);
-		ImGui::DragFloat3("Local Scale", reinterpret_cast<float*>(&vScale), 0.01f, 0.01f, 100.f);
+		ImGui::DragFloat3("Local Position", reinterpret_cast<float*>(&m_vLocalPos), 0.01f, -100.f, 100.f);
+		ImGui::DragFloat3("Local Rotation", reinterpret_cast<float*>(&m_vLocalRot), 0.5f, -360.f, 360.f);
+		ImGui::DragFloat3("Local Scale", reinterpret_cast<float*>(&m_vLocalScale), 0.01f, 0.01f, 100.f);
+
+		ImGui::SeparatorText("Muzzle");
+
+		ImGui::DragFloat3("Muzzle Local Position", reinterpret_cast<float*>(&m_vMuzzleLocalPos), 0.01f, -10.f, 10.f);
+	
+		_float4x4 WeaponWorldFloat4x4 = __super::GetCombined();
+
+		_matrix WeaponWorld = XMLoadFloat4x4(&WeaponWorldFloat4x4);
+
+		// 기본 발사 위치 = Weapon 현재 위치
+		_vector vWeaponPos = WeaponWorld.r[3];
+
+		// 총구 Local Offset 적용
+		_vector vMuzzleLocal = XMVectorSet(m_vMuzzleLocalPos.x,m_vMuzzleLocalPos.y,m_vMuzzleLocalPos.z,1.f);
+
+		_vector vMuzzleWorld = XMVector3TransformCoord(vMuzzleLocal, WeaponWorld);
+
+		XMStoreFloat3(&m_vMuzzleWorldPos, vMuzzleWorld);
+
+		ImGui::Text("Bullet Dir : %.3f, %.3f, %.3f",
+			m_vBulletDir.x,
+			m_vBulletDir.y,
+			m_vBulletDir.z);
+
+		if (ImGui::Button("Test Fire"))
+		{
+			Fire_Bullet();
+		}
 
 		if (ImGui::Button("Reset"))
 		{
-			vPos = { 0.f, 0.f, 0.f };
-			vRot = { 90.f, 0.f, 0.f };
-			vScale = { 1.f, 1.f, 1.f };
+			m_vLocalPos = { 0.f, 0.f, 0.f };
+			m_vLocalRot = { 90.f, 0.f, 0.f };
+			m_vLocalScale = { 1.f, 1.f, 1.f };
+			m_vMuzzleLocalPos = { 0.f, 0.f, 1.f };
 		}
-
-		m_pTransformCom->Set_Scale(vScale.x, vScale.y, vScale.z);
-
-		_matrix matWorld = XMMatrixScaling(vScale.x, vScale.y, vScale.z);
-
-		matWorld *= XMMatrixRotationRollPitchYaw(
-			XMConvertToRadians(vRot.x),
-			XMConvertToRadians(vRot.y),
-			XMConvertToRadians(vRot.z)
-		);
-
-		matWorld *= XMMatrixTranslation(vPos.x, vPos.y, vPos.z);
-
-		_float4x4 World;
-		XMStoreFloat4x4(&World, matWorld);
-
-		m_pTransformCom->Set_WorldMatrix(World);
 	}
 
 	ImGui::End();

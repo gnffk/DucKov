@@ -15,6 +15,7 @@
 #include "MainUI.h"
 #include "InvenUI.h"
 #include "Player_Weapon.h"
+#include "Bullet.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -329,6 +330,13 @@ HRESULT CLoader::Loading_For_MapEditor()
 	{
 		return E_FAIL;
 	}
+	_matrix BulletMatrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Bullet",
+		Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(), L"Bullet",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Bullet/SM_Bullet.bin", BulletMatrix))))
+	{
+		return E_FAIL;
+	}
 
 
 #pragma endregion
@@ -423,6 +431,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_Player_Weapon */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Weapon"),
 		Player_Weapon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_Bullet */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Bullet"),
+		Bullet::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

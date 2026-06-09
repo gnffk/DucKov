@@ -26,6 +26,9 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+
+public:
+	_float4x4& GetCombined() { return m_CombinedWorldMatrix; }
 protected:
 	const _float4x4* m_pParentMatrix = { nullptr };
 	_float4x4				m_CombinedWorldMatrix = { };
