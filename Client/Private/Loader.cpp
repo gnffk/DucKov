@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "PlayerCamera.h"
 #include "Tree.h"
+#include "MainUI.h"
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
@@ -132,6 +133,31 @@ HRESULT CLoader::Loading_For_MapEditor()
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/Terrain_Splat.png"), 1))))
 			return E_FAIL;
 
+		/* For.Prototype_Com_Texture_Icon */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Icon"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/UI_BaseRect_Toggle.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_Number */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Number"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/MainUI/UI_Main_%d.png"), 9))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_V */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_V"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/MainUI/UI_Main_v.png"), 9))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_Graph */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Graph"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/MainUI/UI_Main_Slider01.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_Heart */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Heart"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/MainUI/UI_Main_heart.png"), 1))))
+			return E_FAIL;
+
 
 
 #pragma endregion
@@ -156,6 +182,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_Vtx_Instance_Tex"),
 		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_Vtx_Instance_Tex.hlsl"),VTXMESHINSTANCE::Elements,VTXMESHINSTANCE::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_VtxPosTex"),
+		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_VtxPosTex.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
 		return E_FAIL;
 #pragma endregion
 
@@ -303,6 +333,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Cube"),
 		VIBuffer_Cube::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	/* For.Prototype_Com_VIBuffer_Rect */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Rect"),
+		VIBuffer_Rect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 #pragma endregion
 
 #pragma region Collider Component Prototype
@@ -364,6 +399,12 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Tree"),
 		Tree::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"),
+		MainUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 #pragma endregion
 

@@ -100,6 +100,9 @@
     <Filter Include="02. GameObject\Tree">
       <UniqueIdentifier>{1edb7663-85ea-4b2d-8567-1a1398a39f79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\UI">
+      <UniqueIdentifier>{66780bee-cf29-4e6d-8d43-5ce1b49066f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -201,6 +204,9 @@
     <ClInclude Include="..\Public\Tree.h">
       <Filter>02. GameObject\Tree</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MainUI.h">
+      <Filter>02. GameObject\Player\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -300,6 +306,9 @@
     <ClCompile Include="..\Private\Tree.cpp">
       <Filter>02. GameObject\Tree</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\MainUI.cpp">
+      <Filter>02. GameObject\Player\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -321,6 +330,9 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Instance_Tex.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

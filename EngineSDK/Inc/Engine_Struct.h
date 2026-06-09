@@ -20,6 +20,7 @@ namespace Engine
 		float		fTrackPosition;
 	}KEYFRAME;
 
+
 	typedef struct tagInstanceMeshData
 	{
 		_float4 vRight;

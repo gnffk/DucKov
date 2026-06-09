@@ -3,6 +3,7 @@
 #include "Layer.h"
 #include "Camera.h"
 #include "BaseCollider.h"
+
 Map_Manager::Map_Manager()
 {
 }
@@ -759,7 +760,6 @@ HRESULT Map_Manager::Load(string _mapDataName, uint32_t Levelindex)
     CGameInstance::Get().Change_Camera(0);
     return S_OK;
 }
-
 
 unique_ptr<Map_Manager> Map_Manager::Create()
 {

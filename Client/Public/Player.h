@@ -39,14 +39,18 @@ public:
 private:
 	uint32_t			m_iState = {};
 	
+
 	shared_ptr<class FSM> m_pPlayerFSM = { nullptr };
 	shared_ptr<class Navigation> m_pNavigationCom = { nullptr };
+	map<string, shared_ptr<class GameObject>> m_pUI ;
 	_bool				m_bShift = { false };
 	_bool				m_isRolling = { false };
 	_float				m_fRollTimer = {};
 	_float				m_fRollDuration = { 0.45f };
 	_vector				m_vRollDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	float			m_fSpeedFloat{ 0.f };
+	
+	
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();

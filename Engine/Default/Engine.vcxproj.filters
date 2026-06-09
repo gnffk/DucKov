@@ -166,6 +166,12 @@
     <Filter Include="06.Component\VIBuffer\Rect">
       <UniqueIdentifier>{5a5176f2-d2d1-4970-9291-571c4985dc9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05.GameObject\UIObject">
+      <UniqueIdentifier>{6a673e32-755f-4d4a-b759-46edb2248786}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="12.UI">
+      <UniqueIdentifier>{8ed9e64f-5f48-491e-8851-3697dd954988}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -351,6 +357,12 @@
     <ClCompile Include="..\Private\InstanceModel.cpp">
       <Filter>06.Component\VIBuffer\Instancing\Model\InstanceModel</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\UIObject.cpp">
+      <Filter>05.GameObject\UIObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Manager.cpp">
+      <Filter>12.UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -523,6 +535,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\InstanceModel.h">
       <Filter>06.Component\VIBuffer\Instancing\Model\InstanceModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UIObject.h">
+      <Filter>05.GameObject\UIObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Manager.h">
+      <Filter>12.UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

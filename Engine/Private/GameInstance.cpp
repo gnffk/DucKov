@@ -11,6 +11,7 @@
 #include "Collider_Manager.h"
 #include "Map_Manager.h"
 #include "Font_Manager.h"
+#include "UI_Manager.h"
 
 CGameInstance::CGameInstance()
 {
@@ -75,6 +76,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pFont_Manager)
         return E_FAIL;
 
+    m_pUI_Manager = UI_Manager::Create();
+    if (nullptr == m_pFont_Manager)
+        return E_FAIL;
+
+
     return S_OK;
 }
 
@@ -94,6 +100,12 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
     m_pObject_Manager->Late_Update(fTimeDelta);
 
+    m_pUI_Manager->Priority_Update(fTimeDelta);
+
+    m_pUI_Manager->Update(fTimeDelta);
+
+    m_pUI_Manager->Late_Update(fTimeDelta);
+
     m_pLevel_Manager->Update(fTimeDelta);
 
 
@@ -109,7 +121,7 @@ HRESULT CGameInstance::Draw()
     if (FAILED(m_pLevel_Manager->Render()))
         return E_FAIL;
 
-
+    m_pUI_Manager->Clear();
     m_pCollider_Manager->Render();
     m_pImGUI_Manager->Render_Imgui();
     return S_OK;
@@ -417,6 +429,27 @@ vector<string>& CGameInstance::GetMapNames() {
 
 vector<string>& CGameInstance::FindCategories(string _category) {
     return m_pMap_Manager->FindCategories(_category);
+}
+#pragma endregion
+
+#pragma region UI_Manager
+HRESULT CGameInstance::Add_UIObject(const wstring& strUIGroup, shared_ptr<UIObject> pUIObject) {
+    return m_pUI_Manager->Add_UIObject(strUIGroup,pUIObject);
+}
+
+vector<shared_ptr<class UIObject>>* CGameInstance::Find_UIGroup(const wstring& strUIGroup) {
+    return m_pUI_Manager->Find_UIGroup(strUIGroup);
+}
+
+shared_ptr<class UIObject> CGameInstance::Find_UIObject(const wstring& strUIGroup, const wstring& strUIObjectTag) {
+    return m_pUI_Manager->Find_UIObject(strUIGroup, strUIObjectTag);
+}
+
+void CGameInstance::Set_MainUIGroup(const wstring& strUIGroup) {
+    return m_pUI_Manager->Set_MainUIGroup(strUIGroup);
+}
+const wstring& CGameInstance::Get_MainUIGroup() const {
+    return m_pUI_Manager->Get_MainUIGroup();
 }
 #pragma endregion
 

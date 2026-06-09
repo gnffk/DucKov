@@ -47,6 +47,8 @@
     <ClInclude Include="..\Public\stb_image.h" />
     <ClInclude Include="..\Public\stb_image_write.h" />
     <ClInclude Include="..\Public\Texture.h" />
+    <ClInclude Include="..\Public\UI_Manager.h" />
+    <ClInclude Include="..\Public\UIObject.h" />
     <ClInclude Include="..\Public\VIBuffer_Cell.h" />
     <ClInclude Include="..\Public\VIBuffer_Cube.h" />
     <ClInclude Include="..\Public\VIBuffer_Fbx.h" />
@@ -138,6 +140,8 @@
     <ClCompile Include="..\Private\Shader.cpp" />
     <ClCompile Include="..\Private\Sphere_Collider.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
+    <ClCompile Include="..\Private\UI_Manager.cpp" />
+    <ClCompile Include="..\Private\UIObject.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Cell.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Cube.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Fbx.cpp" />

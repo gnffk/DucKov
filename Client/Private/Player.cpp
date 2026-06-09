@@ -1,6 +1,6 @@
 #include "Player.h"
 
-
+#include "MainUI.h"
 #include "Body_Player.h"
 #include "BaseCollider.h"
 #include "OBB_Collider.h"
@@ -67,6 +67,27 @@ HRESULT Player::Initialize(void* pArg)
 			)
 		);
 	}
+
+
+	UIObject::UIOBJECT_DESC DesUI{};
+	DesUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+	DesUI.m_strName = L"MainUI";
+	DesUI.m_strPrototypeObjectName = L"Prototype_GameObject_MainUI";
+	DesUI.m_strPrototypeBaseName = L"MainUI";
+	DesUI.pCameraType = ETOUI(CAMERA::NONE);
+	DesUI.fSpeedPerSec = 5.f;
+	DesUI.fRotationPerSec = 1.f;
+	DesUI.fSizeX = 1.f;
+	DesUI.fSizeY = 1.f;
+	DesUI.fX = 1.f;
+	DesUI.fY = 1.f;
+
+	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"), CGameInstance::Get().Get_Level(), L"PlayerTag", &DesUI))
+		return E_FAIL;
+
+	m_pUI.emplace("MainUI", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"MainUI"));
+
+
 	return S_OK;
 }
 
@@ -86,7 +107,7 @@ void Player::Priority_Update(_float fTimeDelta)
 		}
 	}
 	m_pPlayerFSM->Priority_Update(fTimeDelta);
-
+	
 }
 
 void Player::Update(_float fTimeDelta)
@@ -107,6 +128,15 @@ void Player::Update(_float fTimeDelta)
 void Player::Late_Update(_float fTimeDelta)
 {
 	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Player));
+
+	for (auto& Pair : m_pUI)
+	{
+		auto& pUIObject = Pair.second;
+		if (nullptr == pUIObject)
+			continue;
+		CGameInstance::Get().Add_RenderObject(RENDERGROUP::UI, pUIObject);
+	}
+
 	__super::Late_Update(fTimeDelta);
 	Collider_Obstacle(fTimeDelta);
 	m_pPlayerFSM->Late_Update(fTimeDelta);

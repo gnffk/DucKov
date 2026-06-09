@@ -154,6 +154,7 @@
     <ClInclude Include="..\Public\Body_Player.h" />
     <ClInclude Include="..\Public\CMainGame.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\MainUI.h" />
     <ClInclude Include="..\Public\Player_HAND_UP_State.h" />
     <ClInclude Include="..\Public\Player_Idle_State.h" />
     <ClInclude Include="..\Public\Player_FSM.h" />
@@ -188,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Body_Player.cpp" />
     <ClCompile Include="..\Private\CMainGame.cpp" />
+    <ClCompile Include="..\Private\MainUI.cpp" />
     <ClCompile Include="..\Private\Player_HAND_UP_State.cpp" />
     <ClCompile Include="..\Private\Player_Idle_State.cpp" />
     <ClCompile Include="..\Private\Player_FSM.cpp" />
@@ -226,6 +228,7 @@
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxInstance_Model.hlsl" />
+    <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_AnimFbx.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>

@@ -126,6 +126,19 @@ public:
 	vector<string>& GetMapNames();
 	vector<string>& FindCategories(string _category);
 #pragma endregion
+
+#pragma region UI_Manager
+	HRESULT Add_UIObject(const wstring& strUIGroup, shared_ptr<class UIObject> pUIObject);
+
+	vector<shared_ptr<class UIObject>>* Find_UIGroup(const wstring& strUIGroup);
+
+	shared_ptr<class UIObject> Find_UIObject(const wstring& strUIGroup, const wstring& strUIObjectTag);
+
+	void Set_MainUIGroup(const wstring& strUIGroup);
+	const wstring& Get_MainUIGroup() const;
+
+#pragma endregion
+
 private:
 	_float2											m_vViewportSize = {};
 	uint32_t										m_iCurrentLevel = {};
@@ -142,6 +155,7 @@ private:
 	unique_ptr<class Collider_Manager>				m_pCollider_Manager = { nullptr };
 	unique_ptr<class Map_Manager>					m_pMap_Manager = { nullptr };
 	unique_ptr<class Font_Manager>					m_pFont_Manager = { nullptr };
+	unique_ptr<class UI_Manager>					m_pUI_Manager = { nullptr };
 
 public:
 	void			Release_Engine();
