@@ -1,12 +1,15 @@
 #include "Player.h"
 
 #include "MainUI.h"
+#include "InvenUI.h"
 #include "Body_Player.h"
 #include "BaseCollider.h"
 #include "OBB_Collider.h"
 #include "AABB_Collider.h"
 #include "Player_FSM.h"
 #include "GameInstance.h"
+#include "Player_Weapon.h"
+
 
 Player::Player(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: ContainerObject{ pDevice, pContext }
@@ -87,6 +90,23 @@ HRESULT Player::Initialize(void* pArg)
 
 	m_pUI.emplace("MainUI", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"MainUI"));
 
+	UIObject::UIOBJECT_DESC DesIvenUI{};
+	DesIvenUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+	DesIvenUI.m_strName = L"MainUI";
+	DesIvenUI.m_strPrototypeObjectName = L"Prototype_GameObject_MainUI";
+	DesIvenUI.m_strPrototypeBaseName = L"MainUI";
+	DesIvenUI.pCameraType = ETOUI(CAMERA::NONE);
+	DesIvenUI.fSpeedPerSec = 5.f;
+	DesIvenUI.fRotationPerSec = 1.f;
+	DesIvenUI.fSizeX = 1.f;
+	DesIvenUI.fSizeY = 1.f;
+	DesIvenUI.fX = 1.f;
+	DesIvenUI.fY = 1.f;
+
+	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_EvenUI"), CGameInstance::Get().Get_Level(), L"PlayerTag", &DesUI))
+		return E_FAIL;
+
+	m_pUI.emplace("EvenUI", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"EvenUI"));
 
 	return S_OK;
 }
@@ -549,16 +569,24 @@ HRESULT Player::Ready_PartObjects()
 		TEXT("Part_Body"), &BodyDesc)))
 		return E_FAIL;
 
-	/*Weapon::WEAPON_DESC		WeaponDesc{};
+
+
+	Player_Weapon::WEAPON_DESC		WeaponDesc{};
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.pParentState = &m_iState;
-	WeaponDesc.pSocketMatrix = dynamic_pointer_cast<CBody_Player>(m_PartObjects[TEXT("Part_Body")])->Get_SocketMatrixPtr("SWORD");
+	WeaponDesc.pSocketMatrix = dynamic_pointer_cast<Body_Player>(m_PartObjects[TEXT("Part_Body")])->Get_SocketMatrixPtr("MeleeWeaponSocket");
+	WeaponDesc.ObjectType = ETOUI(OBJECTTYPE::OBEJCT_PART);
+	WeaponDesc.m_strName = L"ObjectPart";
+	WeaponDesc.pParentState = &m_iState;
+	WeaponDesc.m_strPrototypeObjectName = L"Prototype_GameObject_Body_Player";
+	WeaponDesc.m_strPrototypeBaseName = L"SK_CustomBody";
+	WeaponDesc.pCameraType = ETOUI(CAMERA::NONE);
+	WeaponDesc.fSpeedPerSec = 5.f;
+	WeaponDesc.fRotationPerSec = 1.f;
 
-	if (FAILED(__super::Add_PartObject(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Weapon"),
+	if (FAILED(__super::Add_PartObject(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Weapon"),
 		TEXT("Part_Weapon"), &WeaponDesc)))
-		return E_FAIL;*/
-
-
+		return E_FAIL;
 
 
 

@@ -13,7 +13,8 @@
 #include "PlayerCamera.h"
 #include "Tree.h"
 #include "MainUI.h"
-
+#include "InvenUI.h"
+#include "Player_Weapon.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -160,6 +161,8 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 
 
+
+
 #pragma endregion
 
 #pragma region Shader Component Prototype
@@ -199,7 +202,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 	XMMatrixScaling(0.01f, 0.01f, 0.01f) *
 	XMMatrixRotationY(XMConvertToRadians(180.f));
 
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomBody"),
+ 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_CustomBody"),
 		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomBody/SK_CustomBody.bin", CustomMatrix))))
 		return E_FAIL;
 
@@ -319,6 +322,14 @@ HRESULT CLoader::Loading_For_MapEditor()
 		return E_FAIL;
 	}
 
+	_matrix GunMatrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Gun2",
+		Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(), L"Gun2",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Gun2/SM_Gun2.bin", GunMatrix))))
+	{
+		return E_FAIL;
+	}
+
 
 #pragma endregion
 
@@ -402,6 +413,16 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"),
 		MainUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_EvenUI */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_EvenUI"),
+		InvenUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_Player_Weapon */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Weapon"),
+		Player_Weapon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

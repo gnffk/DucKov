@@ -490,7 +490,7 @@ HRESULT Model::Ready_AnimBone(ifstream& _file, const char* modelFileName)
 
         _char* BoneName = new _char[BoneNamesize + 1];
 
-        _file.read(BoneName, BoneNamesize);
+         _file.read(BoneName, BoneNamesize);
         BoneName[BoneNamesize] = '\0';
 
         _file.read((char*)&BoneMatrix, sizeof(_float4x4));

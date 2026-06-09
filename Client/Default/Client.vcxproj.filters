@@ -103,6 +103,18 @@
     <Filter Include="02. GameObject\Player\UI">
       <UniqueIdentifier>{66780bee-cf29-4e6d-8d43-5ce1b49066f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\UI\MainUI">
+      <UniqueIdentifier>{ef8aec36-9ac8-4b0a-a219-62e0da70b888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\UI\Inven">
+      <UniqueIdentifier>{f12a8f7b-4fbd-4786-8783-64f93addb9c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\Weapon">
+      <UniqueIdentifier>{317b165f-5469-4a91-8b34-22b6244df6c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Bullet">
+      <UniqueIdentifier>{243f1c39-8814-4735-a78c-7b9948dbfc67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -205,7 +217,16 @@
       <Filter>02. GameObject\Tree</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MainUI.h">
-      <Filter>02. GameObject\Player\UI</Filter>
+      <Filter>02. GameObject\Player\UI\MainUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InvenUI.h">
+      <Filter>02. GameObject\Player\UI\Inven</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_Weapon.h">
+      <Filter>02. GameObject\Player\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bullet.h">
+      <Filter>02. GameObject\Bullet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -307,7 +328,16 @@
       <Filter>02. GameObject\Tree</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MainUI.cpp">
-      <Filter>02. GameObject\Player\UI</Filter>
+      <Filter>02. GameObject\Player\UI\MainUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InvenUI.cpp">
+      <Filter>02. GameObject\Player\UI\Inven</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_Weapon.cpp">
+      <Filter>02. GameObject\Player\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bullet.cpp">
+      <Filter>02. GameObject\Bullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

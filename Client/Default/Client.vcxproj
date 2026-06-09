@@ -152,8 +152,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Body_Player.h" />
+    <ClInclude Include="..\Public\Bullet.h" />
     <ClInclude Include="..\Public\CMainGame.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\InvenUI.h" />
     <ClInclude Include="..\Public\MainUI.h" />
     <ClInclude Include="..\Public\Player_HAND_UP_State.h" />
     <ClInclude Include="..\Public\Player_Idle_State.h" />
@@ -177,6 +179,7 @@
     <ClInclude Include="..\Public\Player_ROLL_State.h" />
     <ClInclude Include="..\Public\Player_RUN_State.h" />
     <ClInclude Include="..\Public\Player_WALK_State.h" />
+    <ClInclude Include="..\Public\Player_Weapon.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Tree.h" />
@@ -188,7 +191,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Body_Player.cpp" />
+    <ClCompile Include="..\Private\Bullet.cpp" />
     <ClCompile Include="..\Private\CMainGame.cpp" />
+    <ClCompile Include="..\Private\InvenUI.cpp" />
     <ClCompile Include="..\Private\MainUI.cpp" />
     <ClCompile Include="..\Private\Player_HAND_UP_State.cpp" />
     <ClCompile Include="..\Private\Player_Idle_State.cpp" />
@@ -212,6 +217,7 @@
     <ClCompile Include="..\Private\Player_ROLL_State.cpp" />
     <ClCompile Include="..\Private\Player_RUN_State.cpp" />
     <ClCompile Include="..\Private\Player_WALK_State.cpp" />
+    <ClCompile Include="..\Private\Player_Weapon.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Tree.cpp" />
