@@ -41,7 +41,6 @@ HRESULT Player_Weapon::Initialize(void* pArg)
 	//m_pTransformCom->Rotation(360.f, -148.5f, -14.5);
 	//m_pTransformCom->Set_State(STATE::POSITION, {-0.06f, 0.15f,0.27f});
 
-
 	return S_OK;
 }
 
@@ -85,19 +84,18 @@ void Player_Weapon::Update(_float fTimeDelta)
 	_float4x4 WeaponWorldFloat4x4 = __super::GetCombined();
 	_matrix WeaponWorld = XMLoadFloat4x4(&WeaponWorldFloat4x4);
 
-	_vector vMuzzleLocal = XMVectorSet(
-		m_vMuzzleLocalPos.x,
-		m_vMuzzleLocalPos.y,
-		m_vMuzzleLocalPos.z,
-		1.f
-	);
+	_vector vMuzzleLocal = XMVectorSet(m_vMuzzleLocalPos.x,m_vMuzzleLocalPos.y,m_vMuzzleLocalPos.z,1.f);
 
 	_vector vMuzzleWorld =XMVector3TransformCoord(vMuzzleLocal, WeaponWorld);
 
 	XMStoreFloat3(&m_vMuzzleWorldPos, vMuzzleWorld);
 
+	if (m_fFireTimer > 0.f)
+		m_fFireTimer -= fTimeDelta;
 
 
+
+	Update_MouseRecoil(fTimeDelta, CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_LB));
 }
 
 void Player_Weapon::Late_Update(_float fTimeDelta)
@@ -111,6 +109,10 @@ void Player_Weapon::Late_Update(_float fTimeDelta)
 
 HRESULT Player_Weapon::Render()
 {
+	if (!m_bVisible) 
+		return E_FAIL;
+	
+
 	if (FAILED(__super::Bind_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
@@ -128,7 +130,7 @@ HRESULT Player_Weapon::Render()
 
 	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for (uint32_t i = 0; i < iNumMeshes; i++)
 	{
 		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
 			return E_FAIL;
@@ -158,6 +160,11 @@ HRESULT Player_Weapon::Ready_Components()
 	m_pColliderCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
 	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pColliderCom)))
 		return E_FAIL;
+
+
+
+
+
 
 	return S_OK;
 }
@@ -191,6 +198,11 @@ shared_ptr<Prototype> Player_Weapon::Clone(void* pArg)
 void Player_Weapon::Fire_Bullet()
 {
 
+	if (m_fFireTimer > 0.f)
+		return;
+
+	m_fFireTimer = m_fFireCoolTime;
+
 	_matrix ParentMatrix = XMLoadFloat4x4(m_pParentMatrix);
 
 	_vector vDir = ParentMatrix.r[2];
@@ -200,13 +212,15 @@ void Player_Weapon::Fire_Bullet()
 
 	XMStoreFloat3(&m_vBulletDir, vDir);
 
+	Apply_MouseRecoil(vDir);
+
+
 	Bullet::BULLET_DESC Desc{};
 	Desc.vStartPos = m_vMuzzleWorldPos;
 	Desc.vDir = m_vBulletDir;
-	Desc.fSpeed = 20.f;
-
-	Desc.m_bCollider =false;
-	Desc.ContainerObject =true;
+	Desc.fSpeed = 60.f;
+	Desc.m_bCollider = false;
+	Desc.ContainerObject = true;
 	Desc.m_strName = TEXT("Bullet");
 	Desc.m_strPrototypeObjectName = TEXT("Prototype_GameObject_Bullet");
 	Desc.m_strPrototypeBaseName = TEXT("Prototype_GameObject_Bullet");
@@ -214,9 +228,13 @@ void Player_Weapon::Fire_Bullet()
 	Desc.fSpeedPerSec = 20.f;
 	Desc.fRotationPerSec = 20.f;
 
-	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Bullet"), CGameInstance::Get().Get_Level(), TEXT("Layer_Bullet"), &Desc))) {
-		return;
-	}
+	CGameInstance::Get().Add_GameObject_toLayer(
+		CGameInstance::Get().Get_Level(),
+		TEXT("Prototype_GameObject_Bullet"),
+		CGameInstance::Get().Get_Level(),
+		TEXT("Layer_Bullet"),
+		&Desc
+	);
 }
 #ifdef _DEBUG
 
@@ -271,3 +289,213 @@ void Player_Weapon::GUI_PlayerWeapon()
 }
 
 #endif
+
+
+_bool Player_Weapon::Make_ScreenDirFromWorldDir(const _float3& vWorldPos,_vector vWorldDir,_float2& vOutScreenDir)
+{
+	_float2 vViewportSize = CGameInstance::Get().Get_ViewportSize();
+
+	_float fWidth = vViewportSize.x;
+	_float fHeight = vViewportSize.y;
+
+	_float4x4 ViewMatrix{};
+	_float4x4 ProjMatrix{};
+
+	CGameInstance::Get().Get_MainCamerwaViewMatrix(ViewMatrix);
+	CGameInstance::Get().Get_MainCamerwaProjectionMatrix(ProjMatrix);
+
+	_matrix matView = XMLoadFloat4x4(&ViewMatrix);
+	_matrix matProj = XMLoadFloat4x4(&ProjMatrix);
+	_matrix matWorld = XMMatrixIdentity();
+
+	_vector vStart = XMLoadFloat3(&vWorldPos);
+	_vector vDir = XMVector3Normalize(vWorldDir);
+
+	// 총알 방향으로 살짝 앞쪽 점
+	_vector vEnd = vStart + vDir * 10.f;
+
+	_vector vScreenStart = XMVector3Project(vStart,0.f,0.f,fWidth,fHeight,0.f,1.f,matProj,matView,matWorld);
+
+	_vector vScreenEnd = XMVector3Project(vEnd,0.f,0.f,fWidth,fHeight,0.f,1.f,matProj,matView,matWorld
+	);
+
+	_float3 vS0{};
+	_float3 vS1{};
+
+	XMStoreFloat3(&vS0, vScreenStart);
+	XMStoreFloat3(&vS1, vScreenEnd);
+
+	_float fDX = vS1.x - vS0.x;
+	_float fDY = vS1.y - vS0.y;
+
+	_float fLen = sqrtf(fDX * fDX + fDY * fDY);
+
+	if (fLen <= 0.001f)
+	{
+		// 화면상 방향이 거의 안 잡히면 위쪽으로 반동
+		vOutScreenDir = { 0.f, -1.f };
+		return false;
+	}
+
+	vOutScreenDir.x = fDX / fLen;
+	vOutScreenDir.y = fDY / fLen;
+
+	return true;
+}
+
+void Player_Weapon::Apply_MouseRecoil(_vector vBulletDir)
+{
+	_float2 vScreenDir{};
+
+	Make_ScreenDirFromWorldDir(m_vMuzzleWorldPos, vBulletDir, vScreenDir);
+
+	_float2 vSideDir{};
+	vSideDir.x = -vScreenDir.y;
+	vSideDir.y = vScreenDir.x;
+
+	_float fPower =
+		m_fMouseRecoilPower +
+		CGameInstance::Get().Random(-m_fMouseRecoilPowerRandom, m_fMouseRecoilPowerRandom);
+
+	_float fSidePower =
+		CGameInstance::Get().Random(-m_fMouseRecoilSideRandom, m_fMouseRecoilSideRandom);
+
+	_float2 vKick{};
+	vKick.x = vScreenDir.x * fPower + vSideDir.x * fSidePower;
+	vKick.y = vScreenDir.y * fPower + vSideDir.y * fSidePower;
+
+	POINT ptCursor{};
+	GetCursorPos(&ptCursor);
+
+	if (!m_bMouseRecoilActive)
+	{
+		m_ptMouseRecoilBase = ptCursor;
+
+		m_vMouseRecoilTargetOffset = { 0.f, 0.f };
+		m_vMouseRecoilAppliedOffset = { 0.f, 0.f };
+		m_vPrevAppliedMouseRecoil = { 0.f, 0.f };
+
+		m_bMouseRecoilActive = true;
+	}
+	else
+	{
+		// 유저가 반동 중에도 마우스를 움직였으면 기준점 갱신
+		m_ptMouseRecoilBase.x = LONG(ptCursor.x - m_vPrevAppliedMouseRecoil.x);
+		m_ptMouseRecoilBase.y = LONG(ptCursor.y - m_vPrevAppliedMouseRecoil.y);
+	}
+
+	// 여기서 바로 마우스를 움직이지 않고 목표값만 증가
+	m_vMouseRecoilTargetOffset.x += vKick.x;
+	m_vMouseRecoilTargetOffset.y += vKick.y;
+
+	_float fLen = sqrtf(
+		m_vMouseRecoilTargetOffset.x * m_vMouseRecoilTargetOffset.x +
+		m_vMouseRecoilTargetOffset.y * m_vMouseRecoilTargetOffset.y
+	);
+
+	if (fLen > m_fMouseRecoilMaxOffset)
+	{
+		_float fRatio = m_fMouseRecoilMaxOffset / fLen;
+
+		m_vMouseRecoilTargetOffset.x *= fRatio;
+		m_vMouseRecoilTargetOffset.y *= fRatio;
+	}
+}
+void Player_Weapon::Update_MouseRecoil(_float fTimeDelta, _bool bIsShooting)
+{
+	if (!m_bMouseRecoilActive)
+		return;
+
+	POINT ptCursor{};
+	GetCursorPos(&ptCursor);
+
+	if (!bIsShooting)
+	{
+		m_ptMouseRecoilBase = ptCursor;
+
+		m_vMouseRecoilTargetOffset = { 0.f, 0.f };
+		m_vMouseRecoilAppliedOffset = { 0.f, 0.f };
+		m_vPrevAppliedMouseRecoil = { 0.f, 0.f };
+
+		m_bMouseRecoilActive = false;
+		return;
+	}
+
+	// 유저가 마우스를 직접 움직였을 수 있으므로 기준점 갱신
+	m_ptMouseRecoilBase.x = LONG(ptCursor.x - m_vPrevAppliedMouseRecoil.x);
+	m_ptMouseRecoilBase.y = LONG(ptCursor.y - m_vPrevAppliedMouseRecoil.y);
+
+	// 총을 누르고 있을 때만 반동 복귀
+	if (bIsShooting)
+	{
+		_float fTargetLen = sqrtf(
+			m_vMouseRecoilTargetOffset.x * m_vMouseRecoilTargetOffset.x +
+			m_vMouseRecoilTargetOffset.y * m_vMouseRecoilTargetOffset.y
+		);
+
+		if (fTargetLen > 0.001f)
+		{
+			_float fRecover = m_fMouseRecoilRecoverSpeed * fTimeDelta;
+
+			if (fRecover >= fTargetLen)
+			{
+				m_vMouseRecoilTargetOffset = { 0.f, 0.f };
+			}
+			else
+			{
+				m_vMouseRecoilTargetOffset.x -=
+					m_vMouseRecoilTargetOffset.x / fTargetLen * fRecover;
+
+				m_vMouseRecoilTargetOffset.y -=
+					m_vMouseRecoilTargetOffset.y / fTargetLen * fRecover;
+			}
+		}
+	}
+
+	// 현재 적용된 반동이 목표 반동까지 서서히 따라감
+	_float2 vDelta{};
+	vDelta.x = m_vMouseRecoilTargetOffset.x - m_vMouseRecoilAppliedOffset.x;
+	vDelta.y = m_vMouseRecoilTargetOffset.y - m_vMouseRecoilAppliedOffset.y;
+
+	_float fDeltaLen = sqrtf(vDelta.x * vDelta.x + vDelta.y * vDelta.y);
+
+	if (fDeltaLen > 0.001f)
+	{
+		_float fMove = m_fMouseRecoilKickSpeed * fTimeDelta;
+
+		if (fMove >= fDeltaLen)
+		{
+			m_vMouseRecoilAppliedOffset = m_vMouseRecoilTargetOffset;
+		}
+		else
+		{
+			m_vMouseRecoilAppliedOffset.x += vDelta.x / fDeltaLen * fMove;
+			m_vMouseRecoilAppliedOffset.y += vDelta.y / fDeltaLen * fMove;
+		}
+	}
+
+	m_vPrevAppliedMouseRecoil = m_vMouseRecoilAppliedOffset;
+
+	SetCursorPos(
+		LONG(m_ptMouseRecoilBase.x + m_vMouseRecoilAppliedOffset.x),
+		LONG(m_ptMouseRecoilBase.y + m_vMouseRecoilAppliedOffset.y)
+	);
+
+	_float fAppliedLen = sqrtf(
+		m_vMouseRecoilAppliedOffset.x * m_vMouseRecoilAppliedOffset.x +
+		m_vMouseRecoilAppliedOffset.y * m_vMouseRecoilAppliedOffset.y
+	);
+
+	_float fTargetLen = sqrtf(
+		m_vMouseRecoilTargetOffset.x * m_vMouseRecoilTargetOffset.x +
+		m_vMouseRecoilTargetOffset.y * m_vMouseRecoilTargetOffset.y
+	);
+
+	if (fAppliedLen <= 0.5f && fTargetLen <= 0.5f)
+	{
+		m_vMouseRecoilAppliedOffset = { 0.f, 0.f };
+		m_vMouseRecoilTargetOffset = { 0.f, 0.f };
+		m_vPrevAppliedMouseRecoil = { 0.f, 0.f };
+		m_bMouseRecoilActive = false;
+	}
+}

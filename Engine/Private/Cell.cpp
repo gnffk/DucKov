@@ -104,6 +104,33 @@ void Cell::WriteFile(HANDLE hFile)
     ::WriteFile(hFile, m_iNeighborIndices, sizeof(uint32_t) * 3, &dwByte, nullptr);
 }
 
+_vector Cell::Get_BlockingNormal(_fvector vPosition)
+{
+    _vector vBlockingNormal = XMVectorZero();
+
+    for (uint32_t i = 0; i < ETOUI(LINE_CELL::END); ++i)
+    {
+        _vector vLineNormal = XMLoadFloat3(&m_vNormals[i]);
+        _vector vPoint = XMLoadFloat3(&m_vPoints[i]);
+
+        _vector vToPos = vPosition - vPoint;
+
+        float fDot = XMVectorGetX(XMVector3Dot(vLineNormal, vToPos));
+
+        if (fDot > 0.f)
+        {
+            vBlockingNormal += vLineNormal;
+        }
+    }
+
+    vBlockingNormal = XMVectorSetY(vBlockingNormal, 0.f);
+
+    if (XMVector3Equal(vBlockingNormal, XMVectorZero()))
+        return XMVectorZero();
+
+    return XMVector3Normalize(vBlockingNormal);
+}
+
 #ifdef _DEBUG
 
 HRESULT Cell::Render()

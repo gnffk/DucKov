@@ -35,6 +35,7 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+
 private:
 	shared_ptr<Model>			m_pModelCom = { nullptr };
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
@@ -52,10 +53,34 @@ private:
 	_float3 m_vMuzzleWorldPos = {};
 	_float3 m_vBulletDir = { 0.f, 0.f, 1.f };
 
+	// 마우스 반동
 private:
+	void Apply_MouseRecoil(_vector vBulletDir);
+	void Update_MouseRecoil(_float fTimeDelta, _bool bIsShooting);
+	_bool Make_ScreenDirFromWorldDir(const _float3& vWorldPos, _vector vWorldDir, _float2& vOutScreenDir);
+
+private:
+	_bool m_bMouseRecoilActive = false;
+
+	POINT m_ptMouseRecoilBase{};
+
+	_float2 m_vMouseRecoilTargetOffset = { 0.f, 0.f };   // 목표 반동 위치
+	_float2 m_vMouseRecoilAppliedOffset = { 0.f, 0.f };  // 실제 현재 적용된 반동
+	_float2 m_vPrevAppliedMouseRecoil = { 0.f, 0.f };
+
+	_float m_fMouseRecoilPower = 70.f;
+	_float m_fMouseRecoilPowerRandom = 10.f;
+	_float m_fMouseRecoilSideRandom = 12.f;
+	_float m_fMouseRecoilMaxOffset = 220.f;
+
+	_float m_fMouseRecoilKickSpeed = 550.f;      // 밀리는 속도
+	_float m_fMouseRecoilRecoverSpeed = 180.f;
+public:
 	void Fire_Bullet();
 
-
+private:
+	_float m_fFireCoolTime = 0.2f;
+	_float m_fFireTimer = 0.f;
 
 private:
 	HRESULT Ready_Components();

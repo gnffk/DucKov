@@ -62,6 +62,12 @@ public:
 protected:
     void ChangeState(shared_ptr<class State> pNextState)
     {
+        if (pNextState == nullptr)
+            return;
+
+        if (m_pCurrentState == pNextState)
+            return;
+
         if (m_pCurrentState)
             m_pCurrentState->Exit(this);
 

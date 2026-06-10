@@ -16,6 +16,7 @@
 #include "InvenUI.h"
 #include "Player_Weapon.h"
 #include "Bullet.h"
+#include "Player_Mouse.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -160,6 +161,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/MainUI/UI_Main_heart.png"), 1))))
 			return E_FAIL;
 
+		/* For.Prototype_Com_Texture_MouseMarker */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_MouseMarker"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/point_scan.png"), 1))))
+			return E_FAIL;
+
 
 
 
@@ -191,11 +197,14 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_VtxPosTex"),
 		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_VtxPosTex.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
 		return E_FAIL;
+
+
 #pragma endregion
 
 #pragma region Model Component Prototype
 
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
 
 
 
@@ -341,8 +350,6 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 #pragma endregion
 
-
-
 #pragma region VIBuffer Component Prototype
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_VIBuffer_Terrain"),
 		VIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/terrain.raw")))))
@@ -377,7 +384,6 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 
 #pragma endregion
-
 
 #pragma region GameObject Prototype
 	/* Prototype_GameObject_TestModel */
@@ -437,6 +443,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Bullet"),
 		Bullet::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+	/* For.Prototype_GameObject_Player_Mouse */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Mouse"),
+		Player_Mouse::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 
@@ -448,7 +458,6 @@ HRESULT CLoader::Loading_For_MapEditor()
 		Navigation::Create(m_pDevice, m_pContext, TEXT("../../Resources/DataFiles/Navigation.dat"), TEXT("../../Resources/DataFiles/Navigation_Neighbors.dat")))))
 		return E_FAIL;
 #pragma endregion
-
 
 	m_isFinished = true;
 

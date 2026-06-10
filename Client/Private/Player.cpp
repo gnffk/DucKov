@@ -59,16 +59,9 @@ HRESULT Player::Initialize(void* pArg)
 
 	if (nullptr != m_pNavigationCom)
 	{
-		m_pNavigationCom->Set_CurrentCell(
-			m_pTransformCom->Get_State(STATE::POSITION)
-		);
+		m_pNavigationCom->Set_CurrentCell(m_pTransformCom->Get_State(STATE::POSITION));
 
-		m_pTransformCom->Set_State(
-			STATE::POSITION,
-			m_pNavigationCom->SetUp_OnNavigation(
-				m_pTransformCom->Get_State(STATE::POSITION)
-			)
-		);
+		m_pTransformCom->Set_State(STATE::POSITION,m_pNavigationCom->SetUp_OnNavigation(m_pTransformCom->Get_State(STATE::POSITION)));
 	}
 
 
@@ -90,23 +83,25 @@ HRESULT Player::Initialize(void* pArg)
 
 	m_pUI.emplace("MainUI", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"MainUI"));
 
-	UIObject::UIOBJECT_DESC DesIvenUI{};
-	DesIvenUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
-	DesIvenUI.m_strName = L"MainUI";
-	DesIvenUI.m_strPrototypeObjectName = L"Prototype_GameObject_MainUI";
-	DesIvenUI.m_strPrototypeBaseName = L"MainUI";
-	DesIvenUI.pCameraType = ETOUI(CAMERA::NONE);
-	DesIvenUI.fSpeedPerSec = 5.f;
-	DesIvenUI.fRotationPerSec = 1.f;
-	DesIvenUI.fSizeX = 1.f;
-	DesIvenUI.fSizeY = 1.f;
-	DesIvenUI.fX = 1.f;
-	DesIvenUI.fY = 1.f;
 
-	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_EvenUI"), CGameInstance::Get().Get_Level(), L"PlayerTag", &DesUI))
+
+	UIObject::UIOBJECT_DESC DesPlayerMouseUI{};
+	DesPlayerMouseUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+	DesPlayerMouseUI.m_strName = L"Player_Mouse";
+	DesPlayerMouseUI.m_strPrototypeObjectName = L"Prototype_GameObject_Player_Mouse";
+	DesPlayerMouseUI.m_strPrototypeBaseName = L"Player_Mouse";
+	DesPlayerMouseUI.pCameraType = ETOUI(CAMERA::NONE);
+	DesPlayerMouseUI.fSpeedPerSec = 5.f;
+	DesPlayerMouseUI.fRotationPerSec = 1.f;
+	DesPlayerMouseUI.fSizeX = 1.f;
+	DesPlayerMouseUI.fSizeY = 1.f;
+	DesPlayerMouseUI.fX = 1.f;
+	DesPlayerMouseUI.fY = 1.f;
+
+	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), L"Prototype_GameObject_Player_Mouse", CGameInstance::Get().Get_Level(), L"PlayerTag",&DesPlayerMouseUI))
 		return E_FAIL;
+	m_pUI.emplace("Player_Mouse", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player_Mouse"));
 
-	m_pUI.emplace("EvenUI", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"EvenUI"));
 
 	return S_OK;
 }
@@ -138,8 +133,7 @@ void Player::Update(_float fTimeDelta)
 	Shift(fTimeDelta);
 	m_pPlayerFSM->Update(fTimeDelta);
 
-	m_pTransformCom->Set_State(STATE::POSITION,
-		m_pNavigationCom->SetUp_OnNavigation(m_pTransformCom->Get_State(STATE::POSITION)));
+	m_pTransformCom->Set_State(STATE::POSITION,m_pNavigationCom->SetUp_OnNavigation(m_pTransformCom->Get_State(STATE::POSITION)));
 
 	__super::Update(fTimeDelta);
 
@@ -151,10 +145,10 @@ void Player::Late_Update(_float fTimeDelta)
 
 	for (auto& Pair : m_pUI)
 	{
-		auto& pUIObject = Pair.second;
+		auto pUIObject = Pair.second;
 		if (nullptr == pUIObject)
 			continue;
-		CGameInstance::Get().Add_RenderObject(RENDERGROUP::UI, pUIObject);
+		CGameInstance::Get().Add_UIObject(L"Player", static_pointer_cast<UIObject>(pUIObject));
 	}
 
 	__super::Late_Update(fTimeDelta);
@@ -578,7 +572,7 @@ HRESULT Player::Ready_PartObjects()
 	WeaponDesc.ObjectType = ETOUI(OBJECTTYPE::OBEJCT_PART);
 	WeaponDesc.m_strName = L"ObjectPart";
 	WeaponDesc.pParentState = &m_iState;
-	WeaponDesc.m_strPrototypeObjectName = L"Prototype_GameObject_Body_Player";
+	WeaponDesc.m_strPrototypeObjectName = L"";
 	WeaponDesc.m_strPrototypeBaseName = L"SK_CustomBody";
 	WeaponDesc.pCameraType = ETOUI(CAMERA::NONE);
 	WeaponDesc.fSpeedPerSec = 5.f;

@@ -36,6 +36,8 @@ public:
 	{
 		return m_vRollDir;
 	}
+	shared_ptr<class Navigation> GetNavigation() { return m_pNavigationCom; }
+	map<string, shared_ptr<class GameObject>>& GetUIs() { return m_pUI; }
 private:
 	uint32_t			m_iState = {};
 	

@@ -58,7 +58,8 @@ private:
 	unique_ptr<class VIBuffer_Cell>		m_pVIBuffer = { nullptr };
 
 #endif
-
+public:
+	_vector Get_BlockingNormal(_fvector vPosition);
 
 public:
 	static shared_ptr<Cell> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, const _float3* pPoints, int32_t iIndex);

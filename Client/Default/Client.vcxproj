@@ -175,6 +175,7 @@
     <ClInclude Include="..\Public\Player_HAND_UP_AND_RIGHT_State.h" />
     <ClInclude Include="..\Public\Player_HAND_UP_AND_WALK_State.h" />
     <ClInclude Include="..\Public\Player_LEFT_WALK_State.h" />
+    <ClInclude Include="..\public\Player_Mouse.h" />
     <ClInclude Include="..\Public\Player_RIGHT_WALK_State.h" />
     <ClInclude Include="..\Public\Player_ROLL_State.h" />
     <ClInclude Include="..\Public\Player_RUN_State.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="..\Private\Player_HAND_UP_AND_RIGHT_State.cpp" />
     <ClCompile Include="..\Private\Player_HAND_UP_AND_WALK_State.cpp" />
     <ClCompile Include="..\Private\Player_LEFT_WALK_State.cpp" />
+    <ClCompile Include="..\Private\Player_Mouse.cpp" />
     <ClCompile Include="..\Private\Player_RIGHT_WALK_State.cpp" />
     <ClCompile Include="..\Private\Player_ROLL_State.cpp" />
     <ClCompile Include="..\Private\Player_RUN_State.cpp" />

@@ -31,11 +31,9 @@ HRESULT UIObject::Initialize(void* pArg)
 
 	Update_Transform();
 
-	XMStoreFloat4x4(&m_ViewMatrix,
-		XMMatrixIdentity());
+	XMStoreFloat4x4(&m_ViewMatrix,XMMatrixIdentity());
 
-	XMStoreFloat4x4(&m_ProjMatrix,
-		XMMatrixOrthographicLH(vViewportSize.x, vViewportSize.y, 0.f, 1.f));
+	XMStoreFloat4x4(&m_ProjMatrix,XMMatrixOrthographicLH(vViewportSize.x, vViewportSize.y, 0.f, 1.f));
 
 	return S_OK;
 }
@@ -63,6 +61,5 @@ void UIObject::Update_Transform()
 	_float2		vViewportSize = CGameInstance::Get().Get_ViewportSize();
 
 	m_pTransformCom->Set_Scale(m_fSizeX, m_fSizeY, 1.f);
-	m_pTransformCom->Set_State(STATE::POSITION,
-		XMVectorSet(m_fX - vViewportSize.x * 0.5f, -m_fY + vViewportSize.y * 0.5f, 0.f, 1.f));
+	m_pTransformCom->Set_State(STATE::POSITION,XMVectorSet(m_fX - vViewportSize.x * 0.5f, -m_fY + vViewportSize.y * 0.5f, 0.f, 1.f));
 }

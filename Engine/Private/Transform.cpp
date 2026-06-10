@@ -231,10 +231,7 @@ void Transform::Go_Direction(
     shared_ptr<Navigation> pNavigation,
     _float fSpeedScale)
 {
-    _vector vMoveDir = vDirection;
-
-    // 이동은 XZ 평면 기준
-    vMoveDir = XMVectorSetY(vMoveDir, 0.f);
+    _vector vMoveDir = XMVectorSetY(vDirection, 0.f);
 
     if (XMVector3Equal(vMoveDir, XMVectorZero()))
         return;
@@ -243,9 +240,9 @@ void Transform::Go_Direction(
 
     _vector vPosition = Get_State(STATE::POSITION);
 
-    _vector vNextPosition =
-        vPosition + vMoveDir * m_fSpeedPerSec * fTimeDelta * fSpeedScale;
+    float fMoveAmount = m_fSpeedPerSec * fTimeDelta * fSpeedScale;
 
+    _vector vNextPosition = vPosition + vMoveDir * fMoveAmount;
     vNextPosition = XMVectorSetW(vNextPosition, 1.f);
 
     if (nullptr == pNavigation)
@@ -254,12 +251,45 @@ void Transform::Go_Direction(
         return;
     }
 
-    if (true == pNavigation->isMove(vNextPosition))
+    if (pNavigation->isMove(vNextPosition))
     {
-        
         vNextPosition = pNavigation->SetUp_OnNavigation(vNextPosition);
-
         Set_State(STATE::POSITION, vNextPosition);
+        return;
+    }
+
+    // ============================
+    // Sliding
+    // ============================
+
+    _vector vWallNormal = pNavigation->Get_BlockingNormal(vNextPosition);
+    vWallNormal = XMVectorSetY(vWallNormal, 0.f);
+
+    if (XMVector3Equal(vWallNormal, XMVectorZero()))
+        return;
+
+    vWallNormal = XMVector3Normalize(vWallNormal);
+
+    // moveDir에서 벽 normal 방향 성분 제거
+    _vector vSlideDir =
+        vMoveDir - vWallNormal * XMVectorGetX(XMVector3Dot(vMoveDir, vWallNormal));
+
+    vSlideDir = XMVectorSetY(vSlideDir, 0.f);
+
+    if (XMVector3Equal(vSlideDir, XMVectorZero()))
+        return;
+
+    vSlideDir = XMVector3Normalize(vSlideDir);
+
+    _vector vSlidePosition =
+        vPosition + vSlideDir * fMoveAmount;
+
+    vSlidePosition = XMVectorSetW(vSlidePosition, 1.f);
+
+    if (pNavigation->isMove(vSlidePosition))
+    {
+        vSlidePosition = pNavigation->SetUp_OnNavigation(vSlidePosition);
+        Set_State(STATE::POSITION, vSlidePosition);
     }
 }
 
@@ -273,6 +303,65 @@ void Transform::Move(_fvector vDir, _float fTimeDelta,_float plusSpeed)
 
     Set_State(STATE::POSITION, vPosition);
 
+}
+
+void Transform::Move(_fvector vDir, _float fTimeDelta,  shared_ptr<Navigation> pNavigation,_float plusSpeed)
+{
+    _vector vMoveDir = XMVectorSetY(vDir, 0.f);
+
+    if (XMVector3Equal(vMoveDir, XMVectorZero()))
+        return;
+
+    vMoveDir = XMVector3Normalize(vMoveDir);
+
+    _vector vPosition = Get_State(STATE::POSITION);
+
+    float fMoveAmount = (m_fSpeedPerSec + plusSpeed) * fTimeDelta;
+
+    _vector vNextPosition = vPosition + vMoveDir * fMoveAmount;
+    vNextPosition = XMVectorSetW(vNextPosition, 1.f);
+
+    if (pNavigation == nullptr)
+    {
+        Set_State(STATE::POSITION, vNextPosition);
+        return;
+    }
+
+    if (pNavigation->isMove(vNextPosition))
+    {
+        vNextPosition = pNavigation->SetUp_OnNavigation(vNextPosition);
+        Set_State(STATE::POSITION, vNextPosition);
+        return;
+    }
+
+    _vector vWallNormal = pNavigation->Get_BlockingNormal(vNextPosition);
+    vWallNormal = XMVectorSetY(vWallNormal, 0.f);
+
+    if (XMVector3Equal(vWallNormal, XMVectorZero()))
+        return;
+
+    vWallNormal = XMVector3Normalize(vWallNormal);
+
+    _vector vSlideDir =
+        vMoveDir - vWallNormal * XMVectorGetX(XMVector3Dot(vMoveDir, vWallNormal));
+
+    vSlideDir = XMVectorSetY(vSlideDir, 0.f);
+
+    if (XMVector3Equal(vSlideDir, XMVectorZero()))
+        return;
+
+    vSlideDir = XMVector3Normalize(vSlideDir);
+
+    _vector vSlidePosition =
+        vPosition + vSlideDir * fMoveAmount * 0.8f;
+
+    vSlidePosition = XMVectorSetW(vSlidePosition, 1.f);
+
+    if (pNavigation->isMove(vSlidePosition))
+    {
+        vSlidePosition = pNavigation->SetUp_OnNavigation(vSlidePosition);
+        Set_State(STATE::POSITION, vSlidePosition);
+    }
 }
 shared_ptr<Transform> Transform::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {

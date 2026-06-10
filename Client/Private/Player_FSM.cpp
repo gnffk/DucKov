@@ -35,6 +35,10 @@ HRESULT Player_FSM::Initialize(uint32_t* eModelState)
 
 void Player_FSM::Change_State(PLAYER_STATE eState)
 {
+	// 이미 같은 상태면 무시
+	if (m_eCurrentState == eState)
+		return;
+
 	auto& States = Get_States();
 
 	auto iter = States.find(eState);
@@ -42,9 +46,11 @@ void Player_FSM::Change_State(PLAYER_STATE eState)
 	if (iter == States.end())
 		return;
 
+	m_eCurrentState = eState;
 
 	SetModelState(eState);
-	__super::ChangeState(iter->second);
+
+	ChangeState(iter->second);
 }
 
 shared_ptr<Player_FSM> Player_FSM::Create(uint32_t* eModelState)

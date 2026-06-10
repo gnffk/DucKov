@@ -280,3 +280,10 @@ shared_ptr<Prototype> Navigation::Clone(void* pArg)
     return pInstance;
 }
 
+_vector Navigation::Get_BlockingNormal(_fvector vPosition)
+{
+    if (m_iCurrentCellIndex < 0)
+        return XMVectorZero();
+
+    return m_Cells[m_iCurrentCellIndex]->Get_BlockingNormal(vPosition);
+}

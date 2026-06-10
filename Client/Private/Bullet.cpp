@@ -19,7 +19,7 @@ Bullet::~Bullet()
 {
 	//a.clear();
 }
-0.1f
+
 
 HRESULT Bullet::Initialize_Prototype()
 {
@@ -55,7 +55,6 @@ HRESULT Bullet::Initialize(void* pArg)
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -158,6 +157,7 @@ HRESULT Bullet::Ready_Components()
 
 	pOBBCom->Set_Tag(COLLIDER::COLLIDER_OBB);
 	pOBBCom->Set_GroupTag(L"Bullet");
+	pOBBCom->Set_Extend(_float3{ 0.1f,0.1f,0.1f });
 
 	if (FAILED(__super::Add_Component(TEXT("Com_Collider"), m_pShaderCom)))
 		return E_FAIL;

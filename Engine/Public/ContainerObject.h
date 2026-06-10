@@ -25,6 +25,8 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	map<const _wstring, shared_ptr<class PartObject>>&	GetPartObjectMap() { return 	m_PartObjects; }
 protected:
 	map<const _wstring, shared_ptr<class PartObject>>		m_PartObjects;
 

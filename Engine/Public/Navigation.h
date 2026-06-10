@@ -29,6 +29,8 @@ public:
 	_bool isMove(_fvector vResultPos);
 
 public:
+	_vector Get_BlockingNormal(_fvector vPosition);
+public:
 	int32_t Find_CellIndex(_fvector vPosition);
 	_bool Set_CurrentCell(_fvector vPosition);
 
@@ -50,6 +52,7 @@ private:
 public:
 	static unique_ptr<Navigation> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, const _tchar* pNavigationDataFilePath, const _tchar* pNavigationNeighborsFilePath = nullptr);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
+
 };
 
 NS_END

@@ -115,6 +115,9 @@
     <Filter Include="02. GameObject\Bullet">
       <UniqueIdentifier>{243f1c39-8814-4735-a78c-7b9948dbfc67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\UI\Mouse">
+      <UniqueIdentifier>{586fa144-0ab0-4133-aab9-f53cc1ac48d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -228,6 +231,9 @@
     <ClInclude Include="..\Public\Bullet.h">
       <Filter>02. GameObject\Bullet</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Player_Mouse.h">
+      <Filter>02. GameObject\Player\UI\Mouse</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -338,6 +344,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Bullet.cpp">
       <Filter>02. GameObject\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_Mouse.cpp">
+      <Filter>02. GameObject\Player\UI\Mouse</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

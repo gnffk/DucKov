@@ -75,6 +75,8 @@ private:
 public:
 
 
+	void Move(_fvector vDir, _float fTimeDelta, shared_ptr<Navigation> pNavigation, _float plusSpeed);
+
 	static shared_ptr<Transform> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
 
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;

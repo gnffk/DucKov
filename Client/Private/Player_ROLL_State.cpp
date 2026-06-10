@@ -14,7 +14,7 @@ HRESULT Player_ROLL_State::Initialize() {
 }
 void Player_ROLL_State::Enter(FSM* pFSM) {
 
-    m_fCurrentSpeed = 5.f;
+    m_fCurrentSpeed = 6.f;
 }
 void Player_ROLL_State::Exit(FSM* pFSM) {
 
@@ -50,13 +50,14 @@ void Player_ROLL_State::Update(FSM* pFSM, float fDeltaTime) {
 
 
 
-    m_fCurrentSpeed -= 45.f * fDeltaTime;
+    m_fCurrentSpeed -= 1.f * fDeltaTime;
 
     if (m_fCurrentSpeed < 0.f)
         m_fCurrentSpeed = 0.f;
 
+    auto Nav =  pPlayer->GetNavigation();
 
-    pTransform->Move(vRollDir, fDeltaTime , m_fCurrentSpeed);
+    pTransform->Move(vRollDir, fDeltaTime , Nav, m_fCurrentSpeed);
 }
 
 void Player_ROLL_State::Late_Update(FSM* pFSM, float fDeltaTime) {

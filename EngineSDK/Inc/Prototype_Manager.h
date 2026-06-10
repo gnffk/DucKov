@@ -17,6 +17,7 @@
 
 
 
+
 NS_BEGIN(Engine)
 
 class ENGINE_DLL Prototype_Manager final

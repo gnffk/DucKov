@@ -9,13 +9,11 @@
 #include <sstream>
 
 
-MainUI::MainUI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
-    : UIObject{ pDevice, pContext }
+MainUI::MainUI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): UIObject{ pDevice, pContext }
 {
 }
 
-MainUI::MainUI(const MainUI& Prototype)
-    : UIObject{ Prototype }
+MainUI::MainUI(const MainUI& Prototype) : UIObject{ Prototype }
 {
 }
 
@@ -96,6 +94,8 @@ HRESULT MainUI::Initialize(void* pArg)
     if (FAILED(Add_UIRect(TEXT("HeartGraph"), TEXT("HeartGraph"), TEXT("Prototype_Com_Texture_Graph"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
         return E_FAIL;
 
+
+    Load_UIRects(TEXT("../../Resources/Data/UI/MainUI.txt"));
     return S_OK;
 }
 
@@ -112,7 +112,7 @@ void MainUI::Update(_float fTimeDelta)
 
 void MainUI::Late_Update(_float fTimeDelta)
 {
-    CGameInstance::Get().Add_RenderObject(RENDERGROUP::UI, SHARED_THIS(MainUI));
+
 }
 
 HRESULT MainUI::Render()
@@ -297,11 +297,7 @@ HRESULT MainUI::Add_UIRect(const wstring& UIName, const wstring& strName, const 
 
 
 
-    if (FAILED(__super::Add_Component(
-        CGameInstance::Get().Get_Level(),
-        strTextureTag.c_str(),
-        UI.strName,
-        UI.pTexture)))
+    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(),strTextureTag.c_str(), UI.strName, UI.pTexture)))
         return E_FAIL;
 
     m_UIRects[UIName] = (UI);

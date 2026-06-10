@@ -30,8 +30,10 @@ public:
 
 	string WStringToString(const std::wstring& wstr);
 	wstring StringToWString(const string& str);
+
 public:
 #pragma region TIME_MANAGER
+	_float			Random(_float fMin, _float fMax);
 	_float			Get_TimeDelta(const _wstring& strTimerTag);
 	void			Set_TimeDelta(const _wstring& strTimerTag);
 	HRESULT			Add_Timer(const _wstring& strTimerTag);

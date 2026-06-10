@@ -142,7 +142,6 @@ void MapEditor::IMGUI_Render() {
     IMGUI_AddPlayer();
 
     IMGUI_TreeBrush_Render();
-
     if (m_pNavMeshEditor)
         m_pNavMeshEditor->IMGUI_Render();
 #endif
