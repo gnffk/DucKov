@@ -83,7 +83,7 @@ HRESULT BossMonster::Update_Animation(_float fTimeDelta)
 			nextAnimPlus = 1.f;
 			break;
 
-		case BossMonsterFSM::BOSS_STATE::RIGHT_WALK:
+		case BossMonsterFSM::BOSS_STATE::WALK:
 			targetAnim = 2;
 			blendDuration = 0.12f;
 			nextAnimPlus = 1.f;
@@ -95,7 +95,7 @@ HRESULT BossMonster::Update_Animation(_float fTimeDelta)
 			nextAnimPlus = 1.f;
 			break;
 
-		case BossMonsterFSM::BOSS_STATE::WALK:
+		case BossMonsterFSM::BOSS_STATE::RIGHT_WALK:
 			targetAnim = 4;
 			blendDuration = 0.12f;
 			nextAnimPlus = 0.5f;
@@ -107,19 +107,19 @@ HRESULT BossMonster::Update_Animation(_float fTimeDelta)
 			nextAnimPlus = 1.f;
 			break;
 
-		case BossMonsterFSM::BOSS_STATE::TPOSE:
+		case BossMonsterFSM::BOSS_STATE::HAND_UP_AND_WALK:
 			targetAnim = 6;
 			blendDuration = 0.15f;
-			nextAnimPlus = 1.f;
+			nextAnimPlus = 0.7f;
 			break;
 
-		case BossMonsterFSM::BOSS_STATE::HAND_UP_AND_BACKWARD:
+		case BossMonsterFSM::BOSS_STATE::HAND_UP_AND_LEFT:
 			targetAnim = 7;
 			blendDuration = 0.12f;
 			nextAnimPlus = 1.f;
 			break;
 
-		case BossMonsterFSM::BOSS_STATE::HAND_UP_AND_WALK:
+		case BossMonsterFSM::BOSS_STATE::HAND_UP_AND_BACKWARD:
 			targetAnim = 8;
 			blendDuration = 0.12f;
 			nextAnimPlus = 0.7f;
@@ -131,7 +131,7 @@ HRESULT BossMonster::Update_Animation(_float fTimeDelta)
 			nextAnimPlus = 1.f;
 			break;
 
-		case BossMonsterFSM::BOSS_STATE::HAND_UP_AND_LEFT:
+		case BossMonsterFSM::BOSS_STATE::TPOSE:
 			targetAnim = 10;
 			blendDuration = 0.12f;
 			nextAnimPlus = 1.f;
@@ -350,14 +350,23 @@ void BossMonster::Turn_To_Direction(const _float3& vDirection,_float fTimeDelta)
 
 	_float fTurnSign = XMVectorGetY(vCross);
 
-	if (fTurnSign >= 0.f)
+
+	if (fDot < -0.999f)
 	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f),fTimeDelta);
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+
 	}
-	else
+	else if (fDot < 0.98f)
 	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f),fTimeDelta);
+		if (fTurnSign < 0.f)
+			m_pTransformCom->Turn(XMVectorSet(0.f, -1.f, 0.f, 0.f), fTimeDelta * 1.5f);
+		else
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * 1.5f);
+
+
 	}
+
+
 }
 void BossMonster::Turn_To_Position(const _float3& vPosition,_float fTimeDelta)
 {

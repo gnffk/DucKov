@@ -868,7 +868,7 @@ void MapEditor::IMGUI_ChoiceObject()
                 bossSpeed;
 
             desc.fRotationPerSec =
-                bossRotation;
+                180.f;
 
             CGameInstance::Get().Add_GameObject_toLayer(
                 CGameInstance::Get().Get_Level(),

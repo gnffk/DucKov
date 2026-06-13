@@ -33,6 +33,13 @@ public:
 public:
 	int32_t Find_CellIndex(_fvector vPosition);
 	_bool Set_CurrentCell(_fvector vPosition);
+public:
+	_float3 Get_CellCenter(int32_t iCellIndex);
+	int32_t Get_NeighborIndex(int32_t iCellIndex, LINE_CELL eLine) const;
+
+	_bool Build_AStarPath(_fvector vStartPosition,_fvector vGoalPosition,vector<_float3>& PathPoints);
+public:
+	_bool Can_MoveStraight(_fvector vStartPosition,_fvector vEndPosition,_float fStep = 0.5f);
 
 #ifdef _DEBUG
 public:

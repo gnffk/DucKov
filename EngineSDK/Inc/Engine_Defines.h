@@ -28,9 +28,6 @@ using namespace DirectX;
 #include <functional>
 #include <string>
 #include <unordered_map>
-#include <queue>
-#include <algorithm>
-
 #include <ctime>
 #include <memory>
 #include <wrl/client.h>

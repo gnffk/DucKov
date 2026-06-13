@@ -2,9 +2,41 @@
 #include "Cell.h"
 
 #include "GameInstance.h"
+#include <queue>
+namespace
+{
+    struct NAV_ASTAR_NODE
+    {
+        int32_t iCellIndex = -1;
 
-Navigation::Navigation(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
-    : Component{ pDevice, pContext }
+        float fG = FLT_MAX;
+        float fH = 0.f;
+
+        int32_t iParentCellIndex = -1;
+        bool bClosed = false;
+    };
+
+    struct NAV_ASTAR_OPEN
+    {
+        int32_t iCellIndex = -1;
+        float fCost = 0.f;
+
+        bool operator<(const NAV_ASTAR_OPEN& rhs) const
+        {
+            return fCost > rhs.fCost;
+        }
+    };
+
+    float DistanceXZ(const _float3& vA, const _float3& vB)
+    {
+        float fX = vA.x - vB.x;
+        float fZ = vA.z - vB.z;
+
+        return sqrtf(fX * fX + fZ * fZ);
+    }
+}
+
+Navigation::Navigation(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : Component{ pDevice, pContext }
 {
 
 }
@@ -242,6 +274,250 @@ int32_t Navigation::Find_CellIndex(_fvector vPosition)
 
     return -1;
 }
+
+_float3 Navigation::Get_CellCenter(int32_t iCellIndex)
+{
+    _float3 vCenter{};
+
+    if (iCellIndex < 0 ||
+        iCellIndex >= static_cast<int32_t>(m_Cells.size()))
+    {
+        return vCenter;
+    }
+
+    if (m_Cells[iCellIndex] == nullptr)
+        return vCenter;
+
+    _vector vA = m_Cells[iCellIndex]->Get_Point(POINT_CELL::A);
+
+    _vector vB = m_Cells[iCellIndex]->Get_Point(POINT_CELL::B);
+
+    _vector vC = m_Cells[iCellIndex]->Get_Point(POINT_CELL::C);
+
+    _vector vCenterVector = (vA + vB + vC) / 3.f;
+
+    vCenterVector = XMVectorSetW(vCenterVector, 1.f);
+
+    XMStoreFloat3(&vCenter, vCenterVector);
+
+    return vCenter;
+}
+int32_t Navigation::Get_NeighborIndex(int32_t iCellIndex,LINE_CELL eLine) const
+{
+    if (iCellIndex < 0 || iCellIndex >= static_cast<int32_t>(m_Cells.size()))
+    {
+        return -1;
+    }
+
+    if (m_Cells[iCellIndex] == nullptr)
+        return -1;
+
+    return m_Cells[iCellIndex]->Get_NeighborIndex(eLine);
+}
+_bool Navigation::Build_AStarPath( _fvector vStartPosition, _fvector vGoalPosition, vector<_float3>& PathPoints)
+{
+    PathPoints.clear();
+
+    int32_t iStartCellIndex =Find_CellIndex(vStartPosition);
+
+    int32_t iGoalCellIndex = Find_CellIndex(vGoalPosition);
+
+    if (iStartCellIndex == -1 || iGoalCellIndex == -1)
+    {
+        return false;
+    }
+
+    if (iStartCellIndex == iGoalCellIndex)
+    {
+        _float3 vGoal{};
+        XMStoreFloat3(&vGoal, vGoalPosition);
+
+        PathPoints.push_back(vGoal);
+        return true;
+    }
+
+    unordered_map<int32_t, NAV_ASTAR_NODE> Nodes;
+    priority_queue<NAV_ASTAR_OPEN> OpenList;
+
+    _float3 vGoalCenter = Get_CellCenter(iGoalCellIndex);
+
+    NAV_ASTAR_NODE StartNode{};
+    StartNode.iCellIndex = iStartCellIndex;
+    StartNode.fG = 0.f;
+    StartNode.fH = DistanceXZ(Get_CellCenter(iStartCellIndex),vGoalCenter);
+    StartNode.iParentCellIndex = -1;
+
+    Nodes[iStartCellIndex] = StartNode;
+
+    OpenList.push( NAV_ASTAR_OPEN{ iStartCellIndex, StartNode.fG + StartNode.fH});
+
+    bool bFound = false;
+
+    while (!OpenList.empty())
+    {
+        NAV_ASTAR_OPEN CurrentOpen = OpenList.top();
+
+        OpenList.pop();
+
+        auto CurrentIter = Nodes.find(CurrentOpen.iCellIndex);
+
+        if (CurrentIter == Nodes.end())
+            continue;
+
+        NAV_ASTAR_NODE& CurrentNode = CurrentIter->second;
+
+        if (CurrentNode.bClosed)
+            continue;
+
+        CurrentNode.bClosed = true;
+
+        if (CurrentNode.iCellIndex == iGoalCellIndex)
+        {
+            bFound = true;
+            break;
+        }
+
+        _float3 vCurrentCenter = Get_CellCenter(CurrentNode.iCellIndex);
+
+        for (uint32_t i = 0; i < ETOUI(LINE_CELL::END); ++i)
+        {
+            int32_t iNeighborCellIndex =Get_NeighborIndex(CurrentNode.iCellIndex, static_cast<LINE_CELL>(i));
+
+            if (iNeighborCellIndex == -1)
+                continue;
+
+            if (iNeighborCellIndex < 0 || iNeighborCellIndex >= static_cast<int32_t>(m_Cells.size()))
+            {
+                continue;
+            }
+
+            _float3 vNeighborCenter = Get_CellCenter(iNeighborCellIndex);
+
+            float fMoveCost = DistanceXZ(vCurrentCenter, vNeighborCenter);
+
+            float fNewG = CurrentNode.fG + fMoveCost;
+
+            auto NeighborIter = Nodes.find(iNeighborCellIndex);
+
+            if (NeighborIter == Nodes.end())
+            {
+                NAV_ASTAR_NODE NeighborNode{};
+                NeighborNode.iCellIndex = iNeighborCellIndex;
+                NeighborNode.fG = fNewG;
+                NeighborNode.fH = DistanceXZ( vNeighborCenter,vGoalCenter);
+                NeighborNode.iParentCellIndex =CurrentNode.iCellIndex;
+
+                Nodes[iNeighborCellIndex] =NeighborNode;
+
+                OpenList.push(NAV_ASTAR_OPEN{ iNeighborCellIndex, NeighborNode.fG + NeighborNode.fH});
+            }
+            else
+            {
+                NAV_ASTAR_NODE& NeighborNode = NeighborIter->second;
+
+                if (NeighborNode.bClosed)
+                    continue;
+
+                if (fNewG < NeighborNode.fG)
+                {
+                    NeighborNode.fG = fNewG;
+                    NeighborNode.iParentCellIndex = CurrentNode.iCellIndex;
+
+                    OpenList.push( NAV_ASTAR_OPEN{iNeighborCellIndex, NeighborNode.fG + NeighborNode.fH});
+                }
+            }
+        }
+    }
+
+    if (!bFound)
+        return false;
+
+    vector<int32_t> ReverseCellPath;
+
+    int32_t iTraceCellIndex = iGoalCellIndex;
+
+    while (iTraceCellIndex != -1)
+    {
+        ReverseCellPath.push_back(iTraceCellIndex);
+
+        auto Iter = Nodes.find(iTraceCellIndex);
+
+        if (Iter == Nodes.end())
+            break;
+
+        iTraceCellIndex = Iter->second.iParentCellIndex;
+    }
+
+    reverse( ReverseCellPath.begin(), ReverseCellPath.end());
+
+    // 시작 Cell은 현재 위치라서 제외하고,
+    // 다음 Cell Center부터 waypoint로 넣음.
+    for (uint32_t i = 1; i < ReverseCellPath.size(); ++i)
+    {
+        _float3 vCenter = Get_CellCenter(ReverseCellPath[i]);
+
+        _vector vCenterPosition = XMLoadFloat3(&vCenter);
+
+        vCenterPosition = XMVectorSetW(vCenterPosition, 1.f);
+
+        // 높이 보정
+        int32_t iPrevCellIndex = m_iCurrentCellIndex;
+
+        m_iCurrentCellIndex = ReverseCellPath[i];
+
+        vCenterPosition = SetUp_OnNavigation(vCenterPosition);
+
+        m_iCurrentCellIndex = iPrevCellIndex;
+
+        XMStoreFloat3( &vCenter, vCenterPosition);
+
+        PathPoints.push_back(vCenter);
+    }
+
+    _float3 vGoal{};
+    XMStoreFloat3(&vGoal, vGoalPosition);
+
+    PathPoints.push_back(vGoal);
+
+    return true;
+}
+
+_bool Navigation::Can_MoveStraight(_fvector vStartPosition, _fvector vEndPosition, _float fStep)
+{
+    _vector vStart = vStartPosition;
+    _vector vEnd = vEndPosition;
+
+    _vector vDir = vEnd - vStart;
+    vDir = XMVectorSetY(vDir, 0.f);
+
+    _float fDistance =
+        XMVectorGetX(XMVector3Length(vDir));
+
+    if (fDistance <= 0.001f)
+        return true;
+
+    int32_t iSampleCount =
+        max(1, static_cast<int32_t>(ceilf(fDistance / fStep)));
+
+    for (int32_t i = 0; i <= iSampleCount; ++i)
+    {
+        _float fRatio =
+            static_cast<_float>(i) /
+            static_cast<_float>(iSampleCount);
+
+        _vector vSample =
+            XMVectorLerp(vStart, vEnd, fRatio);
+
+        vSample =
+            XMVectorSetW(vSample, 1.f);
+
+        if (Find_CellIndex(vSample) == -1)
+            return false;
+    }
+
+    return true;
+}
+
 _bool Navigation::Set_CurrentCell(_fvector vPosition)
 {
     const int32_t iCellIndex = Find_CellIndex(vPosition);

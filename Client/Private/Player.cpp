@@ -511,7 +511,7 @@ HRESULT Player::Ready_PartObjects()
 	BodyDesc.m_strPrototypeBaseName =L"SK_CustomBody";
 	BodyDesc.pCameraType = ETOUI(CAMERA::NONE);
 	BodyDesc.fSpeedPerSec = 5.f;
-	BodyDesc.fRotationPerSec = 1.f;
+	BodyDesc.fRotationPerSec = 180.f;
 
 	if (FAILED(__super::Add_PartObject(CGameInstance::Get().Get_Level(), BodyDesc.m_strPrototypeObjectName,
 		TEXT("Part_Body"), &BodyDesc)))
