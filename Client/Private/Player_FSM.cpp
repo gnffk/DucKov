@@ -10,6 +10,7 @@
 #include "Player_ROLL_State.h"
 #include "Player_RUN_State.h"
 #include "Player_FSM.h"
+#include "BossMonsterFSM.h"
 
 Player_FSM::Player_FSM()
 {
@@ -32,6 +33,8 @@ HRESULT Player_FSM::Initialize(uint32_t* eModelState)
 	*m_eModelState = PLAYER_STATE::IDLE;
 	return S_OK;
 }
+
+
 
 void Player_FSM::Change_State(PLAYER_STATE eState)
 {

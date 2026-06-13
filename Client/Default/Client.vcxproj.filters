@@ -118,6 +118,51 @@
     <Filter Include="02. GameObject\Player\UI\Mouse">
       <UniqueIdentifier>{586fa144-0ab0-4133-aab9-f53cc1ac48d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster">
+      <UniqueIdentifier>{44dd7af8-b862-48f5-bc08-6d746fa470d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\FSM">
+      <UniqueIdentifier>{30907634-fbad-48d5-aeaf-e56a9d978db1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State">
+      <UniqueIdentifier>{65805efb-5f82-4995-b987-709a39253057}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\IDLE">
+      <UniqueIdentifier>{b75164bb-464a-4157-a27c-987d73626e63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\Weapon">
+      <UniqueIdentifier>{5725c12d-028f-4a10-ac03-d4402289e24f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\WALK">
+      <UniqueIdentifier>{22b6cffe-6634-4cc8-ba43-82b97e7055b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\RUN">
+      <UniqueIdentifier>{878c2e4a-e88a-45d1-9e46-92ad417b3cfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\ROLL">
+      <UniqueIdentifier>{f3d19388-d337-4587-82dc-c1d9ad7d2f98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\RIGHT_WALK">
+      <UniqueIdentifier>{a9df6895-902f-4ba8-96ab-406b88a3a731}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\LEFT_WALK">
+      <UniqueIdentifier>{19d15df4-3ba1-4158-bd7a-fffa53b87886}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\HAND_UP">
+      <UniqueIdentifier>{d76943f8-b634-484e-8660-b1cba873020e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\HAND_UP_AND_LEFT">
+      <UniqueIdentifier>{d713184c-e13c-4211-9c28-f9649df3f00b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\HAND_UP_AND_RIGHT">
+      <UniqueIdentifier>{41905ab3-bdff-488a-bdd0-6f55f7685c68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\HAND_UP_AND_WALK">
+      <UniqueIdentifier>{e3a65096-2ee5-4c27-bec4-03efb79f80bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\Pattern">
+      <UniqueIdentifier>{1373312f-f9cc-4072-b258-4418c2085480}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -234,6 +279,48 @@
     <ClInclude Include="..\public\Player_Mouse.h">
       <Filter>02. GameObject\Player\UI\Mouse</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BossMonster.h">
+      <Filter>02. GameObject\Monster\BossMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossMonsterFSM.h">
+      <Filter>02. GameObject\Monster\BossMonster\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_Idle_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\IDLE</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_Weapon.h">
+      <Filter>02. GameObject\Monster\BossMonster\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_LEFT_WALK_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\LEFT_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_Hand_UP_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\HAND_UP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_HAND_UP_AND_LEFT_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\HAND_UP_AND_LEFT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_HAND_UP_AND_RIGHT_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\HAND_UP_AND_RIGHT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_HAND_UP_AND_WALK_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\HAND_UP_AND_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_RIGHT_WALK_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\RIGHT_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_ROLL_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\ROLL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_RUN_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\RUN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_WALK_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossPattern.h">
+      <Filter>02. GameObject\Monster\BossMonster\Pattern</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -347,6 +434,48 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player_Mouse.cpp">
       <Filter>02. GameObject\Player\UI\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossMonster.cpp">
+      <Filter>02. GameObject\Monster\BossMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossMonsterFSM.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_Idle_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\IDLE</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_Weapon.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_LEFT_WALK_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\LEFT_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_Hand_UP_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\HAND_UP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_HAND_UP_AND_LEFT_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\HAND_UP_AND_LEFT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_HAND_UP_AND_RIGHT_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\HAND_UP_AND_RIGHT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_HAND_UP_AND_WALK_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\HAND_UP_AND_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_RIGHT_WALK_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\RIGHT_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_ROLL_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\ROLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_RUN_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\RUN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_WALK_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossPattern.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\Pattern</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

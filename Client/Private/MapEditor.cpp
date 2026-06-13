@@ -210,6 +210,7 @@ void MapEditor::IMGUI_Level_Render()
 
         
 
+
                 // =========================================
                 // 생성
                 // =========================================
@@ -220,7 +221,11 @@ void MapEditor::IMGUI_Level_Render()
                    ImGui::OpenPopup("Select Monster");
 
                 }
-
+                else if (className == "BossMonster")
+                {
+                    OpenDataObject = true;
+                    ImGui::OpenPopup("Select BossMonster");
+                }
                 else if (className == "Obstacle")
                 {
                     OpenDataObject = true;
@@ -569,6 +574,37 @@ void MapEditor::IMGUI_MadeFunction()
 
     ImGui::Spacing();
 
+
+    ImGui::Spacing();
+
+    // =====================================================
+    // BossMonster
+    // =====================================================
+
+    ImGui::PushID("BossMonster");
+
+    if (ImGui::Button("BossMonster", buttonSize))
+    {
+    }
+
+    if (ImGui::BeginDragDropSource())
+    {
+        string className = "BossMonster";
+
+        ImGui::SetDragDropPayload(
+            "GAME_OBJECT",
+            className.c_str(),
+            className.size() + 1);
+
+        ImGui::Text("Create BossMonster");
+
+        ImGui::EndDragDropSource();
+    }
+
+    ImGui::PopID();
+
+    ImGui::Spacing();
+
     // =====================================================
     // Obstacle
     // =====================================================
@@ -717,6 +753,157 @@ void MapEditor::IMGUI_ChoiceObject()
             ImVec2(120.f, 35.f)))
         {
             selectedSkeletonIndex = -1;
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopupModal(
+        "Select BossMonster",
+        nullptr))
+    {
+        static char bossObjectName[128] = "";
+        static char bossLayerName[128] = "";
+        static float bossSpeed = 3.f;
+        static float bossRotation = 1.f;
+
+        static int selectedBossSkeletonIndex = -1;
+
+        auto& SkeletonNames =
+            CGameInstance::Get().FindCategories("Skeleton");
+
+        ImGui::Text("Create BossMonster");
+        ImGui::Separator();
+
+        ImGui::InputText(
+            "Object Name",
+            bossObjectName,
+            IM_ARRAYSIZE(bossObjectName));
+
+        ImGui::InputText(
+            "Layer Name",
+            bossLayerName,
+            IM_ARRAYSIZE(bossLayerName));
+
+        ImGui::DragFloat(
+            "Speed",
+            &bossSpeed,
+            0.1f,
+            0.f,
+            100.f);
+
+        ImGui::DragFloat(
+            "Rotation",
+            &bossRotation,
+            0.1f,
+            0.f,
+            100.f);
+
+        ImGui::Separator();
+
+        ImGui::Text("Select Boss Skeleton");
+
+        for (int i = 0; i < SkeletonNames.size(); ++i)
+        {
+            bool selected =
+                selectedBossSkeletonIndex == i;
+
+            if (ImGui::Selectable(
+                SkeletonNames[i].c_str(),
+                selected,
+                ImGuiSelectableFlags_DontClosePopups))
+            {
+                selectedBossSkeletonIndex = i;
+            }
+        }
+
+        ImGui::Separator();
+
+        bool canCreate =
+            selectedBossSkeletonIndex >= 0
+            && strlen(bossObjectName) > 0
+            && strlen(bossLayerName) > 0;
+
+        if (!canCreate)
+            ImGui::BeginDisabled();
+
+        if (ImGui::Button(
+            "Create",
+            ImVec2(120.f, 35.f)))
+        {
+            GameObject::GAMEOBJECT_DESC desc{};
+
+            wstring selectedSkeleton =
+                CGameInstance::Get().StringToWString(
+                    SkeletonNames[selectedBossSkeletonIndex]);
+
+            wstring inputName =
+                CGameInstance::Get().StringToWString(
+                    bossObjectName);
+
+            wstring inputLayer =
+                CGameInstance::Get().StringToWString(
+                    bossLayerName);
+
+            desc.ObjectType =
+                ETOUI(OBJECTTYPE::OBJECT_MONSTER);
+            // 만약 OBJECT_BOSSMONSTER enum을 따로 만들었으면
+            // ETOUI(OBJECTTYPE::OBJECT_BOSSMONSTER) 로 변경
+
+            desc.m_strName =
+                Make_UniqueObjectName(inputLayer, inputName);
+
+            desc.m_strPrototypeObjectName =
+                L"Prototype_GameObject_BossMonster";
+
+            desc.m_strPrototypeBaseName =
+                selectedSkeleton;
+
+            desc.pCameraType =
+                ETOUI(CAMERA::NONE);
+
+            desc.fSpeedPerSec =
+                bossSpeed;
+
+            desc.fRotationPerSec =
+                bossRotation;
+
+            CGameInstance::Get().Add_GameObject_toLayer(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_GameObject_BossMonster"),
+                CGameInstance::Get().Get_Level(),
+                inputLayer,
+                &desc);
+
+            auto pBoss =
+                CGameInstance::Get().Find_Object(
+                    CGameInstance::Get().Get_Level(),
+                    inputLayer,
+                    desc.m_strName);
+
+            if (pBoss)
+            {
+                CGameInstance::Get().SetSeletObject(
+                    pBoss.get());
+            }
+
+            selectedBossSkeletonIndex = -1;
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (!canCreate)
+            ImGui::EndDisabled();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(
+            "Cancel",
+            ImVec2(120.f, 35.f)))
+        {
+            selectedBossSkeletonIndex = -1;
 
             ImGui::CloseCurrentPopup();
         }

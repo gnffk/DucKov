@@ -17,6 +17,8 @@
 #include "Player_Weapon.h"
 #include "Bullet.h"
 #include "Player_Mouse.h"
+#include "BossMonster.h"
+#include "Boss_Weapon.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -216,6 +218,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_CustomBody/SK_CustomBody.bin", CustomMatrix))))
 		return E_FAIL;
 
+  	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_Boss_Test"),
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck_Boss", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Boss_Test/SK_Boss_Test.bin", CustomMatrix))))
+		return E_FAIL;
+
 	// static Mesh
 	_matrix HomeTransformMatrix =
 		XMMatrixScaling(0.001f, 0.001f, 0.001f) *
@@ -387,9 +393,9 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 #pragma region GameObject Prototype
 	/* Prototype_GameObject_TestModel */
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Monster"),
-		Monster::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Monster"),
+	//	Monster::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 	/* Prototype_GameObject_PerspectiveCamera */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_PerspectiveCamera"),
@@ -439,6 +445,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 		Player_Weapon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	/* For.Prototype_GameObject_BossPlayer_Weapon */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossPlayer_Weapon"),
+		Boss_Weapon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/* For.Prototype_GameObject_Bullet */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Bullet"),
 		Bullet::Create(m_pDevice, m_pContext))))
@@ -446,6 +457,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_Player_Mouse */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Mouse"),
 		Player_Mouse::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_BossMonster */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossMonster"),
+		BossMonster::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

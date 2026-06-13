@@ -152,6 +152,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Body_Player.h" />
+    <ClInclude Include="..\Public\BossMonster.h" />
+    <ClInclude Include="..\Public\BossMonsterFSM.h" />
+    <ClInclude Include="..\Public\BossPattern.h" />
+    <ClInclude Include="..\Public\Boss_HAND_UP_AND_LEFT_State.h" />
+    <ClInclude Include="..\Public\Boss_HAND_UP_AND_RIGHT_State.h" />
+    <ClInclude Include="..\Public\Boss_HAND_UP_AND_WALK_State.h" />
+    <ClInclude Include="..\Public\Boss_Hand_UP_State.h" />
+    <ClInclude Include="..\Public\Boss_Idle_State.h" />
+    <ClInclude Include="..\Public\Boss_LEFT_WALK_State.h" />
+    <ClInclude Include="..\Public\Boss_RIGHT_WALK_State.h" />
+    <ClInclude Include="..\Public\Boss_ROLL_State.h" />
+    <ClInclude Include="..\Public\Boss_RUN_State.h" />
+    <ClInclude Include="..\Public\Boss_WALK_State.h" />
+    <ClInclude Include="..\Public\Boss_Weapon.h" />
     <ClInclude Include="..\Public\Bullet.h" />
     <ClInclude Include="..\Public\CMainGame.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
@@ -192,6 +206,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Body_Player.cpp" />
+    <ClCompile Include="..\Private\BossMonster.cpp" />
+    <ClCompile Include="..\Private\BossMonsterFSM.cpp" />
+    <ClCompile Include="..\Private\BossPattern.cpp" />
+    <ClCompile Include="..\Private\Boss_HAND_UP_AND_LEFT_State.cpp" />
+    <ClCompile Include="..\Private\Boss_HAND_UP_AND_RIGHT_State.cpp" />
+    <ClCompile Include="..\Private\Boss_HAND_UP_AND_WALK_State.cpp" />
+    <ClCompile Include="..\Private\Boss_Hand_UP_State.cpp" />
+    <ClCompile Include="..\Private\Boss_Idle_State.cpp" />
+    <ClCompile Include="..\Private\Boss_LEFT_WALK_State.cpp" />
+    <ClCompile Include="..\Private\Boss_RIGHT_WALK_State.cpp" />
+    <ClCompile Include="..\Private\Boss_ROLL_State.cpp" />
+    <ClCompile Include="..\Private\Boss_RUN_State.cpp" />
+    <ClCompile Include="..\Private\Boss_WALK_State.cpp" />
+    <ClCompile Include="..\Private\Boss_Weapon.cpp" />
     <ClCompile Include="..\Private\Bullet.cpp" />
     <ClCompile Include="..\Private\CMainGame.cpp" />
     <ClCompile Include="..\Private\InvenUI.cpp" />

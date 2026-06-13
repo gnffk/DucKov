@@ -56,7 +56,7 @@ private:
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();
-
+	HRESULT Ready_UI();
 
 private:
 	_bool Collider_Obstacle(_float fTimeDelta);

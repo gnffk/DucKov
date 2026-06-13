@@ -1,6 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "ContainerObject.h"
 
 
 NS_BEGIN(Engine)
@@ -14,15 +14,16 @@ NS_END
 
 NS_BEGIN(Client)
 // 
-class Monster final : public GameObject
+class Monster : public ContainerObject
 {
 public:
-	typedef struct tagTestModelDesc : public GameObject::GAMEOBJECT_DESC
+	typedef struct tagTestModelDesc : public ContainerObject::GAMEOBJECT_DESC
 	{
 		uint32_t		iData;
+	
 	}TestModelDec;
 
-private:
+protected:
 	Monster(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	Monster(const Monster& Prototype);
 public:
@@ -39,20 +40,20 @@ public:
 
 	HRESULT Set_Model(wstring m_strPrototypeBaseName);
 
-private:
+protected:
 	uint32_t			m_iData = {};
 	_wstring			m_ModelComponentName;
-private:
-	//shared_ptr<VIBuffer_Fbx>	m_pVIBufferCom = { nullptr };
-	//shared_ptr<VIBuffer_Rect>	m_pVIBufferCom = { nullptr };
+
+protected:
+
 
 	shared_ptr<Model>			m_pModelCom = { nullptr };
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
-	shared_ptr<BaseCollider>	m_pAABBCom = { nullptr };
+
 
 
 public:
-	static unique_ptr<Monster> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 
 	void IMGUITEST();

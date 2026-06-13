@@ -225,11 +225,7 @@ void Transform::Move(_fvector vDir, _float fTimeDelta)
 
 }
 
-void Transform::Go_Direction(
-    _fvector vDirection,
-    _float fTimeDelta,
-    shared_ptr<Navigation> pNavigation,
-    _float fSpeedScale)
+void Transform::Go_Direction(_fvector vDirection,_float fTimeDelta,shared_ptr<Navigation> pNavigation, _float fSpeedScale)
 {
     _vector vMoveDir = XMVectorSetY(vDirection, 0.f);
 

@@ -52,55 +52,9 @@ HRESULT Player::Initialize(void* pArg)
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
 
-	_vector vPos = XMVectorSet(455.f, 33.f, 104.f, 1.f);
-	m_pTransformCom->Set_State(STATE::POSITION, vPos);
-
-	m_pPlayerFSM->SetOwner(SHARED_THIS(Player));
-
-	if (nullptr != m_pNavigationCom)
-	{
-		m_pNavigationCom->Set_CurrentCell(m_pTransformCom->Get_State(STATE::POSITION));
-
-		m_pTransformCom->Set_State(STATE::POSITION,m_pNavigationCom->SetUp_OnNavigation(m_pTransformCom->Get_State(STATE::POSITION)));
-	}
-
-
-	UIObject::UIOBJECT_DESC DesUI{};
-	DesUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
-	DesUI.m_strName = L"MainUI";
-	DesUI.m_strPrototypeObjectName = L"Prototype_GameObject_MainUI";
-	DesUI.m_strPrototypeBaseName = L"MainUI";
-	DesUI.pCameraType = ETOUI(CAMERA::NONE);
-	DesUI.fSpeedPerSec = 5.f;
-	DesUI.fRotationPerSec = 1.f;
-	DesUI.fSizeX = 1.f;
-	DesUI.fSizeY = 1.f;
-	DesUI.fX = 1.f; 
-	DesUI.fY = 1.f;
-
-	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"), CGameInstance::Get().Get_Level(), L"PlayerTag", &DesUI))
+	if (FAILED(Ready_UI()))
 		return E_FAIL;
 
-	m_pUI.emplace("MainUI", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"MainUI"));
-
-
-
-	UIObject::UIOBJECT_DESC DesPlayerMouseUI{};
-	DesPlayerMouseUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
-	DesPlayerMouseUI.m_strName = L"Player_Mouse";
-	DesPlayerMouseUI.m_strPrototypeObjectName = L"Prototype_GameObject_Player_Mouse";
-	DesPlayerMouseUI.m_strPrototypeBaseName = L"Player_Mouse";
-	DesPlayerMouseUI.pCameraType = ETOUI(CAMERA::NONE);
-	DesPlayerMouseUI.fSpeedPerSec = 5.f;
-	DesPlayerMouseUI.fRotationPerSec = 1.f;
-	DesPlayerMouseUI.fSizeX = 1.f;
-	DesPlayerMouseUI.fSizeY = 1.f;
-	DesPlayerMouseUI.fX = 1.f;
-	DesPlayerMouseUI.fY = 1.f;
-
-	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), L"Prototype_GameObject_Player_Mouse", CGameInstance::Get().Get_Level(), L"PlayerTag",&DesPlayerMouseUI))
-		return E_FAIL;
-	m_pUI.emplace("Player_Mouse", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player_Mouse"));
 
 
 	return S_OK;
@@ -584,6 +538,61 @@ HRESULT Player::Ready_PartObjects()
 
 
 
+
+	return S_OK;
+}
+
+HRESULT Player::Ready_UI()
+{
+	_vector vPos = XMVectorSet(455.f, 33.f, 104.f, 1.f);
+	m_pTransformCom->Set_State(STATE::POSITION, vPos);
+
+	m_pPlayerFSM->SetOwner(SHARED_THIS(Player));
+
+	if (nullptr != m_pNavigationCom)
+	{
+		m_pNavigationCom->Set_CurrentCell(m_pTransformCom->Get_State(STATE::POSITION));
+
+		m_pTransformCom->Set_State(STATE::POSITION, m_pNavigationCom->SetUp_OnNavigation(m_pTransformCom->Get_State(STATE::POSITION)));
+	}
+
+
+	UIObject::UIOBJECT_DESC DesUI{};
+	DesUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+	DesUI.m_strName = L"MainUI";
+	DesUI.m_strPrototypeObjectName = L"Prototype_GameObject_MainUI";
+	DesUI.m_strPrototypeBaseName = L"MainUI";
+	DesUI.pCameraType = ETOUI(CAMERA::NONE);
+	DesUI.fSpeedPerSec = 5.f;
+	DesUI.fRotationPerSec = 1.f;
+	DesUI.fSizeX = 1.f;
+	DesUI.fSizeY = 1.f;
+	DesUI.fX = 1.f;
+	DesUI.fY = 1.f;
+
+	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"), CGameInstance::Get().Get_Level(), L"PlayerTag", &DesUI))
+		return E_FAIL;
+
+	m_pUI.emplace("MainUI", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"MainUI"));
+
+
+
+	UIObject::UIOBJECT_DESC DesPlayerMouseUI{};
+	DesPlayerMouseUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+	DesPlayerMouseUI.m_strName = L"Player_Mouse";
+	DesPlayerMouseUI.m_strPrototypeObjectName = L"Prototype_GameObject_Player_Mouse";
+	DesPlayerMouseUI.m_strPrototypeBaseName = L"Player_Mouse";
+	DesPlayerMouseUI.pCameraType = ETOUI(CAMERA::NONE);
+	DesPlayerMouseUI.fSpeedPerSec = 5.f;
+	DesPlayerMouseUI.fRotationPerSec = 1.f;
+	DesPlayerMouseUI.fSizeX = 1.f;
+	DesPlayerMouseUI.fSizeY = 1.f;
+	DesPlayerMouseUI.fX = 1.f;
+	DesPlayerMouseUI.fY = 1.f;
+
+	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), L"Prototype_GameObject_Player_Mouse", CGameInstance::Get().Get_Level(), L"PlayerTag", &DesPlayerMouseUI))
+		return E_FAIL;
+	m_pUI.emplace("Player_Mouse", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player_Mouse"));
 
 	return S_OK;
 }
