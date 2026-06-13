@@ -105,6 +105,16 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
         return E_FAIL;
     }
 
+    LIGHT_DESC			LightDesc{};
+
+    LightDesc.eType = LIGHT::DIRECTIONAL;
+    LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+    LightDesc.vDiffuse = _float4(0.6f, 0.6f, 0.6f, 1.f);
+    LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
+    LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+
+    if (FAILED(CGameInstance::Get().Add_Light(LightDesc)))
+        return E_FAIL;
 	return S_OK;
   
 }

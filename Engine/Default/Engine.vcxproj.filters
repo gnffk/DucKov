@@ -172,6 +172,21 @@
     <Filter Include="12.UI">
       <UniqueIdentifier>{8ed9e64f-5f48-491e-8851-3697dd954988}</UniqueIdentifier>
     </Filter>
+    <Filter Include="13.Light">
+      <UniqueIdentifier>{7dd61bf9-f66a-4107-b359-ea16dcc9f47f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="13.Light\Manager">
+      <UniqueIdentifier>{f79bcf84-2e3a-4164-9a90-f9704df3b763}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="14.RenderTargets">
+      <UniqueIdentifier>{7e1fbe6a-9602-403f-9249-efe18b1ed41f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="14.RenderTargets\Manager">
+      <UniqueIdentifier>{e3dfbb6f-993c-4784-94a1-0ef17dc5e9a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99.Defines\Shader">
+      <UniqueIdentifier>{b6d154b7-0001-4763-8952-e1e8370aa08a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -363,6 +378,18 @@
     <ClCompile Include="..\Private\UI_Manager.cpp">
       <Filter>12.UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Light.cpp">
+      <Filter>13.Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light_Manager.cpp">
+      <Filter>13.Light\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RenderTarget.cpp">
+      <Filter>14.RenderTargets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Target_Manager.cpp">
+      <Filter>14.RenderTargets\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -542,5 +569,22 @@
     <ClInclude Include="..\Public\UI_Manager.h">
       <Filter>12.UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Light.h">
+      <Filter>13.Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light_Manager.h">
+      <Filter>13.Light\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RenderTarget.h">
+      <Filter>14.RenderTargets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Target_Manager.h">
+      <Filter>14.RenderTargets\Manager</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Deferred.hlsl">
+      <Filter>99.Defines\Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

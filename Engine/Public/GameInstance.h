@@ -141,6 +141,30 @@ public:
 
 #pragma endregion
 
+#pragma region TARGET_MANAGER
+public:
+	HRESULT Add_RenderTarget(const _wstring& strTargetTag, uint32_t iWidth, uint32_t iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
+	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
+	HRESULT Begin_MRT(const _wstring& strMRTTag);
+	HRESULT End_MRT();
+	HRESULT Bind_RT_ShaderResource(const _wstring& strTargetTag, shared_ptr<class Shader> pShader, const _char* pConstantName);
+	HRESULT Copy_RenderTarget(const _wstring& strTargetTag, ComPtr<ID3D11Texture2D> pOut);
+
+
+#ifdef _DEBUG
+	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Debug_RT_Render(const _wstring& strMRTTag, shared_ptr<class Shader> pShader, const _char* pConstantName, shared_ptr<class VIBuffer_Rect> pVIBuffer);
+#endif
+#pragma endregion
+
+
+#pragma region LIGHT_MANAGER
+public:
+	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+	HRESULT Render_Lights(shared_ptr<class Shader> pShader, shared_ptr<class VIBuffer_Rect> pVIBuffer);
+
+#pragma endregion
+
 private:
 	_float2											m_vViewportSize = {};
 	uint32_t										m_iCurrentLevel = {};
@@ -158,6 +182,8 @@ private:
 	unique_ptr<class Map_Manager>					m_pMap_Manager = { nullptr };
 	unique_ptr<class Font_Manager>					m_pFont_Manager = { nullptr };
 	unique_ptr<class UI_Manager>					m_pUI_Manager = { nullptr };
+	unique_ptr<class Target_Manager>				m_pTarget_Manager = { nullptr };
+	unique_ptr<class Light_Manager>				m_pLight_Manager = { nullptr };
 
 public:
 	void			Release_Engine();

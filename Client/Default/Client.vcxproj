@@ -263,7 +263,6 @@
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxCube.hlsl" />
-    <FxCompile Include="..\..\Resources\Shaders\Shader_VtxInstance_Model.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_AnimFbx.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

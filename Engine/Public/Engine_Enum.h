@@ -5,13 +5,17 @@ namespace Engine
 {
 	enum class WINMODE { FULL, WIN };
 
-	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
+	enum class RENDERGROUP { PRIORITY, NONBLEND, NONLIGHT, BLEND, UI, END };
 
 	enum class STATE { RIGHT, UP, LOOK, POSITION, END };
 
 	enum class ERESOURCE { SHADER, END };
 
 	enum class MODELTYPE { NONANIM, ANIM, END };
+
+	enum class LIGHT { DIRECTIONAL, POINT, END };
+
+	enum class DEFERRED { DEBUG, DIRECTIONAL, POINT, COMBINED, END };
 
 	enum MOUSEKEYSTATE { DIM_LB, DIM_RB, DIM_MB, DIM_END };
 

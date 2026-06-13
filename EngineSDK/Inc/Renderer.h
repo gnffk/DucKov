@@ -15,16 +15,38 @@ public:
 	HRESULT Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObject> pRenderObject);
 	HRESULT Draw();
 
+
+
 private:
 	ComPtr<ID3D11Device>					m_pDevice = { nullptr };
 	ComPtr<ID3D11DeviceContext>				m_pContext = { nullptr };
 	list<shared_ptr<GameObject>>			m_RenderObjects[ETOUI(RENDERGROUP::END)];
 
 private:
+	shared_ptr<class VIBuffer_Rect>		m_pVIBuffer = { nullptr };
+	shared_ptr<class Shader>				m_pShader = { nullptr };
+	_float4x4								m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
+
+
+#ifdef _DEBUG
+private:
+	list<shared_ptr<Component>>			m_DebugComponents;
+
+
+
+#endif
+
+
+private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonBlend();
 	HRESULT Render_Blend();
+	HRESULT Render_Lights();
+	HRESULT Render_Combined();
+	HRESULT Render_NonLights();
 	HRESULT Render_UI();
+
+	HRESULT Render_DEBUG();
 
 
 

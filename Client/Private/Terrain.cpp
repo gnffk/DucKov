@@ -108,8 +108,6 @@ HRESULT Terrain::Render()
 	if (FAILED(m_pRoadTex->Bind_ShaderResource(m_pShaderCom, "g_RoadTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &World, sizeof(_float4))))
-		return E_FAIL;
 
 
 

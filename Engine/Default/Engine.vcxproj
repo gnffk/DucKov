@@ -35,6 +35,8 @@
     <ClInclude Include="..\Public\FSM.h" />
     <ClInclude Include="..\Public\InstanceModel.h" />
     <ClInclude Include="..\Public\Key_Manager.h" />
+    <ClInclude Include="..\Public\Light.h" />
+    <ClInclude Include="..\Public\Light_Manager.h" />
     <ClInclude Include="..\Public\Map_Manager.h" />
     <ClInclude Include="..\Public\Material.h" />
     <ClInclude Include="..\Public\Mesh.h" />
@@ -42,10 +44,12 @@
     <ClInclude Include="..\Public\Navigation.h" />
     <ClInclude Include="..\Public\OBB_Collider.h" />
     <ClInclude Include="..\Public\PartObject.h" />
+    <ClInclude Include="..\Public\RenderTarget.h" />
     <ClInclude Include="..\Public\Shader.h" />
     <ClInclude Include="..\Public\Sphere_Collider.h" />
     <ClInclude Include="..\Public\stb_image.h" />
     <ClInclude Include="..\Public\stb_image_write.h" />
+    <ClInclude Include="..\Public\Target_Manager.h" />
     <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\UI_Manager.h" />
     <ClInclude Include="..\Public\UIObject.h" />
@@ -130,6 +134,8 @@
     <ClCompile Include="..\Private\FSM.cpp" />
     <ClCompile Include="..\Private\InstanceModel.cpp" />
     <ClCompile Include="..\Private\Key_Manager.cpp" />
+    <ClCompile Include="..\Private\Light.cpp" />
+    <ClCompile Include="..\Private\Light_Manager.cpp" />
     <ClCompile Include="..\Private\Map_Manager.cpp" />
     <ClCompile Include="..\Private\Material.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
@@ -137,8 +143,10 @@
     <ClCompile Include="..\Private\Navigation.cpp" />
     <ClCompile Include="..\Private\OBB_Collider.cpp" />
     <ClCompile Include="..\Private\PartObject.cpp" />
+    <ClCompile Include="..\Private\RenderTarget.cpp" />
     <ClCompile Include="..\Private\Shader.cpp" />
     <ClCompile Include="..\Private\Sphere_Collider.cpp" />
+    <ClCompile Include="..\Private\Target_Manager.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
     <ClCompile Include="..\Private\UI_Manager.cpp" />
     <ClCompile Include="..\Private\UIObject.cpp" />
@@ -164,6 +172,9 @@
     <ClCompile Include="..\Private\VIBuffer_Mesh_Instance.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Rect.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Terrain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Deferred.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -284,6 +295,15 @@
       <Command>cd /d $(SolutionDir)
 call Copy.bat</Command>
     </PostBuildEvent>
+    <FxCompile>
+      <EntryPointName>VS_MAIN</EntryPointName>
+    </FxCompile>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -310,6 +330,15 @@ call Copy.bat</Command>
       <Command>cd /d $(SolutionDir)
 call Copy.bat</Command>
     </PostBuildEvent>
+    <FxCompile>
+      <EntryPointName>VS_MAIN</EntryPointName>
+    </FxCompile>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

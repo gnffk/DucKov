@@ -20,6 +20,16 @@ namespace Engine
 		float		fTrackPosition;
 	}KEYFRAME;
 
+	typedef struct tagLightDesc
+	{
+		LIGHT			eType;
+		XMFLOAT4		vDiffuse, vAmbient, vSpecular;
+
+		XMFLOAT4		vDirection;
+		XMFLOAT4		vPosition;
+		float			fRange;
+	}LIGHT_DESC;
+
 
 	typedef struct tagInstanceMeshData
 	{
@@ -178,6 +188,7 @@ namespace Engine
 		};
 
 	} VTXMESHINSTANCE;
+
 	/* 애니메이션이 있는 메시용 정점. */
 	typedef struct tagVertexAnimMesh
 	{
@@ -198,7 +209,7 @@ namespace Engine
 			{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 56, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "BLENDINDEX", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 56, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 	}VTXANIMMESH;

@@ -12,6 +12,8 @@
 #include "Map_Manager.h"
 #include "Font_Manager.h"
 #include "UI_Manager.h"
+#include "Target_Manager.h"
+#include "Light_Manager.h"
 
 CGameInstance::CGameInstance()
 {
@@ -51,17 +53,21 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pImGUI_Manager)
         return E_FAIL;
 
-    m_pRenderer = Renderer::Create(pOutDevice, pOutDeviceContext);
-    if (nullptr == m_pRenderer)
-        return E_FAIL;
-
-
     m_pPrototype_Manager = Prototype_Manager::Create(Engine_Desc.iNumLevels);
     if (nullptr == m_pPrototype_Manager)
         return E_FAIL;
 
     m_pObject_Manager = Object_Manager::Create(Engine_Desc.iNumLevels);
     if (nullptr == m_pObject_Manager)
+        return E_FAIL;
+
+    m_pTarget_Manager = Target_Manager::Create(pOutDevice, pOutDeviceContext);
+    if (nullptr == m_pTarget_Manager)
+        return E_FAIL;
+
+
+    m_pRenderer = Renderer::Create(pOutDevice, pOutDeviceContext);
+    if (nullptr == m_pRenderer)
         return E_FAIL;
 
     m_pTimer_Manager = CTimer_Manager::Create();
@@ -78,6 +84,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
 
     m_pUI_Manager = UI_Manager::Create();
     if (nullptr == m_pFont_Manager)
+        return E_FAIL;
+
+    m_pLight_Manager = Light_Manager::Create(pOutDevice, pOutDeviceContext);
+    if (nullptr == m_pLight_Manager)
         return E_FAIL;
 
 
@@ -458,11 +468,71 @@ const wstring& CGameInstance::Get_MainUIGroup() const {
 }
 #pragma endregion
 
+#pragma region TARGET_MANAGER
+HRESULT CGameInstance::Add_RenderTarget(const _wstring& strTargetTag, uint32_t iWidth, uint32_t iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
+{
+
+    return m_pTarget_Manager->Add_RenderTarget(strTargetTag, iWidth, iHeight, ePixelFormat, vClearColor);
+}
+
+HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag)
+{
+    return m_pTarget_Manager->Add_MRT(strMRTTag, strTargetTag);
+}
+
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag)
+{
+    return m_pTarget_Manager->Begin_MRT(strMRTTag);
+}
+
+
+HRESULT CGameInstance::End_MRT()
+{
+    return m_pTarget_Manager->End_MRT();
+}
+
+HRESULT CGameInstance::Bind_RT_ShaderResource(const _wstring& strTargetTag, shared_ptr<class Shader> pShader, const _char* pConstantName)
+{
+    return m_pTarget_Manager->Bind_ShaderResource(strTargetTag, pShader, pConstantName);
+}
+
+HRESULT CGameInstance::Copy_RenderTarget(const _wstring& strTargetTag, ComPtr<ID3D11Texture2D> pOut)
+{
+    return m_pTarget_Manager->Copy_RenderTarget(strTargetTag, pOut);
+}
+
+#ifdef _DEBUG
+HRESULT CGameInstance::Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+{
+    return m_pTarget_Manager->Ready_Debug(strTargetTag, fX, fY, fSizeX, fSizeY);
+}
+HRESULT CGameInstance::Debug_RT_Render(const _wstring& strMRTTag, shared_ptr<class Shader> pShader, const _char* pConstantName, shared_ptr<class VIBuffer_Rect> pVIBuffer)
+{
+    return m_pTarget_Manager->Debug_Render(strMRTTag, pShader, pConstantName, pVIBuffer);
+}
+#endif
+#pragma endregion
+
+#pragma region LIGHT_MANAGER
+
+HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
+{
+    return m_pLight_Manager->Add_Light(LightDesc);
+}
+HRESULT CGameInstance::Render_Lights(shared_ptr<class Shader> pShader, shared_ptr<class VIBuffer_Rect> pVIBuffer)
+{
+    return m_pLight_Manager->Render(pShader, pVIBuffer);
+}
+#pragma endregion
 
 
 void CGameInstance::Release_Engine()
 {
     m_pFont_Manager.reset();
+
+    m_pLight_Manager.reset();
+
+    m_pTarget_Manager.reset();
 
     m_pCamera_Manager.reset();
 

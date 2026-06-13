@@ -494,9 +494,6 @@
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\Resources\Shaders\Shader_VtxInstance_Model.hlsl">
-      <Filter>02. GameObject\97. ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Instance_Tex.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
