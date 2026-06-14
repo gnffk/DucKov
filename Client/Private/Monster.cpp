@@ -40,7 +40,7 @@ HRESULT Monster::Initialize(void* pArg)
 
 void Monster::Priority_Update(_float fTimeDelta)
 {
-	CGameInstance::Get().Add_RenderObject(RENDERGROUP::BLEND, SHARED_THIS(Monster));
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Monster));
 	for (int type = 0; type < (int)COLLIDER::COLLIDER_END; ++type)
 	{
 		auto& colliderList = m_pColliderComs[type];
