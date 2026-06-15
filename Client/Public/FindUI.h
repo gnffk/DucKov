@@ -10,16 +10,17 @@ NS_END
 
 NS_BEGIN(Client)
 
-class InvenUI final : public UIObject
+class FindUI final : public UIObject
 {
 private:
+  
 
 private:
-    InvenUI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
-    InvenUI(const InvenUI& Prototype);
+    FindUI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+    FindUI(const FindUI& Prototype);
 
 public:
-    virtual ~InvenUI();
+    virtual ~FindUI();
 
 public:
     virtual HRESULT Initialize_Prototype() override;
@@ -29,7 +30,7 @@ public:
     virtual void Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
 
-    void    GUI_InvenUI();
+    void    GUI_FindUI();
 
 private:
     shared_ptr<Shader>        m_pShaderCom = nullptr;
@@ -48,24 +49,12 @@ private:
     HRESULT Load_UIRects(const wstring& strFilePath);
 
 private:
-    HRESULT Add_UIText(const wstring& TextName, const wstring& FontTag, const wstring& Text, const _float2& vPos,_float fScale = 1.f, const _float4& vColor = { 1.f, 1.f, 1.f, 1.f });
+    HRESULT Add_UIText(const wstring& TextName, const wstring& FontTag, const wstring& Text, const _float2& vPos, _float fScale = 1.f, const _float4& vColor = { 1.f, 1.f, 1.f, 1.f });
 
     HRESULT Save_UITexts(const wstring& strFilePath);
     HRESULT Load_UITexts(const wstring& strFilePath);
 
 
-public:
-    HRESULT Add_Item(const INV_ITEM& Item);
-private:
-    int Find_EmptyBagSlot() const;
-
-private:
-    uint32_t m_iDynamicItemSerial = 0;
-private:
-    HRESULT Ready_InventorySlots();
-    HRESULT Ready_InventoryItems();
-
-    void Update_Inventory(_float fTimeDelta);
     void Update_SlotHover();
     void Update_ItemIconPosition();
 
@@ -92,8 +81,45 @@ private:
     _bool   m_bDraggingItem = false;
     _float2 m_vMouseUIPos = { 0.f, 0.f };
 
+    private:
+        weak_ptr<GameObject> m_pOwner;
+        weak_ptr<GameObject> m_pPlayer;
+
+        _bool m_bCollidingOwner = false;
+        _bool m_bBoxOpen = false;
+
+        _float3 m_vOwnerUIOffset = { 0.f, 2.f, 0.f };
+
+        _float2 m_vFindTextScreenPos = { 0.f, 0.f };
+        _bool   m_bFindTextOnScreen = false;
+
 public:
-    static unique_ptr<InvenUI> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+    void Set_Owner(shared_ptr<GameObject> pOwner) { m_pOwner = pOwner; }
+    void Set_Player(shared_ptr<GameObject> pPlayer) { m_pPlayer = pPlayer; }
+
+    void Set_CollidingOwner(_bool bColliding)
+    {
+        m_bCollidingOwner = bColliding;
+
+        if (false == m_bCollidingOwner)
+            m_bBoxOpen = false;
+    }
+
+    weak_ptr<GameObject> GetOwner() { return m_pPlayer; }
+    
+private:
+    _bool WorldToScreen(_fvector vWorldPos, _float2& vOutScreenPos);
+    void Update_FindPrompt(_float fTimeDelta);
+    void Update_LootBox(_float fTimeDelta);
+
+    HRESULT Ready_LootSlots();
+    HRESULT Ready_LootItems();
+
+    void Farm_Item(int iSlotIndex);
+
+
+public:
+    static unique_ptr<FindUI> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
     virtual shared_ptr<Prototype> Clone(void* pArg) override;
 };
 

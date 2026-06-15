@@ -67,6 +67,22 @@ public:
 	_bool Picking_Terrain(_float3& vPickingPoint);
 	void Paint_Splat(_float3 vWorldPos);
 	void Update_SplatTexture();
+
+#if _DEBUG
+private:
+	bool    m_bHasSplatDebug = false;
+
+	_float3 m_vDebugPickWorld{};
+	_float3 m_vDebugPickLocal{};
+
+	int     m_iDebugSplatX = 0;
+	int     m_iDebugSplatY = 0;
+
+	float   m_fDebugReconLocalX = 0.f;
+	float   m_fDebugReconLocalZ = 0.f;
+	float   m_fDebugErrorX = 0.f;
+	float   m_fDebugErrorZ = 0.f;
+#endif
 #endif
 private:
 	HRESULT Ready_Components();

@@ -58,7 +58,11 @@ protected:
 	GAMEOBJECT_DESC Object_INFO;
 
 	_bool			m_bDead = false;
+	_bool			m_bCollision = false;
 
+public:
+	void SetCollision(_bool bcol) { m_bCollision = bcol; }
+	_bool GetCollision() { return m_bCollision; }
 public:
 	HRESULT Add_Component(const _wstring& strComponentTag, shared_ptr<Component> pComponent);
 protected:

@@ -92,6 +92,10 @@ HRESULT Terrain::Render()
 	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
 	_float4x4 World = m_pTransformCom->GetWorldMatrix();
+	_float2 vTerrainSize = { (float)(m_pVIBufferCom->GetNumVerticesX() - 1),(float)(m_pVIBufferCom->GetNumVerticesZ() - 1) };
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_TerrainSize", &vTerrainSize, sizeof(_float2))))
+		return E_FAIL;
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
@@ -261,6 +265,91 @@ void Terrain::GUI_TerrainPaint()
 	{
 		Save_SplatPNG("../../Resources/Textures/Terrian/Terrain_Splat1.png");
 	}
+
+	ImGui::Separator();
+
+	if (ImGui::CollapsingHeader("Splat Debug", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Text("Splat Size : %u x %u", m_iSplatWidth, m_iSplatHeight);
+
+		if (m_bHasSplatDebug)
+		{
+			ImGui::Text("Pick World : %.3f, %.3f, %.3f",
+				m_vDebugPickWorld.x,
+				m_vDebugPickWorld.y,
+				m_vDebugPickWorld.z);
+
+			ImGui::Text("Pick Local : %.3f, %.3f, %.3f",
+				m_vDebugPickLocal.x,
+				m_vDebugPickLocal.y,
+				m_vDebugPickLocal.z);
+
+			ImGui::Text("Splat Pixel : %d, %d",
+				m_iDebugSplatX,
+				m_iDebugSplatY);
+
+			ImGui::Text("Recon Local : %.3f, %.3f",
+				m_fDebugReconLocalX,
+				m_fDebugReconLocalZ);
+
+			ImGui::Text("Error : %.3f, %.3f",
+				m_fDebugErrorX,
+				m_fDebugErrorZ);
+		}
+		else
+		{
+			ImGui::Text("No paint debug data yet.");
+		}
+
+		ImGui::Separator();
+
+		if (m_pSplatSRV)
+		{
+			ImVec2 imageSize = ImVec2(256.f, 256.f);
+			ImVec2 imagePos = ImGui::GetCursorScreenPos();
+
+			ImGui::Image(
+				(ImTextureID)m_pSplatSRV.Get(),
+				imageSize,
+				ImVec2(0.f, 0.f),
+				ImVec2(1.f, 1.f));
+
+			if (m_bHasSplatDebug)
+			{
+				float u = 0.f;
+				float v = 0.f;
+
+				if (m_iSplatWidth > 1)
+					u = (float)m_iDebugSplatX / (float)(m_iSplatWidth - 1);
+
+				if (m_iSplatHeight > 1)
+					v = (float)m_iDebugSplatY / (float)(m_iSplatHeight - 1);
+
+				ImVec2 p;
+				p.x = imagePos.x + u * imageSize.x;
+				p.y = imagePos.y + v * imageSize.y;
+
+				ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+				drawList->AddCircleFilled(
+					p,
+					5.f,
+					IM_COL32(255, 0, 0, 255));
+
+				drawList->AddLine(
+					ImVec2(p.x - 10.f, p.y),
+					ImVec2(p.x + 10.f, p.y),
+					IM_COL32(255, 255, 0, 255),
+					2.f);
+
+				drawList->AddLine(
+					ImVec2(p.x, p.y - 10.f),
+					ImVec2(p.x, p.y + 10.f),
+					IM_COL32(255, 255, 0, 255),
+					2.f);
+			}
+		}
+	}
 	ImGui::End();
 }
 HRESULT Terrain::Create_SplatTexture()
@@ -314,7 +403,7 @@ _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 	if (m_pVIBufferCom == nullptr || m_pTransformCom == nullptr)
 		return false;
 
-	POINT pt{};
+	POINT pt = {};
 	GetCursorPos(&pt);
 	ScreenToClient(g_hWnd, &pt);
 
@@ -331,7 +420,6 @@ _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 	float py = mouseY / -(height * 0.5f) + 1.0f;
 
 	_float4x4 proj{}, view{}, world{};
-
 	CGameInstance::Get().Get_MainCamerwaViewMatrix(view);
 	CGameInstance::Get().Get_MainCamerwaProjectionMatrix(proj);
 
@@ -345,10 +433,6 @@ _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 	XMMATRIX invView = XMMatrixInverse(nullptr, matView);
 	XMMATRIX invWorld = XMMatrixInverse(nullptr, matWorld);
 
-	// =====================================================
-	// 1. Screen -> World Ray
-	// =====================================================
-
 	XMVECTOR nearPoint = XMVectorSet(px, py, 0.f, 1.f);
 	nearPoint = XMVector3TransformCoord(nearPoint, invProj);
 	nearPoint = XMVector3TransformCoord(nearPoint, invView);
@@ -359,10 +443,6 @@ _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 
 	XMVECTOR rayOrigin = nearPoint;
 	XMVECTOR rayDir = XMVector3Normalize(farPoint - nearPoint);
-
-	// =====================================================
-	// 2. World Ray -> Terrain Local Ray
-	// =====================================================
 
 	rayOrigin = XMVector3TransformCoord(rayOrigin, invWorld);
 	rayDir = XMVector3TransformNormal(rayDir, invWorld);
@@ -380,182 +460,86 @@ _bool Terrain::Picking_Terrain(_float3& vPickingPoint)
 	float nearestDist = FLT_MAX;
 	bool bHit = false;
 
-	XMVECTOR nearestHit = XMVectorZero();
+	XMVECTOR nearestHitLocal = XMVectorZero();
 
-	const uint32_t terrainWidth = m_pVIBufferCom->GetNumVerticesX();
-	const uint32_t terrainHeight = m_pVIBufferCom->GetNumVerticesZ();
-
-	if (terrainWidth < 2 || terrainHeight < 2)
-		return false;
-
-	// =====================================================
-	// Triangle 검사 Lambda
-	// =====================================================
-
-	auto TestTriangle = [&](
-		uint32_t i0,
-		uint32_t i1,
-		uint32_t i2)
-		{
-			if (i0 >= vertices->size() ||
-				i1 >= vertices->size() ||
-				i2 >= vertices->size())
-				return;
-
-			XMVECTOR v0 = XMLoadFloat3(&(*vertices)[i0].vPosition);
-			XMVECTOR v1 = XMLoadFloat3(&(*vertices)[i1].vPosition);
-			XMVECTOR v2 = XMLoadFloat3(&(*vertices)[i2].vPosition);
-
-			float dist = 0.f;
-
-			if (TriangleTests::Intersects(
-				rayOrigin,
-				rayDir,
-				v0,
-				v1,
-				v2,
-				dist))
-			{
-				if (dist < nearestDist)
-				{
-					nearestDist = dist;
-					nearestHit = rayOrigin + rayDir * dist;
-					bHit = true;
-				}
-			}
-		};
-
-	// =====================================================
-	// 전체 Terrain 검사 Lambda
-	// =====================================================
-
-	auto TestAllTerrain = [&]()
-		{
-			nearestDist = FLT_MAX;
-			bHit = false;
-			nearestHit = XMVectorZero();
-
-			for (size_t i = 0; i + 2 < indices->size(); i += 3)
-			{
-				uint32_t i0 = (*indices)[i];
-				uint32_t i1 = (*indices)[i + 1];
-				uint32_t i2 = (*indices)[i + 2];
-
-				TestTriangle(i0, i1, i2);
-			}
-		};
-
-	// =====================================================
-	// 주변 Terrain 검사 Lambda
-	// =====================================================
-
-	auto TestAroundLastPick = [&]() -> bool
-		{
-			nearestDist = FLT_MAX;
-			bHit = false;
-			nearestHit = XMVectorZero();
-
-			int centerX = static_cast<int>(m_CheckPickTerrainNum.x);
-			int centerZ = static_cast<int>(m_CheckPickTerrainNum.z);
-
-			const int Range = 30;
-
-			for (int z = centerZ - Range; z <= centerZ + Range; ++z)
-			{
-				for (int x = centerX - Range; x <= centerX + Range; ++x)
-				{
-					if (x < 0 || z < 0)
-						continue;
-
-					if (x >= static_cast<int>(terrainWidth) - 1)
-						continue;
-
-					if (z >= static_cast<int>(terrainHeight) - 1)
-						continue;
-
-					uint32_t i0 = z * terrainWidth + x;
-					uint32_t i1 = i0 + 1;
-					uint32_t i2 = i0 + terrainWidth;
-					uint32_t i3 = i2 + 1;
-
-					// 기존 코드 기준 삼각형 방향 유지
-					TestTriangle(i2, i3, i1);
-					TestTriangle(i2, i1, i0);
-				}
-			}
-
-			return bHit;
-		};
-
-	// =====================================================
-	// 3. Picking 검사
-	// =====================================================
-
-	bool bHasPreviousPick = false;
-
-	if (!(m_CheckPickTerrainNum.x == 0.f &&
-		m_CheckPickTerrainNum.y == 0.f &&
-		m_CheckPickTerrainNum.z == 0.f))
+	for (size_t i = 0; i + 2 < indices->size(); i += 3)
 	{
-		bHasPreviousPick = true;
-	}
+		uint32_t i0 = (*indices)[i];
+		uint32_t i1 = (*indices)[i + 1];
+		uint32_t i2 = (*indices)[i + 2];
 
-	if (bHasPreviousPick)
-	{
-		TestAroundLastPick();
+		if (i0 >= vertices->size() ||
+			i1 >= vertices->size() ||
+			i2 >= vertices->size())
+			continue;
 
-		// 주변 검사 실패하면 전체 Terrain 검사로 fallback
-		if (!bHit)
+		XMVECTOR v0 = XMLoadFloat3(&(*vertices)[i0].vPosition);
+		XMVECTOR v1 = XMLoadFloat3(&(*vertices)[i1].vPosition);
+		XMVECTOR v2 = XMLoadFloat3(&(*vertices)[i2].vPosition);
+
+		float dist = 0.f;
+
+		if (TriangleTests::Intersects(rayOrigin, rayDir, v0, v1, v2, dist))
 		{
-			TestAllTerrain();
+			if (dist < nearestDist)
+			{
+				nearestDist = dist;
+				nearestHitLocal = rayOrigin + rayDir * dist;
+				bHit = true;
+			}
 		}
-	}
-	else
-	{
-		TestAllTerrain();
 	}
 
 	if (!bHit)
 		return false;
 
-	// =====================================================
-	// 4. Local Terrain 범위 체크
-	// =====================================================
+	float x = XMVectorGetX(nearestHitLocal);
+	float z = XMVectorGetZ(nearestHitLocal);
 
-	float localX = XMVectorGetX(nearestHit);
-	float localZ = XMVectorGetZ(nearestHit);
+	float terrainSizeX = static_cast<float>(m_pVIBufferCom->GetNumVerticesX() - 1);
+	float terrainSizeZ = static_cast<float>(m_pVIBufferCom->GetNumVerticesZ() - 1);
 
-	float terrainSizeX = static_cast<float>(terrainWidth - 1);
-	float terrainSizeZ = static_cast<float>(terrainHeight - 1);
-
-	if (localX < 0.f || localZ < 0.f)
+	if (x < 0.f || z < 0.f || x > terrainSizeX || z > terrainSizeZ)
 		return false;
 
-	if (localX > terrainSizeX || localZ > terrainSizeZ)
-		return false;
-
-	// =====================================================
-	// 5. 캐시는 Local 좌표로 저장
-	// =====================================================
-
-	XMStoreFloat4(&m_CheckPickTerrainNum, nearestHit);
-
-	// =====================================================
-	// 6. 반환은 World 좌표로 반환
-	// =====================================================
-
-	XMVECTOR worldHit = XMVector3TransformCoord(nearestHit, matWorld);
-	XMStoreFloat3(&vPickingPoint, worldHit);
+	// Paint용이니까 Local 좌표 그대로 반환
+	XMStoreFloat3(&vPickingPoint, nearestHitLocal);
 
 	return true;
+
 }
-void Terrain::Paint_Splat(_float3 vWorldPos)
+void Terrain::Paint_Splat(_float3 vLocalPos)
 {
 	float terrainSizeX = (float)(m_pVIBufferCom->GetNumVerticesX() - 1);
 	float terrainSizeZ = (float)(m_pVIBufferCom->GetNumVerticesZ() - 1);
 
-	int centerX = (int)(vWorldPos.x / terrainSizeX * (m_iSplatWidth - 1));
-	int centerY = (int)(vWorldPos.z / terrainSizeZ * (m_iSplatHeight - 1));
+	if (vLocalPos.x < 0.f || vLocalPos.z < 0.f ||
+		vLocalPos.x > terrainSizeX || vLocalPos.z > terrainSizeZ)
+		return;
+
+	int centerX = (int)(vLocalPos.x / terrainSizeX * (m_iSplatWidth - 1));
+	int centerY = (int)(vLocalPos.z / terrainSizeZ * (m_iSplatHeight - 1));
+
+	centerX = std::clamp(centerX, 0, (int)m_iSplatWidth - 1);
+	centerY = std::clamp(centerY, 0, (int)m_iSplatHeight - 1);
+
+#if _DEBUG
+	m_bHasSplatDebug = true;
+
+	m_vDebugPickLocal = vLocalPos;
+
+	m_iDebugSplatX = centerX;
+	m_iDebugSplatY = centerY;
+
+	m_fDebugReconLocalX =
+		(float)centerX / (float)(m_iSplatWidth - 1) * terrainSizeX;
+
+	m_fDebugReconLocalZ =
+		(float)centerY / (float)(m_iSplatHeight - 1) * terrainSizeZ;
+
+	m_fDebugErrorX = m_fDebugReconLocalX - vLocalPos.x;
+	m_fDebugErrorZ = m_fDebugReconLocalZ - vLocalPos.z;
+#endif
 
 	int radius = (int)m_fBrushRadius;
 
@@ -579,11 +563,10 @@ void Terrain::Paint_Splat(_float3 vWorldPos)
 
 			_float4& pixel = m_SplatPixels[y * m_iSplatWidth + x];
 
-			float r = pixel.x; // Grass
-			float g = pixel.y; // Mud
-			float b = pixel.z; // Road
+			float r = pixel.x;
+			float g = pixel.y;
+			float b = pixel.z;
 
-			// 선택한 채널 쪽으로 부드럽게 보간
 			float targetR = (m_iPaintChannel == 0) ? 1.f : 0.f;
 			float targetG = (m_iPaintChannel == 1) ? 1.f : 0.f;
 			float targetB = (m_iPaintChannel == 2) ? 1.f : 0.f;
@@ -598,9 +581,9 @@ void Terrain::Paint_Splat(_float3 vWorldPos)
 
 			float total = (std::max)(r + g + b, 0.0001f);
 
-			pixel.x = r / total; // R = Grass
-			pixel.y = g / total; // G = Mud
-			pixel.z = b / total; // B = Road
+			pixel.x = r / total;
+			pixel.y = g / total;
+			pixel.z = b / total;
 			pixel.w = 1.f;
 		}
 	}
@@ -662,7 +645,7 @@ _bool Terrain::Picking_Terrain_ForNavMesh(_float3& vPickingPoint)
 
 	XMVECTOR nearestHitLocal = XMVectorZero();
 
-	// NavMesh 찍을 때는 캐시 쓰지 말고 전체 Terrain 검사
+	// NavMesh 찍을 때는 전체 Terrain 검사
 	for (size_t i = 0; i < indices->size(); i += 3)
 	{
 		XMVECTOR v0 = XMLoadFloat3(&(*vertices)[(*indices)[i]].vPosition);

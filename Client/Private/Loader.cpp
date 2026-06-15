@@ -19,8 +19,12 @@
 #include "Player_Mouse.h"
 #include "BossMonster.h"
 #include "Boss_Weapon.h"
-CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
-	: m_pDevice{ pDevice }
+#include "Block.h"
+#include "InteractBox.h"
+#include "FindUI.h"
+
+
+CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
 	, m_pContext{ pContext }
 {
 }
@@ -166,6 +170,55 @@ HRESULT CLoader::Loading_For_MapEditor()
 		/* For.Prototype_Com_Texture_MouseMarker */
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_MouseMarker"),
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/point_scan.png"), 1))))
+			return E_FAIL;
+
+
+		/* For.Prototype_Com_Texture_Inven_Gun */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Inven_Gun"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Inven/UI_Inven_Gun.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_Inven_Clothes */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Inven_Clothes"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Inven/UI_Inven_Clothes.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_Inven_Head */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Inven_Head"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Inven/UI_Inven_Head.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_Inven_Swords */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Inven_Swords"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Inven/UI_Inven_Swords.png"), 1))))
+			return E_FAIL;
+
+
+
+
+
+		/* For.Prototype_Com_Texture_UI_BaseRectCustom */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_BaseRectCustom"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Inven/UI_BaseRect0.png"), 1))))
+			return E_FAIL;
+
+
+
+
+		/* For.Prototype_Com_Texture_UI_BaseRectCustom1 */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_BaseRectCustom1"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Inven/UI_BaseRect1.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_UI_BaseRectItemRect */
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_BaseRectItemRect"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Inven/UI_BaseItemRect.png"), 1))))
+			return E_FAIL;
+
+
+		/* For.Prototype_Com_Texture_UI_Item_Gun2*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Gun2"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/MachineGun01.png"), 1))))
 			return E_FAIL;
 
 
@@ -435,8 +488,8 @@ HRESULT CLoader::Loading_For_MapEditor()
 		MainUI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	/* For.Prototype_GameObject_EvenUI */
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_EvenUI"),
+	/* For.Prototype_GameObject_InvenUI */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_InvenUI"),
 		InvenUI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
@@ -463,6 +516,22 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossMonster"),
 		BossMonster::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	/* For.Prototype_GameObject_Block */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Block"),
+		Block::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_InteractBox */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_InteractBox"),
+		InteractBox::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_FindUI */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_FindUI"),
+		FindUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 
 
 

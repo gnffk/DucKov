@@ -26,7 +26,15 @@ private:
 	int         m_iSelectedLight = -1;
 	LIGHT_DESC  m_DebugCreateLightDesc{};
 	bool        m_bDebugCreateLightInit = false;
+private:
+	char m_szLightJsonPath[MAX_PATH] = "../../Resources/Data/Light/Lights.json";
+
+
 #endif
+
+public:
+	HRESULT Save_Lights_ToJson(const _wstring& strFilePath);
+	HRESULT Load_Lights_FromJson(const _wstring& strFilePath);
 
 private:
 	ComPtr<ID3D11Device>				m_pDevice = { nullptr };

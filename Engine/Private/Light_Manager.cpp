@@ -5,7 +5,7 @@ Light_Manager::Light_Manager(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceCo
     : m_pDevice{ pDevice }
     , m_pContext{ pContext }
 {
-
+ 
 }
 
 Light_Manager::~Light_Manager()
@@ -188,8 +188,199 @@ void Light_Manager::ImGui_Render()
         ImGui::PopID();
     }
 
+    ImGui::Separator();
+
+    if (ImGui::CollapsingHeader("Light File", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::InputText("Json Path", m_szLightJsonPath, MAX_PATH);
+
+        if (ImGui::Button("Save Lights"))
+        {
+            wchar_t wszPath[MAX_PATH] = {};
+            MultiByteToWideChar(CP_ACP, 0, m_szLightJsonPath, -1, wszPath, MAX_PATH);
+
+            Save_Lights_ToJson(wszPath);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Load Lights"))
+        {
+            wchar_t wszPath[MAX_PATH] = {};
+            MultiByteToWideChar(CP_ACP, 0, m_szLightJsonPath, -1, wszPath, MAX_PATH);
+
+            Load_Lights_FromJson(wszPath);
+        }
+    }
+
     ImGui::End();
 }
 
 
 #endif
+
+static const char* LightType_ToString(LIGHT eType)
+{
+    switch (eType)
+    {
+    case LIGHT::DIRECTIONAL:
+        return "Directional";
+
+    case LIGHT::POINT:
+        return "Point";
+
+    default:
+        return "Unknown";
+    }
+}
+
+static LIGHT String_ToLightType(const std::string& strType)
+{
+    if (strType == "Directional")
+        return LIGHT::DIRECTIONAL;
+
+    if (strType == "Point")
+        return LIGHT::POINT;
+
+    return LIGHT::END;
+}
+
+static nlohmann::json Float4_ToJson(const XMFLOAT4& v)
+{
+    return nlohmann::json::array({ v.x, v.y, v.z, v.w });
+}
+
+static XMFLOAT4 Json_ToFloat4(const nlohmann::json& j)
+{
+    XMFLOAT4 v{};
+
+    if (j.is_array() && j.size() >= 4)
+    {
+        v.x = j[0].get<float>();
+        v.y = j[1].get<float>();
+        v.z = j[2].get<float>();
+        v.w = j[3].get<float>();
+    }
+
+    return v;
+}
+
+static nlohmann::json LightDesc_ToJson(const LIGHT_DESC& Desc)
+{
+    nlohmann::json j;
+
+    j["type"] = LightType_ToString(Desc.eType);
+
+    j["diffuse"] = Float4_ToJson(Desc.vDiffuse);
+    j["ambient"] = Float4_ToJson(Desc.vAmbient);
+    j["specular"] = Float4_ToJson(Desc.vSpecular);
+
+    j["direction"] = Float4_ToJson(Desc.vDirection);
+    j["position"] = Float4_ToJson(Desc.vPosition);
+
+    j["range"] = Desc.fRange;
+
+    return j;
+}
+
+static LIGHT_DESC Json_ToLightDesc(const nlohmann::json& j)
+{
+    LIGHT_DESC Desc{};
+
+    Desc.eType = String_ToLightType(j.value("type", "Unknown"));
+
+    Desc.vDiffuse = Json_ToFloat4(j.value("diffuse", nlohmann::json::array({ 1.f, 1.f, 1.f, 1.f })));
+    Desc.vAmbient = Json_ToFloat4(j.value("ambient", nlohmann::json::array({ 0.2f, 0.2f, 0.2f, 1.f })));
+    Desc.vSpecular = Json_ToFloat4(j.value("specular", nlohmann::json::array({ 1.f, 1.f, 1.f, 1.f })));
+
+    Desc.vDirection = Json_ToFloat4(j.value("direction", nlohmann::json::array({ 0.f, -1.f, 0.f, 0.f })));
+    Desc.vPosition = Json_ToFloat4(j.value("position", nlohmann::json::array({ 0.f, 5.f, 0.f, 1.f })));
+
+    Desc.fRange = j.value("range", 10.f);
+
+    return Desc;
+}
+
+HRESULT Light_Manager::Save_Lights_ToJson(const _wstring& strFilePath)
+{
+    nlohmann::json Root;
+    Root["lights"] = nlohmann::json::array();
+
+    for (auto& pLight : m_Lights)
+    {
+        if (nullptr == pLight)
+            continue;
+
+        const LIGHT_DESC& Desc = pLight->Get_LightDesc();
+
+        Root["lights"].push_back(LightDesc_ToJson(Desc));
+    }
+
+    try
+    {
+        std::filesystem::path path(strFilePath);
+
+        if (path.has_parent_path())
+            std::filesystem::create_directories(path.parent_path());
+
+        std::ofstream ofs(path);
+
+        if (!ofs.is_open())
+            return E_FAIL;
+
+        ofs << Root.dump(4);
+        ofs.close();
+    }
+    catch (...)
+    {
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+HRESULT Light_Manager::Load_Lights_FromJson(const _wstring& strFilePath)
+{
+    try
+    {
+        std::filesystem::path path(strFilePath);
+
+        std::ifstream ifs(path);
+
+        if (!ifs.is_open())
+            return E_FAIL;
+
+        nlohmann::json Root;
+        ifs >> Root;
+        ifs.close();
+
+        if (!Root.contains("lights") || false == Root["lights"].is_array())
+            return E_FAIL;
+
+        m_Lights.clear();
+
+        for (auto& LightJson : Root["lights"])
+        {
+            LIGHT_DESC Desc = Json_ToLightDesc(LightJson);
+
+            if (Desc.eType == LIGHT::END)
+                continue;
+
+            if (FAILED(Add_Light(Desc)))
+                return E_FAIL;
+        }
+
+#ifdef _DEBUG
+        if (m_Lights.empty())
+            m_iSelectedLight = -1;
+        else
+            m_iSelectedLight = 0;
+#endif
+    }
+    catch (...)
+    {
+        return E_FAIL;
+    }
+
+    return S_OK;
+}

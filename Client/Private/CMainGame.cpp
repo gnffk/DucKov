@@ -76,7 +76,7 @@ HRESULT CMainGame::Ready_Fonts()
 	*/
 
 
-	if (FAILED(CGameInstance::Get().Add_Font(TEXT("Font_Default"), TEXT("../../Resources/Fonts/160ex.spriteFont"))))
+	if (FAILED(CGameInstance::Get().Add_Font(TEXT("Font_Default"), TEXT("../../Resources/Fonts/160.spriteFont"))))
 		return E_FAIL;
 
 	return S_OK;

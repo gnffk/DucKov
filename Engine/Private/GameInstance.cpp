@@ -14,6 +14,8 @@
 #include "UI_Manager.h"
 #include "Target_Manager.h"
 #include "Light_Manager.h"
+#include "Picking.h"
+
 
 CGameInstance::CGameInstance()
 {
@@ -90,12 +92,18 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pLight_Manager)
         return E_FAIL;
 
+    m_pPicking = Picking::Create(pOutDevice, pOutDeviceContext, Engine_Desc.hWnd);
+    if (nullptr == m_pPicking)
+        return E_FAIL;
+
 
     return S_OK;
 }
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+    m_pPicking->Update();
+
     m_pKey_Manager->Update_InputDev();
 
     m_pImGUI_Manager->Update_Imgui(fTimeDelta);
@@ -525,6 +533,15 @@ HRESULT CGameInstance::Render_Lights(shared_ptr<class Shader> pShader, shared_pt
 }
 #pragma endregion
 
+#pragma region PICKING
+_bool CGameInstance::Picking_to_Shader(_float4* pOut)
+{
+
+    return m_pPicking->Picking_to_Shader(pOut);
+}
+
+
+#pragma endregion
 
 void CGameInstance::Release_Engine()
 {

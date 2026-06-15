@@ -44,6 +44,11 @@ private:
 
 	HRESULT Ready_NonAnimMaterial(ifstream& _file, const char* modelFileName);
 
+
+public:
+	HRESULT Save_Instances_JSON(const char* pFilePath);
+	HRESULT Load_Instances_JSON(const char* pFilePath);
+
 private:
 
 	_float4x4				m_PreTransformMatrix = {};

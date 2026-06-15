@@ -163,6 +163,18 @@
     <Filter Include="02. GameObject\Monster\BossMonster\Pattern">
       <UniqueIdentifier>{1373312f-f9cc-4072-b258-4418c2085480}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\InteractObject">
+      <UniqueIdentifier>{48cf7ac7-4b6e-49f8-b8d2-a3860e19ee19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\InteractObject\Block">
+      <UniqueIdentifier>{23f44372-ef9f-4eb4-9a2f-d410d1cb8c5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\InteractObject\InteractBox">
+      <UniqueIdentifier>{d07a4732-788d-4596-838b-2a1ddfb2a0a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\InteractObject\InteractBox\UI">
+      <UniqueIdentifier>{61c43ec5-3ec4-46b0-bb41-76d1978e6331}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -321,6 +333,15 @@
     <ClInclude Include="..\Public\BossPattern.h">
       <Filter>02. GameObject\Monster\BossMonster\Pattern</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Block.h">
+      <Filter>02. GameObject\InteractObject\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InteractBox.h">
+      <Filter>02. GameObject\InteractObject\InteractBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FindUI.h">
+      <Filter>02. GameObject\InteractObject\InteractBox\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -476,6 +497,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\BossPattern.cpp">
       <Filter>02. GameObject\Monster\BossMonster\Pattern</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Block.cpp">
+      <Filter>02. GameObject\InteractObject\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InteractBox.cpp">
+      <Filter>02. GameObject\InteractObject\InteractBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FindUI.cpp">
+      <Filter>02. GameObject\InteractObject\InteractBox\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

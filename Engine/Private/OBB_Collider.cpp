@@ -65,12 +65,13 @@ HRESULT OBB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_b
     case  ColliderColor::GREEN:
     {
         XMStoreFloat4(&m_color, { 0.f, 255.f, 0.f, 0.f });
+        m_Owner->SetCollision(false);
     }
     break;
     case  ColliderColor::RED:
     {
         XMStoreFloat4(&m_color, { 255.f, 0.f, 0.f, 0.f });
-
+        m_Owner->SetCollision(true);
     }
     break;
     case  ColliderColor::BLACK:

@@ -31,6 +31,7 @@ public:
 	virtual HRESULT Render() override;
 	HRESULT Ready_Components();
 
+	HRESULT Render_GUI();
 
 private:
 	uint32_t			m_iData = {};
@@ -62,13 +63,17 @@ private:
 	_float  m_fScaleMin = 0.8f;
 	_float  m_fScaleMax = 1.3f;
 
-	_float3 m_vBrushPickingPoint = {};
+	_float4 m_vBrushPickingPoint = {};
 	_bool   m_bBrushPicked = false;
 
 public:
 	void GUI_TreeBrush();
 	void Update_TreeBrush(_float fTimeDelta);
 
+public:
+	HRESULT Save_Trees_JSON(const char* pFilePath);
+	HRESULT Load_Trees_JSON(const char* pFilePath);
+	char m_szTreeSavePath[260] = "../../Resources/Data/Instance/TreeData.json";
 
 public:
 	static unique_ptr<Tree> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

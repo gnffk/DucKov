@@ -165,6 +165,11 @@ public:
 
 #pragma endregion
 
+#pragma region PICKING
+	_bool Picking_to_Shader(_float4* pOut);
+#pragma endregion
+
+
 private:
 	_float2											m_vViewportSize = {};
 	uint32_t										m_iCurrentLevel = {};
@@ -183,7 +188,8 @@ private:
 	unique_ptr<class Font_Manager>					m_pFont_Manager = { nullptr };
 	unique_ptr<class UI_Manager>					m_pUI_Manager = { nullptr };
 	unique_ptr<class Target_Manager>				m_pTarget_Manager = { nullptr };
-	unique_ptr<class Light_Manager>				m_pLight_Manager = { nullptr };
+	unique_ptr<class Light_Manager>					m_pLight_Manager = { nullptr };
+	unique_ptr<class Picking>						m_pPicking = { nullptr };
 
 public:
 	void			Release_Engine();

@@ -13,22 +13,7 @@ NS_BEGIN(Client)
 class MainUI final : public UIObject
 {
 private:
-    typedef struct tagUIRect
-    {
-        wstring strName = L"";
-        wstring strTextureTag = L"";
 
-        shared_ptr<Texture> pTexture = nullptr;
-
-        _float2 vPos = {};
-        _float2 vSize = {};
-        _float  fDepth = 0.f;
-        _float4 vColor = { 1.f,1.f,1.f,1.f };
-        float fAlpha = 1.f;
-        uint32_t iTextureIndex = 0;
-        _bool bVisible = true;
-
-    } UI_RECT;
 
 private:
     MainUI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

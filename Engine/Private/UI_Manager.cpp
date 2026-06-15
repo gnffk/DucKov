@@ -59,6 +59,7 @@ HRESULT UI_Manager::Render()
 {
   
 
+    Clear();
     return S_OK;
 }
 

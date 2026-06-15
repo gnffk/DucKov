@@ -187,6 +187,9 @@
     <Filter Include="99.Defines\Shader">
       <UniqueIdentifier>{b6d154b7-0001-4763-8952-e1e8370aa08a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="15.Picking">
+      <UniqueIdentifier>{187e7b3b-f50a-45b9-a17e-c3c14d766a6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -390,6 +393,9 @@
     <ClCompile Include="..\Private\Target_Manager.cpp">
       <Filter>14.RenderTargets\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Picking.cpp">
+      <Filter>15.Picking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -580,6 +586,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Target_Manager.h">
       <Filter>14.RenderTargets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Picking.h">
+      <Filter>15.Picking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

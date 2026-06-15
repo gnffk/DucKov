@@ -52,7 +52,13 @@ private:
 	_vector				m_vRollDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	float			m_fSpeedFloat{ 0.f };
 	
-	
+
+private:
+#ifdef _DEBUG
+	void			IMGUI_DEBUGRENDER();
+#endif
+private:
+	_bool m_bInventoryOpen = false;
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();
@@ -60,6 +66,7 @@ private:
 
 private:
 	_bool Collider_Obstacle(_float fTimeDelta);
+	_bool Collider_Box(_float fTimeDelta);
 public:
 	static unique_ptr<Player> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;

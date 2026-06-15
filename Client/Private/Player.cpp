@@ -81,6 +81,12 @@ void Player::Priority_Update(_float fTimeDelta)
 
 void Player::Update(_float fTimeDelta)
 {
+	if (CGameInstance::Get().Key_Down(DIK_I))
+	{
+		m_bInventoryOpen = !m_bInventoryOpen;
+	}
+
+
 	if (FAILED(Roll(fTimeDelta))) {
 		return;
 	}
@@ -99,14 +105,31 @@ void Player::Late_Update(_float fTimeDelta)
 
 	for (auto& Pair : m_pUI)
 	{
+		const string& strUIName = Pair.first;
 		auto pUIObject = Pair.second;
+
 		if (nullptr == pUIObject)
 			continue;
-		CGameInstance::Get().Add_UIObject(L"Player", static_pointer_cast<UIObject>(pUIObject));
-	}
 
+		// 인벤토리가 닫혀 있을 때는 InvenUI만 숨김
+		if (!m_bInventoryOpen)
+		{
+			if (strUIName == "InvenUI")
+				continue;
+		}
+
+		// 인벤토리가 열려 있을 때는 Mouse와 InvenUI만 보임
+		else
+		{
+			if (strUIName != "Player_Mouse" && strUIName != "InvenUI")
+				continue;
+		}
+
+		CGameInstance::Get().Add_UIObject(L"Player",static_pointer_cast<UIObject>(pUIObject));
+	}
 	__super::Late_Update(fTimeDelta);
 	Collider_Obstacle(fTimeDelta);
+	Collider_Box(fTimeDelta);
 	m_pPlayerFSM->Late_Update(fTimeDelta);
 }
 
@@ -467,11 +490,181 @@ HRESULT Player::Render()
 {
 #ifdef _DEBUG
 	m_pNavigationCom->Render();
-
+	IMGUI_DEBUGRENDER();
 #endif
 	return S_OK;
 }
 
+#ifdef _DEBUG
+void Player::IMGUI_DEBUGRENDER()
+{
+	//-----------------------------------------------Collider-------------------------------------------------
+	ImGui::Begin("Collider");
+
+	static int selectedCollider = -1;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.f);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8.f, 10.f));
+
+	ImGui::SeparatorText("Create Collider");
+
+	auto CreateUniqueColliderName = [&](const wstring& baseName)
+		{
+			wstring finalName = baseName;
+
+			int index = 1;
+
+			while (true)
+			{
+				auto iter =
+					m_Components.find(finalName);
+
+				if (iter == m_Components.end())
+					break;
+
+				finalName =
+					baseName + L"_" + to_wstring(index);
+
+				++index;
+			}
+
+			return finalName;
+		};
+
+	if (ImGui::Selectable("AABB Collider", selectedCollider == 0))
+	{
+		selectedCollider = 0;
+
+		auto pAABBCom =
+			dynamic_pointer_cast<BaseCollider>(
+				CGameInstance::Get().Clone_Prototype(
+					CGameInstance::Get().Get_Level(),
+					TEXT("Prototype_Com_AABB_Collider")));
+		pAABBCom->Set_Tag(COLLIDER::COLLIDER_AABB);
+		wstring componentName =
+			CreateUniqueColliderName(L"Com_AABBCollider");
+
+
+		__super::Add_Component(componentName, pAABBCom);
+
+		pAABBCom->SetOwner(SHARED_THIS(Player).get());
+		pAABBCom->Set_GroupTag(L"Player");
+		m_pColliderComs[(int)COLLIDER::COLLIDER_AABB].push_back(pAABBCom);
+	}
+
+	if (ImGui::Selectable("OBB Collider", selectedCollider == 1))
+	{
+		selectedCollider = 1;
+
+		auto pOBBCom =
+			dynamic_pointer_cast<BaseCollider>(
+				CGameInstance::Get().Clone_Prototype(
+					CGameInstance::Get().Get_Level(),
+					TEXT("Prototype_Com_OBB_Collider")));
+
+		pOBBCom->Set_Tag(COLLIDER::COLLIDER_OBB);
+		pOBBCom->Set_GroupTag(L"Player");
+		wstring componentName =
+			CreateUniqueColliderName(L"Com_OBBCollider");
+
+		__super::Add_Component(
+			componentName,
+			pOBBCom);
+
+		pOBBCom->SetOwner(
+			SHARED_THIS(Player).get());
+
+		m_pColliderComs[(int)COLLIDER::COLLIDER_OBB]
+			.push_back(pOBBCom);
+	}
+
+
+	if (ImGui::Selectable("Sphere Collider", selectedCollider == 2))
+	{
+		selectedCollider = 2;
+
+		auto pSphereCom =
+			dynamic_pointer_cast<BaseCollider>(
+				CGameInstance::Get().Clone_Prototype(
+					CGameInstance::Get().Get_Level(),
+					TEXT("Prototype_Com_Sphere_Collider")));
+		pSphereCom->Set_Tag(COLLIDER::COLLIDER_SPHERE);
+		wstring componentName =
+			CreateUniqueColliderName(L"Com_Sphere_Collider");
+
+
+		__super::Add_Component(
+			componentName,
+			pSphereCom);
+
+		pSphereCom->SetOwner(
+			SHARED_THIS(Player).get());
+		pSphereCom->Set_GroupTag(L"Player");
+		m_pColliderComs[(int)COLLIDER::COLLIDER_SPHERE]
+			.push_back(pSphereCom);
+	}
+
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	ImGui::TextDisabled("Click a collider type to add it.");
+
+
+	// =====================================================
+// Collider Settings
+// =====================================================
+
+	ImGui::Spacing();
+	ImGui::SeparatorText("Collider Settings");
+	for (int type = 0; type < (int)COLLIDER::COLLIDER_END; ++type)
+	{
+		auto& colliderList = m_pColliderComs[type];
+
+		for (size_t i = 0; i < colliderList.size(); ++i)
+		{
+			ImGui::PushID(type * 1000 + (int)i);
+
+			auto& collider = colliderList[i];
+
+			if (collider == nullptr)
+			{
+				ImGui::PopID();
+				continue;
+			}
+
+			string colliderTypeName;
+
+			switch ((COLLIDER)type)
+			{
+			case COLLIDER::COLLIDER_AABB:
+				colliderTypeName = "AABB";
+				break;
+
+			case COLLIDER::COLLIDER_OBB:
+				colliderTypeName = "OBB";
+				break;
+
+			case COLLIDER::COLLIDER_SPHERE:
+				colliderTypeName = "SPHERE";
+				break;
+			}
+
+			string headerName =
+				colliderTypeName + " Collider " + std::to_string(i);
+
+			if (ImGui::CollapsingHeader(headerName.c_str()))
+			{
+				collider->GUI_ColliderExtend();
+			}
+
+			ImGui::PopID();
+		}
+	}
+	ImGui::PopStyleVar(2);
+
+	ImGui::End();
+}
+#endif
 HRESULT Player::Ready_Components()
 {
 	auto m_pCollider = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
@@ -479,6 +672,10 @@ HRESULT Player::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pCollider)))
 		return E_FAIL;
 	m_pCollider->Set_GroupTag(L"Player");
+	m_pCollider->Set_Center(_float3{0.f, 0.6f, 0.f});
+	m_pCollider->Set_Extend(_float3{0.3f, 0.6f, 0.3f});
+
+	
 	m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].push_back(m_pCollider);
 
 	Navigation::NAVIGATION_DESC		NaviDesc{ 1 };
@@ -557,6 +754,7 @@ HRESULT Player::Ready_UI()
 	}
 
 
+	// UI는 오로지 UI_Manager안에서 관리하기 위해 Layer에 넣지 말기
 	UIObject::UIOBJECT_DESC DesUI{};
 	DesUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
 	DesUI.m_strName = L"MainUI";
@@ -568,13 +766,9 @@ HRESULT Player::Ready_UI()
 	DesUI.fSizeX = 1.f;
 	DesUI.fSizeY = 1.f;
 	DesUI.fX = 1.f;
-	DesUI.fY = 1.f;
+	DesUI.fY = 1.f;	
 
-	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"), CGameInstance::Get().Get_Level(), L"PlayerTag", &DesUI))
-		return E_FAIL;
-
-	m_pUI.emplace("MainUI", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"MainUI"));
-
+	m_pUI.emplace("MainUI", dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"), &DesUI)));
 
 
 	UIObject::UIOBJECT_DESC DesPlayerMouseUI{};
@@ -590,9 +784,24 @@ HRESULT Player::Ready_UI()
 	DesPlayerMouseUI.fX = 1.f;
 	DesPlayerMouseUI.fY = 1.f;
 
-	if (CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), L"Prototype_GameObject_Player_Mouse", CGameInstance::Get().Get_Level(), L"PlayerTag", &DesPlayerMouseUI))
-		return E_FAIL;
-	m_pUI.emplace("Player_Mouse", CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player_Mouse"));
+	m_pUI.emplace("Player_Mouse", dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Mouse"), &DesPlayerMouseUI)));
+
+	UIObject::UIOBJECT_DESC DesPlayerInven{};
+	DesPlayerInven.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+	DesPlayerInven.m_strName = L"InvenUI";
+	DesPlayerInven.m_strPrototypeObjectName = L"Prototype_GameObject_InvenUI";
+	DesPlayerInven.m_strPrototypeBaseName = L"InvenUI";
+	DesPlayerInven.pCameraType = ETOUI(CAMERA::NONE);
+	DesPlayerInven.fSpeedPerSec = 5.f;
+	DesPlayerInven.fRotationPerSec = 1.f;
+	DesPlayerInven.fSizeX = 1.f;
+	DesPlayerInven.fSizeY = 1.f;
+	DesPlayerInven.fX = 1.f;
+	DesPlayerInven.fY = 1.f;
+
+	m_pUI.emplace("InvenUI", dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_InvenUI"), &DesPlayerInven)));
+
+
 
 	return S_OK;
 }
@@ -618,6 +827,32 @@ _bool Player::Collider_Obstacle(_float fTimeDelta)
 			}
 		}
 	
+	}
+
+	return _bool();
+}
+
+_bool Player::Collider_Box(_float fTimeDelta)
+{
+
+	auto ColliderGroup = CGameInstance::Get().GetColliderGroups(L"InteractBox");
+	auto ColliderPlayer = CGameInstance::Get().GetColliderGroups(L"Player");
+	if (ColliderGroup != nullptr && ColliderPlayer != nullptr) {
+		for (auto _PlayerCollider : *ColliderPlayer) {
+			for (auto Collider : *ColliderGroup)
+			{
+				if (CGameInstance::Get().Intersect(_PlayerCollider, Collider))
+				{
+
+					Collider->SetColliderColor(ColliderColor::RED);
+
+					_PlayerCollider->SetColliderColor(ColliderColor::RED);
+				}
+
+
+			}
+		}
+
 	}
 
 	return _bool();

@@ -146,7 +146,7 @@ void MapEditor::IMGUI_Render() {
 
 	IMGUI_OTHER_Render();
 
-	IMGUI_Level_Render();
+	//IMGUI_Level_Render();
     IMGUI_SaveLoad_Render();
     IMGUI_MadeFunction();
     IMGUI_AddPlayer();
@@ -236,10 +236,27 @@ void MapEditor::IMGUI_Level_Render()
                     OpenDataObject = true;
                     ImGui::OpenPopup("Select BossMonster");
                 }
+                else if (className == "Tree Instance")
+                {
+                    OpenDataObject = true;
+                    ImGui::OpenPopup("Select TreeInstance");
+                }
                 else if (className == "Obstacle")
                 {
                     OpenDataObject = true;
                     ImGui::OpenPopup("Select Obstacle");
+
+                }
+                else if (className == "Block")
+                {
+                    OpenDataObject = true;
+                    ImGui::OpenPopup("Select Block");
+
+                }
+                else if (className == "InteractBox")
+                {
+                    OpenDataObject = true;
+                    ImGui::OpenPopup("Select InteractBox");
 
                 }
              
@@ -616,6 +633,34 @@ void MapEditor::IMGUI_MadeFunction()
     ImGui::Spacing();
 
     // =====================================================
+    // Tree Instance
+    // =====================================================
+
+    ImGui::PushID("Tree Instance");
+
+    if (ImGui::Button("Tree Instance", buttonSize))
+    {
+    }
+
+    if (ImGui::BeginDragDropSource())
+    {
+        string className = "Tree Instance";
+
+        ImGui::SetDragDropPayload(
+            "GAME_OBJECT",
+            className.c_str(),
+            className.size() + 1);
+
+        ImGui::Text("Create Tree Instance");
+
+        ImGui::EndDragDropSource();
+    }
+
+    ImGui::PopID();
+
+    ImGui::Spacing();
+
+    // =====================================================
     // Obstacle
     // =====================================================
 
@@ -641,7 +686,67 @@ void MapEditor::IMGUI_MadeFunction()
 
     ImGui::PopID();
 
+
+    ImGui::Spacing();
+    // =====================================================
+    // Block
+    // =====================================================
+
+    ImGui::PushID("Block");
+
+    if (ImGui::Button("Block", buttonSize))
+    {
+    }
+
+    if (ImGui::BeginDragDropSource())
+    {
+        string className = "Block";
+
+        ImGui::SetDragDropPayload(
+            "GAME_OBJECT",
+            className.c_str(),
+            className.size() + 1);
+
+        ImGui::Text("Create Block");
+
+        ImGui::EndDragDropSource();
+    }
+
+    ImGui::PopID();
+
+    ImGui::Spacing();
+
+    // =====================================================
+    // Block
+    // =====================================================
+
+    ImGui::PushID("InteractBox");
+
+    if (ImGui::Button("InteractBox", buttonSize))
+    {
+    }
+
+    if (ImGui::BeginDragDropSource())
+    {
+        string className = "InteractBox";
+
+        ImGui::SetDragDropPayload(
+            "GAME_OBJECT",
+            className.c_str(),
+            className.size() + 1);
+
+        ImGui::Text("Create InteractBox");
+
+        ImGui::EndDragDropSource();
+    }
+
+    ImGui::PopID();
+
+    ImGui::Spacing();
+
+
     ImGui::End();
+
 
 }
 void MapEditor::IMGUI_ChoiceObject()
@@ -920,6 +1025,153 @@ void MapEditor::IMGUI_ChoiceObject()
 
         ImGui::EndPopup();
     }
+    if (ImGui::BeginPopupModal(
+        "Select TreeInstance",
+        nullptr,
+        ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        static char treeObjectName[128] = "Tree_Instance_Manager";
+        static char treeLayerName[128] = "Instance";
+
+        ImGui::Text("Create Tree Instance Manager");
+        ImGui::Separator();
+
+        ImGui::InputText(
+            "Object Name",
+            treeObjectName,
+            IM_ARRAYSIZE(treeObjectName));
+
+        ImGui::InputText(
+            "Layer Name",
+            treeLayerName,
+            IM_ARRAYSIZE(treeLayerName));
+
+        ImGui::Separator();
+
+        wstring inputName =
+            CGameInstance::Get().StringToWString(treeObjectName);
+
+        wstring inputLayer =
+            CGameInstance::Get().StringToWString(treeLayerName);
+
+        bool bNameEmpty =
+            strlen(treeObjectName) <= 0;
+
+        bool bLayerEmpty =
+            strlen(treeLayerName) <= 0;
+
+        bool bAlreadyExists =
+            false;
+
+        if (!bNameEmpty && !bLayerEmpty)
+        {
+            bAlreadyExists =
+                CGameInstance::Get().Find_Object(
+                    CGameInstance::Get().Get_Level(),
+                    inputLayer,
+                    inputName) != nullptr;
+        }
+
+        if (bAlreadyExists)
+        {
+            ImGui::TextDisabled("Tree Instance Manager already exists.");
+        }
+
+        bool canCreate =
+            !bNameEmpty &&
+            !bLayerEmpty &&
+            !bAlreadyExists;
+
+        if (!canCreate)
+            ImGui::BeginDisabled();
+
+        if (ImGui::Button(
+            "Create",
+            ImVec2(120.f, 35.f)))
+        {
+            GameObject::GAMEOBJECT_DESC descTree{};
+
+            descTree.ObjectType =
+                ETOUI(OBJECTTYPE::OBJECT_STATIC);
+
+            descTree.m_strName =
+                inputName;
+
+            descTree.m_strPrototypeObjectName =
+                L"Prototype_GameObject_Tree";
+
+            descTree.m_strPrototypeBaseName =
+                L"Tree";
+
+            descTree.pCameraType =
+                ETOUI(CAMERA::NONE);
+
+            descTree.fSpeedPerSec =
+                0.f;
+
+            descTree.fRotationPerSec =
+                0.f;
+
+            CGameInstance::Get().Add_GameObject_toLayer(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_GameObject_Tree"),
+                CGameInstance::Get().Get_Level(),
+                inputLayer,
+                &descTree);
+
+            auto pTree =
+                CGameInstance::Get().Find_Object(
+                    CGameInstance::Get().Get_Level(),
+                    inputLayer,
+                    inputName);
+
+            if (pTree)
+            {
+                CGameInstance::Get().SetSeletObject(
+                    pTree.get());
+            }
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (!canCreate)
+            ImGui::EndDisabled();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(
+            "Cancel",
+            ImVec2(120.f, 35.f)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (bAlreadyExists)
+        {
+            ImGui::Separator();
+
+            if (ImGui::Button(
+                "Select Existing",
+                ImVec2(250.f, 35.f)))
+            {
+                auto pTree =
+                    CGameInstance::Get().Find_Object(
+                        CGameInstance::Get().Get_Level(),
+                        inputLayer,
+                        inputName);
+
+                if (pTree)
+                {
+                    CGameInstance::Get().SetSeletObject(
+                        pTree.get());
+                }
+
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::EndPopup();
+    }
 
     if (ImGui::BeginPopupModal(
         "Select Obstacle",
@@ -1033,6 +1285,232 @@ void MapEditor::IMGUI_ChoiceObject()
             CGameInstance::Get().Add_GameObject_toLayer(
                 CGameInstance::Get().Get_Level(),
                 TEXT("Prototype_GameObject_Obstacle"),
+                CGameInstance::Get().Get_Level(),
+                CGameInstance::Get().StringToWString(obstacleLayerName),
+                &desc);
+    
+            CGameInstance::Get().SetSeletObject(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), inputLayer, desc.m_strName).get());
+
+            selectedMeshName.clear();
+            selectedMeshPath.clear();
+            selectedDisplayName.clear();
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (!canCreate)
+            ImGui::EndDisabled();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(
+            "Cancel",
+            ImVec2(120.f, 35.f)))
+        {
+            selectedMeshName.clear();
+            selectedMeshPath.clear();
+            selectedDisplayName.clear();
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopupModal(
+        "Select Block",
+        nullptr))
+    {
+        static char obstacleObjectName[128] = "";
+        static char obstacleLayerName[128] = "";
+
+        static bool useCollider = false;
+
+        static wstring selectedMeshName = L"";
+        static wstring selectedMeshPath = L"";
+        static string selectedDisplayName = "";
+
+        
+        filesystem::path rootPath = L"../../Resources/Model/StaticMesh";
+
+        ImGui::Text("Create StaticMesh");
+        ImGui::Separator();
+
+        ImGui::InputText("Object Name", obstacleObjectName,IM_ARRAYSIZE(obstacleObjectName));
+
+        ImGui::InputText( "Layer Name",obstacleLayerName,IM_ARRAYSIZE(obstacleLayerName));
+
+        ImGui::Separator();
+
+        ImGui::Text("Select StaticMesh");
+        ImGui::Separator();
+
+        ImGui::BeginChild( "StaticMeshTree", ImVec2(0.f, 300.f),true);
+
+        ShowStaticMeshTree(rootPath, selectedMeshName,selectedMeshPath,selectedDisplayName);
+
+        ImGui::EndChild();
+
+        ImGui::Separator();
+
+        if (selectedMeshName.empty())
+        {
+            ImGui::TextDisabled("Selected : None");
+        }
+        else
+        {
+            ImGui::Text("Selected : %s", selectedDisplayName.c_str());
+        }
+
+        ImGui::Separator();
+
+        ImGui::Checkbox("Use Collider", &useCollider);
+
+        ImGui::Separator();
+
+        bool canCreate = !selectedMeshName.empty()  && strlen(obstacleObjectName) > 0  && strlen(obstacleLayerName) > 0;
+
+        if (!canCreate)
+            ImGui::BeginDisabled();
+
+        if (ImGui::Button( "Create", ImVec2(120.f, 35.f)))
+        {
+            GameObject::GAMEOBJECT_DESC desc{};
+
+            desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+
+            wstring inputName = CGameInstance::Get().StringToWString( obstacleObjectName);
+            wstring inputLayer = CGameInstance::Get().StringToWString( obstacleLayerName);
+
+            if (inputName.empty())
+                inputName = selectedMeshName;
+
+            desc.m_strName = Make_UniqueObjectName(inputLayer, inputName);
+
+            desc.m_strPrototypeObjectName = L"Prototype_GameObject_Block";
+
+            desc.m_strPrototypeBaseName = selectedMeshName;
+
+            desc.m_bCollider = useCollider;
+
+            desc.pCameraType =ETOUI(CAMERA::NONE);
+
+            CGameInstance::Get().Add_GameObject_toLayer(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_GameObject_Block"),
+                CGameInstance::Get().Get_Level(),
+                CGameInstance::Get().StringToWString(obstacleLayerName),
+                &desc);
+    
+            CGameInstance::Get().SetSeletObject(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), inputLayer, desc.m_strName).get());
+
+            selectedMeshName.clear();
+            selectedMeshPath.clear();
+            selectedDisplayName.clear();
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (!canCreate)
+            ImGui::EndDisabled();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(
+            "Cancel",
+            ImVec2(120.f, 35.f)))
+        {
+            selectedMeshName.clear();
+            selectedMeshPath.clear();
+            selectedDisplayName.clear();
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopupModal(
+        "Select InteractBox",
+        nullptr))
+    {
+        static char obstacleObjectName[128] = "";
+        static char obstacleLayerName[128] = "";
+
+        static bool useCollider = false;
+
+        static wstring selectedMeshName = L"";
+        static wstring selectedMeshPath = L"";
+        static string selectedDisplayName = "";
+
+        
+        filesystem::path rootPath = L"../../Resources/Model/StaticMesh";
+
+        ImGui::Text("Create StaticMesh");
+        ImGui::Separator();
+
+        ImGui::InputText("Object Name", obstacleObjectName,IM_ARRAYSIZE(obstacleObjectName));
+
+        ImGui::InputText( "Layer Name",obstacleLayerName,IM_ARRAYSIZE(obstacleLayerName));
+
+        ImGui::Separator();
+
+        ImGui::Text("Select StaticMesh");
+        ImGui::Separator();
+
+        ImGui::BeginChild( "StaticMeshTree", ImVec2(0.f, 300.f),true);
+
+        ShowStaticMeshTree(rootPath, selectedMeshName,selectedMeshPath,selectedDisplayName);
+
+        ImGui::EndChild();
+
+        ImGui::Separator();
+
+        if (selectedMeshName.empty())
+        {
+            ImGui::TextDisabled("Selected : None");
+        }
+        else
+        {
+            ImGui::Text("Selected : %s", selectedDisplayName.c_str());
+        }
+
+        ImGui::Separator();
+
+        ImGui::Checkbox("Use Collider", &useCollider);
+
+        ImGui::Separator();
+
+        bool canCreate = !selectedMeshName.empty()  && strlen(obstacleObjectName) > 0  && strlen(obstacleLayerName) > 0;
+
+        if (!canCreate)
+            ImGui::BeginDisabled();
+
+        if (ImGui::Button( "Create", ImVec2(120.f, 35.f)))
+        {
+            GameObject::GAMEOBJECT_DESC desc{};
+
+            desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+
+            wstring inputName = CGameInstance::Get().StringToWString( obstacleObjectName);
+            wstring inputLayer = CGameInstance::Get().StringToWString( obstacleLayerName);
+
+            if (inputName.empty())
+                inputName = selectedMeshName;
+
+            desc.m_strName = Make_UniqueObjectName(inputLayer, inputName);
+
+            desc.m_strPrototypeObjectName = L"Prototype_GameObject_InteractBox";
+
+            desc.m_strPrototypeBaseName = selectedMeshName;
+
+            desc.m_bCollider = useCollider;
+
+            desc.pCameraType =ETOUI(CAMERA::NONE);
+
+            CGameInstance::Get().Add_GameObject_toLayer(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_GameObject_InteractBox"),
                 CGameInstance::Get().Get_Level(),
                 CGameInstance::Get().StringToWString(obstacleLayerName),
                 &desc);
@@ -1187,9 +1665,7 @@ void MapEditor::MousePicking()
 	
 }
 
-void MapEditor::FindStaticMeshFiles(
-    vector<string>& outDisplayNames,
-    vector<wstring>& outMeshNames)
+void MapEditor::FindStaticMeshFiles(vector<string>& outDisplayNames,vector<wstring>& outMeshNames)
 {
     outDisplayNames.clear();
     outMeshNames.clear();
@@ -1239,11 +1715,7 @@ void MapEditor::FindStaticMeshFiles(
     }
 }
 
-void  MapEditor::ShowStaticMeshTree(
-    const std::filesystem::path& rootPath,
-    wstring& selectedMeshName,
-    wstring& selectedMeshPath,
-    string& selectedDisplayName)
+void  MapEditor::ShowStaticMeshTree(const std::filesystem::path& rootPath, wstring& selectedMeshName,wstring& selectedMeshPath,string& selectedDisplayName)
 {
     namespace fs = std::filesystem;
     if (!fs::exists(rootPath))

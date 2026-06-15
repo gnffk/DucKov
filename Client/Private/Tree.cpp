@@ -65,6 +65,8 @@ HRESULT Tree::Render()
 	if (m_pModelCom == nullptr || m_pShaderCom == nullptr)
 		return E_FAIL;
 
+	Render_GUI();
+
 	_float4x4 View, Proj;
 	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
@@ -115,6 +117,33 @@ HRESULT Tree::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
 
+	return S_OK;
+}
+
+HRESULT Tree::Render_GUI()
+{
+	ImGui::Begin("Tree IMGUI");
+
+	if (ImGui::Button("Save Trees"))
+	{
+		if (SUCCEEDED(Save_Trees_JSON(m_szTreeSavePath)))
+			strcpy_s(m_szTreeSavePath, sizeof(m_szTreeSavePath), "Save Success");
+		else
+			strcpy_s(m_szTreeSavePath, sizeof(m_szTreeSavePath), "Save Failed");
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Load Trees"))
+	{
+		if (SUCCEEDED(Load_Trees_JSON(m_szTreeSavePath)))
+			strcpy_s(m_szTreeSavePath, sizeof(m_szTreeSavePath), "Load Success");
+		else
+			strcpy_s(m_szTreeSavePath, sizeof(m_szTreeSavePath), "Load Failed");
+	}
+
+
+	ImGui::End();
 	return S_OK;
 }
 
@@ -225,7 +254,7 @@ void Tree::Update_TreeBrush(_float fTimeDelta)
 
 	m_fBrushTimeAcc += fTimeDelta;
 
-	_float3 vPickingPoint = {};
+	_float4 vPickingPoint = {};
 
 	// 여기서 Terrain Picking 필요
 	// 네 엔진에 Terrain 객체 가져오는 방식에 맞춰서 수정해야 함
@@ -241,11 +270,9 @@ void Tree::Update_TreeBrush(_float fTimeDelta)
 	if (pTerrain == nullptr)
 		return;
 
-	if (pTerrain->Picking_Terrain(vPickingPoint) == false)
-	{
-		m_bBrushPicked = false;
-		return;
-	}
+
+	CGameInstance::Get().Picking_to_Shader(&vPickingPoint);
+
 
 	m_bBrushPicked = true;
 	m_vBrushPickingPoint = vPickingPoint;
@@ -262,7 +289,7 @@ void Tree::Update_TreeBrush(_float fTimeDelta)
 		{
 			for (int i = 0; i < m_iBrushCount; ++i)
 			{
-				_float3 vTreePos = vPickingPoint;
+				_float4 vTreePos = vPickingPoint;
 
 				float fRandomX = ((float)rand() / RAND_MAX) * 2.f - 1.f;
 				float fRandomZ = ((float)rand() / RAND_MAX) * 2.f - 1.f;
@@ -270,23 +297,16 @@ void Tree::Update_TreeBrush(_float fTimeDelta)
 				vTreePos.x += fRandomX * m_fBrushRadius;
 				vTreePos.z += fRandomZ * m_fBrushRadius;
 
-				float fScale =
-					m_fScaleMin +
-					((float)rand() / RAND_MAX) * (m_fScaleMax - m_fScaleMin);
+				float fScale =m_fScaleMin +((float)rand() / RAND_MAX) * (m_fScaleMax - m_fScaleMin);
 
-				float fYaw =
-					((float)rand() / RAND_MAX) * XM_2PI;
+				float fYaw =((float)rand() / RAND_MAX) * XM_2PI;
 
-				Add_Tree(
-					vTreePos,
-					_float3{ fScale, fScale, fScale },
-					fYaw
-				);
+				Add_Tree(_float3{ vTreePos.x,  vTreePos.y , vTreePos.z }, _float3{ fScale, fScale, fScale }, fYaw);
 			}
 		}
 		else
 		{
-			Erase_Tree(vPickingPoint, m_fBrushRadius);
+			Erase_Tree(_float3{ vPickingPoint.x,  vPickingPoint.y , vPickingPoint.z }, m_fBrushRadius);
 		}
 	}
 
@@ -298,6 +318,21 @@ void Tree::Update_TreeBrush(_float fTimeDelta)
 
 		m_fBrushTimeAcc = 0.f;
 
-		Erase_Tree(vPickingPoint, m_fBrushRadius);
+		Erase_Tree(_float3{ vPickingPoint.x,  vPickingPoint.y , vPickingPoint.z }, m_fBrushRadius);
 	}
+}
+HRESULT Tree::Save_Trees_JSON(const char* pFilePath)
+{
+	if (m_pModelCom == nullptr)
+		return E_FAIL;
+
+	return m_pModelCom->Save_Instances_JSON(pFilePath);
+}
+
+HRESULT Tree::Load_Trees_JSON(const char* pFilePath)
+{
+	if (m_pModelCom == nullptr)
+		return E_FAIL;
+
+	return m_pModelCom->Load_Instances_JSON(pFilePath);
 }

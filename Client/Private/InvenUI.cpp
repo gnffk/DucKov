@@ -37,12 +37,81 @@ HRESULT InvenUI::Initialize(void* pArg)
         return E_FAIL;
 
     m_UIRects.clear();
+    m_UITexts.clear();
+    m_InventorySlots.clear();
+    m_InventoryItems.clear();
+ 
 
-
-    if (FAILED(Add_UIRect(TEXT("Base_BackGround"), TEXT("Base_BackGround"), TEXT("Prototype_Com_Texture_Icon"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+    if (FAILED(Add_UIRect(TEXT("BackGround1"), TEXT("BackGround1"), TEXT("Prototype_Com_Texture_UI_BaseRectCustom"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
         return E_FAIL;
 
-  
+    if (FAILED(Add_UIRect(TEXT("BackGround2"), TEXT("BackGround2"), TEXT("Prototype_Com_Texture_UI_BaseRectCustom1"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("BackGround3"), TEXT("BackGround3"), TEXT("Prototype_Com_Texture_UI_BaseRectCustom1"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("Gun1_Box"), TEXT("Gun1_Box"), TEXT("Prototype_Com_Texture_UI_BaseRectItemRect"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("Gun2_Box"), TEXT("Gun2_Box"), TEXT("Prototype_Com_Texture_UI_BaseRectItemRect"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("melee_Box"), TEXT("melee_Box"), TEXT("Prototype_Com_Texture_UI_BaseRectItemRect"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("Clothes_Box"), TEXT("Clothes_Box"), TEXT("Prototype_Com_Texture_UI_BaseRectItemRect"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("Head_Box"), TEXT("Head_Box"), TEXT("Prototype_Com_Texture_UI_BaseRectItemRect"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+
+    if (FAILED(Add_UIRect(TEXT("Gun1"), TEXT("Gun1"), TEXT("Prototype_Com_Texture_Inven_Gun"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("Gun2"), TEXT("Gun2"), TEXT("Prototype_Com_Texture_Inven_Gun"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("melee"), TEXT("melee"), TEXT("Prototype_Com_Texture_Inven_Swords"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("Clothes"), TEXT("Clothes"), TEXT("Prototype_Com_Texture_Inven_Clothes"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+    if (FAILED(Add_UIRect(TEXT("Head"), TEXT("Head"), TEXT("Prototype_Com_Texture_Inven_Head"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+        return E_FAIL;
+
+
+
+
+    if (FAILED(Add_UIText(TEXT("Text_Equip"), TEXT("Font_Default"),TEXT("장비"),  { 1100.f, 0.f }, 1.f,  { 1.f, 1.f, 1.f, 1.f })))
+        return E_FAIL;
+
+    if (FAILED(Add_UIText(TEXT("Text_Bag"), TEXT("Font_Default"),TEXT("가방"),  { 1100.f, 0.f }, 1.f,  { 1.f, 1.f, 1.f, 1.f })))
+        return E_FAIL;
+
+    if (FAILED(Add_UIText(TEXT("Text_Gun1"), TEXT("Font_Default"),TEXT("총기"),  { 1100.f, 0.f }, 1.f,  { 1.f, 1.f, 1.f, 1.f })))
+        return E_FAIL;
+    if (FAILED(Add_UIText(TEXT("Text_Gun2"), TEXT("Font_Default"),TEXT("총기"),  { 1100.f, 0.f }, 1.f,  { 1.f, 1.f, 1.f, 1.f })))
+        return E_FAIL;
+    if (FAILED(Add_UIText(TEXT("Text_melee"), TEXT("Font_Default"),TEXT("근접 무기"),  { 1100.f, 0.f }, 1.f,  { 1.f, 1.f, 1.f, 1.f })))
+        return E_FAIL;
+    if (FAILED(Add_UIText(TEXT("Text_Clothes"), TEXT("Font_Default"),TEXT("신체"),  { 1100.f, 0.f }, 1.f,  { 1.f, 1.f, 1.f, 1.f })))
+        return E_FAIL;
+    if (FAILED(Add_UIText(TEXT("Text_Head"), TEXT("Font_Default"),TEXT("머리"),  { 1100.f, 0.f }, 1.f,  { 1.f, 1.f, 1.f, 1.f })))
+        return E_FAIL;
+
+    // 가방 5x5 슬롯 생성
+    if (FAILED(Ready_InventorySlots()))
+        return E_FAIL;
+
+    // 아이템 생성
+    if (FAILED(Ready_InventoryItems()))
+        return E_FAIL;
+
+    Load_UIRects(TEXT("../../Resources/Data/UI/InvenUI.txt"));
+    Load_UITexts(TEXT("../../Resources/Data/UI/InvenUI_Text.txt"));
 
     return S_OK;
 }
@@ -53,14 +122,21 @@ void InvenUI::Priority_Update(_float fTimeDelta)
 
 void InvenUI::Update(_float fTimeDelta)
 {
+
+    Update_Inventory(fTimeDelta);
+
 #ifdef _DEBUG
-    GUI_MainUI();
+    GUI_InvenUI();
 #endif
+
+
+
+
 }
 
 void InvenUI::Late_Update(_float fTimeDelta)
 {
-    CGameInstance::Get().Add_RenderObject(RENDERGROUP::UI, SHARED_THIS(InvenUI));
+   
 }
 
 HRESULT InvenUI::Render()
@@ -71,85 +147,141 @@ HRESULT InvenUI::Render()
     if (nullptr == m_pVIBufferCom)
         return E_FAIL;
 
+    // 1. 아이템 아이콘 제외하고 일반 UI 먼저 렌더
     for (auto& Pair : m_UIRects)
     {
-        UI_RECT& UI = Pair.second;
+        const wstring& Key = Pair.first;
 
-        if (false == UI.bVisible)
+        if (Is_ItemIconKey(Key))
             continue;
 
-        if (nullptr == UI.pTexture)
+        if (FAILED(Render_UIRect_ByKey(Key)))
+            return E_FAIL;
+    }
+
+    // 2. 아이템 아이콘을 나중에 렌더
+    for (auto& Item : m_InventoryItems)
+    {
+        if (FAILED(Render_UIRect_ByKey(Item.strIconRectKey)))
+            return E_FAIL;
+    }
+
+    // 3. 글자는 제일 마지막
+    for (auto& Pair : m_UITexts)
+    {
+        UI_TEXT& Text = Pair.second;
+
+        if (false == Text.bVisible)
             continue;
 
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &UI.fAlpha, sizeof(float))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &UI.vColor, sizeof(_float4))))
-            return E_FAIL;
+        Text.fScale = std::clamp(Text.fScale, 0.01f, 10.f);
 
-        if (FAILED(Render_UIRect(UI)))
-            return E_FAIL;
+        Text.vColor.x = std::clamp(Text.vColor.x, 0.f, 1.f);
+        Text.vColor.y = std::clamp(Text.vColor.y, 0.f, 1.f);
+        Text.vColor.z = std::clamp(Text.vColor.z, 0.f, 1.f);
+        Text.vColor.w = std::clamp(Text.vColor.w, 0.f, 1.f);
+
+        CGameInstance::Get().Draw_Text(
+            Text.strFontTag,
+            Text.strText.c_str(),
+            Text.vPos,
+            Text.fScale,
+            XMLoadFloat4(&Text.vColor),
+            0.f,
+            _float2(0.f, 0.f)
+        );
     }
 
     return S_OK;
 }
-
-void InvenUI::GUI_MainUI()
+void InvenUI::GUI_InvenUI()
 {
 #ifdef _DEBUG
 
-    if (ImGui::Begin("MainUI Editor"))
-    {
-        ImGui::Text("UI Rect Count : %d", static_cast<int>(m_UIRects.size()));
+    string strWindowName = "InvenUI Editor##";
+    strWindowName += to_string(reinterpret_cast<size_t>(this));
 
+    if (ImGui::Begin(strWindowName.c_str()))
+    {
         if (ImGui::Button("Save UI"))
         {
-            Save_UIRects(TEXT("../../Resources/Data/UI/MainUI.txt"));
+            Save_UIRects(TEXT("../../Resources/Data/UI/InvenUI.txt"));
+            Save_UITexts(TEXT("../../Resources/Data/UI/InvenUI_Text.txt"));
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Load UI"))
         {
-            Load_UIRects(TEXT("../../Resources/Data/UI/MainUI.txt"));
+            Load_UIRects(TEXT("../../Resources/Data/UI/InvenUI.txt"));
+            Load_UITexts(TEXT("../../Resources/Data/UI/InvenUI_Text.txt"));
         }
-
 
         ImGui::Separator();
 
+        // =========================================================
+        // UI RECT EDITOR
+        // =========================================================
+        ImGui::Text("UI Rect Count : %d", static_cast<int>(m_UIRects.size()));
 
-
-        int i = 0;
+        int iRect = 0;
 
         for (auto& Pair : m_UIRects)
         {
             const wstring& UIName = Pair.first;
             UI_RECT& UI = Pair.second;
 
-            string strName(UIName.begin(), UIName.end());
+            string strName = CGameInstance::Get().WStringToString(UIName);
 
             string strHeader = "UI Rect ";
-            strHeader += to_string(i);
+            strHeader += to_string(iRect);
             strHeader += " : ";
             strHeader += strName;
 
+            ImGui::PushID(("Rect_" + strName).c_str());
+
             if (ImGui::CollapsingHeader(strHeader.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
             {
-                ImGui::PushID(i);
+                ImGui::Checkbox("Visible", reinterpret_cast<bool*>(&UI.bVisible));
 
-                bool bVisible = UI.bVisible;
-                if (ImGui::Checkbox("Visible", &bVisible))
-                {
-                    UI.bVisible = bVisible;
-                }
+                ImGui::DragFloat2(
+                    "Position",
+                    reinterpret_cast<float*>(&UI.vPos),
+                    1.f,
+                    -5000.f,
+                    5000.f
+                );
 
-                ImGui::DragFloat2("Position", reinterpret_cast<float*>(&UI.vPos), 1.f, -5000.f, 5000.f);
+                ImGui::DragFloat2(
+                    "Size",
+                    reinterpret_cast<float*>(&UI.vSize),
+                    1.f,
+                    0.f,
+                    5000.f
+                );
 
-                ImGui::DragFloat2("Size", reinterpret_cast<float*>(&UI.vSize), 1.f, 0.f, 5000.f);
+                ImGui::DragFloat(
+                    "Depth",
+                    &UI.fDepth,
+                    0.001f,
+                    0.f,
+                    1.f
+                );
 
-                ImGui::DragFloat("Depth", &UI.fDepth, 0.001f, 0.f, 1.f);
-                ImGui::SliderFloat("Alpha", &UI.fAlpha, 0.f, 1.f);
-                ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&UI.vColor));
+                ImGui::SliderFloat(
+                    "Alpha",
+                    &UI.fAlpha,
+                    0.f,
+                    1.f
+                );
+
+                ImGui::ColorEdit4(
+                    "Color",
+                    reinterpret_cast<float*>(&UI.vColor)
+                );
+
                 int iTexIndex = static_cast<int>(UI.iTextureIndex);
+
                 if (ImGui::InputInt("Texture Index", &iTexIndex))
                 {
                     if (iTexIndex < 0)
@@ -158,29 +290,111 @@ void InvenUI::GUI_MainUI()
                     UI.iTextureIndex = static_cast<int>(iTexIndex);
                 }
 
+                string strTextureTag = CGameInstance::Get().WStringToString(UI.strTextureTag);
+
                 ImGui::Text("Texture Prototype");
-
-                string strTextureTag(
-                    UI.strTextureTag.begin(),
-                    UI.strTextureTag.end());
-
                 ImGui::Text("%s", strTextureTag.c_str());
 
-                if (ImGui::Button("Reset"))
+                if (ImGui::Button("Reset Rect"))
                 {
                     UI.vPos = { 50.f, 50.f };
                     UI.vSize = { 64.f, 64.f };
                     UI.fDepth = 0.f;
                     UI.bVisible = true;
                     UI.iTextureIndex = 0;
+                    UI.fAlpha = 1.f;
+                    UI.vColor = { 1.f, 1.f, 1.f, 1.f };
                 }
-
-                ImGui::PopID();
             }
+
+            ImGui::PopID();
 
             ImGui::Separator();
 
-            ++i;
+            ++iRect;
+        }
+
+        // =========================================================
+        // FONT TEXT EDITOR
+        // =========================================================
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Text("Font Text Count : %d", static_cast<int>(m_UITexts.size()));
+
+        int iText = 0;
+
+        for (auto& Pair : m_UITexts)
+        {
+            const wstring& TextName = Pair.first;
+            UI_TEXT& Text = Pair.second;
+
+            string strName = CGameInstance::Get().WStringToString(TextName);
+
+            string strHeader = "Font Text ";
+            strHeader += to_string(iText);
+            strHeader += " : ";
+            strHeader += strName;
+
+            ImGui::PushID(("Text_" + strName).c_str());
+
+            if (ImGui::CollapsingHeader(strHeader.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Visible", reinterpret_cast<bool*>(&Text.bVisible));
+
+                ImGui::DragFloat2(
+                    "Text Position",
+                    reinterpret_cast<float*>(&Text.vPos),
+                    1.f,
+                    -5000.f,
+                    5000.f
+                );
+
+                ImGui::DragFloat(
+                    "Text Scale",
+                    &Text.fScale,
+                    0.01f,
+                    0.01f,
+                    10.f
+                );
+
+                ImGui::ColorEdit4(
+                    "Text Color",
+                    reinterpret_cast<float*>(&Text.vColor)
+                );
+
+                string strFontTag = CGameInstance::Get().WStringToString(Text.strFontTag);
+                string strText = CGameInstance::Get().WStringToString(Text.strText);
+
+                char szFontTag[256]{};
+                char szText[256]{};
+
+                strcpy_s(szFontTag, strFontTag.c_str());
+                strcpy_s(szText, strText.c_str());
+
+                if (ImGui::InputText("Font Tag", szFontTag, sizeof(szFontTag)))
+                {
+                    Text.strFontTag = CGameInstance::Get().StringToWString(szFontTag);
+                }
+
+                if (ImGui::InputText("Text", szText, sizeof(szText)))
+                {
+                    Text.strText = CGameInstance::Get().StringToWString(szText);
+                }
+
+                if (ImGui::Button("Reset Text"))
+                {
+                    Text.vPos = { 1100.f, 0.f };
+                    Text.fScale = 1.f;
+                    Text.vColor = { 1.f, 1.f, 1.f, 1.f };
+                    Text.bVisible = true;
+                }
+            }
+
+            ImGui::PopID();
+
+            ImGui::Separator();
+
+            ++iText;
         }
     }
 
@@ -188,7 +402,6 @@ void InvenUI::GUI_MainUI()
 
 #endif
 }
-
 HRESULT InvenUI::Render_UIRect(UI_RECT& UI)
 {
     _float2 vViewportSize = CGameInstance::Get().Get_ViewportSize();
@@ -231,9 +444,10 @@ HRESULT InvenUI::Ready_Components()
     return S_OK;
 }
 
-HRESULT InvenUI::Add_UIRect(const wstring& UIName, const wstring& strName, const wstring& strTextureTag, const _float2& vPos, const _float2& vSize, _float fDepth)
+HRESULT InvenUI::Add_UIRect(const wstring& UIName,const wstring& strName,const wstring& strTextureTag,const _float2& vPos,const _float2& vSize, _float fDepth)
 {
     UI_RECT UI{};
+
     UI.strName = strName;
     UI.strTextureTag = strTextureTag;
     UI.vPos = vPos;
@@ -242,8 +456,8 @@ HRESULT InvenUI::Add_UIRect(const wstring& UIName, const wstring& strName, const
     UI.iTextureIndex = 0;
     UI.bVisible = true;
 
-
-
+    UI.fAlpha = 1.f;
+    UI.vColor = { 1.f, 1.f, 1.f, 1.f };
 
     if (FAILED(__super::Add_Component(
         CGameInstance::Get().Get_Level(),
@@ -252,11 +466,26 @@ HRESULT InvenUI::Add_UIRect(const wstring& UIName, const wstring& strName, const
         UI.pTexture)))
         return E_FAIL;
 
-    m_UIRects[UIName] = (UI);
+    m_UIRects[UIName] = UI;
 
     return S_OK;
 }
 
+HRESULT InvenUI::Add_UIText(const wstring& TextName, const wstring& FontTag, const wstring& Text,const _float2& vPos,_float fScale,const _float4& vColor)
+{
+    UI_TEXT Desc{};
+
+    Desc.strFontTag = FontTag;
+    Desc.strText = Text;
+    Desc.vPos = vPos;
+    Desc.fScale = fScale;
+    Desc.vColor = vColor;
+    Desc.bVisible = true;
+
+    m_UITexts[TextName] = Desc;
+
+    return S_OK;
+}
 unique_ptr<InvenUI> InvenUI::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
     unique_ptr<InvenUI> pInstance = unique_ptr<InvenUI>(new InvenUI(pDevice, pContext));
@@ -306,7 +535,7 @@ HRESULT InvenUI::Save_UIRects(const wstring& strFilePath)
             << UI.fDepth << "|"
             << static_cast<int>(UI.bVisible) << "|"
             << UI.iTextureIndex << "|"
-            << UI.fAlpha
+            << UI.fAlpha << "|"
             << UI.vColor.x << "|"
             << UI.vColor.y << "|"
             << UI.vColor.z << "|"
@@ -395,6 +624,529 @@ HRESULT InvenUI::Load_UIRects(const wstring& strFilePath)
     }
 
     ifs.close();
+
+    return S_OK;
+}
+HRESULT InvenUI::Save_UITexts(const wstring& strFilePath)
+{
+    ofstream ofs(strFilePath);
+
+    if (!ofs.is_open())
+        return E_FAIL;
+
+    for (auto& Pair : m_UITexts)
+    {
+        const wstring& TextName = Pair.first;
+        const UI_TEXT& Text = Pair.second;
+
+        ofs
+            << CGameInstance::Get().WStringToString(TextName) << "|"
+            << CGameInstance::Get().WStringToString(Text.strFontTag) << "|"
+            << CGameInstance::Get().WStringToString(Text.strText) << "|"
+            << Text.vPos.x << "|"
+            << Text.vPos.y << "|"
+            << Text.fScale << "|"
+            << static_cast<int>(Text.bVisible) << "|"
+            << Text.vColor.x << "|"
+            << Text.vColor.y << "|"
+            << Text.vColor.z << "|"
+            << Text.vColor.w
+            << endl;
+    }
+
+    ofs.close();
+
+    return S_OK;
+}
+HRESULT InvenUI::Load_UITexts(const wstring& strFilePath)
+{
+    ifstream ifs(strFilePath);
+
+    if (!ifs.is_open())
+        return E_FAIL;
+
+    string strLine;
+
+    while (getline(ifs, strLine))
+    {
+        if (strLine.empty())
+            continue;
+
+        stringstream ss(strLine);
+        string token;
+        vector<string> Tokens;
+
+        while (getline(ss, token, '|'))
+            Tokens.push_back(token);
+
+        // 구버전 최소 형식:
+        // TextName | FontTag | Text | PosX | PosY | Visible
+        if (Tokens.size() < 6)
+            continue;
+
+        wstring TextName = CGameInstance::Get().StringToWString(Tokens[0]);
+
+        auto iter = m_UITexts.find(TextName);
+
+        // Initialize에서 만든 Text가 아니면 무시
+        if (iter == m_UITexts.end())
+            continue;
+
+        UI_TEXT& Text = iter->second;
+
+        try
+        {
+            Text.strFontTag = CGameInstance::Get().StringToWString(Tokens[1]);
+            Text.strText = CGameInstance::Get().StringToWString(Tokens[2]);
+
+            Text.vPos =
+            {
+                stof(Tokens[3]),
+                stof(Tokens[4])
+            };
+
+            // 신버전:
+            // 0 TextName
+            // 1 FontTag
+            // 2 Text
+            // 3 PosX
+            // 4 PosY
+            // 5 Scale
+            // 6 Visible
+            // 7 ColorR
+            // 8 ColorG
+            // 9 ColorB
+            // 10 ColorA
+            if (Tokens.size() >= 11)
+            {
+                Text.fScale = stof(Tokens[5]);
+                Text.bVisible = stoi(Tokens[6]) != 0;
+
+                Text.vColor =
+                {
+                    stof(Tokens[7]),
+                    stof(Tokens[8]),
+                    stof(Tokens[9]),
+                    stof(Tokens[10])
+                };
+            }
+            else
+            {
+                // 구버전 호환
+                Text.fScale = 1.f;
+                Text.bVisible = stoi(Tokens[5]) != 0;
+                Text.vColor = { 1.f, 1.f, 1.f, 1.f };
+            }
+
+            Text.fScale = std::clamp(Text.fScale, 0.01f, 10.f);
+
+            Text.vColor.x = std::clamp(Text.vColor.x, 0.f, 1.f);
+            Text.vColor.y = std::clamp(Text.vColor.y, 0.f, 1.f);
+            Text.vColor.z = std::clamp(Text.vColor.z, 0.f, 1.f);
+            Text.vColor.w = std::clamp(Text.vColor.w, 0.f, 1.f);
+        }
+        catch (...)
+        {
+            continue;
+        }
+    }
+
+    ifs.close();
+
+    return S_OK;
+}
+
+
+HRESULT InvenUI::Add_Item(const INV_ITEM& Item)
+{
+    int iEmptySlot = Find_EmptyBagSlot();
+
+    if (iEmptySlot == -1)
+    {
+        // 인벤토리 가방칸이 꽉 참
+        return E_FAIL;
+    }
+
+    if (Item.strTextureTag.empty())
+        return E_FAIL;
+
+    wchar_t szIconKey[128]{};
+
+    swprintf_s(szIconKey,TEXT("Item_Loot_%u"),m_iDynamicItemSerial++);
+
+    if (FAILED(Add_UIRect(szIconKey,szIconKey,Item.strTextureTag,{ 0.f, 0.f },Item.vIconSize, 0.0f)))
+        return E_FAIL;
+
+    auto iterIconRect = m_UIRects.find(szIconKey);
+
+    if (iterIconRect != m_UIRects.end())
+    {
+        iterIconRect->second.bVisible = false;
+        iterIconRect->second.fAlpha = 1.f;
+        iterIconRect->second.vColor = { 1.f, 1.f, 1.f, 1.f };
+    }
+
+    INV_ITEM NewItem{};
+
+    NewItem.strItemName = Item.strItemName;
+    NewItem.strIconRectKey = szIconKey;
+    NewItem.strTextureTag = Item.strTextureTag;
+    NewItem.eEquipKind = Item.eEquipKind;
+    NewItem.vIconSize = Item.vIconSize;
+
+    int iNewItemIndex = static_cast<int>(m_InventoryItems.size());
+
+    m_InventoryItems.push_back(NewItem);
+
+    m_InventorySlots[iEmptySlot].iItemIndex = iNewItemIndex;
+
+    Update_ItemIconPosition();
+
+    return S_OK;
+}
+
+int InvenUI::Find_EmptyBagSlot() const
+{
+    for (int i = 0; i < static_cast<int>(m_InventorySlots.size()); ++i)
+    {
+        const INV_SLOT& Slot = m_InventorySlots[i];
+
+        if (Slot.eKind != SLOT_KIND::BAG)
+            continue;
+
+        if (Slot.iItemIndex == -1)
+            return i;
+    }
+
+    return -1;
+}
+
+HRESULT InvenUI::Ready_InventorySlots()
+{
+  
+    m_InventorySlots.push_back({ TEXT("Gun1_Box"),    SLOT_KIND::GUN });
+    m_InventorySlots.push_back({ TEXT("Gun2_Box"),    SLOT_KIND::GUN });
+    m_InventorySlots.push_back({ TEXT("melee_Box"),   SLOT_KIND::MELEE });
+    m_InventorySlots.push_back({ TEXT("Head_Box"),    SLOT_KIND::HEAD });
+    m_InventorySlots.push_back({ TEXT("Clothes_Box"), SLOT_KIND::CLOTHES });
+
+    // 가방 5x5
+    const int iColCount = 5;
+    const int iRowCount = 5;
+
+    const float fStartX = 85.f;
+    const float fStartY = 365.f;
+    const float fSlotSize = 58.f;
+    const float fGap = 8.f;
+
+    for (int y = 0; y < iRowCount; ++y)
+    {
+        for (int x = 0; x < iColCount; ++x)
+        {
+            int iIndex = y * iColCount + x;
+
+            wchar_t szKey[64]{};
+            swprintf_s(szKey, TEXT("BagSlot_%02d"), iIndex);
+
+            _float2 vPos =
+            {
+                fStartX + x * (fSlotSize + fGap),
+                fStartY + y * (fSlotSize + fGap)
+            };
+
+            if (FAILED(Add_UIRect(szKey,szKey,TEXT("Prototype_Com_Texture_UI_BaseRectItemRect"),vPos,{ fSlotSize, fSlotSize }, 0.0f)))
+                return E_FAIL;
+
+            INV_SLOT Slot{};
+            Slot.strSlotRectKey = szKey;
+            Slot.eKind = SLOT_KIND::BAG;
+            Slot.iItemIndex = -1;
+            Slot.fNormalAlpha = 0.20f;
+            Slot.fHoverAlpha = 0.65f;
+
+            m_InventorySlots.push_back(Slot);
+        }
+    }
+
+    return S_OK;
+}
+
+HRESULT InvenUI::Ready_InventoryItems()
+{
+    // 예시 아이템 1개
+    if (FAILED(Add_UIRect(TEXT("Item_Bag01"), TEXT("Item_Bag01"), TEXT("Prototype_Com_Texture_Heart"), { 0.f, 0.f }, { 48.f, 48.f },0.0f)))
+        return E_FAIL;
+
+    INV_ITEM Item{};
+    Item.strItemName = TEXT("Lv3_Bag");
+    Item.strIconRectKey = TEXT("Item_Bag01");
+    Item.eEquipKind = SLOT_KIND::GUN;
+    Item.vIconSize = { 48.f, 48.f };
+
+    m_InventoryItems.push_back(Item);
+
+    // 아이템을 일단 첫 번째 가방 슬롯에 넣기
+    // 장비 슬롯 5개 이후부터 BagSlot_00임
+    const int iFirstBagSlotIndex = 5;
+    m_InventorySlots[iFirstBagSlotIndex].iItemIndex = 0;
+
+    return S_OK;
+}
+
+void InvenUI::Update_Inventory(_float fTimeDelta)
+{
+    m_vMouseUIPos = Get_MouseUIPos();
+
+    m_iHoverSlot = Find_Slot_ByMouse(m_vMouseUIPos);
+
+    Update_SlotHover();
+
+    if (CGameInstance::Get().Mouse_Down(MOUSEKEYSTATE::DIM_LB))
+    {
+        if (m_iHoverSlot != -1)
+            Begin_DragItem(m_iHoverSlot);
+    }
+
+    if (m_bDraggingItem)
+    {
+        if (CGameInstance::Get().Mouse_Up(MOUSEKEYSTATE::DIM_LB))
+        {
+            End_DragItem();
+        }
+    }
+
+    Update_ItemIconPosition();
+}
+
+_float2 InvenUI::Get_MouseUIPos()
+{
+    POINT pt{};
+    GetCursorPos(&pt);
+    ScreenToClient(g_hWnd, &pt);
+
+    return _float2(
+        static_cast<float>(pt.x),
+        static_cast<float>(pt.y)
+    );
+}
+
+_bool InvenUI::Is_PointInRect(const _float2& vPoint, const UI_RECT& Rect)
+{
+    float fHalfX = Rect.vSize.x * 0.5f;
+    float fHalfY = Rect.vSize.y * 0.5f;
+
+    if (vPoint.x < Rect.vPos.x - fHalfX)
+        return false;
+
+    if (vPoint.x > Rect.vPos.x + fHalfX)
+        return false;
+
+    if (vPoint.y < Rect.vPos.y - fHalfY)
+        return false;
+
+    if (vPoint.y > Rect.vPos.y + fHalfY)
+        return false;
+
+    return true;
+}
+
+int InvenUI::Find_Slot_ByMouse(const _float2& vMousePos)
+{
+    for (int i = 0; i < static_cast<int>(m_InventorySlots.size()); ++i)
+    {
+        const INV_SLOT& Slot = m_InventorySlots[i];
+
+        auto iter = m_UIRects.find(Slot.strSlotRectKey);
+        if (iter == m_UIRects.end())
+            continue;
+
+        UI_RECT& SlotRect = iter->second;
+
+        if (false == SlotRect.bVisible)
+            continue;
+
+        if (Is_PointInRect(vMousePos, SlotRect))
+            return i;
+    }
+
+    return -1;
+}
+
+void InvenUI::Update_SlotHover()
+{
+    for (int i = 0; i < static_cast<int>(m_InventorySlots.size()); ++i)
+    {
+        INV_SLOT& Slot = m_InventorySlots[i];
+
+        auto iter = m_UIRects.find(Slot.strSlotRectKey);
+        if (iter == m_UIRects.end())
+            continue;
+
+        UI_RECT& SlotRect = iter->second;
+
+        if (i == m_iHoverSlot)
+            SlotRect.fAlpha = Slot.fHoverAlpha;
+        else
+            SlotRect.fAlpha = Slot.fNormalAlpha;
+    }
+}
+
+void InvenUI::Begin_DragItem(int iSlotIndex)
+{
+    if (iSlotIndex < 0 || iSlotIndex >= static_cast<int>(m_InventorySlots.size()))
+        return;
+
+    INV_SLOT& Slot = m_InventorySlots[iSlotIndex];
+
+    if (Slot.iItemIndex == -1)
+        return;
+
+    m_bDraggingItem = true;
+    m_iDragSrcSlot = iSlotIndex;
+    m_iDraggingItem = Slot.iItemIndex;
+
+    // 드래그 중에는 원래 슬롯에서 잠깐 비운다.
+    Slot.iItemIndex = -1;
+}
+void InvenUI::End_DragItem()
+{
+    if (false == m_bDraggingItem)
+        return;
+
+    int iTargetSlot = Find_Slot_ByMouse(m_vMouseUIPos);
+
+    // 아무 슬롯에도 안 놓으면 원래 자리로 복귀
+    if (iTargetSlot == -1)
+    {
+        m_InventorySlots[m_iDragSrcSlot].iItemIndex = m_iDraggingItem;
+    }
+    else
+    {
+        if (Can_PlaceItem(iTargetSlot, m_iDraggingItem))
+        {
+            // 대상 슬롯에 이미 아이템이 있으면 서로 교환
+            int iTargetItem = m_InventorySlots[iTargetSlot].iItemIndex;
+
+            m_InventorySlots[iTargetSlot].iItemIndex = m_iDraggingItem;
+            m_InventorySlots[m_iDragSrcSlot].iItemIndex = iTargetItem;
+        }
+        else
+        {
+            // 장착 불가능한 슬롯이면 원래 자리로 복귀
+            m_InventorySlots[m_iDragSrcSlot].iItemIndex = m_iDraggingItem;
+        }
+    }
+
+    m_bDraggingItem = false;
+    m_iDragSrcSlot = -1;
+    m_iDraggingItem = -1;
+}
+_bool InvenUI::Can_PlaceItem(int iSlotIndex, int iItemIndex)
+{
+    if (iSlotIndex < 0 || iSlotIndex >= static_cast<int>(m_InventorySlots.size()))
+        return false;
+
+    if (iItemIndex < 0 || iItemIndex >= static_cast<int>(m_InventoryItems.size()))
+        return false;
+
+    const INV_SLOT& Slot = m_InventorySlots[iSlotIndex];
+    const INV_ITEM& Item = m_InventoryItems[iItemIndex];
+
+    // 가방 슬롯에는 모든 아이템 가능
+    if (Slot.eKind == SLOT_KIND::BAG)
+        return true;
+
+    // 장비 슬롯은 타입이 맞아야 가능
+    if (Slot.eKind == Item.eEquipKind)
+        return true;
+
+    return false;
+}
+void InvenUI::Update_ItemIconPosition()
+{
+    // 일단 모든 아이템 아이콘 숨김
+    for (auto& Item : m_InventoryItems)
+    {
+        auto iter = m_UIRects.find(Item.strIconRectKey);
+        if (iter == m_UIRects.end())
+            continue;
+
+        iter->second.bVisible = false;
+    }
+
+    // 슬롯에 들어있는 아이템 아이콘 위치 갱신
+    for (auto& Slot : m_InventorySlots)
+    {
+        if (Slot.iItemIndex == -1)
+            continue;
+
+        INV_ITEM& Item = m_InventoryItems[Slot.iItemIndex];
+
+        auto iterSlotRect = m_UIRects.find(Slot.strSlotRectKey);
+        auto iterItemRect = m_UIRects.find(Item.strIconRectKey);
+
+        if (iterSlotRect == m_UIRects.end())
+            continue;
+
+        if (iterItemRect == m_UIRects.end())
+            continue;
+
+        UI_RECT& SlotRect = iterSlotRect->second;
+        UI_RECT& ItemRect = iterItemRect->second;
+
+        ItemRect.vPos = SlotRect.vPos;
+        ItemRect.vSize = Item.vIconSize;
+        ItemRect.fAlpha = 1.f;
+        ItemRect.vColor = { 1.f, 1.f, 1.f, 1.f };
+        ItemRect.bVisible = true;
+    }
+
+    // 드래그 중인 아이템은 마우스를 따라다니게 함
+    if (m_bDraggingItem && m_iDraggingItem != -1)
+    {
+        INV_ITEM& Item = m_InventoryItems[m_iDraggingItem];
+
+        auto iterItemRect = m_UIRects.find(Item.strIconRectKey);
+        if (iterItemRect != m_UIRects.end())
+        {
+            UI_RECT& ItemRect = iterItemRect->second;
+
+            ItemRect.vPos = m_vMouseUIPos;
+            ItemRect.vSize = Item.vIconSize;
+            ItemRect.fAlpha = 0.9f;
+            ItemRect.vColor = { 1.f, 1.f, 1.f, 1.f };
+            ItemRect.bVisible = true;
+        }
+    }
+}
+
+_bool InvenUI::Is_ItemIconKey(const wstring& strKey)
+{
+    return strKey.find(TEXT("Item_")) == 0;
+}
+
+HRESULT InvenUI::Render_UIRect_ByKey(const wstring& strKey)
+{
+    auto iter = m_UIRects.find(strKey);
+    if (iter == m_UIRects.end())
+        return S_OK;
+
+    UI_RECT& UI = iter->second;
+
+    if (false == UI.bVisible)
+        return S_OK;
+
+    if (nullptr == UI.pTexture)
+        return S_OK;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &UI.fAlpha, sizeof(float))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &UI.vColor, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(Render_UIRect(UI)))
+        return E_FAIL;
 
     return S_OK;
 }

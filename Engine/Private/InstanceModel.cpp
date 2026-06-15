@@ -163,8 +163,6 @@ HRESULT InstanceModel::Ready_BinaryModelFile(const char* modelFileName)
         }
     }
     break;
-
-
     }
 
 
@@ -205,21 +203,11 @@ HRESULT InstanceModel::Ready_NonAnimMesh(ifstream& _file, const char* modelFileN
         vertexes->resize(vCount);
         indices->resize(iCount);
 
-        _file.read(
-            (char*)vertexes->data(),
-            sizeof(VTXMESH) * vCount);
+        _file.read((char*)vertexes->data(), sizeof(VTXMESH) * vCount);
 
-        _file.read(
-            (char*)indices->data(),
-            sizeof(uint32_t) * iCount);
+        _file.read((char*)indices->data(), sizeof(uint32_t) * iCount);
 
-        auto pMesh = VIBuffer_Mesh_Instance::Create(
-            m_pDevice,
-            m_pContext,
-            vertexes,
-            indices,
-            materialIndex,
-            XMLoadFloat4x4(&m_PreTransformMatrix));
+        auto pMesh = VIBuffer_Mesh_Instance::Create(m_pDevice,m_pContext,vertexes,indices,materialIndex,XMLoadFloat4x4(&m_PreTransformMatrix));
 
         if (pMesh == nullptr)
             return E_FAIL;
@@ -371,6 +359,129 @@ HRESULT InstanceModel::Update_InstanceBuffer()
     }
 
     m_isInstanceBufferDirty = false;
+
+    return S_OK;
+}
+
+HRESULT InstanceModel::Save_Instances_JSON(const char* pFilePath)
+{
+    if (pFilePath == nullptr)
+        return E_FAIL;
+
+    nlohmann::json root;
+
+    root["type"] = "TREE_INSTANCE";
+    root["version"] = 1;
+    root["count"] = static_cast<uint32_t>(m_InstanceWorlds.size());
+    root["instances"] = nlohmann::json::array();
+
+    for (const auto& World : m_InstanceWorlds)
+    {
+        nlohmann::json mat = nlohmann::json::array();
+
+        mat.push_back(World._11);
+        mat.push_back(World._12);
+        mat.push_back(World._13);
+        mat.push_back(World._14);
+
+        mat.push_back(World._21);
+        mat.push_back(World._22);
+        mat.push_back(World._23);
+        mat.push_back(World._24);
+
+        mat.push_back(World._31);
+        mat.push_back(World._32);
+        mat.push_back(World._33);
+        mat.push_back(World._34);
+
+        mat.push_back(World._41);
+        mat.push_back(World._42);
+        mat.push_back(World._43);
+        mat.push_back(World._44);
+
+        root["instances"].push_back(mat);
+    }
+
+    std::ofstream file(pFilePath);
+
+    if (!file.is_open())
+        return E_FAIL;
+
+    file << root.dump(4);
+    file.close();
+
+    return S_OK;
+}
+
+HRESULT InstanceModel::Load_Instances_JSON(const char* pFilePath)
+{
+    if (pFilePath == nullptr)
+        return E_FAIL;
+
+    std::ifstream file(pFilePath);
+
+    if (!file.is_open())
+        return E_FAIL;
+
+    nlohmann::json root = nlohmann::json::parse(file, nullptr, false);
+
+    if (root.is_discarded())
+        return E_FAIL;
+
+    if (!root.contains("type") || root["type"] != "TREE_INSTANCE")
+        return E_FAIL;
+
+    if (!root.contains("version") || root["version"] != 1)
+        return E_FAIL;
+
+    if (!root.contains("instances") || !root["instances"].is_array())
+        return E_FAIL;
+
+    vector<_float4x4> LoadedWorlds;
+    LoadedWorlds.reserve(root["instances"].size());
+
+    for (const auto& mat : root["instances"])
+    {
+        if (!mat.is_array() || mat.size() != 16)
+            return E_FAIL;
+
+        for (uint32_t i = 0; i < 16; ++i)
+        {
+            if (!mat[i].is_number())
+                return E_FAIL;
+        }
+
+        _float4x4 World{};
+
+        World._11 = mat[0].get<float>();
+        World._12 = mat[1].get<float>();
+        World._13 = mat[2].get<float>();
+        World._14 = mat[3].get<float>();
+
+        World._21 = mat[4].get<float>();
+        World._22 = mat[5].get<float>();
+        World._23 = mat[6].get<float>();
+        World._24 = mat[7].get<float>();
+
+        World._31 = mat[8].get<float>();
+        World._32 = mat[9].get<float>();
+        World._33 = mat[10].get<float>();
+        World._34 = mat[11].get<float>();
+
+        World._41 = mat[12].get<float>();
+        World._42 = mat[13].get<float>();
+        World._43 = mat[14].get<float>();
+        World._44 = mat[15].get<float>();
+
+        LoadedWorlds.emplace_back(World);
+    }
+
+    // 빈 파일로 기존 인스턴스를 날리는 것 방지
+    if (LoadedWorlds.empty())
+        return E_FAIL;
+
+    m_InstanceWorlds = std::move(LoadedWorlds);
+    m_isInstanceBufferDirty = true;
 
     return S_OK;
 }
