@@ -86,7 +86,7 @@ HRESULT Tree::Render()
 		{
 			return E_FAIL;
 		}
-
+	
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 

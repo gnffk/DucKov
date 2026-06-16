@@ -51,6 +51,14 @@ public:
         END
     };
 
+    enum class INVEN_ANIM_STATE
+    {
+        CLOSED,
+        OPENING,
+        OPEN,
+        CLOSING
+    };
+
     struct INV_SLOT
     {
         wstring     strSlotRectKey;   // m_UIRects에 있는 박스 UI 이름

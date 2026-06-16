@@ -196,6 +196,7 @@
     <ClInclude Include="..\Public\Player_RIGHT_WALK_State.h" />
     <ClInclude Include="..\Public\Player_ROLL_State.h" />
     <ClInclude Include="..\Public\Player_RUN_State.h" />
+    <ClInclude Include="..\Public\Player_State_UI.h" />
     <ClInclude Include="..\Public\Player_WALK_State.h" />
     <ClInclude Include="..\Public\Player_Weapon.h" />
     <ClInclude Include="..\Public\Sky.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\Private\Player_RIGHT_WALK_State.cpp" />
     <ClCompile Include="..\Private\Player_ROLL_State.cpp" />
     <ClCompile Include="..\Private\Player_RUN_State.cpp" />
+    <ClCompile Include="..\Private\Player_State_UI.cpp" />
     <ClCompile Include="..\Private\Player_WALK_State.cpp" />
     <ClCompile Include="..\Private\Player_Weapon.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
@@ -268,6 +270,8 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl" />
+    <FxCompile Include="..\..\Resources\Shaders\Shader_MainUI.hlsl" />
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Obstacle.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_AnimFbx.hlsl">

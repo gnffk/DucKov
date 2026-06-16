@@ -79,7 +79,8 @@ private:
     _bool Can_PlaceItem(int iSlotIndex, int iItemIndex);
 
     HRESULT Render_UIRect_ByKey(const wstring& strKey);
-
+    _bool Is_EquipSlot(int iSlotIndex);
+    void Notify_EquipChanged(int iSlotIndex, int iPrevItemIndex, int iNewItemIndex);
     _bool Is_ItemIconKey(const wstring& strKey);
 private:
     vector<INV_SLOT> m_InventorySlots;
@@ -91,6 +92,35 @@ private:
 
     _bool   m_bDraggingItem = false;
     _float2 m_vMouseUIPos = { 0.f, 0.f };
+
+
+private:
+    INVEN_ANIM_STATE m_eAnimState = INVEN_ANIM_STATE::CLOSED;
+
+    float   m_fAnimRatio = 0.f;       // 0 ´ÝÈû, 1 ¿­¸²
+    float   m_fAnimSpeed = 7.5f;
+    float   m_fSlideDistance = 650.f;
+
+    _float2 m_vAnimOffset = { 0.f, 0.f };
+    float   m_fAnimAlpha = 0.f;
+
+private:
+
+    void Open_Inven();
+    void Close_Inven();
+
+    void Update_InvenAnimation(_float fTimeDelta);
+    float ClampFloat(float fValue, float fMin, float fMax);
+    float EaseOutCubic(float fRatio);
+
+public:
+    void Toggle_Inven();
+    void InvenSet(_bool bInvenSet);
+    _bool GetInven() const { return m_bInventoryOpen; }
+
+
+private:
+    _bool m_bInventoryOpen = false;
 
 public:
     static unique_ptr<InvenUI> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

@@ -146,7 +146,20 @@ void MapEditor::IMGUI_Render() {
 
 	IMGUI_OTHER_Render();
 
-	//IMGUI_Level_Render();
+    if (b_Debug == false) {
+        if (CGameInstance::Get().Key_Down(DIK_0)) {
+            b_Debug = true;
+        }
+
+    }
+    else if (b_Debug == true) {
+        if (CGameInstance::Get().Key_Down(DIK_0)) {
+            b_Debug = false;
+        }
+
+    }
+
+	IMGUI_Level_Render();
     IMGUI_SaveLoad_Render();
     IMGUI_MadeFunction();
     IMGUI_AddPlayer();

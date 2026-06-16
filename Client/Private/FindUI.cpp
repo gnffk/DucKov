@@ -45,13 +45,20 @@ HRESULT FindUI::Initialize(void* pArg)
     // 상자 배경
     if (FAILED(Add_UIRect(TEXT("BackGround"), TEXT("BackGround"), TEXT("Prototype_Com_Texture_UI_BaseRectCustom"), { 640.f, 360.f }, { 420.f, 360.f }, 0.0f)))
         return E_FAIL;
+    // 상자 배경2
+    if (FAILED(Add_UIRect(TEXT("BackGround1"), TEXT("BackGround1"), TEXT("Prototype_Com_Texture_UI_BaseRectCustom"), { 640.f, 360.f }, { 420.f, 360.f }, 0.0f)))
+        return E_FAIL;
 
 
     // 찾기 배경
-    if (FAILED(Add_UIRect(TEXT("Prompt_BackGround"), TEXT("Prompt_BackGround"), TEXT("Prototype_Com_Texture_UI_BaseRectCustom"), { 640.f, 360.f }, { 420.f, 360.f }, 0.0f)))
+    if (FAILED(Add_UIRect(TEXT("Prompt_BackGround"), TEXT("Prompt_BackGround"), TEXT("Prototype_Com_Texture_UI_BaseRectCustom"), { 660.f, 360.f }, { 420.f, 360.f }, 0.0f)))
         return E_FAIL;
     // Owner 위에 뜨는 찾기 텍스트
     if (FAILED(Add_UIText(TEXT("Text_FindPrompt"), TEXT("Font_Default"), TEXT("[F] 찾기"), { 0.f, 0.f }, 0.65f, { 1.f, 1.f, 1.f, 1.f })))
+        return E_FAIL;
+
+    // Owner 위에 뜨는 찾기 텍스트
+    if (FAILED(Add_UIText(TEXT("Text_BoxPrompt"), TEXT("Font_Default"), TEXT("상자"), { 0.f, 0.f }, 0.65f, { 1.f, 1.f, 1.f, 1.f })))
         return E_FAIL;
 
 
@@ -166,11 +173,12 @@ void FindUI::Update(_float fTimeDelta)
 
 void FindUI::Late_Update(_float fTimeDelta)
 {
-
+   
 }
 
 HRESULT FindUI::Render()
 {
+ 
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 
@@ -228,6 +236,8 @@ void FindUI::GUI_FindUI()
 
     if (ImGui::Begin(strWindowName.c_str()))
     {
+
+
         if (ImGui::Button("Save UI"))
         {
             Save_UIRects(TEXT("../../Resources/Data/UI/FindUI.txt"));
@@ -240,6 +250,41 @@ void FindUI::GUI_FindUI()
         {
             Load_UIRects(TEXT("../../Resources/Data/UI/FindUI.txt"));
             Load_UITexts(TEXT("../../Resources/Data/UI/FindUI_Text.txt"));
+        }
+
+        ImGui::Separator();
+
+        ImGui::Text("Find Prompt Local Setting");
+
+        ImGui::DragFloat2(
+            "Find Text Local Offset",
+            reinterpret_cast<float*>(&m_vFindTextLocalOffset),
+            1.f,
+            -500.f,
+            500.f
+        );
+
+        ImGui::DragFloat2(
+            "Find Back Local Offset",
+            reinterpret_cast<float*>(&m_vFindBackLocalOffset),
+            1.f,
+            -500.f,
+            500.f
+        );
+
+        ImGui::DragFloat2(
+            "Find Back Size",
+            reinterpret_cast<float*>(&m_vFindBackSize),
+            1.f,
+            1.f,
+            500.f
+        );
+
+        if (ImGui::Button("Reset Find Prompt Local"))
+        {
+            m_vFindTextLocalOffset = { -35.f, -12.f };
+            m_vFindBackLocalOffset = { 0.f, 0.f };
+            m_vFindBackSize = { 120.f, 42.f };
         }
 
         ImGui::Separator();
@@ -423,6 +468,8 @@ void FindUI::GUI_FindUI()
         }
     }
 
+
+
     ImGui::End();
 
 #endif
@@ -542,19 +589,22 @@ HRESULT FindUI::Render_UIRect_ByKey(const wstring& strKey)
 
 void FindUI::Update_FindPrompt(_float fTimeDelta)
 {
-    auto iter = m_UITexts.find(TEXT("Text_FindPrompt"));
-    auto iter2 = m_UIRects.find(TEXT("Prompt_BackGround"));
+    auto iterFindText = m_UITexts.find(TEXT("Text_FindPrompt"));
+    auto iterBoxText = m_UITexts.find(TEXT("Text_BoxPrompt"));
+    auto iterBack = m_UIRects.find(TEXT("Prompt_BackGround"));
+    
+    if (iterFindText != m_UITexts.end())
+        iterFindText->second.bVisible = false;
 
-    if (iter != m_UITexts.end())
-        iter->second.bVisible = false;
-    if (iter2 != m_UIRects.end())
-        iter2->second.bVisible = false;
+
+
+    if (iterBack != m_UIRects.end())
+        iterBack->second.bVisible = false;
 
     if (m_bBoxOpen)
         return;
 
-    if (false == m_bCollidingOwner)
-        return;
+ 
 
     auto pOwner = m_pOwner.lock();
 
@@ -577,31 +627,68 @@ void FindUI::Update_FindPrompt(_float fTimeDelta)
     {
         m_bFindTextOnScreen = true;
 
-        if (iter != m_UITexts.end())
+     
+        if (iterFindText != m_UITexts.end())
         {
-            iter->second.vPos = vScreenPos;
-            iter->second.bVisible = true;
+            iterFindText->second.vPos =
+            {
+                vScreenPos.x + m_vFindTextLocalOffset.x,
+                vScreenPos.y + m_vFindTextLocalOffset.y
+            };
+
+            iterFindText->second.bVisible = true;
         }
-        if (iter2 != m_UIRects.end())
+
+        if (iterBack != m_UIRects.end())
         {
-            iter2->second.vPos = vScreenPos;
-            iter2->second.bVisible = true;
+            iterBack->second.vPos =
+            {
+                vScreenPos.x + m_vFindBackLocalOffset.x,
+                vScreenPos.y + m_vFindBackLocalOffset.y
+            };
+
+            iterBack->second.vSize = m_vFindBackSize;
+            iterBack->second.bVisible = true;
+        }
+
+
+        if (iterBoxText != m_UITexts.end())
+        {
+     
+            iterBoxText->second.bVisible = false;
         }
     }
     else
     {
         m_bFindTextOnScreen = false;
     }
-
     if (CGameInstance::Get().Key_Down(DIK_F))
     {
         m_bBoxOpen = true;
 
-        if (iter != m_UITexts.end())
-            iter->second.bVisible = false;
-        if (iter2 != m_UIRects.end())
+        auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
+
+        if (pPlayer == nullptr)
+            return;
+
+        auto pPlayerObj = static_pointer_cast<Player>(pPlayer);
+
+        if (pPlayerObj == nullptr)
+            return;
+
+        pPlayerObj->InvenSet(true);
+
+        if (iterFindText != m_UITexts.end())
+            iterFindText->second.bVisible = false;
+        if (iterBack != m_UIRects.end())
         {
-            iter2->second.bVisible = false;
+            iterBack->second.bVisible = false;
+        }
+
+        if (iterBoxText != m_UITexts.end())
+        {
+
+            iterBoxText->second.bVisible = true;
         }
     }
 
@@ -1100,6 +1187,27 @@ _bool FindUI::Is_PointInRect(const _float2& vPoint, const UI_RECT& Rect)
 _bool FindUI::Is_ItemIconKey(const wstring& strKey)
 {
     return strKey.find(TEXT("LootItem_")) == 0;
+}
+void FindUI::Set_CollidingOwner(_bool bColliding)
+{
+    m_bCollidingOwner = bColliding;
+    auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
+
+    if (pPlayer == nullptr)
+        return;
+
+    auto pPlayerObj = static_pointer_cast<Player>(pPlayer);
+
+    if (pPlayerObj == nullptr)
+        return;
+
+    pPlayerObj->InvenSet(true);
+
+    if (false == m_bCollidingOwner) {
+        pPlayerObj->InvenSet(false);
+
+        m_bBoxOpen = false;
+    }
 }
 _bool FindUI::WorldToScreen(_fvector vWorldPos, _float2& vOutScreenPos)
 {

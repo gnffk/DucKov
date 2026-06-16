@@ -132,7 +132,7 @@ HRESULT Obstacle::Ready_Components()
 		return E_FAIL;
 
 
-	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_Vtx_FBX_Tex")));
+	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_Obstacle")));
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
 

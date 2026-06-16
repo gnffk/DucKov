@@ -175,6 +175,9 @@
     <Filter Include="02. GameObject\InteractObject\InteractBox\UI">
       <UniqueIdentifier>{61c43ec5-3ec4-46b0-bb41-76d1978e6331}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\UI\Player_State_UI">
+      <UniqueIdentifier>{573d54f3-f746-49c2-8071-add25af0e062}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -342,6 +345,9 @@
     <ClInclude Include="..\Public\FindUI.h">
       <Filter>02. GameObject\InteractObject\InteractBox\UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player_State_UI.h">
+      <Filter>02. GameObject\Player\UI\Player_State_UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -507,6 +513,9 @@
     <ClCompile Include="..\Private\FindUI.cpp">
       <Filter>02. GameObject\InteractObject\InteractBox\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Player_State_UI.cpp">
+      <Filter>02. GameObject\Player\UI\Player_State_UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -528,6 +537,12 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Obstacle.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_MainUI.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

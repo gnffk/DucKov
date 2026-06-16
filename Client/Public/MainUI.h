@@ -47,6 +47,27 @@ private:
     HRESULT Save_UIRects(const wstring& strFilePath);
     HRESULT Load_UIRects(const wstring& strFilePath);
 
+
+private:
+    _float2 m_vHPBarPos = { 180.f, 50.f };
+    _float2 m_vHPBarSize = { 260.f, 24.f };
+
+    float m_fMaxHP = 100.f;
+    float m_fCurHP = 100.f;
+
+    float m_fHpRatio = 1.f;
+    float m_fDamageRatio = 1.f;
+
+private:
+    void Update_HPBar(_float fTimeDelta);
+    void Update_HPBarVisual();
+    void Set_BarRatio(const wstring& strKey, const _float2& vBasePos, const _float2& vBaseSize, float fRatio);
+
+public:
+    void Set_HP(float fCurHP, float fMaxHP);
+
+    float LerpFloat(float fStart, float fEnd, float fRatio);
+
 public:
     static unique_ptr<MainUI> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
     virtual shared_ptr<Prototype> Clone(void* pArg) override;

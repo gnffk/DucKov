@@ -22,6 +22,7 @@
 #include "Block.h"
 #include "InteractBox.h"
 #include "FindUI.h"
+#include "Player_State_UI.h"
 
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
@@ -159,7 +160,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 		/* For.Prototype_Com_Texture_Graph */
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Graph"),
-			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/MainUI/UI_Main_Slider01.png"), 1))))
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/MainUI/UI_BaseRect2.png"), 1))))
 			return E_FAIL;
 
 		/* For.Prototype_Com_Texture_Heart */
@@ -251,6 +252,14 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_VtxPosTex"),
 		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_VtxPosTex.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_Obstacle"),
+		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_Obstacle.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_MainUI"),
+		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_MainUI.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
 		return E_FAIL;
 
 
@@ -385,7 +394,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	_matrix Treematrix =
 		XMMatrixScaling(0.01f, 0.01f, 0.01f);
-	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Tree",
+ 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Tree",
 		InstanceModel::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(), L"Tree",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/Stage1/NonAnim/SM_Tree/SM_Tree.bin", Treematrix))))
 	{
 		return E_FAIL;
@@ -530,6 +539,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_FindUI */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_FindUI"),
 		FindUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_Player_State_UI */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_State_UI"),
+		Player_State_UI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

@@ -81,29 +81,29 @@ private:
     _bool   m_bDraggingItem = false;
     _float2 m_vMouseUIPos = { 0.f, 0.f };
 
-    private:
-        weak_ptr<GameObject> m_pOwner;
-        weak_ptr<GameObject> m_pPlayer;
+private:
+    weak_ptr<GameObject> m_pOwner;
+    weak_ptr<GameObject> m_pPlayer;
 
-        _bool m_bCollidingOwner = false;
-        _bool m_bBoxOpen = false;
+    _bool m_bCollidingOwner = false;
+    _bool m_bBoxOpen = false;
 
-        _float3 m_vOwnerUIOffset = { 0.f, 2.f, 0.f };
+    _float3 m_vOwnerUIOffset = { 0.f, 2.f, 0.f };
 
-        _float2 m_vFindTextScreenPos = { 0.f, 0.f };
-        _bool   m_bFindTextOnScreen = false;
+    _float2 m_vFindTextScreenPos = { 0.f, 0.f };
+    _bool   m_bFindTextOnScreen = false;
 
+
+private:
+    _float2 m_vFindTextLocalOffset = { -35.f, 3.f };
+    _float2 m_vFindBackLocalOffset = { 0.f, 9.f };
+    _float2 m_vFindBackSize = { 93.f, 25.f };
 public:
     void Set_Owner(shared_ptr<GameObject> pOwner) { m_pOwner = pOwner; }
     void Set_Player(shared_ptr<GameObject> pPlayer) { m_pPlayer = pPlayer; }
 
-    void Set_CollidingOwner(_bool bColliding)
-    {
-        m_bCollidingOwner = bColliding;
-
-        if (false == m_bCollidingOwner)
-            m_bBoxOpen = false;
-    }
+    void Set_CollidingOwner(_bool bColliding);
+  
 
     weak_ptr<GameObject> GetOwner() { return m_pPlayer; }
     

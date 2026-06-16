@@ -89,10 +89,22 @@ HRESULT MainUI::Initialize(void* pArg)
     if (FAILED(Add_UIRect(TEXT("vNum"), TEXT("vNum"), TEXT("Prototype_Com_Texture_V"), {50.f, 50.f}, {64.f, 64.f}, 0.0f)))
         return E_FAIL;
 
-    if (FAILED(Add_UIRect(TEXT("Heart"), TEXT("Heart"), TEXT("Prototype_Com_Texture_Heart"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+    // 하트 아이콘
+    if (FAILED(Add_UIRect(TEXT("Heart"),TEXT("Heart"), TEXT("Prototype_Com_Texture_Heart"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
         return E_FAIL;
-    if (FAILED(Add_UIRect(TEXT("HeartGraph"), TEXT("HeartGraph"), TEXT("Prototype_Com_Texture_Graph"), { 50.f, 50.f }, { 64.f, 64.f }, 0.0f)))
+
+    // HP 바 배경
+    if (FAILED(Add_UIRect(  TEXT("HP_Back"), TEXT("HP_Back"), TEXT("Prototype_Com_Texture_Graph"), m_vHPBarPos, m_vHPBarSize, 0.0f)))
         return E_FAIL;
+
+    // 데미지 잔상 바
+    if (FAILED(Add_UIRect( TEXT("HP_Damage"),   TEXT("HP_Damage"), TEXT("Prototype_Com_Texture_Graph"), m_vHPBarPos, m_vHPBarSize,  0.0f)))
+        return E_FAIL;
+
+    // 실제 HP 바
+    if (FAILED(Add_UIRect( TEXT("HeartGraph"), TEXT("HeartGraph"), TEXT("Prototype_Com_Texture_Graph"), m_vHPBarPos, m_vHPBarSize, 0.0f)))
+        return E_FAIL;
+
 
 
     Load_UIRects(TEXT("../../Resources/Data/UI/MainUI.txt"));
@@ -105,6 +117,18 @@ void MainUI::Priority_Update(_float fTimeDelta)
 
 void MainUI::Update(_float fTimeDelta)
 {
+    if (GetAsyncKeyState('H') & 0x0001)
+    {
+        Set_HP(m_fCurHP - 10.f, m_fMaxHP);
+    }
+
+    if (GetAsyncKeyState('J') & 0x0001)
+    {
+        Set_HP(m_fCurHP + 10.f, m_fMaxHP);
+    }
+
+    Update_HPBar(fTimeDelta);
+
 #ifdef _DEBUG
     GUI_MainUI();
 #endif
@@ -264,6 +288,8 @@ HRESULT MainUI::Render_UIRect(UI_RECT& UI)
     if (FAILED(UI.pTexture->Bind_ShaderResource(m_pShaderCom, "g_Texture", UI.iTextureIndex)))
         return E_FAIL;
 
+
+
     m_pShaderCom->Begin(0);
 
     m_pVIBufferCom->Bind_Resources();
@@ -274,7 +300,7 @@ HRESULT MainUI::Render_UIRect(UI_RECT& UI)
 
 HRESULT MainUI::Ready_Components()
 {
-    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_VtxPosTex"), TEXT("Com_Shader"), m_pShaderCom)))
+    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_MainUI"), TEXT("Com_Shader"), m_pShaderCom)))
         return E_FAIL;
 
     if (FAILED(__super::Add_Component( CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_VIBuffer_Rect"), TEXT("Com_VIBuffer"), m_pVIBufferCom)))
@@ -283,9 +309,10 @@ HRESULT MainUI::Ready_Components()
     return S_OK;
 }
 
-HRESULT MainUI::Add_UIRect(const wstring& UIName, const wstring& strName, const wstring& strTextureTag,const _float2& vPos,const _float2& vSize, _float fDepth)
+HRESULT MainUI::Add_UIRect(const wstring& UIName,const wstring& strName,const wstring& strTextureTag,const _float2& vPos,const _float2& vSize,_float fDepth)
 {
     UI_RECT UI{};
+
     UI.strName = strName;
     UI.strTextureTag = strTextureTag;
     UI.vPos = vPos;
@@ -294,13 +321,13 @@ HRESULT MainUI::Add_UIRect(const wstring& UIName, const wstring& strName, const 
     UI.iTextureIndex = 0;
     UI.bVisible = true;
 
+    UI.fAlpha = 1.f;
+    UI.vColor = { 1.f, 1.f, 1.f, 1.f };
 
-
-
-    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(),strTextureTag.c_str(), UI.strName, UI.pTexture)))
+    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), strTextureTag.c_str(),UI.strName, UI.pTexture)))
         return E_FAIL;
 
-    m_UIRects[UIName] = (UI);
+    m_UIRects[UIName] = UI;
 
     return S_OK;
 }
@@ -354,7 +381,7 @@ HRESULT MainUI::Save_UIRects(const wstring& strFilePath)
             << UI.fDepth << "|"
             << static_cast<int>(UI.bVisible) << "|"
             << UI.iTextureIndex << "|"
-            << UI.fAlpha
+            << UI.fAlpha << "|"
             << UI.vColor.x << "|"
             << UI.vColor.y << "|"
             << UI.vColor.z << "|"
@@ -445,4 +472,102 @@ HRESULT MainUI::Load_UIRects(const wstring& strFilePath)
     ifs.close();
 
     return S_OK;
+}
+
+void MainUI::Update_HPBar(_float fTimeDelta)
+{
+    float fTargetRatio = 0.f;
+
+    if (m_fMaxHP > 0.f)
+        fTargetRatio = m_fCurHP / m_fMaxHP;
+
+    fTargetRatio = std::clamp(fTargetRatio, 0.f, 1.f);
+
+    // 실제 HP 바는 빠르게 따라감
+    const float fHpSpeed = 18.f;
+
+    m_fHpRatio = LerpFloat(
+        m_fHpRatio,
+        fTargetRatio,
+        std::clamp(fTimeDelta * fHpSpeed, 0.f, 1.f)
+    );
+
+    // 데미지 바는 늦게 따라감
+    if (fTargetRatio < m_fDamageRatio)
+    {
+        const float fDamageSpeed = 3.5f;
+
+        m_fDamageRatio = LerpFloat(
+            m_fDamageRatio,
+            fTargetRatio,
+            std::clamp(fTimeDelta * fDamageSpeed, 0.f, 1.f)
+        );
+    }
+    else
+    {
+        // 회복할 때는 데미지 바도 바로 따라오게
+        m_fDamageRatio = fTargetRatio;
+    }
+
+    Update_HPBarVisual();
+}
+
+void MainUI::Set_BarRatio(const wstring& strKey,const _float2& vBasePos,const _float2& vBaseSize,float fRatio)
+{
+    fRatio = std::clamp(fRatio, 0.f, 1.f);
+
+    auto iter = m_UIRects.find(strKey);
+    if (iter == m_UIRects.end())
+        return;
+
+    UI_RECT& Bar = iter->second;
+
+    float fNewWidth = vBaseSize.x * fRatio;
+
+    // 원래 바의 왼쪽 끝 좌표
+    float fLeft = vBasePos.x - vBaseSize.x * 0.5f;
+
+    // 줄어든 바의 중심 좌표
+    Bar.vPos.x = fLeft + fNewWidth * 0.5f;
+    Bar.vPos.y = vBasePos.y;
+
+    Bar.vSize.x = fNewWidth;
+    Bar.vSize.y = vBaseSize.y;
+
+    Bar.bVisible = fRatio > 0.001f;
+}
+
+void MainUI::Update_HPBarVisual()
+{
+    // HP_Back을 기준 바 위치/크기로 사용
+    auto iterBack = m_UIRects.find(TEXT("HP_Back"));
+    if (iterBack == m_UIRects.end())
+        return;
+
+    UI_RECT& BackRect = iterBack->second;
+
+    _float2 vBasePos = BackRect.vPos;
+    _float2 vBaseSize = BackRect.vSize;
+
+    // 색깔은 여기서 건드리지 않는다.
+    // ImGui에서 수정한 색/알파가 그대로 유지되게 함.
+
+    Set_BarRatio(TEXT("HP_Damage"), vBasePos, vBaseSize, m_fDamageRatio);
+    Set_BarRatio(TEXT("HeartGraph"), vBasePos, vBaseSize, m_fHpRatio);
+}
+void MainUI::Set_HP(float fCurHP, float fMaxHP)
+{
+    m_fMaxHP = max(fMaxHP, 1.f);
+    m_fCurHP = std::clamp(fCurHP, 0.f, m_fMaxHP);
+}
+
+float  MainUI::LerpFloat(float fStart, float fEnd, float fRatio)
+{
+    if (fRatio < 0.f)
+        fRatio = 0.f;
+
+    if (fRatio > 1.f)
+        fRatio = 1.f;
+
+    return fStart + (fEnd - fStart) * fRatio;
 }

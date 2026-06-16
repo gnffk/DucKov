@@ -37,7 +37,8 @@ public:
 
 	wstring Make_UniqueObjectName(const wstring& LayerName, const wstring& baseName);
 
-
+private:
+	_bool b_Debug = false;
 
 private:
 	unique_ptr<class NavMeshEditor> m_pNavMeshEditor = nullptr;

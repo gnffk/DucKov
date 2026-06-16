@@ -57,6 +57,10 @@ private:
 #ifdef _DEBUG
 	void			IMGUI_DEBUGRENDER();
 #endif
+
+public:
+	void InvenSet(_bool _bInvenSet) { m_bInventoryOpen = _bInvenSet; }
+	_bool GetInven() { return m_bInventoryOpen; }
 private:
 	_bool m_bInventoryOpen = false;
 private:

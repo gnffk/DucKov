@@ -84,9 +84,10 @@ void Player::Update(_float fTimeDelta)
 	if (CGameInstance::Get().Key_Down(DIK_I))
 	{
 		m_bInventoryOpen = !m_bInventoryOpen;
+		
 	}
 
-
+	static_pointer_cast<InvenUI>(m_pUI["InvenUI"])->InvenSet(m_bInventoryOpen);
 	if (FAILED(Roll(fTimeDelta))) {
 		return;
 	}
@@ -801,6 +802,21 @@ HRESULT Player::Ready_UI()
 
 	m_pUI.emplace("InvenUI", dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_InvenUI"), &DesPlayerInven)));
 
+	UIObject::UIOBJECT_DESC DesPlayerStateUI{};
+	DesPlayerStateUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+	DesPlayerStateUI.m_strName = L"PlayerStateUI";
+	DesPlayerStateUI.m_strPrototypeObjectName = L"Prototype_GameObject_Player_State_UI";
+	DesPlayerStateUI.m_strPrototypeBaseName = L"PlayerStateUI";
+	DesPlayerStateUI.pCameraType = ETOUI(CAMERA::NONE);
+	DesPlayerStateUI.fSpeedPerSec = 5.f;
+	DesPlayerStateUI.fRotationPerSec = 1.f;
+	DesPlayerStateUI.fSizeX = 1.f;
+	DesPlayerStateUI.fSizeY = 1.f;
+	DesPlayerStateUI.fX = 1.f;
+	DesPlayerStateUI.fY = 1.f;
+
+	m_pUI.emplace("PlayerStateUI", dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_State_UI"), &DesPlayerStateUI)));
+
 
 
 	return S_OK;
@@ -834,28 +850,34 @@ _bool Player::Collider_Obstacle(_float fTimeDelta)
 
 _bool Player::Collider_Box(_float fTimeDelta)
 {
-
 	auto ColliderGroup = CGameInstance::Get().GetColliderGroups(L"InteractBox");
 	auto ColliderPlayer = CGameInstance::Get().GetColliderGroups(L"Player");
-	if (ColliderGroup != nullptr && ColliderPlayer != nullptr) {
-		for (auto _PlayerCollider : *ColliderPlayer) {
+
+	bool bHitInteractBox = false;
+
+	if (ColliderGroup != nullptr && ColliderPlayer != nullptr)
+	{
+		for (auto _PlayerCollider : *ColliderPlayer)
+		{
 			for (auto Collider : *ColliderGroup)
 			{
 				if (CGameInstance::Get().Intersect(_PlayerCollider, Collider))
 				{
+					bHitInteractBox = true;
 
 					Collider->SetColliderColor(ColliderColor::RED);
-
 					_PlayerCollider->SetColliderColor(ColliderColor::RED);
 				}
-
-
 			}
 		}
-
 	}
 
-	return _bool();
+	if (false == bHitInteractBox)
+	{
+		InvenSet(false);
+	}
+
+	return bHitInteractBox;
 }
 
 unique_ptr<Player> Player::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
