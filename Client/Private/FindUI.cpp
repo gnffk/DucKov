@@ -162,9 +162,9 @@ void FindUI::Update(_float fTimeDelta)
     Update_FindPrompt(fTimeDelta);
     Update_LootBox(fTimeDelta);
 
-#ifdef _DEBUG
-    GUI_FindUI();
-#endif
+//#ifdef _DEBUG
+//    GUI_FindUI();
+//#endif
 
 
 

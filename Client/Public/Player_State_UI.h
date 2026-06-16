@@ -58,7 +58,7 @@ private:
 
 private:
     _float2 m_vHPBarPos = { 180.f, 50.f };
-    _float2 m_vHPBarSize = { 260.f, 24.f };
+    _float2 m_vHPBarSize = { 57.f, 13.f };
 
     float m_fMaxHP = 100.f;
     float m_fCurHP = 100.f;
@@ -66,6 +66,26 @@ private:
     float m_fHpRatio = 1.f;
     float m_fDamageRatio = 1.f;
 
+
+private:
+    _float3 m_vWorldOffset = { 0.f, 2.3f, 0.f };   // 플레이어 머리 위 높이
+    _float2 m_vScreenOffset = { 6.f, 40.f };      // 화면상 미세 조정
+    _bool m_bOnScreen = false;
+
+
+
+private:
+    _bool WorldToScreen(_fvector vWorldPos, _float2& vOutScreenPos);
+    void Update_FollowOwner();
+
+private:
+#ifdef _DEBUG
+    void GUI_PlayerStateUI();
+#endif
+
+private:
+    HRESULT Save_UIRects(const wstring& strFilePath);
+    HRESULT Load_UIRects(const wstring& strFilePath);
 public:
     static unique_ptr<Player_State_UI> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext );
 

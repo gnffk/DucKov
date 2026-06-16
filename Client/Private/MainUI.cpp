@@ -129,9 +129,9 @@ void MainUI::Update(_float fTimeDelta)
 
     Update_HPBar(fTimeDelta);
 
-#ifdef _DEBUG
-    GUI_MainUI();
-#endif
+//#ifdef _DEBUG
+//    GUI_MainUI();
+//#endif
 }
 
 void MainUI::Late_Update(_float fTimeDelta)
