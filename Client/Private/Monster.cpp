@@ -96,8 +96,9 @@ HRESULT Monster::Ready_Components()
 		return E_FAIL;
 	m_pCollider->Set_GroupTag(L"Monster");
 	m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].push_back(m_pCollider);
+	m_pCollider->Set_Center(_float3{ 0.f, 0.6f, 0.f });
+	m_pCollider->Set_Extend(_float3{ 0.3f, 0.6f, 0.3f });
 	
-
 	
 
 	return S_OK;

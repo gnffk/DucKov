@@ -23,7 +23,9 @@
 #include "InteractBox.h"
 #include "FindUI.h"
 #include "Player_State_UI.h"
-
+#include "LittleMonster.h"
+#include "LittleMonster_Weapon.h"
+#include "LittleMonster_StateUI.h"
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -284,6 +286,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck_Boss", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_Boss_Test/SK_Boss_Test.bin", CustomMatrix))))
 		return E_FAIL;
 
+  	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_SK_LittleMonster"),
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Custom_Duck_LittleMonster", ETOUI(MODELTYPE::ANIM), "../../Resources/Model/Skeleton/SK_LittleMonster/SK_LittleMonster.bin", CustomMatrix))))
+		return E_FAIL;
+
 	// static Mesh
 	_matrix HomeTransformMatrix =
 		XMMatrixScaling(0.001f, 0.001f, 0.001f) *
@@ -407,6 +413,14 @@ HRESULT CLoader::Loading_For_MapEditor()
 	{
 		return E_FAIL;
 	}
+
+	_matrix LittleMonsterWeaponMatrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_LittleMonsterWeapon",
+		Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(), L"LittleMonsterWeapon",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_LittleMonsterWeapon/SM_LittleMonsterWeapon.bin", LittleMonsterWeaponMatrix))))
+	{
+		return E_FAIL;
+	}
 	_matrix BulletMatrix =
 		XMMatrixScaling(0.01f, 0.01f, 0.01f);
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Bullet",
@@ -452,7 +466,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 
 #pragma endregion
-
+	
 #pragma region GameObject Prototype
 	/* Prototype_GameObject_TestModel */
 	//if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Monster"),
@@ -543,6 +557,21 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_Player_State_UI */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_State_UI"),
 		Player_State_UI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_LittleMonster_Weapon */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_LittleMonster_Weapon"),
+		LittleMonster_Weapon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_LittleMonster */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_LittleMonster"),
+		LittleMonster::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_LittleMonster_StateUI */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_LittleMonster_StateUI"),
+		LittleMonster_StateUI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

@@ -17,6 +17,8 @@ public:
 	void Update(_float fTimeDelta);
 	void Late_Update(_float fTimeDelta);
 
+	void Clear_DeadObjects();
+
 	list<shared_ptr<GameObject>>& Get_GameObjects(){ return m_GameObjects; }
 	_bool Is_Empty() const{
 		return m_GameObjects.empty();}

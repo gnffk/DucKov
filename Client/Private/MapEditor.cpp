@@ -272,6 +272,12 @@ void MapEditor::IMGUI_Level_Render()
                     ImGui::OpenPopup("Select InteractBox");
 
                 }
+                else if (className == "LittleMonster")
+                {
+                    OpenDataObject = true;
+                    ImGui::OpenPopup("Select LittleMonster");
+
+                }
              
             }
             ImGui::EndDragDropTarget();
@@ -757,6 +763,34 @@ void MapEditor::IMGUI_MadeFunction()
 
     ImGui::Spacing();
 
+    // =====================================================
+    // LittleMonster
+    // =====================================================
+
+    ImGui::PushID("LittleMonster");
+
+    if (ImGui::Button("LittleMonster", buttonSize))
+    {
+    }
+
+    if (ImGui::BeginDragDropSource())
+    {
+        string className = "LittleMonster";
+
+        ImGui::SetDragDropPayload(
+            "GAME_OBJECT",
+            className.c_str(),
+            className.size() + 1);
+
+        ImGui::Text("Create LittleMonster");
+
+        ImGui::EndDragDropSource();
+    }
+
+    ImGui::PopID();
+
+    ImGui::Spacing();
+
 
     ImGui::End();
 
@@ -1032,6 +1066,157 @@ void MapEditor::IMGUI_ChoiceObject()
             ImVec2(120.f, 35.f)))
         {
             selectedBossSkeletonIndex = -1;
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+    if (ImGui::BeginPopupModal(
+        "Select LittleMonster",
+        nullptr))
+    {
+        static char littleObjectName[128] = "";
+        static char littleLayerName[128] = "";
+        static float littleSpeed = 3.f;
+        static float littleRotation = 180.f;
+
+        static int selectedLittleSkeletonIndex = -1;
+
+        auto& SkeletonNames =
+            CGameInstance::Get().FindCategories("Skeleton");
+
+        ImGui::Text("Create LittleMonster");
+        ImGui::Separator();
+
+        ImGui::InputText(
+            "Object Name",
+            littleObjectName,
+            IM_ARRAYSIZE(littleObjectName));
+
+        ImGui::InputText(
+            "Layer Name",
+            littleLayerName,
+            IM_ARRAYSIZE(littleLayerName));
+
+        ImGui::DragFloat(
+            "Speed",
+            &littleSpeed,
+            0.1f,
+            0.f,
+            100.f);
+
+        ImGui::DragFloat(
+            "Rotation",
+            &littleRotation,
+            1.f,
+            0.f,
+            360.f);
+
+        ImGui::Separator();
+
+        ImGui::Text("Select LittleMonster Skeleton");
+
+        for (int i = 0; i < static_cast<int>(SkeletonNames.size()); ++i)
+        {
+            bool selected =
+                selectedLittleSkeletonIndex == i;
+
+            if (ImGui::Selectable(
+                SkeletonNames[i].c_str(),
+                selected,
+                ImGuiSelectableFlags_DontClosePopups))
+            {
+                selectedLittleSkeletonIndex = i;
+            }
+        }
+
+        ImGui::Separator();
+
+        bool canCreate =
+            selectedLittleSkeletonIndex >= 0
+            && strlen(littleObjectName) > 0
+            && strlen(littleLayerName) > 0;
+
+        if (!canCreate)
+            ImGui::BeginDisabled();
+
+        if (ImGui::Button(
+            "Create",
+            ImVec2(120.f, 35.f)))
+        {
+            GameObject::GAMEOBJECT_DESC desc{};
+
+            wstring selectedSkeleton =
+                CGameInstance::Get().StringToWString(
+                    SkeletonNames[selectedLittleSkeletonIndex]);
+
+            wstring inputName =
+                CGameInstance::Get().StringToWString(
+                    littleObjectName);
+
+            wstring inputLayer =
+                CGameInstance::Get().StringToWString(
+                    littleLayerName);
+
+            desc.ObjectType =
+                ETOUI(OBJECTTYPE::OBJECT_MONSTER);
+
+            desc.m_strName =
+                Make_UniqueObjectName(inputLayer, inputName);
+
+            desc.m_strPrototypeObjectName =
+                L"Prototype_GameObject_LittleMonster";
+
+            desc.m_strPrototypeBaseName =
+                selectedSkeleton;
+
+            desc.pCameraType =
+                ETOUI(CAMERA::NONE);
+
+            desc.fSpeedPerSec =
+                littleSpeed;
+
+            desc.fRotationPerSec =
+                littleRotation;
+
+            CGameInstance::Get().Add_GameObject_toLayer(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_GameObject_LittleMonster"),
+                CGameInstance::Get().Get_Level(),
+                inputLayer,
+                &desc);
+
+            auto pLittleMonster =
+                CGameInstance::Get().Find_Object(
+                    CGameInstance::Get().Get_Level(),
+                    inputLayer,
+                    desc.m_strName);
+
+            if (pLittleMonster)
+            {
+                CGameInstance::Get().SetSeletObject(
+                    pLittleMonster.get());
+            }
+
+            selectedLittleSkeletonIndex = -1;
+
+            littleObjectName[0] = '\0';
+            littleLayerName[0] = '\0';
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (!canCreate)
+            ImGui::EndDisabled();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(
+            "Cancel",
+            ImVec2(120.f, 35.f)))
+        {
+            selectedLittleSkeletonIndex = -1;
 
             ImGui::CloseCurrentPopup();
         }

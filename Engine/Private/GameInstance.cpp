@@ -15,7 +15,7 @@
 #include "Target_Manager.h"
 #include "Light_Manager.h"
 #include "Picking.h"
-
+#include "Layer.h"
 
 CGameInstance::CGameInstance()
 {
@@ -142,6 +142,8 @@ HRESULT CGameInstance::Draw()
     m_pUI_Manager->Clear();
     m_pCollider_Manager->Render();
     m_pImGUI_Manager->Render_Imgui();
+
+    End_Frame();
     return S_OK;
 }
 
@@ -159,6 +161,22 @@ void CGameInstance::Clear_Resource_SameLevel(uint32_t iClearLevelIndex)
     m_pCollider_Manager->Clear();
     m_pObject_Manager->Clear(iClearLevelIndex);
     m_pImGUI_Manager->Clear();
+   
+}
+
+void CGameInstance::End_Frame()
+{
+    auto& LayerMap = Find_Layer_Lists(Get_Level());
+
+    for (auto& Pair : LayerMap)
+    {
+        unique_ptr<Layer>& pLayer = Pair.second;
+
+        if (pLayer == nullptr)
+            continue;
+
+        pLayer->Clear_DeadObjects();
+    }
    
 }
 

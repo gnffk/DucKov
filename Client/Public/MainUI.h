@@ -47,7 +47,9 @@ private:
     HRESULT Save_UIRects(const wstring& strFilePath);
     HRESULT Load_UIRects(const wstring& strFilePath);
 
-
+private:
+    float m_fHPBarPaddingX = 4.f;
+    float m_fHPBarPaddingY = 3.f;
 private:
     _float2 m_vHPBarPos = { 180.f, 50.f };
     _float2 m_vHPBarSize = { 260.f, 24.f };

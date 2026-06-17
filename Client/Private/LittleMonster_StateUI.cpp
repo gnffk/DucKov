@@ -1,30 +1,32 @@
-#include "Player_State_UI.h"
+#include "LittleMonster_StateUI.h"
 
 #include "GameInstance.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "VIBuffer_Rect.h"
 #include "Transform.h"
-#include "Player.h"
+#include "LittleMonster.h"
+#include <fstream>
+#include <sstream>
 
-Player_State_UI::Player_State_UI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): UIObject{ pDevice, pContext }
+LittleMonster_StateUI::LittleMonster_StateUI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : UIObject{ pDevice, pContext }
 {
 }
 
-Player_State_UI::Player_State_UI(const Player_State_UI& Prototype) : UIObject{ Prototype }
+LittleMonster_StateUI::LittleMonster_StateUI(const LittleMonster_StateUI& Prototype) : UIObject{ Prototype }
 {
 }
 
-Player_State_UI::~Player_State_UI()
+LittleMonster_StateUI::~LittleMonster_StateUI()
 {
 }
 
-HRESULT Player_State_UI::Initialize_Prototype()
+HRESULT LittleMonster_StateUI::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT Player_State_UI::Initialize(void* pArg)
+HRESULT LittleMonster_StateUI::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -36,7 +38,7 @@ HRESULT Player_State_UI::Initialize(void* pArg)
 
 
     // HP 배경
-    if (FAILED(Add_UIRect( TEXT("HP_Back"), TEXT("HP_Back"),TEXT("Prototype_Com_Texture_Graph"),m_vHPBarPos, m_vHPBarSize,  0.0f)))
+    if (FAILED(Add_UIRect(TEXT("HP_Back"), TEXT("HP_Back"), TEXT("Prototype_Com_Texture_Graph"), m_vHPBarPos, m_vHPBarSize, 0.0f)))
         return E_FAIL;
 
     // 데미지 잔상 바
@@ -44,7 +46,7 @@ HRESULT Player_State_UI::Initialize(void* pArg)
         return E_FAIL;
 
     // 실제 HP 바
-    if (FAILED(Add_UIRect( TEXT("HP_Fill"),TEXT("HP_Fill"),  TEXT("Prototype_Com_Texture_Graph"), m_vHPBarPos,  m_vHPBarSize,  0.0f)))
+    if (FAILED(Add_UIRect(TEXT("HP_Fill"), TEXT("HP_Fill"), TEXT("Prototype_Com_Texture_Graph"), m_vHPBarPos, m_vHPBarSize, 0.0f)))
         return E_FAIL;
 
     // 기본 색상
@@ -58,30 +60,35 @@ HRESULT Player_State_UI::Initialize(void* pArg)
     m_UIRects[TEXT("HP_Fill")].vColor = { 0.9f, 0.05f, 0.05f, 1.f };
     m_UIRects[TEXT("HP_Fill")].fAlpha = 1.f;
 
-    Load_UIRects(TEXT("../../Resources/Data/UI/Player_State_UI.txt"));
+    Load_UIRects(TEXT("../../Resources/Data/UI/LittleMonster_State_UI.txt"));
+    m_vBillboardHPSize = { 0.8f, 0.14f };
+    m_vBillboardOffset = { 0.f, 1.5f, 0.f };
 
+    // 빌보드에서는 padding도 월드 단위라 작아야 함
+    m_fHPBarPaddingX = 0.03f;
+    m_fHPBarPaddingY = 0.015f;
     return S_OK;
 }
 
-void Player_State_UI::Priority_Update(_float fTimeDelta)
+void LittleMonster_StateUI::Priority_Update(_float fTimeDelta)
 {
 }
 
-void Player_State_UI::Update(_float fTimeDelta)
+void LittleMonster_StateUI::Update(_float fTimeDelta)
 {
     Update_FollowOwner();
     Update_HPBar(fTimeDelta);
 
-//#ifdef _DEBUG
-//    GUI_PlayerStateUI();
-//#endif
+    #ifdef _DEBUG
+    GUI_MonsterStateUI();
+    #endif
 }
 
-void Player_State_UI::Late_Update(_float fTimeDelta)
+void LittleMonster_StateUI::Late_Update(_float fTimeDelta)
 {
 }
 
-HRESULT Player_State_UI::Render()
+HRESULT LittleMonster_StateUI::Render()
 {
     if (nullptr == m_pShaderCom)
         return E_FAIL;
@@ -89,58 +96,22 @@ HRESULT Player_State_UI::Render()
     if (nullptr == m_pVIBufferCom)
         return E_FAIL;
 
-    // 순서 중요
-    if (FAILED(Render_UIRect_ByKey(TEXT("HP_Back"))))
+    if (false == m_bVisible)
+        return S_OK;
+
+    if (FAILED(Render_BillboardRect(TEXT("HP_Back"))))
         return E_FAIL;
 
-    if (FAILED(Render_UIRect_ByKey(TEXT("HP_Damage"))))
+    if (FAILED(Render_BillboardRect(TEXT("HP_Damage"))))
         return E_FAIL;
 
-    if (FAILED(Render_UIRect_ByKey(TEXT("HP_Fill"))))
-        return E_FAIL;
-
-
-    return S_OK;
-}
-
-HRESULT Player_State_UI::Ready_Components()
-{
-    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_VtxPosTex"), TEXT("Com_Shader"), m_pShaderCom)))
-        return E_FAIL;
-
-    if (FAILED(__super::Add_Component( CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Rect"), TEXT("Com_VIBuffer"),m_pVIBufferCom)))
+    if (FAILED(Render_BillboardRect(TEXT("HP_Fill"))))
         return E_FAIL;
 
     return S_OK;
 }
 
-HRESULT Player_State_UI::Add_UIRect(const wstring& UIName,const wstring& strName,const wstring& strTextureTag, const _float2& vPos,const _float2& vSize,_float fDepth)
-{
-    UI_RECT UI{};
-
-    UI.strName = strName;
-    UI.strTextureTag = strTextureTag;
-    UI.vPos = vPos;
-    UI.vSize = vSize;
-    UI.fDepth = fDepth;
-    UI.iTextureIndex = 0;
-    UI.bVisible = true;
-    UI.fAlpha = 1.f;
-    UI.vColor = { 1.f, 1.f, 1.f, 1.f };
-
-    if (FAILED(__super::Add_Component(
-        CGameInstance::Get().Get_Level(),
-        strTextureTag.c_str(),
-        UI.strName,
-        UI.pTexture)))
-        return E_FAIL;
-
-    m_UIRects[UIName] = UI;
-
-    return S_OK;
-}
-
-HRESULT Player_State_UI::Render_UIRect_ByKey(const wstring& strKey)
+HRESULT LittleMonster_StateUI::Render_BillboardRect(const wstring& strKey)
 {
     auto iter = m_UIRects.find(strKey);
     if (iter == m_UIRects.end())
@@ -154,38 +125,70 @@ HRESULT Player_State_UI::Render_UIRect_ByKey(const wstring& strKey)
     if (nullptr == UI.pTexture)
         return S_OK;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha",&UI.fAlpha, sizeof(float))))
+    _float4x4 ViewMatrix{};
+    _float4x4 ProjMatrix{};
+
+    CGameInstance::Get().Get_MainCamerwaViewMatrix(ViewMatrix);
+    CGameInstance::Get().Get_MainCamerwaProjectionMatrix(ProjMatrix);
+
+    _matrix matView = XMLoadFloat4x4(&ViewMatrix);
+    _matrix matProj = XMLoadFloat4x4(&ProjMatrix);
+
+    _matrix matInvView =
+        XMMatrixInverse(nullptr, matView);
+
+    _vector vCamRight =
+        XMVector3Normalize(matInvView.r[0]);
+
+    _vector vCamUp =
+        XMVector3Normalize(matInvView.r[1]);
+
+    _vector vCamLook =
+        XMVector3Normalize(matInvView.r[2]);
+
+    _vector vCenter =
+        XMLoadFloat3(&m_vBillboardCenter);
+
+
+
+    // UI.vPos는 빌보드 내부 로컬 오프셋으로 사용
+    vCenter += vCamRight * UI.vPos.x;
+    vCenter += vCamUp * UI.vPos.y;
+
+    // HP_Back, HP_Damage, HP_Fill이 같은 평면에 겹치지 않도록 깊이 분리
+    vCenter -= vCamLook * UI.fDepth;
+
+    _matrix matWorld = XMMatrixIdentity();
+
+    matWorld.r[0] = vCamRight * UI.vSize.x;
+    matWorld.r[1] = vCamUp * UI.vSize.y;
+    matWorld.r[2] = vCamLook;
+    matWorld.r[3] = XMVectorSetW(vCenter, 1.f);
+
+    _float4x4 World{};
+    _float4x4 View{};
+    _float4x4 Proj{};
+
+    XMStoreFloat4x4(&World, matWorld);
+    XMStoreFloat4x4(&View, matView);
+    XMStoreFloat4x4(&Proj, matProj);
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor",&UI.vColor,sizeof(_float4))))
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
         return E_FAIL;
 
-    if (FAILED(Render_UIRect(UI)))
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
         return E_FAIL;
 
-    return S_OK;
-}
-
-HRESULT Player_State_UI::Render_UIRect(UI_RECT& UI)
-{
-    _float2 vViewportSize = CGameInstance::Get().Get_ViewportSize();
-
-    _float fX = UI.vPos.x - vViewportSize.x * 0.5f;
-    _float fY = -UI.vPos.y + vViewportSize.y * 0.5f;
-
-    m_pTransformCom->Set_Scale(UI.vSize.x, UI.vSize.y, 1.f);
-    m_pTransformCom->Set_State( STATE::POSITION,XMVectorSet(fX, fY, UI.fDepth, 1.f));
-
-    if (FAILED(m_pTransformCom->Bind_ShaderResource( m_pShaderCom,"g_WorldMatrix")))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &UI.fAlpha, sizeof(float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &UI.vColor, sizeof(_float4))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-
-    if (FAILED(UI.pTexture->Bind_ShaderResource( m_pShaderCom,"g_Texture",UI.iTextureIndex)))
+    if (FAILED(UI.pTexture->Bind_ShaderResource(m_pShaderCom, "g_Texture",  UI.iTextureIndex)))
         return E_FAIL;
 
     m_pShaderCom->Begin(0);
@@ -195,13 +198,168 @@ HRESULT Player_State_UI::Render_UIRect(UI_RECT& UI)
 
     return S_OK;
 }
-void Player_State_UI::Set_HP(float fCurHP, float fMaxHP)
+
+void LittleMonster_StateUI::Set_BarRatio_Billboard(const wstring& strKey,const _float2& vBaseSize,float fRatio)
+{
+    fRatio = ClampFloat(fRatio, 0.f, 1.f);
+
+    auto iter = m_UIRects.find(strKey);
+    if (iter == m_UIRects.end())
+        return;
+
+    UI_RECT& Bar = iter->second;
+
+    float fNewWidth = vBaseSize.x * fRatio;
+    float fLeft = -vBaseSize.x * 0.5f;
+
+    // 빌보드 로컬 좌표 기준
+    Bar.vPos.x = fLeft + fNewWidth * 0.5f;
+    Bar.vPos.y = 0.f;
+
+    Bar.vSize.x = fNewWidth;
+    Bar.vSize.y = vBaseSize.y;
+
+    Bar.bVisible = fRatio > 0.001f;
+}
+
+void LittleMonster_StateUI::Update_HPBarVisual_Billboard()
+{
+    auto iterBack = m_UIRects.find(TEXT("HP_Back"));
+    if (iterBack == m_UIRects.end())
+        return;
+
+    UI_RECT& Back = iterBack->second;
+
+    Back.vPos = { 0.f, 0.f };
+    Back.vSize = m_vBillboardHPSize;
+    Back.fDepth = 0.000f;
+    Back.bVisible = true;
+
+    _float2 vInnerSize =
+    {
+        m_vBillboardHPSize.x - m_fHPBarPaddingX * 2.f,
+        m_vBillboardHPSize.y - m_fHPBarPaddingY * 2.f
+    };
+
+    if (vInnerSize.x < 0.01f)
+        vInnerSize.x = 0.01f;
+
+    if (vInnerSize.y < 0.01f)
+        vInnerSize.y = 0.01f;
+
+    Set_BarRatio_Billboard(TEXT("HP_Damage"), vInnerSize, m_fDamageRatio);
+    Set_BarRatio_Billboard(TEXT("HP_Fill"), vInnerSize, m_fHpRatio);
+
+    auto iterDamage = m_UIRects.find(TEXT("HP_Damage"));
+    if (iterDamage != m_UIRects.end())
+    {
+        iterDamage->second.fDepth = 0.01f;
+        iterDamage->second.bVisible = m_fDamageRatio > 0.001f;
+    }
+
+    auto iterFill = m_UIRects.find(TEXT("HP_Fill"));
+    if (iterFill != m_UIRects.end())
+    {
+        iterFill->second.fDepth = 0.05f;
+        iterFill->second.bVisible = m_fHpRatio > 0.001f;
+    }
+}
+
+HRESULT LittleMonster_StateUI::Ready_Components()
+{
+    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_VtxPosTex"), TEXT("Com_Shader"), m_pShaderCom)))
+        return E_FAIL;
+
+    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Rect"), TEXT("Com_VIBuffer"), m_pVIBufferCom)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT LittleMonster_StateUI::Add_UIRect(const wstring& UIName, const wstring& strName, const wstring& strTextureTag, const _float2& vPos, const _float2& vSize, _float fDepth)
+{
+    UI_RECT UI{};
+
+    UI.strName = strName;
+    UI.strTextureTag = strTextureTag;
+    UI.vPos = vPos;
+    UI.vSize = vSize;
+    UI.fDepth = fDepth;
+    UI.iTextureIndex = 0;
+    UI.bVisible = true;
+    UI.fAlpha = 1.f;
+    UI.vColor = { 1.f, 1.f, 1.f, 1.f };
+
+    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), strTextureTag.c_str(),  UI.strName,  UI.pTexture)))
+        return E_FAIL;
+
+    m_UIRects[UIName] = UI;
+
+    return S_OK;
+}
+
+HRESULT LittleMonster_StateUI::Render_UIRect_ByKey(const wstring& strKey)
+{
+    auto iter = m_UIRects.find(strKey);
+    if (iter == m_UIRects.end())
+        return S_OK;
+
+    UI_RECT& UI = iter->second;
+
+    if (false == UI.bVisible)
+        return S_OK;
+
+    if (nullptr == UI.pTexture)
+        return S_OK;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &UI.fAlpha, sizeof(float))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &UI.vColor, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(Render_UIRect(UI)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT LittleMonster_StateUI::Render_UIRect(UI_RECT& UI)
+{
+    _float2 vViewportSize = CGameInstance::Get().Get_ViewportSize();
+
+    _float fX = UI.vPos.x - vViewportSize.x * 0.5f;
+    _float fY = -UI.vPos.y + vViewportSize.y * 0.5f;
+
+    m_pTransformCom->Set_Scale(UI.vSize.x, UI.vSize.y, 1.f);
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(fX, fY, UI.fDepth, 1.f));
+
+    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    if (FAILED(UI.pTexture->Bind_ShaderResource(m_pShaderCom, "g_Texture", UI.iTextureIndex)))
+        return E_FAIL;
+
+    m_pShaderCom->Begin(0);
+
+    m_pVIBufferCom->Bind_Resources();
+    m_pVIBufferCom->Render();
+
+    return S_OK;
+}
+void LittleMonster_StateUI::Set_HP(float fCurHP, float fMaxHP)
 {
     m_fMaxHP = max(fMaxHP, 1.f);
     m_fCurHP = ClampFloat(fCurHP, 0.f, m_fMaxHP);
 }
 
-void Player_State_UI::Update_HPBar(_float fTimeDelta)
+void LittleMonster_StateUI::Update_HPBar(_float fTimeDelta)
 {
     float fTargetRatio = 0.f;
 
@@ -212,23 +370,23 @@ void Player_State_UI::Update_HPBar(_float fTimeDelta)
 
     const float fHpSpeed = 18.f;
 
-    m_fHpRatio = LerpFloat( m_fHpRatio, fTargetRatio, fTimeDelta * fHpSpeed);
+    m_fHpRatio = LerpFloat(m_fHpRatio, fTargetRatio, fTimeDelta * fHpSpeed);
 
     if (fTargetRatio < m_fDamageRatio)
     {
         const float fDamageSpeed = 3.5f;
 
-        m_fDamageRatio = LerpFloat( m_fDamageRatio,fTargetRatio, fTimeDelta * fDamageSpeed );
+        m_fDamageRatio = LerpFloat(m_fDamageRatio, fTargetRatio, fTimeDelta * fDamageSpeed);
     }
     else
     {
         m_fDamageRatio = fTargetRatio;
     }
 
-    Update_HPBarVisual();
+    Update_HPBarVisual_Billboard();
 }
 
-void Player_State_UI::Update_HPBarVisual()
+void LittleMonster_StateUI::Update_HPBarVisual()
 {
     auto iterBack = m_UIRects.find(TEXT("HP_Back"));
     if (iterBack == m_UIRects.end())
@@ -256,7 +414,7 @@ void Player_State_UI::Update_HPBarVisual()
     Set_BarRatio(TEXT("HP_Damage"), vInnerPos, vInnerSize, m_fDamageRatio);
     Set_BarRatio(TEXT("HP_Fill"), vInnerPos, vInnerSize, m_fHpRatio);
 }
-void Player_State_UI::Set_BarRatio( const wstring& strKey,const _float2& vBasePos, const _float2& vBaseSize,float fRatio)
+void LittleMonster_StateUI::Set_BarRatio(const wstring& strKey, const _float2& vBasePos, const _float2& vBaseSize, float fRatio)
 {
     fRatio = ClampFloat(fRatio, 0.f, 1.f);
 
@@ -277,7 +435,7 @@ void Player_State_UI::Set_BarRatio( const wstring& strKey,const _float2& vBasePo
 
     Bar.bVisible = fRatio > 0.001f;
 }
-float Player_State_UI::ClampFloat(float fValue, float fMin, float fMax)
+float LittleMonster_StateUI::ClampFloat(float fValue, float fMin, float fMax)
 {
     if (fValue < fMin)
         return fMin;
@@ -288,7 +446,7 @@ float Player_State_UI::ClampFloat(float fValue, float fMin, float fMax)
     return fValue;
 }
 
-float Player_State_UI::LerpFloat(float fStart, float fEnd, float fRatio)
+float LittleMonster_StateUI::LerpFloat(float fStart, float fEnd, float fRatio)
 {
     fRatio = ClampFloat(fRatio, 0.f, 1.f);
 
@@ -296,39 +454,13 @@ float Player_State_UI::LerpFloat(float fStart, float fEnd, float fRatio)
 }
 
 
-void Player_State_UI::Update_FollowOwner()
+void LittleMonster_StateUI::Update_FollowOwner()
 {
-    auto pOwner = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
+    auto pOwner = m_pOwner;
 
     if (pOwner == nullptr)
     {
-        m_bOnScreen = false;
-        return;
-    }
-
-    auto pTransform = pOwner->GetTransform();
-
-    if (pTransform == nullptr)
-    {
-        m_bOnScreen = false;
-        return;
-    }
-
-    _vector vWorldPos = pTransform->Get_State(STATE::POSITION);
-
-    // 플레이어 머리 위로 올리기
-    vWorldPos += XMVectorSet(
-        m_vWorldOffset.x,
-        m_vWorldOffset.y,
-        m_vWorldOffset.z,
-        0.f
-    );
-
-    _float2 vScreenPos{};
-
-    if (false == WorldToScreen(vWorldPos, vScreenPos))
-    {
-        m_bOnScreen = false;
+        m_bVisible = false;
 
         for (auto& Pair : m_UIRects)
             Pair.second.bVisible = false;
@@ -336,83 +468,55 @@ void Player_State_UI::Update_FollowOwner()
         return;
     }
 
-    m_bOnScreen = true;
+    auto pTransform = pOwner->GetTransform();
 
-    _float2 vFinalPos =
+    if (pTransform == nullptr)
     {
-        vScreenPos.x + m_vScreenOffset.x,
-        vScreenPos.y + m_vScreenOffset.y
-    };
+        m_bVisible = false;
 
-    auto iterBack = m_UIRects.find(TEXT("HP_Back"));
-    if (iterBack != m_UIRects.end())
-    {
-        iterBack->second.vPos = vFinalPos;
-        iterBack->second.vSize = m_vHPBarSize;
-        iterBack->second.bVisible = true;
+        for (auto& Pair : m_UIRects)
+            Pair.second.bVisible = false;
+
+        return;
     }
 
-    auto iterDamage = m_UIRects.find(TEXT("HP_Damage"));
-    if (iterDamage != m_UIRects.end())
-        iterDamage->second.bVisible = true;
+    _vector vOwnerPos =
+        pTransform->Get_State(STATE::POSITION);
 
-    auto iterFill = m_UIRects.find(TEXT("HP_Fill"));
-    if (iterFill != m_UIRects.end())
-        iterFill->second.bVisible = true;
+    vOwnerPos += XMVectorSet(
+        m_vBillboardOffset.x,
+        m_vBillboardOffset.y,
+        m_vBillboardOffset.z,
+        0.f
+    );
+
+    XMStoreFloat3(&m_vBillboardCenter, vOwnerPos);
+
+    m_bVisible = true;
+
+    for (auto& Pair : m_UIRects)
+        Pair.second.bVisible = true;
 }
-
-_bool Player_State_UI::WorldToScreen(_fvector vWorldPos, _float2& vOutScreenPos)
+unique_ptr<LittleMonster_StateUI> LittleMonster_StateUI::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
-    _float2 vViewportSize = CGameInstance::Get().Get_ViewportSize();
-
-    if (vViewportSize.x <= 0.f || vViewportSize.y <= 0.f)
-        return false;
-
-    _float4x4 ViewMatrix{};
-    _float4x4 ProjMatrix{};
-
-    CGameInstance::Get().Get_MainCamerwaViewMatrix(ViewMatrix);
-    CGameInstance::Get().Get_MainCamerwaProjectionMatrix(ProjMatrix);
-
-    _matrix matView = XMLoadFloat4x4(&ViewMatrix);
-    _matrix matProj = XMLoadFloat4x4(&ProjMatrix);
-
-    _vector vClip = XMVector3TransformCoord(vWorldPos, matView);
-    vClip = XMVector3TransformCoord(vClip, matProj);
-
-    float x = XMVectorGetX(vClip);
-    float y = XMVectorGetY(vClip);
-    float z = XMVectorGetZ(vClip);
-
-    if (z < 0.f || z > 1.f)
-        return false;
-
-    vOutScreenPos.x = (x * 0.5f + 0.5f) * vViewportSize.x;
-    vOutScreenPos.y = (-y * 0.5f + 0.5f) * vViewportSize.y;
-
-    return true;
-}
-
-unique_ptr<Player_State_UI> Player_State_UI::Create( ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext)
-{
-    unique_ptr<Player_State_UI> pInstance =unique_ptr<Player_State_UI>( new Player_State_UI(pDevice, pContext));
+    unique_ptr<LittleMonster_StateUI> pInstance = unique_ptr<LittleMonster_StateUI>(new LittleMonster_StateUI(pDevice, pContext));
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created : Player_State_UI");
+        MSG_BOX("Failed to Created : LittleMonster_StateUI");
         return nullptr;
     }
 
     return pInstance;
 }
 
-shared_ptr<Prototype> Player_State_UI::Clone(void* pArg)
+shared_ptr<Prototype> LittleMonster_StateUI::Clone(void* pArg)
 {
-    shared_ptr<Player_State_UI> pInstance =shared_ptr<Player_State_UI>(new Player_State_UI(*this));
+    shared_ptr<LittleMonster_StateUI> pInstance = shared_ptr<LittleMonster_StateUI>(new LittleMonster_StateUI(*this));
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned : Player_State_UI");
+        MSG_BOX("Failed to Cloned : LittleMonster_StateUI");
         return nullptr;
     }
 
@@ -420,7 +524,7 @@ shared_ptr<Prototype> Player_State_UI::Clone(void* pArg)
 }
 
 #ifdef _DEBUG
-void Player_State_UI::GUI_PlayerStateUI()
+void LittleMonster_StateUI::GUI_MonsterStateUI()
 {
     string strWindowName = "Player State UI Editor##";
     strWindowName += to_string(reinterpret_cast<size_t>(this));
@@ -429,14 +533,14 @@ void Player_State_UI::GUI_PlayerStateUI()
     {
         if (ImGui::Button("Save UI"))
         {
-            Save_UIRects(TEXT("../../Resources/Data/UI/Player_State_UI.txt"));
+            Save_UIRects(TEXT("../../Resources/Data/UI/LittleMonster_State_UI.txt"));
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Load UI"))
         {
-            Load_UIRects(TEXT("../../Resources/Data/UI/Player_State_UI.txt"));
+            Load_UIRects(TEXT("../../Resources/Data/UI/LittleMonster_State_UI.txt"));
         }
 
         ImGui::Separator();
@@ -645,7 +749,7 @@ void Player_State_UI::GUI_PlayerStateUI()
 }
 #endif
 
-HRESULT Player_State_UI::Save_UIRects(const wstring& strFilePath)
+HRESULT LittleMonster_StateUI::Save_UIRects(const wstring& strFilePath)
 {
     ofstream ofs(strFilePath);
 
@@ -680,7 +784,7 @@ HRESULT Player_State_UI::Save_UIRects(const wstring& strFilePath)
     return S_OK;
 }
 
-HRESULT Player_State_UI::Load_UIRects(const wstring& strFilePath)
+HRESULT LittleMonster_StateUI::Load_UIRects(const wstring& strFilePath)
 {
     ifstream ifs(strFilePath);
 

@@ -188,9 +188,7 @@ void ImGUI_Manager::Update_Guizmo()
 
         _vector vNewPos = vCamPos + vCamLook * fDistance;
 
-        m_pSelectObject->GetTransform()->Set_State(
-            STATE::POSITION,
-            vNewPos);
+        m_pSelectObject->GetTransform()->Set_State( STATE::POSITION,vNewPos);
 
         matrix = m_pSelectObject->GetTransform()->GetWorldMatrix();
     }

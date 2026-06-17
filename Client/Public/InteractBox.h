@@ -26,6 +26,13 @@ public:
 
 	};
 
+public:
+	typedef struct tagInteractBoxDesc : public GameObject::GAMEOBJECT_DESC
+	{
+		InteractType eInteractType = InteractType::GeneralBox;
+		_float3 vSpawnPos = { 0.f, 0.f, 0.f };
+	} INTERACTBOX_DESC;
+
 private:
 	InteractBox(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	InteractBox(const InteractBox& Prototype);

@@ -549,11 +549,24 @@ void MainUI::Update_HPBarVisual()
     _float2 vBasePos = BackRect.vPos;
     _float2 vBaseSize = BackRect.vSize;
 
-    // 색깔은 여기서 건드리지 않는다.
-    // ImGui에서 수정한 색/알파가 그대로 유지되게 함.
+    // 안쪽 Fill 영역 계산
+    _float2 vInnerPos = vBasePos;
 
-    Set_BarRatio(TEXT("HP_Damage"), vBasePos, vBaseSize, m_fDamageRatio);
-    Set_BarRatio(TEXT("HeartGraph"), vBasePos, vBaseSize, m_fHpRatio);
+    _float2 vInnerSize =
+    {
+        vBaseSize.x - m_fHPBarPaddingX * 2.f,
+        vBaseSize.y - m_fHPBarPaddingY * 2.f
+    };
+
+    if (vInnerSize.x < 1.f)
+        vInnerSize.x = 1.f;
+
+    if (vInnerSize.y < 1.f)
+        vInnerSize.y = 1.f;
+
+    // Damage / HP Fill은 HP_Back보다 살짝 작게
+    Set_BarRatio(TEXT("HP_Damage"), vInnerPos, vInnerSize, m_fDamageRatio);
+    Set_BarRatio(TEXT("HeartGraph"), vInnerPos, vInnerSize, m_fHpRatio);
 }
 void MainUI::Set_HP(float fCurHP, float fMaxHP)
 {

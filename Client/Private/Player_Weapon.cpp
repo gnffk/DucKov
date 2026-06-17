@@ -157,9 +157,9 @@ HRESULT Player_Weapon::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
 
-	m_pColliderCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
-	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pColliderCom)))
-		return E_FAIL;
+	//m_pColliderCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
+	//if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pColliderCom)))
+	//	return E_FAIL;
 
 
 

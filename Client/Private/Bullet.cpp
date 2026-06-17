@@ -41,11 +41,7 @@ HRESULT Bullet::Initialize(void* pArg)
 
 		_matrix matWorld =
 			XMMatrixScaling(0.1f, 0.1f, 0.1f) *
-			XMMatrixTranslation(
-				pDesc->vStartPos.x,
-				pDesc->vStartPos.y,
-				pDesc->vStartPos.z
-			);
+			XMMatrixTranslation(pDesc->vStartPos.x,pDesc->vStartPos.y,pDesc->vStartPos.z);
 
 		_float4x4 World{};
 		XMStoreFloat4x4(&World, matWorld);

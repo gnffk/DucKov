@@ -94,6 +94,15 @@ HRESULT Player_Mouse::Render()
     if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
+    // 중요: 이전 UI 색상 값 초기화
+    _float4 vMouseColor = { 1.f, 1.f, 1.f, 1.f };
+    float fMouseAlpha = 1.f;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vMouseColor, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &fMouseAlpha, sizeof(float))))
+        return E_FAIL;
 
     if (FAILED(m_pShaderCom->Begin(0)))
         return E_FAIL;

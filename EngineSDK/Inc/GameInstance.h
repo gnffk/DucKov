@@ -20,6 +20,7 @@ public:
 	HRESULT Draw();
 	void Clear_Resource(uint32_t iClearLevelIndex);
 	void Clear_Resource_SameLevel(uint32_t iClearLevelIndex);
+	void End_Frame();
 	_float2 Get_ViewportSize() const {
 		return m_vViewportSize;
 	}

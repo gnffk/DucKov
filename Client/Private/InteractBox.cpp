@@ -32,16 +32,33 @@ HRESULT InteractBox::Initialize_Prototype()
 
 HRESULT InteractBox::Initialize(void* pArg)
 {
+	INTERACTBOX_DESC* pDesc = static_cast<INTERACTBOX_DESC*>(pArg);
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	if (pDesc != nullptr)
+	{
+		m_eInteractType = pDesc->eInteractType;
+
+
+		if (m_pTransformCom != nullptr)
+		{
+			_vector vPos = XMLoadFloat3(&pDesc->vSpawnPos);
+			vPos = XMVectorSetW(vPos, 1.f);
+
+			m_pTransformCom->Set_State(STATE::POSITION, vPos);
+		}
+	}
+
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
+
 	if (FAILED(Ready_UI()))
 		return E_FAIL;
 
 
+	m_pTransformCom->Set_Scale(0.01f, 0.01f, 0.01f);
 	return S_OK;
 }
 
@@ -90,10 +107,10 @@ void InteractBox::Late_Update(_float fTimeDelta)
 
 HRESULT InteractBox::Render()
 {
-#ifdef _DEBUG
-	IMGUITEST();
-
-#endif
+//#ifdef _DEBUG
+//	IMGUITEST();
+//
+//#endif
 	_float4x4 View, Proj;
 	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
@@ -165,9 +182,16 @@ HRESULT InteractBox::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
 
-	/*
-	pFindUI->Set_Owner(SHARED_THIS(BoxObject));
-	pFindUI->Set_Player(pPlayer);*/
+	auto m_pCollider = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
+	m_pCollider->SetOwner(SHARED_THIS(InteractBox).get());
+	if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pCollider)))
+		return E_FAIL;
+	m_pCollider->Set_GroupTag(L"InteractBox");
+	m_pCollider->Set_Center(_float3{ 0.f, 0.6f, 0.f });
+	m_pCollider->Set_Extend(_float3{ 0.3f, 0.6f, 0.3f });
+
+
+	m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].push_back(m_pCollider);
 
 
 

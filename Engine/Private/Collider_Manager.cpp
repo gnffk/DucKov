@@ -307,7 +307,6 @@ void Collider_Manager::Render() {
 
     for (auto& ColliderGroup : m_Colliders) {
         for (auto& Collider : ColliderGroup.second) {
-
             Collider->Render(m_batch);
        }
     }

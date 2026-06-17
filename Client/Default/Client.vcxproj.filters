@@ -178,6 +178,57 @@
     <Filter Include="02. GameObject\Player\UI\Player_State_UI">
       <UniqueIdentifier>{573d54f3-f746-49c2-8071-add25af0e062}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster">
+      <UniqueIdentifier>{4b9b172f-3730-45c0-a374-f3e5d5572a52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\FSM">
+      <UniqueIdentifier>{f4986f36-33ae-4ddb-983d-e5f614268703}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\Pattern">
+      <UniqueIdentifier>{4e2da7ed-4ae2-4bf2-9c5f-b1cdbd35a0be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State">
+      <UniqueIdentifier>{ce8dca6c-9daa-49f3-81ac-077e89f65582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\Weapon">
+      <UniqueIdentifier>{cdebfeda-562c-427d-a62d-8976539351d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\HAND_UP">
+      <UniqueIdentifier>{850b1a1e-d08c-4435-b48c-61f7591a62b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_LEFT">
+      <UniqueIdentifier>{50cb4715-a38b-41c5-8e04-0b045e6c1074}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_RIGHT">
+      <UniqueIdentifier>{803aaafc-2252-4f8f-89a4-7733b3796148}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_WALK">
+      <UniqueIdentifier>{892b0d35-df08-44ab-aed5-19579d67fc3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\IDLE">
+      <UniqueIdentifier>{d07d2fd8-d44e-41d6-96db-15af40944ff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\LEFT_WALK">
+      <UniqueIdentifier>{e138bf68-474e-4b27-bf74-778860094777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\RIGHT_WALK">
+      <UniqueIdentifier>{fdaf0c5e-3fcf-4bdc-8eec-4502c765d4f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\ROLL">
+      <UniqueIdentifier>{285eb59b-7720-4819-b662-463afa137865}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\RUN">
+      <UniqueIdentifier>{b6c8c8f6-c942-46ba-9c69-f308b777a596}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\WALK">
+      <UniqueIdentifier>{1147da5a-6236-4243-a45e-e732d78059e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\State\ATTACK">
+      <UniqueIdentifier>{d863942a-6754-4f57-89a3-0dcbe385eb97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\LittleMonster\UI">
+      <UniqueIdentifier>{53931124-f65e-4e04-8dfd-8309661a5779}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -348,6 +399,54 @@
     <ClInclude Include="..\Public\Player_State_UI.h">
       <Filter>02. GameObject\Player\UI\Player_State_UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster.h">
+      <Filter>02. GameObject\Monster\LittleMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_Pattern.h">
+      <Filter>02. GameObject\Monster\LittleMonster\Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_Weapon.h">
+      <Filter>02. GameObject\Monster\LittleMonster\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonsterFSM.h">
+      <Filter>02. GameObject\Monster\LittleMonster\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_WALK_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_HAND_UP_AND_LEFT_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_LEFT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_HAND_UP_AND_RIGHT_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_RIGHT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_HAND_UP_AND_WALK_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_Hand_UP_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\HAND_UP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_Idle_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\IDLE</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_LEFT_WALK_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\LEFT_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_RIGHT_WALK_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\RIGHT_WALK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_ROLL_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\ROLL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_RUN_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\RUN</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_Attack_State.h">
+      <Filter>02. GameObject\Monster\LittleMonster\State\ATTACK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LittleMonster_StateUI.h">
+      <Filter>02. GameObject\Monster\LittleMonster\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -515,6 +614,54 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player_State_UI.cpp">
       <Filter>02. GameObject\Player\UI\Player_State_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_Pattern.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\Pattern</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_Weapon.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonsterFSM.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_HAND_UP_AND_LEFT_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_LEFT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_HAND_UP_AND_RIGHT_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_RIGHT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_HAND_UP_AND_WALK_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\HAND_UP_AND_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_Hand_UP_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\HAND_UP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_Idle_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\IDLE</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_LEFT_WALK_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\LEFT_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_RIGHT_WALK_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\RIGHT_WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_ROLL_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\ROLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_RUN_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\RUN</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_WALK_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\WALK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_Attack_State.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\State\ATTACK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LittleMonster_StateUI.cpp">
+      <Filter>02. GameObject\Monster\LittleMonster\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
