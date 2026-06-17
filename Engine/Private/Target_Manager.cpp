@@ -1,5 +1,5 @@
 #include "Target_Manager.h"
-
+#include "GameInstance.h"
 #include "RenderTarget.h"
 
 Target_Manager::Target_Manager(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
@@ -49,17 +49,30 @@ HRESULT Target_Manager::Add_MRT(const _wstring& strMRTTag, const _wstring& strTa
     return S_OK;
 }
 
-HRESULT Target_Manager::Begin_MRT(const _wstring& strMRTTag)
+HRESULT Target_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bUseDepth)
 {
     auto pMRTList = Find_MRT(strMRTTag);
     if (nullptr == pMRTList)
         return E_FAIL;
 
-    // 이전에 ShaderResource로 묶였던 RenderTarget들 해제
     ID3D11ShaderResourceView* pNullSRVs[16] = {};
     m_pContext->PSSetShaderResources(0, 16, pNullSRVs);
 
-    m_pContext->OMGetRenderTargets(1, &m_pBackBufferRTV, &m_pOriginalDSV);
+    m_pBackBufferRTV.Reset();
+    m_pOriginalDSV.Reset();
+
+    m_pContext->OMGetRenderTargets(
+        1,
+        m_pBackBufferRTV.GetAddressOf(),
+        m_pOriginalDSV.GetAddressOf()
+    );
+
+    // 현재 Viewport 저장
+    m_iOriginalViewportCount = 1;
+    m_pContext->RSGetViewports(
+        &m_iOriginalViewportCount,
+        &m_OriginalViewport
+    );
 
     ID3D11RenderTargetView* pRTVs[8] = {};
     uint32_t iNumRenderTargets = 0;
@@ -67,28 +80,42 @@ HRESULT Target_Manager::Begin_MRT(const _wstring& strMRTTag)
     for (auto& pRenderTarget : *pMRTList)
     {
         pRenderTarget->Clear();
-
         pRTVs[iNumRenderTargets++] = pRenderTarget->Get_RTV().Get();
     }
 
-    m_pContext->OMSetRenderTargets(
-        iNumRenderTargets,
-        pRTVs,
-        m_pOriginalDSV.Get()
-    );
+    ID3D11DepthStencilView* pDSV = nullptr;
+
+    if (bUseDepth)
+        pDSV = m_pOriginalDSV.Get();
+
+    m_pContext->OMSetRenderTargets(iNumRenderTargets,pRTVs, pDSV);
+
+    // 현재 MRT의 첫 번째 RenderTarget 크기로 Viewport 설정
+    auto pFirstTarget = pMRTList->front();
+
+    D3D11_VIEWPORT Viewport{};
+    Viewport.TopLeftX = 0.f;
+    Viewport.TopLeftY = 0.f;
+    Viewport.Width = static_cast<float>(pFirstTarget->Get_Width());
+    Viewport.Height = static_cast<float>(pFirstTarget->Get_Height());
+    Viewport.MinDepth = 0.f;
+    Viewport.MaxDepth = 1.f;
+
+    m_pContext->RSSetViewports(1, &Viewport);
 
     return S_OK;
 }
-
 HRESULT Target_Manager::End_MRT()
 {
-    ComPtr<ID3D11RenderTargetView>      RenderTargets[8] = { m_pBackBufferRTV };
+    ID3D11RenderTargetView* pBackBufferRTV = m_pBackBufferRTV.Get();
 
-    m_pContext->OMSetRenderTargets(8, RenderTargets[0].GetAddressOf(), m_pOriginalDSV.Get());
+    m_pContext->OMSetRenderTargets(1,&pBackBufferRTV,m_pOriginalDSV.Get() );
+
+    // Begin_MRT 전에 저장했던 Viewport로 복구
+    m_pContext->RSSetViewports(m_iOriginalViewportCount, &m_OriginalViewport );
 
     return S_OK;
 }
-
 HRESULT Target_Manager::Bind_ShaderResource(const _wstring& strTargetTag, shared_ptr<class Shader> pShader, const _char* pConstantName)
 {
     auto    pRenderTarget = Find_RenderTarget(strTargetTag);

@@ -79,9 +79,9 @@ void LittleMonster_StateUI::Update(_float fTimeDelta)
     Update_FollowOwner();
     Update_HPBar(fTimeDelta);
 
-    #ifdef _DEBUG
-    GUI_MonsterStateUI();
-    #endif
+    //#ifdef _DEBUG
+    //GUI_MonsterStateUI();
+    //#endif
 }
 
 void LittleMonster_StateUI::Late_Update(_float fTimeDelta)

@@ -31,6 +31,14 @@ public:
 #endif
 
 private:
+	uint32_t m_iWidth = 0;
+	uint32_t m_iHeight = 0;
+
+public:
+	uint32_t Get_Width() const { return m_iWidth; }
+	uint32_t Get_Height() const { return m_iHeight; }
+
+private:
 	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
 	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
 

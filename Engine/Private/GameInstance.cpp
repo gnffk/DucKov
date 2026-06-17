@@ -506,9 +506,9 @@ HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strTar
     return m_pTarget_Manager->Add_MRT(strMRTTag, strTargetTag);
 }
 
-HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag)
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, _bool bUseDepth)
 {
-    return m_pTarget_Manager->Begin_MRT(strMRTTag);
+    return m_pTarget_Manager->Begin_MRT(strMRTTag, bUseDepth);
 }
 
 

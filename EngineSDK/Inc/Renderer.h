@@ -33,9 +33,9 @@ private:
 	list<shared_ptr<Component>>			m_DebugComponents;
 
 
-
+	int debugRender = 0;
 #endif
-
+	
 
 private:
 	HRESULT Render_Priority();
@@ -46,11 +46,39 @@ private:
 	HRESULT Render_NonLights();
 	HRESULT Render_UI();
 
+	HRESULT Render_Final();
+
+	HRESULT Render_Scene();
+	HRESULT Render_Combined_InScene();
+
+
 	HRESULT Render_DEBUG();
+
+
+private:
+
+
+	HRESULT Render_BloomDownSamples();
+
+	HRESULT Render_DownSample(const _wstring& strSrcTarget,const _wstring& strDstMRT,DEFERRED ePass,const _float2& vSrcTexelSize);
+
+
+private:
+	HRESULT Render_Blur1();
+	HRESULT Render_Blur2();
+	HRESULT Render_Blur3();
+
+	HRESULT Render_BlurPass(const _wstring& strSrcTarget,const _wstring& strDstMRT,const _float2& vSrcTexelSize, int iHorizontal);
+private:
+	HRESULT Render_UpSample1();
+	HRESULT Render_UpSample2();
+	HRESULT Render_UpSamplePass(const _wstring& strSrcTarget,const _wstring& strDstMRT,const _float2& vSrcTexelSize);
+	HRESULT Render_UpSampleBlend(const _wstring& strLowTarget, const _wstring& strBlendTarget, const _wstring& strDstMRT, const _float2& vLowTexelSize);
 
 
 
 public:
+
 	static unique_ptr<Renderer> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 
 

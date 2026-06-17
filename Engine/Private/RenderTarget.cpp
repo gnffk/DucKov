@@ -17,7 +17,8 @@ HRESULT RenderTarget::Initialize(uint32_t iWidth, uint32_t iHeight, DXGI_FORMAT 
 {
 
 	D3D11_TEXTURE2D_DESC	TextureDesc{};
-
+	m_iWidth = iWidth;
+	m_iHeight = iHeight;
 	TextureDesc.Width = iWidth;
 	TextureDesc.Height = iHeight;
 	TextureDesc.MipLevels = 1;

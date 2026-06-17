@@ -159,7 +159,10 @@ void MapEditor::IMGUI_Render() {
 
     }
 
-	IMGUI_Level_Render();
+    if (b_Debug) {
+        IMGUI_Level_Render();
+    }
+
     IMGUI_SaveLoad_Render();
     IMGUI_MadeFunction();
     IMGUI_AddPlayer();

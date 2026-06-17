@@ -146,7 +146,7 @@ public:
 public:
 	HRESULT Add_RenderTarget(const _wstring& strTargetTag, uint32_t iWidth, uint32_t iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
-	HRESULT Begin_MRT(const _wstring& strMRTTag);
+	HRESULT Begin_MRT(const _wstring& strMRTTag, _bool bUseDepth = true);
 	HRESULT End_MRT();
 	HRESULT Bind_RT_ShaderResource(const _wstring& strTargetTag, shared_ptr<class Shader> pShader, const _char* pConstantName);
 	HRESULT Copy_RenderTarget(const _wstring& strTargetTag, ComPtr<ID3D11Texture2D> pOut);
