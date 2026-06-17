@@ -33,7 +33,7 @@ private:
 	list<shared_ptr<Component>>			m_DebugComponents;
 
 
-	int debugRender = 0;
+	int debugRender = 1;
 #endif
 	
 

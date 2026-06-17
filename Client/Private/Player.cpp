@@ -847,13 +847,12 @@ _bool Player::Collider_Obstacle(_float fTimeDelta)
 
 	return _bool();
 }
-
 _bool Player::Collider_Box(_float fTimeDelta)
 {
 	auto ColliderGroup = CGameInstance::Get().GetColliderGroups(L"InteractBox");
 	auto ColliderPlayer = CGameInstance::Get().GetColliderGroups(L"Player");
 
-	bool bHitInteractBox = false;
+	_bool bHitInteractBox = false;
 
 	if (ColliderGroup != nullptr && ColliderPlayer != nullptr)
 	{
@@ -872,14 +871,16 @@ _bool Player::Collider_Box(_float fTimeDelta)
 		}
 	}
 
-	if (false == bHitInteractBox)
+
+	if (m_bPrevHitInteractBox == true && bHitInteractBox == false)
 	{
 		InvenSet(false);
 	}
 
+	m_bPrevHitInteractBox = bHitInteractBox;
+
 	return bHitInteractBox;
 }
-
 unique_ptr<Player> Player::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
 	auto	pInstance = unique_ptr<Player>(new Player(pDevice, pContext));

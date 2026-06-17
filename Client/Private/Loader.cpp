@@ -224,6 +224,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/MachineGun01.png"), 1))))
 			return E_FAIL;
 
+		/* For.Prototype_Com_Texture_UI_Item_Gun2*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_BulletTrail"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Bullet/BulletTrail.png"), 1))))
+			return E_FAIL;
+
 
 
 
@@ -262,6 +267,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_MainUI"),
 		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_MainUI.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_BulletTrail"),
+		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_BulletTrail.hlsl"), VTXBULLETTRAIL::Elements, VTXBULLETTRAIL::iNumElements))))
 		return E_FAIL;
 
 

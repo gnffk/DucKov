@@ -51,7 +51,8 @@ private:
 	_float				m_fRollDuration = { 0.45f };
 	_vector				m_vRollDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	float			m_fSpeedFloat{ 0.f };
-	
+private:
+	_bool m_bPrevHitInteractBox = false;
 
 private:
 #ifdef _DEBUG

@@ -52,6 +52,9 @@ HRESULT Bullet::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Trail()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -78,12 +81,58 @@ void Bullet::Priority_Update(_float fTimeDelta)
 
 void Bullet::Update(_float fTimeDelta)
 {
+
 	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vDir = XMLoadFloat3(&m_vDir);
 
 	vDir = XMVector3Normalize(vDir);
 
 	vPos += vDir * m_fSpeed * fTimeDelta;
+
+	// 기존 TrailPoint 수명 증가
+	for (auto& point : m_TrailPoints)
+		point.fLife += fTimeDelta;
+
+	// 오래된 점 제거
+	m_TrailPoints.erase(
+		remove_if(
+			m_TrailPoints.begin(),
+			m_TrailPoints.end(),
+			[this](const TrailPoint& p)
+			{
+				return p.fLife > m_fTrailLife;
+			}
+		),
+		m_TrailPoints.end()
+	);
+
+
+	_float3 vPosition{};
+	XMStoreFloat3(&vPosition, vPos);
+
+	// 너무 촘촘하게 쌓이는 것 방지
+	bool bAddPoint = true;
+
+	if (!m_TrailPoints.empty())
+	{
+		_vector vLast = XMLoadFloat3(&m_TrailPoints.back().vPos);
+		_vector vCurr = XMLoadFloat3(&vPosition);
+
+		float fDist = XMVectorGetX(XMVector3Length(vCurr - vLast));
+
+		if (fDist < 0.03f)
+			bAddPoint = false;
+	}
+
+	if (bAddPoint)
+	{
+		m_TrailPoints.push_back({ vPosition, 0.f });
+
+		if (m_TrailPoints.size() > MAX_TRAIL_POINTS)
+			m_TrailPoints.erase(m_TrailPoints.begin());
+	}
+
+	Build_TrailMesh();
 
 	m_pTransformCom->Set_State(STATE::POSITION, vPos);
 }
@@ -96,45 +145,95 @@ void Bullet::Late_Update(_float fTimeDelta)
 HRESULT Bullet::Render()
 {
 
-
 	_float4x4 View, Proj;
 	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
 	_float4x4 World = m_pTransformCom->GetWorldMatrix();
 
-
-
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
 		return E_FAIL;
 
-
-
-	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
+	uint32_t iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (uint32_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom,"g_DiffuseTexture",i,(uint32_t)ETOUI(TEXTURETYPE::DIFFUSE),0)))
+		{
 			return E_FAIL;
-
-
-		//if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_Normals, 0)))
-		//	return E_FAIL;
+		}
 
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 
-
 		m_pModelCom->Render(i);
 	}
 
+	// 총알 모델 렌더 후 Trail 렌더
+	if (FAILED(Render_Trail()))
+		return E_FAIL;
+
 	return S_OK;
 }
+HRESULT Bullet::Render_Trail()
+{
+	if (m_TrailVertices.size() < 4)
+		return S_OK;
 
+	if (m_pTrailVB == nullptr || m_pTrailShaderCom == nullptr)
+		return S_OK;
+
+	D3D11_MAPPED_SUBRESOURCE mapped{};
+
+	if (FAILED(m_pContext->Map(m_pTrailVB.Get(),0,D3D11_MAP_WRITE_DISCARD,0,&mapped)))
+	{
+		return E_FAIL;
+	}
+
+	memcpy(mapped.pData,m_TrailVertices.data(),sizeof(VTXBULLETTRAIL) * m_TrailVertices.size());
+
+	m_pContext->Unmap(m_pTrailVB.Get(), 0);
+
+	_float4x4 View, Proj;
+	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
+
+	_float4x4 Identity{};
+	XMStoreFloat4x4(&Identity, XMMatrixIdentity());
+
+	if (FAILED(m_pTrailShaderCom->Bind_Matrix("g_WorldMatrix", &Identity)))
+		return E_FAIL;
+
+	if (FAILED(m_pTrailShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
+		return E_FAIL;
+
+	if (FAILED(m_pTrailShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
+		return E_FAIL;
+
+
+	if (FAILED(m_pTrailTextureCom->Bind_ShaderResource(m_pTrailShaderCom,"g_DiffuseTexture",0)))
+	{
+		return E_FAIL;
+	}
+
+	UINT stride = sizeof(VTXBULLETTRAIL);
+	UINT offset = 0;
+
+	m_pContext->IASetVertexBuffers(0,1,m_pTrailVB.GetAddressOf(),&stride,&offset);
+
+	m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	if (FAILED(m_pTrailShaderCom->Begin(0)))
+		return E_FAIL;
+
+	m_pContext->Draw(static_cast<UINT>(m_TrailVertices.size()), 0);
+
+	return S_OK;
+}
 HRESULT Bullet::Ready_Components()
 {
 	__super::Clear_Compnent();
@@ -155,7 +254,7 @@ HRESULT Bullet::Ready_Components()
 	pOBBCom->Set_GroupTag(L"Bullet");
 	pOBBCom->Set_Extend(_float3{ 0.1f,0.1f,0.1f });
 
-	if (FAILED(__super::Add_Component(TEXT("Com_Collider"), m_pShaderCom)))
+	if (FAILED(__super::Add_Component(TEXT("Com_Collider"), pOBBCom)))
 		return E_FAIL;
 
 	pOBBCom->SetOwner(SHARED_THIS(Bullet).get());
@@ -165,6 +264,107 @@ HRESULT Bullet::Ready_Components()
 	return S_OK;
 }
 
+HRESULT Bullet::Ready_Trail()
+{
+	m_pTrailShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_BulletTrail")));
+
+	if (m_pTrailShaderCom == nullptr)
+		return E_FAIL;
+
+	// Trail Texture 추가
+	m_pTrailTextureCom = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Texture_BulletTrail")));
+
+	if (m_pTrailTextureCom == nullptr)
+		return E_FAIL;
+
+
+	D3D11_BUFFER_DESC desc{};
+	desc.ByteWidth = sizeof(VTXBULLETTRAIL) * MAX_TRAIL_VERTICES;
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+	desc.StructureByteStride = sizeof(VTXBULLETTRAIL);
+
+	if (FAILED(m_pDevice->CreateBuffer(&desc, nullptr, m_pTrailVB.GetAddressOf())))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void Bullet::Build_TrailMesh()
+{
+	m_TrailVertices.clear();
+
+	if (m_TrailPoints.size() < 2)
+		return;
+
+	_float4x4 View, Proj;
+	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
+
+	_matrix matView = XMLoadFloat4x4(&View);
+	_matrix matInvView = XMMatrixInverse(nullptr, matView);
+
+	_vector vCamPos = matInvView.r[3];
+
+	const size_t iPointCount = m_TrailPoints.size();
+
+	for (size_t i = 0; i < iPointCount; ++i)
+	{
+		_vector vCurr = XMLoadFloat3(&m_TrailPoints[i].vPos);
+
+		_vector vDir{};
+
+		if (i == 0)
+		{
+			_vector vNext = XMLoadFloat3(&m_TrailPoints[i + 1].vPos);
+			vDir = vNext - vCurr;
+		}
+		else if (i == iPointCount - 1)
+		{
+			_vector vPrev = XMLoadFloat3(&m_TrailPoints[i - 1].vPos);
+			vDir = vCurr - vPrev;
+		}
+		else
+		{
+			_vector vPrev = XMLoadFloat3(&m_TrailPoints[i - 1].vPos);
+			_vector vNext = XMLoadFloat3(&m_TrailPoints[i + 1].vPos);
+			vDir = vNext - vPrev;
+		}
+
+		vDir = XMVector3Normalize(vDir);
+
+		_vector vToCam = XMVector3Normalize(vCamPos - vCurr);
+
+		// 카메라 기준으로 Trail의 좌우 방향
+		_vector vSide = XMVector3Cross(vToCam, vDir);
+		vSide = XMVector3Normalize(vSide);
+
+		float fAlpha = 1.f - (m_TrailPoints[i].fLife / m_fTrailLife);
+
+		if (fAlpha < 0.f)
+			fAlpha = 0.f;
+
+		float fWidth = m_fTrailWidth * fAlpha;
+
+		_vector vLeft = vCurr + vSide * fWidth * 0.5f;
+		_vector vRight = vCurr - vSide * fWidth * 0.5f;
+
+		_float3 vLeftPos{};
+		_float3 vRightPos{};
+
+		XMStoreFloat3(&vLeftPos, vLeft);
+		XMStoreFloat3(&vRightPos, vRight);
+
+		float fV = static_cast<float>(i) / static_cast<float>(iPointCount - 1);
+
+		_float4 vColor = { 1.f, 1.f, 0.05f, fAlpha };
+
+		m_TrailVertices.push_back(VTXBULLETTRAIL{ vLeftPos, _float2{ 0.f, fV }, vColor });
+
+		m_TrailVertices.push_back(VTXBULLETTRAIL{ vRightPos, _float2{ 1.f, fV }, vColor });
+	}
+}
 
 unique_ptr<Bullet> Bullet::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {

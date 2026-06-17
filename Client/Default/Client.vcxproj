@@ -301,6 +301,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_BulletTrail.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_MainUI.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Obstacle.hlsl" />

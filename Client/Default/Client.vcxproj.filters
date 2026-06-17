@@ -692,6 +692,9 @@
     <FxCompile Include="..\..\Resources\Shaders\Shader_MainUI.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_BulletTrail.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Resources\Shaders\Engine_Shader_Defines.hlsli">

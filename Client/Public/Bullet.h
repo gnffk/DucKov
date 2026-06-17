@@ -23,6 +23,13 @@ public:
 		_float  fSpeed = 30.f;
 	} BULLET_DESC;
 
+	struct TrailPoint
+	{
+		_float3 vPos;
+		float   fLife;
+	};
+
+
 private:
 	_float3 m_vDir = { 0.f, 0.f, 1.f };
 	_float  m_fSpeed = 30.f;
@@ -41,7 +48,25 @@ public:
 	virtual HRESULT Render() override;
 	HRESULT Ready_Components();
 
+private:
+	HRESULT Ready_Trail();
+	void Build_TrailMesh();
+	HRESULT Render_Trail();
 
+private:
+	vector<TrailPoint> m_TrailPoints;
+	vector<VTXBULLETTRAIL>  m_TrailVertices;
+
+	ComPtr<ID3D11Buffer> m_pTrailVB = nullptr;
+
+	shared_ptr<Shader> m_pTrailShaderCom = nullptr;
+	shared_ptr<Texture> m_pTrailTextureCom = nullptr;
+
+	float m_fTrailLife = 0.15f;
+	float m_fTrailWidth = 0.3f;
+private:
+	static constexpr uint32_t MAX_TRAIL_POINTS = 32;
+	static constexpr uint32_t MAX_TRAIL_VERTICES = MAX_TRAIL_POINTS * 2;
 private:
 	uint32_t			m_iData = {};
 
@@ -50,6 +75,7 @@ private:
 
 	shared_ptr<Model>			m_pModelCom = { nullptr };
 	shared_ptr<Shader>			m_pShaderCom = { nullptr };
+
 
 
 
