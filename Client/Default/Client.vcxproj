@@ -190,6 +190,7 @@
     <ClInclude Include="..\Public\LittleMonster_WALK_State.h" />
     <ClInclude Include="..\Public\LittleMonster_Weapon.h" />
     <ClInclude Include="..\Public\MainUI.h" />
+    <ClInclude Include="..\Public\Particle_Blood.h" />
     <ClInclude Include="..\Public\Player_HAND_UP_State.h" />
     <ClInclude Include="..\Public\Player_Idle_State.h" />
     <ClInclude Include="..\Public\Player_FSM.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="..\Private\LittleMonster_WALK_State.cpp" />
     <ClCompile Include="..\Private\LittleMonster_Weapon.cpp" />
     <ClCompile Include="..\Private\MainUI.cpp" />
+    <ClCompile Include="..\Private\Particle_Blood.cpp" />
     <ClCompile Include="..\Private\Player_HAND_UP_State.cpp" />
     <ClCompile Include="..\Private\Player_Idle_State.cpp" />
     <ClCompile Include="..\Private\Player_FSM.cpp" />
@@ -301,6 +303,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Blood_Particle.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_BulletTrail.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_MainUI.hlsl" />

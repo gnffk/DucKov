@@ -9,6 +9,7 @@
 #include "VIBuffer_Cube.h"
 #include "VIBuffer_Cell.h"
 #include "VIBuffer_Mesh_Instance.h"
+#include "VIBuffer_Particle_Rect.h"
 #include "InstanceModel.h"
 #include "Model.h"
 #include "Texture.h"

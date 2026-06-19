@@ -60,7 +60,7 @@ HRESULT Bullet::Initialize(void* pArg)
 
 void Bullet::Priority_Update(_float fTimeDelta)
 {
-	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Bullet));
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONLIGHT, SHARED_THIS(Bullet));
 
 
 	for (int type = 0; type < (int)COLLIDER::COLLIDER_END; ++type)
@@ -168,7 +168,7 @@ HRESULT Bullet::Render()
 			return E_FAIL;
 		}
 
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderCom->Begin(2)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);

@@ -45,6 +45,7 @@ private:
 	HRESULT Render_Combined();
 	HRESULT Render_NonLights();
 	HRESULT Render_UI();
+	HRESULT Render_Effect();
 
 	HRESULT Render_Final();
 

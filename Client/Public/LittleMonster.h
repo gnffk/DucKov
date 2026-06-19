@@ -56,6 +56,9 @@ private:
 	void Spawn_DieBox();
 private:
 	_bool Collider_Bullet(_float fTimeDelta);
+private:
+	void Spawn_BloodEffect(const _float3& vSpawnPos);
+
 public:
 	shared_ptr<class FSM> GetFSM() { return m_pMonsterFSM; }
 private:
@@ -64,8 +67,8 @@ private:
 	shared_ptr<class Navigation> m_pNavigationCom = { nullptr };
 	map<string, shared_ptr<class GameObject>> m_pUI;
 
-	_float		m_fMaxHP = 100.f;
-	_float		m_fHP = 100.f;
+	_float		m_fMaxHP = 1000.f;
+	_float		m_fHP = 1000.f;
 	_float		m_fAttackPower = 10.f;
 
 private:
@@ -76,6 +79,7 @@ private:
 
 public:
 	void Take_Damage(_float fDamage);
+	void Take_Damage(_float fDamage, const _float3& vHitPos);
 	void Update_HP_UI();
 public:
 	static unique_ptr<LittleMonster> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

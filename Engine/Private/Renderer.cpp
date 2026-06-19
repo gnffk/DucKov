@@ -1,5 +1,10 @@
 #include "Renderer.h"
 
+//1. 얼마나 밝아야 Bloom에 걸리는가 ? → Threshold
+//2. Bloom이 얼마나 강하게 합쳐지는가 ? → FinalBloomStrength
+//3. Blur가 얼마나 퍼지는가 ? → Blur kernel / downsample 단계
+//4. 이펙트 자체가 얼마나 밝게 출력되는가 ? → Trail Shader Intensity
+
 Renderer::Renderer(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : 
     m_pDevice{ pDevice }
 ,   m_pContext{ pContext }
@@ -337,6 +342,11 @@ HRESULT Renderer::Draw()
     if (FAILED(Render_Final()))
         return E_FAIL;
 
+    
+    if (FAILED(Render_Effect()))
+        return E_FAIL;
+    
+
     if (FAILED(Render_UI()))
         return E_FAIL;
 
@@ -535,6 +545,18 @@ HRESULT Renderer::Render_UI()
     return S_OK;
 }
 
+HRESULT Renderer::Render_Effect()
+{
+    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERGROUP::EFFECT)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
+    }
+
+    m_RenderObjects[ETOUI(RENDERGROUP::EFFECT)].clear();
+    return S_OK;
+}
+
 HRESULT Renderer::Render_Final()
 {
     if (debugRender == 1) {
@@ -578,13 +600,9 @@ HRESULT Renderer::Render_Final()
         if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Blur0"),m_pShader,"g_BloomTexture")))
             return E_FAIL;
 
-        _float fFinalBloomStrength = 0.25f;
+        _float fFinalBloomStrength = 0.6f;
         m_pShader->Bind_RawValue("g_fFinalBloomStrength",&fFinalBloomStrength,sizeof(_float));
     }
-
-
-
-
 
     m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
@@ -620,10 +638,10 @@ HRESULT Renderer::Render_Scene()
     if (FAILED(Render_Combined()))
         return E_FAIL;
 
-    if (FAILED(Render_NonLights()))
+    if (FAILED(Render_Blend()))
         return E_FAIL;
 
-    if (FAILED(Render_Blend()))
+    if (FAILED(Render_NonLights()))
         return E_FAIL;
 
     if (FAILED(CGameInstance::Get().End_MRT()))
@@ -735,7 +753,7 @@ HRESULT Renderer::Render_DownSample(const _wstring& strSrcTarget, const _wstring
 
     m_pShader->Bind_RawValue("g_vTexelSize",&vSrcTexelSize,sizeof(_float2));
 
-    _float fBloomThreshold = 0.4f;
+    _float fBloomThreshold = 0.8f;
     m_pShader->Bind_RawValue("g_fBloomThreshold",&fBloomThreshold,sizeof(_float));
 
     m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);

@@ -229,6 +229,12 @@
     <Filter Include="02. GameObject\Monster\LittleMonster\UI">
       <UniqueIdentifier>{53931124-f65e-4e04-8dfd-8309661a5779}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Particle">
+      <UniqueIdentifier>{5e2cae72-8e90-43b6-8172-d1c59cd8ab88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Particle\Blood">
+      <UniqueIdentifier>{a404f810-f669-41bf-aedc-22d398fd411e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -447,6 +453,9 @@
     <ClInclude Include="..\Public\LittleMonster_StateUI.h">
       <Filter>02. GameObject\Monster\LittleMonster\UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Particle_Blood.h">
+      <Filter>02. GameObject\Particle\Blood</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -663,6 +672,9 @@
     <ClCompile Include="..\Private\LittleMonster_StateUI.cpp">
       <Filter>02. GameObject\Monster\LittleMonster\UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Particle_Blood.cpp">
+      <Filter>02. GameObject\Particle\Blood</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -693,6 +705,9 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_BulletTrail.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Blood_Particle.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

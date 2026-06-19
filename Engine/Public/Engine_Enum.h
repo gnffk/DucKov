@@ -5,7 +5,7 @@ namespace Engine
 {
 	enum class WINMODE { FULL, WIN };
 
-	enum class RENDERGROUP { PRIORITY, NONBLEND, NONLIGHT, BLEND, UI, END };
+	enum class RENDERGROUP { PRIORITY, NONBLEND, NONLIGHT, BLEND, EFFECT, UI, END };
 
 	enum class STATE { RIGHT, UP, LOOK, POSITION, END };
 

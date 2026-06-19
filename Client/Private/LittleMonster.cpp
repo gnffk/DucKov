@@ -6,6 +6,8 @@
 #include "LittleMonster_StateUI.h"
 #include "BaseCollider.h"
 #include "InteractBox.h"
+#include "Particle_Blood.h"
+
 NS_BEGIN(Client)
 
 LittleMonster::LittleMonster(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : Monster{ pDevice, pContext }
@@ -234,9 +236,22 @@ _bool LittleMonster::Collider_Bullet(_float fTimeDelta)
 		{
 			if (CGameInstance::Get().Intersect(ColliderPlayer.get(), Collider))
 			{
-				Take_Damage(20.f);
+				_float3 vHitPos{};
 
 				auto pBulletOwner = Collider->GetOwner();
+
+				if (pBulletOwner != nullptr && pBulletOwner->GetTransform() != nullptr)
+				{
+					XMStoreFloat3(&vHitPos,pBulletOwner->GetTransform()->Get_State(STATE::POSITION));
+				}
+				else
+				{
+					XMStoreFloat3(&vHitPos,m_pTransformCom->Get_State(STATE::POSITION));
+
+					vHitPos.y += 1.0f;
+				}
+
+				Take_Damage(20.f, vHitPos);
 
 				if (pBulletOwner != nullptr) {
 					pBulletOwner->Set_Dead();
@@ -256,6 +271,26 @@ _bool LittleMonster::Collider_Bullet(_float fTimeDelta)
 	}
 
 	return _bool();
+}
+
+void LittleMonster::Spawn_BloodEffect(const _float3& vSpawnPos)
+{
+	Particle_Blood::PARTICLE_BLOOD_DESC Desc{};
+
+	Desc.vSpawnPos = vSpawnPos;
+
+	Desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+	Desc.m_strName = L"Particle_Blood";
+	Desc.m_strPrototypeObjectName = L"Prototype_GameObject_Particle_Blood";
+	Desc.m_strPrototypeBaseName = L"Particle_Blood";
+	Desc.pCameraType = ETOUI(CAMERA::NONE);
+	Desc.fSpeedPerSec = 0.f;
+	Desc.fRotationPerSec = 0.f;
+
+	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_Particle_Blood"),CGameInstance::Get().Get_Level(),TEXT("Effect"),&Desc)))
+	{
+		return;
+	}
 }
 
 void LittleMonster::Priority_Update(_float fTimeDelta)
@@ -458,7 +493,20 @@ void LittleMonster::Move_Forward(_float fTimeDelta, _float fSpeedScale)
 
 void LittleMonster::Take_Damage(_float fDamage)
 {
+	_float3 vBloodPos{};
+	XMStoreFloat3(&vBloodPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	vBloodPos.y += 1.0f;
+
+	Take_Damage(fDamage, vBloodPos);
+}
+
+void LittleMonster::Take_Damage(_float fDamage, const _float3& vHitPos)
+{
 	if (Get_Dead())
+		return;
+
+	if (fDamage <= 0.f)
 		return;
 
 	m_fHP -= fDamage;
@@ -468,13 +516,14 @@ void LittleMonster::Take_Damage(_float fDamage)
 
 	Update_HP_UI();
 
+	Spawn_BloodEffect(vHitPos);
+
 	if (m_fHP <= 0.f)
 	{
 		Spawn_DieBox();
 		Set_Dead();
 	}
 }
-
 void LittleMonster::Update_HP_UI()
 {
 	auto iter = m_pUI.find("LittleMonsterStateUI");

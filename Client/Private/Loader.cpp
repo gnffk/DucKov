@@ -26,6 +26,7 @@
 #include "LittleMonster.h"
 #include "LittleMonster_Weapon.h"
 #include "LittleMonster_StateUI.h"
+#include "Particle_Blood.h"
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -229,6 +230,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Bullet/BulletTrail.png"), 1))))
 			return E_FAIL;
 
+		/* For.Prototype_Com_Texture_Blood*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Blood"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Blood/Blood.png"), 1))))
+			return E_FAIL;
+
 
 
 
@@ -273,15 +279,16 @@ HRESULT CLoader::Loading_For_MapEditor()
 		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_BulletTrail.hlsl"), VTXBULLETTRAIL::Elements, VTXBULLETTRAIL::iNumElements))))
 		return E_FAIL;
 
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_Blood_Particle_Rect"),
+		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_Blood_Particle.hlsl"), VTXINSTANCE_PARTICLE_RECT::Elements, VTXINSTANCE_PARTICLE_RECT::iNumElements))))
+		return E_FAIL;
+
 
 #pragma endregion
 
 #pragma region Model Component Prototype
 
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
-
-
-
 
 	_matrix CustomMatrix =
 	XMMatrixScaling(0.01f, 0.01f, 0.01f) *
@@ -455,6 +462,22 @@ HRESULT CLoader::Loading_For_MapEditor()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Rect"),
 		VIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+
+	/* For.Prototype_Com_VIBuffer_Particle_Blood */
+	VIBuffer_Particle_Rect::PARTICLE_INSTANCE_DESC		BloodDesc{};
+	BloodDesc.iNumInstances = 10;
+	BloodDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	BloodDesc.vRange = _float3(1.f, 1.f, 1.f);
+	BloodDesc.vSize = _float2(1.f, 1.f);
+	BloodDesc.vSpeed = _float2(1.f, 4.f);
+	BloodDesc.vLifeTime = _float2(2.f, 10.f);
+	BloodDesc.isLoop = false;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Particle_Blood"),
+		VIBuffer_Particle_Rect::Create(m_pDevice, m_pContext, &BloodDesc))))
+		return E_FAIL;
+
 #pragma endregion
 
 #pragma region Collider Component Prototype
@@ -581,6 +604,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_LittleMonster_StateUI */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_LittleMonster_StateUI"),
 		LittleMonster_StateUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_Particle_Blood */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Particle_Blood"),
+		Particle_Blood::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 
