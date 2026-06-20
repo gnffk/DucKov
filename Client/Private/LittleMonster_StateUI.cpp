@@ -79,9 +79,9 @@ void LittleMonster_StateUI::Update(_float fTimeDelta)
     Update_FollowOwner();
     Update_HPBar(fTimeDelta);
 
-    //#ifdef _DEBUG
-    //GUI_MonsterStateUI();
-    //#endif
+    #ifdef _DEBUG
+    GUI_MonsterStateUI();
+    #endif
 }
 
 void LittleMonster_StateUI::Late_Update(_float fTimeDelta)
@@ -586,6 +586,17 @@ void LittleMonster_StateUI::GUI_MonsterStateUI()
         if (ImGui::Button("Damage 10"))
         {
             Set_HP(m_fCurHP - 10.f, m_fMaxHP);
+
+
+            _vector vPos =  m_pOwner->GetTransform()->Get_State(STATE::POSITION);
+
+			_float3 vPosFloat3;
+
+            XMStoreFloat3(&vPosFloat3, vPos);
+
+			static_pointer_cast<LittleMonster>(m_pOwner)->Take_Damage(10.f, vPosFloat3);
+
+
         }
 
         ImGui::SameLine();

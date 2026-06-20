@@ -1,8 +1,7 @@
-
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "Particle_System.h"
 
 NS_BEGIN(Engine)
 class Shader;
@@ -10,10 +9,9 @@ class Texture;
 class VIBuffer_Particle_Rect;
 NS_END
 
-
 NS_BEGIN(Client)
 
-class Particle_Blood final : public GameObject
+class Particle_Blood final : public Particle_System
 {
 public:
 	typedef struct tagParticleBloodDesc : public GameObject::GAMEOBJECT_DESC
@@ -24,6 +22,7 @@ public:
 private:
 	Particle_Blood(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	Particle_Blood(const Particle_Blood& Prototype);
+
 public:
 	virtual ~Particle_Blood();
 
@@ -35,20 +34,28 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-private:
-	shared_ptr<VIBuffer_Particle_Rect>	m_pVIBufferCom = { nullptr };
-	shared_ptr<Texture>				m_pTextureCom = { nullptr };
-	shared_ptr<Shader>				m_pShaderCom = { nullptr };
-	vector<_float3>					m_vVelocity;
-	vector<_float4>					m_vStartPosition;
+public:
+	virtual void Add_Particle(const PARTICLE_SPAWN_DESC& Desc) override;
+
 private:
 	HRESULT Ready_Components();
 
-	void Reset_Blood();
+private:
+	shared_ptr<VIBuffer_Particle_Rect>	m_pVIBufferCom = { nullptr };
+	shared_ptr<Texture>					m_pTextureCom = { nullptr };
+	shared_ptr<Texture>					m_pNoiseTextureCom = { nullptr };
+	shared_ptr<Texture>					m_pMaskTextureCom = { nullptr };
+	shared_ptr<Texture>					m_pNormalTextureCom = { nullptr };
+	shared_ptr<Shader>					m_pShaderCom = { nullptr };
+private:
+	_float m_fTimeAcc = 0.f;
 
 public:
+	static unique_ptr<Particle_Blood> Create(
+		ComPtr<ID3D11Device> pDevice,
+		ComPtr<ID3D11DeviceContext> pContext
+	);
 
-	static unique_ptr<Particle_Blood> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;
 };
 

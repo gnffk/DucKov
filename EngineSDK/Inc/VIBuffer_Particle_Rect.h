@@ -24,18 +24,20 @@ public:
 
 
 
-private:
-	void Drop(_float fTimeDelta);
-
 public:
-	void Reset_Spray(vector<_float3>& vVelocity,vector<_float4>& vStartPosition);
-	_bool Spray(vector<_float3>& m_vVelocity, vector<_float4>& m_vStartPosition, _float fTimeDelta);
+	void Drop(_float fTimeDelta);
+	void Add_Spray(const _float3& vSpawnPos, uint32_t iCount);
+	void Update_Spray(_float fTimeDelta);
 
 
 private:
 	shared_ptr<VTXINSTANCE_PARTICLE[]>			m_pInstanceData = { nullptr };
 	shared_ptr<_float[]>						m_pSpeeds = { nullptr };
 	_bool										m_isLoop = { false };
+
+	vector<_float3>								m_vVelocity;
+	vector<_bool>								m_vActive;
+
 
 public:
 	static unique_ptr<VIBuffer_Particle_Rect> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext, void* pArg);

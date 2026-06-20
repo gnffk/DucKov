@@ -235,6 +235,21 @@ HRESULT CLoader::Loading_For_MapEditor()
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Blood/Blood.png"), 1))))
 			return E_FAIL;
 
+		/* For.Prototype_Com_Texture_Noise*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Noise"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Blood/Noise.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_Mask*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Mask"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Blood/Mask.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_BloodN*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_BloodN"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Blood/Blood_N.png"), 1))))
+			return E_FAIL;
+
 
 
 
@@ -466,12 +481,12 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	/* For.Prototype_Com_VIBuffer_Particle_Blood */
 	VIBuffer_Particle_Rect::PARTICLE_INSTANCE_DESC		BloodDesc{};
-	BloodDesc.iNumInstances = 10;
+	BloodDesc.iNumInstances = 50;
 	BloodDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	BloodDesc.vRange = _float3(1.f, 1.f, 1.f);
-	BloodDesc.vSize = _float2(1.f, 1.f);
+	BloodDesc.vRange = _float3(0.f, 0.f, 0.f);
+	BloodDesc.vSize = _float2(10.f, 12.f);
 	BloodDesc.vSpeed = _float2(1.f, 4.f);
-	BloodDesc.vLifeTime = _float2(2.f, 10.f);
+	BloodDesc.vLifeTime = _float2(2.f, 4.f);
 	BloodDesc.isLoop = false;
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Particle_Blood"),

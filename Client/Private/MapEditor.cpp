@@ -115,6 +115,34 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
 
     if (FAILED(CGameInstance::Get().Add_Light(LightDesc)))
         return E_FAIL;
+
+
+
+    GameObject::GAMEOBJECT_DESC Desc{};
+
+    Desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+    Desc.m_strName = L"Particle_Blood";
+    Desc.m_strPrototypeObjectName = L"Prototype_GameObject_Particle_Blood";
+    Desc.m_strPrototypeBaseName = L"Particle_Blood";
+    Desc.pCameraType = ETOUI(CAMERA::NONE);
+    Desc.fSpeedPerSec = 0.f;
+    Desc.fRotationPerSec = 0.f;
+
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_Particle_Blood"),CGameInstance::Get().Get_Level(),TEXT("Effect"),&Desc)))
+    {
+        return E_FAIL;
+    }
+
+    auto pBlood = dynamic_pointer_cast<Particle_System>(CGameInstance::Get().Find_Object( CGameInstance::Get().Get_Level(), TEXT("Effect"),TEXT("Particle_Blood") ));
+
+    if (pBlood == nullptr)
+        return E_FAIL;
+
+    if (FAILED(CGameInstance::Get().Register_ParticleSystem( PARTICLE_TYPE::BLOOD,pBlood)))
+    {
+        return E_FAIL;
+    }
+
 	return S_OK;
   
 }

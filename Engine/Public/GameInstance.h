@@ -170,6 +170,12 @@ public:
 	_bool Picking_to_Shader(_float4* pOut);
 #pragma endregion
 
+#pragma region Particle_Manager
+	HRESULT Register_ParticleSystem(PARTICLE_TYPE eType, shared_ptr<class Particle_System> pParticleSystem);
+
+	HRESULT Add_Particle(PARTICLE_TYPE eType, void* pArg = nullptr);
+#pragma endregion
+
 
 private:
 	_float2											m_vViewportSize = {};
@@ -191,6 +197,7 @@ private:
 	unique_ptr<class Target_Manager>				m_pTarget_Manager = { nullptr };
 	unique_ptr<class Light_Manager>					m_pLight_Manager = { nullptr };
 	unique_ptr<class Picking>						m_pPicking = { nullptr };
+	unique_ptr<class Particle_Manager>				m_pParticle_Manager = {nullptr};
 
 public:
 	void			Release_Engine();

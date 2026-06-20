@@ -275,22 +275,12 @@ _bool LittleMonster::Collider_Bullet(_float fTimeDelta)
 
 void LittleMonster::Spawn_BloodEffect(const _float3& vSpawnPos)
 {
-	Particle_Blood::PARTICLE_BLOOD_DESC Desc{};
-
+	Particle_System::PARTICLE_SPAWN_DESC Desc{};
 	Desc.vSpawnPos = vSpawnPos;
+	Desc.iCount = 10;
+	Desc.fPower = 1.f;
 
-	Desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
-	Desc.m_strName = L"Particle_Blood";
-	Desc.m_strPrototypeObjectName = L"Prototype_GameObject_Particle_Blood";
-	Desc.m_strPrototypeBaseName = L"Particle_Blood";
-	Desc.pCameraType = ETOUI(CAMERA::NONE);
-	Desc.fSpeedPerSec = 0.f;
-	Desc.fRotationPerSec = 0.f;
-
-	if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_Particle_Blood"),CGameInstance::Get().Get_Level(),TEXT("Effect"),&Desc)))
-	{
-		return;
-	}
+	CGameInstance::Get().Add_Particle(PARTICLE_TYPE::BLOOD, &Desc);
 }
 
 void LittleMonster::Priority_Update(_float fTimeDelta)

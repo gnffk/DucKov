@@ -51,6 +51,16 @@ namespace Engine
 	enum class POINT_CELL { A, B, C, END };
 	enum class LINE_CELL { AB, BC, CA, END };
 
+	enum class PARTICLE_TYPE : uint8_t
+	{
+		BLOOD,
+		SMOKE,
+		FIRE,
+		DUST,
+		SPARK,
+		END
+	};
+
 	//// Dynamic 컴포넌트 경우 매 프레임마다 갱신해야하는 컴포넌트 집단
 	//enum COMPONENTID { ID_DYNAMIC, ID_STATIC, ID_END };
 

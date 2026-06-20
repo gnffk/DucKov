@@ -16,6 +16,8 @@
 #include "Light_Manager.h"
 #include "Picking.h"
 #include "Layer.h"
+#include "Particle_Manager.h"
+#include "Particle_System.h"
 
 CGameInstance::CGameInstance()
 {
@@ -94,6 +96,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
 
     m_pPicking = Picking::Create(pOutDevice, pOutDeviceContext, Engine_Desc.hWnd);
     if (nullptr == m_pPicking)
+        return E_FAIL;
+
+    m_pParticle_Manager = Particle_Manager::Create(pOutDevice, pOutDeviceContext);
+    if (nullptr == m_pParticle_Manager)
         return E_FAIL;
 
 
@@ -561,8 +567,25 @@ _bool CGameInstance::Picking_to_Shader(_float4* pOut)
 
 #pragma endregion
 
+#pragma region Particle_Manager
+HRESULT CGameInstance::Register_ParticleSystem(PARTICLE_TYPE eType, shared_ptr<Particle_System> pParticleSystem) {
+
+	return m_pParticle_Manager->Register_ParticleSystem(eType, pParticleSystem);
+}
+
+HRESULT CGameInstance::Add_Particle(PARTICLE_TYPE eType, void* pArg ) {
+	return m_pParticle_Manager->Add_Particle(eType, pArg);
+}
+#pragma endregion
+
 void CGameInstance::Release_Engine()
 {
+    m_pParticle_Manager.reset();
+
+    m_pPicking.reset();
+
+    m_pUI_Manager.reset();
+
     m_pFont_Manager.reset();
 
     m_pLight_Manager.reset();

@@ -196,6 +196,12 @@
     <Filter Include="06.Component\VIBuffer\Instancing\Rect">
       <UniqueIdentifier>{ab8aea2c-e64a-45cd-8089-8e6ebfa8ed59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="16.Particle">
+      <UniqueIdentifier>{cc1f515f-cb68-402e-ac04-26801d0290aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="16.Particle\Particle_System">
+      <UniqueIdentifier>{849ac170-3be1-4f74-9971-4bc57526b3a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -405,6 +411,12 @@
     <ClCompile Include="..\Private\VIBuffer_Particle_Rect.cpp">
       <Filter>06.Component\VIBuffer\Instancing\Rect</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Particle_Manager.cpp">
+      <Filter>16.Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Particle_System.cpp">
+      <Filter>16.Particle\Particle_System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -601,6 +613,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_Particle_Rect.h">
       <Filter>06.Component\VIBuffer\Instancing\Rect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Particle_Manager.h">
+      <Filter>16.Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Particle_System.h">
+      <Filter>16.Particle\Particle_System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

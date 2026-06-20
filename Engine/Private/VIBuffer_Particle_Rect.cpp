@@ -1,5 +1,6 @@
 #include "VIBuffer_Particle_Rect.h"
 #include "GameInstance.h"
+#include "Particle_System.h"
 
 VIBuffer_Particle_Rect::VIBuffer_Particle_Rect(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
     : VIBuffer_Instance{ pDevice, pContext }
@@ -132,6 +133,14 @@ HRESULT VIBuffer_Particle_Rect::Initialize_Prototype(void* pArg)
 
 HRESULT VIBuffer_Particle_Rect::Initialize(void* pArg)
 {
+    m_vVelocity.resize(m_iNumInstances);
+    m_vActive.resize(m_iNumInstances, false);
+
+    for (uint32_t i = 0; i < m_iNumInstances; ++i)
+    {
+        m_pInstanceData[i].vLifeTime = _float2(1.f, 1.f); // 이미 죽은 상태
+    }
+
     return S_OK;
 }
 
@@ -159,87 +168,86 @@ void VIBuffer_Particle_Rect::Drop(_float fTimeDelta)
     m_pContext->Unmap(m_pVBInstance.Get(), 0);
 }
 
-void VIBuffer_Particle_Rect::Reset_Spray(vector<_float3>& vVelocity, vector<_float4>& vStartPosition)
+void VIBuffer_Particle_Rect::Add_Spray(const _float3& vSpawnPos, uint32_t iCount)
 {
-    vVelocity.resize(m_iNumInstances);
-    vStartPosition.resize(m_iNumInstances);
-
-    D3D11_MAPPED_SUBRESOURCE MappedSubResource{};
-
-    if (FAILED(m_pContext->Map( m_pVBInstance.Get(),0,D3D11_MAP_WRITE_DISCARD, 0, &MappedSubResource)))
-    {
-        return;
-    }
-
-    auto pVertices = static_cast<VTXINSTANCE_PARTICLE*>(MappedSubResource.pData);
+    uint32_t iSpawned = 0;
 
     for (uint32_t i = 0; i < m_iNumInstances; ++i)
     {
-        vStartPosition[i] = m_pInstanceData[i].vTranslation;
+        if (iSpawned >= iCount)
+            break;
 
-        pVertices[i].vTranslation = m_pInstanceData[i].vTranslation;
-        pVertices[i].vLifeTime.y = 0.f;
+        if (m_vActive[i])
+            continue;
 
-        float randX = CGameInstance::Get().Random(-1.f, 1.f);
-        float randY = CGameInstance::Get().Random(0.5f, 2.0f);
-        float randZ = CGameInstance::Get().Random(-1.f, 1.f);
+        m_vActive[i] = true;
+
+        _float fScale = CGameInstance::Get().Random(0.5f,1.f);
+
+        m_pInstanceData[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
+        m_pInstanceData[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
+        m_pInstanceData[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
+
+        m_pInstanceData[i].vTranslation = _float4(vSpawnPos.x,vSpawnPos.y,vSpawnPos.z,1.f);
+
+        m_pInstanceData[i].vLifeTime = _float2(CGameInstance::Get().Random(0.4f, 0.8f),0.f);
+
+        _float randX = CGameInstance::Get().Random(-1.f, 1.f);
+        _float randY = CGameInstance::Get().Random(0.5f, 2.0f);
+        _float randZ = CGameInstance::Get().Random(-1.f, 1.f);
 
         _vector vDir = XMVectorSet(randX, randY, randZ, 0.f);
         vDir = XMVector3Normalize(vDir);
 
-        float fSpeed = CGameInstance::Get().Random(2.f, 6.f);
+        _float fSpeed = CGameInstance::Get().Random(2.f, 6.f);
 
-        _vector vNewVelocity = vDir * fSpeed;
-        XMStoreFloat3(&vVelocity[i], vNewVelocity);
+        XMStoreFloat3(&m_vVelocity[i], vDir * fSpeed);
+
+        ++iSpawned;
     }
-
-    m_pContext->Unmap(m_pVBInstance.Get(), 0);
 }
 
-_bool VIBuffer_Particle_Rect::Spray(vector<_float3>& vVelocity,vector<_float4>& vStartPosition,_float fTimeDelta)
+void VIBuffer_Particle_Rect::Update_Spray(_float fTimeDelta)
 {
-    if (vVelocity.size() < m_iNumInstances ||vStartPosition.size() < m_iNumInstances)
+    const _float fGravity = 4.f;
+
+    for (uint32_t i = 0; i < m_iNumInstances; ++i)
     {
-        return true;
+        if (!m_vActive[i])
+            continue;
+
+        m_pInstanceData[i].vLifeTime.y += fTimeDelta;
+
+        if (m_pInstanceData[i].vLifeTime.y >= m_pInstanceData[i].vLifeTime.x)
+        {
+            m_pInstanceData[i].vLifeTime.y = m_pInstanceData[i].vLifeTime.x;
+            m_vActive[i] = false;
+
+            // 수명 끝난 파티클은 안 보이게 처리
+            m_pInstanceData[i].vRight = _float4(0.f, 0.f, 0.f, 0.f);
+            m_pInstanceData[i].vUp = _float4(0.f, 0.f, 0.f, 0.f);
+            m_pInstanceData[i].vLook = _float4(0.f, 0.f, 0.f, 0.f);
+
+            continue;
+        }
+
+        m_vVelocity[i].y -= fGravity * fTimeDelta;
+
+        m_pInstanceData[i].vTranslation.x += m_vVelocity[i].x * fTimeDelta;
+        m_pInstanceData[i].vTranslation.y += m_vVelocity[i].y * fTimeDelta;
+        m_pInstanceData[i].vTranslation.z += m_vVelocity[i].z * fTimeDelta;
     }
 
     D3D11_MAPPED_SUBRESOURCE MappedSubResource{};
 
-    if (FAILED(m_pContext->Map( m_pVBInstance.Get(), 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0,&MappedSubResource)))
+    if (FAILED(m_pContext->Map( m_pVBInstance.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedSubResource)))
     {
-        return true;
+        return;
     }
 
-    auto pVertices = static_cast<VTXINSTANCE_PARTICLE*>(MappedSubResource.pData);
-
-    const float fGravity = 9.8f;
-
-    _bool bAllDead = true;
-
-    for (uint32_t i = 0; i < m_iNumInstances; ++i)
-    {
-        pVertices[i].vLifeTime.y += fTimeDelta;
-
- 
-        if (pVertices[i].vLifeTime.y < pVertices[i].vLifeTime.x)
-        {
-            bAllDead = false;
-
-            vVelocity[i].y -= fGravity * fTimeDelta;
-
-            pVertices[i].vTranslation.x += vVelocity[i].x * fTimeDelta;
-            pVertices[i].vTranslation.y += vVelocity[i].y * fTimeDelta;
-            pVertices[i].vTranslation.z += vVelocity[i].z * fTimeDelta;
-        }
-        else
-        {
-            pVertices[i].vLifeTime.y = pVertices[i].vLifeTime.x;
-        }
-    }
+    memcpy( MappedSubResource.pData,  m_pInstanceData.get(),sizeof(VTXINSTANCE_PARTICLE) * m_iNumInstances);
 
     m_pContext->Unmap(m_pVBInstance.Get(), 0);
-
-    return bAllDead;
 }
 
 unique_ptr<VIBuffer_Particle_Rect> VIBuffer_Particle_Rect::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext, void* pArg)
