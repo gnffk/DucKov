@@ -1,10 +1,12 @@
 #include "InvenUI.h"
-
+#include "Player.h"
 #include "GameInstance.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "VIBuffer_Rect.h"
 #include "Transform.h"
+#include "UIObject.h"
+#include "MainUI.h"
 #include <fstream>
 #include <sstream>
 
@@ -809,6 +811,7 @@ HRESULT InvenUI::Add_Item(const INV_ITEM& Item)
     NewItem.strTextureTag = Item.strTextureTag;
     NewItem.eEquipKind = Item.eEquipKind;
     NewItem.vIconSize = Item.vIconSize;
+    NewItem.strEquipModelKey = Item.strEquipModelKey;
 
     int iNewItemIndex = static_cast<int>(m_InventoryItems.size());
 
@@ -1034,64 +1037,119 @@ void InvenUI::End_DragItem()
     int iSrcSlot = m_iDragSrcSlot;
     int iDraggingItem = m_iDraggingItem;
 
-    // 변경 전 상태 저장
-    int iPrevSrcItem = -1;
-    int iPrevTargetItem = -1;
+    auto Restore_DragItem = [&]()
+        {
+            if (iSrcSlot != -1 && iDraggingItem != -1)
+                m_InventorySlots[iSrcSlot].iItemIndex = iDraggingItem;
+        };
 
-    if (iSrcSlot != -1)
-        iPrevSrcItem = m_InventorySlots[iSrcSlot].iItemIndex;
+    // 안전 검사
+    if (iSrcSlot < 0 || iSrcSlot >= static_cast<int>(m_InventorySlots.size()))
+    {
+        m_bDraggingItem = false;
+        m_iDragSrcSlot = -1;
+        m_iDraggingItem = -1;
+        Update_ItemIconPosition();
+        return;
+    }
 
-    if (iTargetSlot != -1)
-        iPrevTargetItem = m_InventorySlots[iTargetSlot].iItemIndex;
+    if (iDraggingItem < 0 || iDraggingItem >= static_cast<int>(m_InventoryItems.size()))
+    {
+        m_bDraggingItem = false;
+        m_iDragSrcSlot = -1;
+        m_iDraggingItem = -1;
+        Update_ItemIconPosition();
+        return;
+    }
 
-    // 현재 Begin_DragItem에서 원래 슬롯을 비웠기 때문에
-    // 원래 소스 슬롯의 이전 아이템은 드래그 중인 아이템으로 봐야 함
-    iPrevSrcItem = iDraggingItem;
-
+    // 아무 슬롯에도 안 놓으면 원래 자리로 복귀
     if (iTargetSlot == -1)
     {
-        // 아무 슬롯에도 안 놓으면 원래 자리로 복귀
-        m_InventorySlots[iSrcSlot].iItemIndex = iDraggingItem;
+        Restore_DragItem();
+
+        m_bDraggingItem = false;
+        m_iDragSrcSlot = -1;
+        m_iDraggingItem = -1;
+
+        Update_ItemIconPosition();
+        return;
     }
-    else
+
+    if (iTargetSlot < 0 || iTargetSlot >= static_cast<int>(m_InventorySlots.size()))
     {
-        if (Can_PlaceItem(iTargetSlot, iDraggingItem))
+        Restore_DragItem();
+
+        m_bDraggingItem = false;
+        m_iDragSrcSlot = -1;
+        m_iDraggingItem = -1;
+
+        Update_ItemIconPosition();
+        return;
+    }
+
+    // 타겟 슬롯에 드래그 아이템을 넣을 수 없으면 복귀
+    if (false == Can_PlaceItem(iTargetSlot, iDraggingItem))
+    {
+        Restore_DragItem();
+
+        m_bDraggingItem = false;
+        m_iDragSrcSlot = -1;
+        m_iDraggingItem = -1;
+
+        Update_ItemIconPosition();
+        return;
+    }
+
+    int iTargetItem = m_InventorySlots[iTargetSlot].iItemIndex;
+
+    // 서로 교환할 경우, 타겟 아이템이 원래 슬롯으로 들어갈 수 있는지도 검사해야 함
+    if (iTargetItem != -1)
+    {
+        if (false == Can_PlaceItem(iSrcSlot, iTargetItem))
         {
-            // 대상 슬롯에 이미 아이템이 있으면 서로 교환
-            int iTargetItem = m_InventorySlots[iTargetSlot].iItemIndex;
+            Restore_DragItem();
 
-            m_InventorySlots[iTargetSlot].iItemIndex = iDraggingItem;
-            m_InventorySlots[iSrcSlot].iItemIndex = iTargetItem;
+            m_bDraggingItem = false;
+            m_iDragSrcSlot = -1;
+            m_iDraggingItem = -1;
 
-            // 여기서 딱 한 번 Player 소켓에 반영
-            if (Is_EquipSlot(iSrcSlot))
-            {
-                Notify_EquipChanged(
-                    iSrcSlot,
-                    iPrevSrcItem,
-                    m_InventorySlots[iSrcSlot].iItemIndex
-                );
-            }
-
-            if (Is_EquipSlot(iTargetSlot))
-            {
-                Notify_EquipChanged(
-                    iTargetSlot,
-                    iPrevTargetItem,
-                    m_InventorySlots[iTargetSlot].iItemIndex
-                );
-            }
+            Update_ItemIconPosition();
+            return;
         }
-        else
-        {
-            // 장착 불가능한 슬롯이면 원래 자리로 복귀
-            m_InventorySlots[iSrcSlot].iItemIndex = iDraggingItem;
-        }
+    }
+
+    // 변경 전 상태 저장
+    int iPrevSrcItem = iDraggingItem;
+    int iPrevTargetItem = iTargetItem;
+
+    // 실제 이동/교환
+    m_InventorySlots[iTargetSlot].iItemIndex = iDraggingItem;
+    m_InventorySlots[iSrcSlot].iItemIndex = iTargetItem;
+
+    // 장비 슬롯 변화 반영
+    if (Is_EquipSlot(iSrcSlot))
+    {
+        Notify_EquipChanged(
+            iSrcSlot,
+            iPrevSrcItem,
+            m_InventorySlots[iSrcSlot].iItemIndex
+        );
+    }
+
+    if (Is_EquipSlot(iTargetSlot))
+    {
+        Notify_EquipChanged(
+            iTargetSlot,
+            iPrevTargetItem,
+            m_InventorySlots[iTargetSlot].iItemIndex
+        );
     }
 
     m_bDraggingItem = false;
     m_iDragSrcSlot = -1;
     m_iDraggingItem = -1;
+
+    Update_ItemIconPosition();
 }
 _bool InvenUI::Can_PlaceItem(int iSlotIndex, int iItemIndex)
 {
@@ -1250,30 +1308,93 @@ void InvenUI::Notify_EquipChanged(int iSlotIndex, int iPrevItemIndex, int iNewIt
         return;
 
     SLOT_KIND eSlotKind = m_InventorySlots[iSlotIndex].eKind;
+    const wstring& strSlotKey = m_InventorySlots[iSlotIndex].strSlotRectKey;
 
-    // 이전 아이템 해제
+    auto pPlayer =
+        CGameInstance::Get().Find_Object(
+            CGameInstance::Get().Get_Level(),
+            L"PlayerTag",
+            L"Player"
+        );
+
+    if (pPlayer == nullptr)
+        return;
+
+    auto pPlayerObj = static_pointer_cast<Player>(pPlayer);
+
+    if (pPlayerObj == nullptr)
+        return;
+
+    // ==========================
+    // 무기 슬롯 처리
+    // ==========================
+    if (eSlotKind == SLOT_KIND::GUN)
+    {
+        int iWeaponSlotNumber = -1;
+
+        if (strSlotKey == TEXT("Gun1_Box"))
+            iWeaponSlotNumber = 1;
+        else if (strSlotKey == TEXT("Gun2_Box"))
+            iWeaponSlotNumber = 2;
+
+        if (iWeaponSlotNumber == -1)
+            return;
+
+        // Player의 무기 슬롯 데이터 갱신
+        if (iNewItemIndex != -1)
+        {
+            INV_ITEM& NewItem = m_InventoryItems[iNewItemIndex];
+            pPlayerObj->Set_WeaponSlot(iWeaponSlotNumber, NewItem);
+        }
+        else
+        {
+            pPlayerObj->Clear_WeaponSlot(iWeaponSlotNumber);
+        }
+
+        // MainUI의 1, 2번 아이콘 갱신
+        auto& UIs = pPlayerObj->GetUIs();
+
+        auto iterMainUI = UIs.find("MainUI");
+
+        if (iterMainUI != UIs.end())
+        {
+            auto pMainUI = static_pointer_cast<MainUI>(iterMainUI->second);
+
+            if (pMainUI != nullptr)
+            {
+                if (iNewItemIndex != -1)
+                {
+                    INV_ITEM& NewItem = m_InventoryItems[iNewItemIndex];
+
+                    pMainUI->Set_WeaponSlotIcon(
+                        iWeaponSlotNumber,
+                        NewItem.strTextureTag
+                    );
+                }
+                else
+                {
+                    pMainUI->Clear_WeaponSlotIcon(iWeaponSlotNumber);
+                }
+            }
+        }
+
+        return;
+    }
+    // ==========================
+    // 방어구, 머리, 근접무기 등 기존 처리
+    // ==========================
     if (iPrevItemIndex != -1)
     {
         INV_ITEM& PrevItem = m_InventoryItems[iPrevItemIndex];
-
-        // TODO:
-        // Player 소켓에서 PrevItem 제거
-        // 예: pPlayer->Unequip_Item(eSlotKind, PrevItem);
+        pPlayerObj->Unequip_Item(eSlotKind, PrevItem);
     }
 
-    // 새 아이템 장착
     if (iNewItemIndex != -1)
     {
         INV_ITEM& NewItem = m_InventoryItems[iNewItemIndex];
-
-        // TODO:
-        // Player 소켓에 NewItem 장착
-        // 예: pPlayer->Equip_Item(eSlotKind, NewItem);
+        pPlayerObj->Equip_Item(eSlotKind, NewItem);
     }
 }
-
-//-----
-
 void InvenUI::Toggle_Inven()
 {
     InvenSet(!m_bInventoryOpen);
@@ -1306,7 +1427,6 @@ void InvenUI::Open_Inven()
 
 void InvenUI::Close_Inven()
 {
-    // 드래그 중에 닫으면 원래 슬롯으로 복귀
     if (m_bDraggingItem)
     {
         if (m_iDragSrcSlot != -1 && m_iDraggingItem != -1)
@@ -1317,10 +1437,12 @@ void InvenUI::Close_Inven()
         m_bDraggingItem = false;
         m_iDragSrcSlot = -1;
         m_iDraggingItem = -1;
+
+        // 추가
+        Update_ItemIconPosition();
     }
 
     m_eAnimState = INVEN_ANIM_STATE::CLOSING;
-    // 닫을 때는 현재 열린 상태에서 사라지게 시작
     m_fAnimRatio = 1.f;
     m_fAnimAlpha = 1.f;
     m_vAnimOffset = { 0.f, 0.f };

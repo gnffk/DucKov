@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "ContainerObject.h"
-
+#include "UIObject.h"
 NS_BEGIN(Client)
 
 class Player final : public ContainerObject
@@ -38,6 +38,7 @@ public:
 	}
 	shared_ptr<class Navigation> GetNavigation() { return m_pNavigationCom; }
 	map<string, shared_ptr<class GameObject>>& GetUIs() { return m_pUI; }
+	void Update_HP_UI();
 private:
 	uint32_t			m_iState = {};
 	
@@ -54,6 +55,10 @@ private:
 private:
 	_bool m_bPrevHitInteractBox = false;
 
+	_float		m_fMaxHP = 1000.f;
+	_float		m_fHP = 1000.f;
+	_float		m_fAttackPower = 10.f;
+
 private:
 #ifdef _DEBUG
 	void			IMGUI_DEBUGRENDER();
@@ -68,10 +73,29 @@ private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_UI();
+private:
+	void Spawn_BloodEffect(const _float3& vSpawnPos);
+public:
+	void Take_Damage(_float fDamage, const _float3& vHitPos);
+
+
+public:
+	void Equip_Item(Engine::UIObject::SLOT_KIND eSlotKind, const Engine::UIObject::INV_ITEM& Item);
+	void Unequip_Item(Engine::UIObject::SLOT_KIND eSlotKind, const Engine::UIObject::INV_ITEM& Item);
+
+public:
+	void Set_WeaponSlot(int iSlotNumber, const Engine::UIObject::INV_ITEM& Item);
+	void Clear_WeaponSlot(int iSlotNumber);
+	void Switch_WeaponSlot(int iSlotNumber);
+
+private:
+	string m_strWeaponSlotKey[2] = { "Default", "Default" };
+	int m_iCurrentWeaponSlot = -1;
 
 private:
 	_bool Collider_Obstacle(_float fTimeDelta);
 	_bool Collider_Box(_float fTimeDelta);
+	_bool Collider_HitAttack(_float fTimeDelta);
 public:
 	static unique_ptr<Player> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	virtual shared_ptr<Prototype> Clone(void* pArg) override;

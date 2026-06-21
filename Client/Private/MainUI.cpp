@@ -584,3 +584,71 @@ float  MainUI::LerpFloat(float fStart, float fEnd, float fRatio)
 
     return fStart + (fEnd - fStart) * fRatio;
 }
+
+void MainUI::Set_WeaponSlotIcon(int iSlotNumber, const wstring& strTextureTag)
+{
+    wstring strSlotKey;
+
+    if (iSlotNumber == 1)
+        strSlotKey = TEXT("1");
+    else if (iSlotNumber == 2)
+        strSlotKey = TEXT("2");
+    else
+        return;
+
+    auto iter = m_UIRects.find(strSlotKey);
+
+    if (iter == m_UIRects.end())
+        return;
+
+    UI_RECT& UI = iter->second;
+
+    UI.strTextureTag = strTextureTag;
+
+    // 기존 pTexture를 새 아이콘 텍스처로 교체
+    UI.pTexture =
+        dynamic_pointer_cast<Texture>(
+            CGameInstance::Get().Clone_Prototype(
+                CGameInstance::Get().Get_Level(),
+                strTextureTag
+            )
+        );
+
+    UI.bVisible = true;
+    UI.iTextureIndex = 0;
+    UI.fAlpha = 1.f;
+    UI.vColor = { 1.f, 1.f, 1.f, 1.f };
+}
+
+void MainUI::Clear_WeaponSlotIcon(int iSlotNumber)
+{
+    wstring strSlotKey;
+
+    if (iSlotNumber == 1)
+        strSlotKey = TEXT("1");
+    else if (iSlotNumber == 2)
+        strSlotKey = TEXT("2");
+    else
+        return;
+
+    auto iter = m_UIRects.find(strSlotKey);
+
+    if (iter == m_UIRects.end())
+        return;
+
+    UI_RECT& UI = iter->second;
+
+    UI.strTextureTag = TEXT("Prototype_Com_Texture_Icon");
+
+    UI.pTexture =
+        dynamic_pointer_cast<Texture>(
+            CGameInstance::Get().Clone_Prototype(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_Com_Texture_Icon")
+            )
+        );
+
+    UI.iTextureIndex = 0;
+    UI.fAlpha = 1.f;
+    UI.vColor = { 1.f, 1.f, 1.f, 1.f };
+}

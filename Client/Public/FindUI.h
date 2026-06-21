@@ -70,6 +70,10 @@ private:
     HRESULT Render_UIRect_ByKey(const wstring& strKey);
 
     _bool Is_ItemIconKey(const wstring& strKey);
+
+
+public:
+    HRESULT Set_LootItems(const vector<INV_ITEM>& LootItems);
 private:
     vector<INV_SLOT> m_InventorySlots;
     vector<INV_ITEM> m_InventoryItems;

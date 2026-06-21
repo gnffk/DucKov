@@ -57,6 +57,9 @@ void Player_Weapon::Update(_float fTimeDelta)
 	GUI_PlayerWeapon();
 #endif
 
+	if (m_strCurrentWeaponType == "Default")
+		return;
+
 	_matrix SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
 	_vector vSocketPos = SocketMatrix.r[3];
@@ -64,17 +67,23 @@ void Player_Weapon::Update(_float fTimeDelta)
 	_matrix SocketPosMatrix = XMMatrixIdentity();
 	SocketPosMatrix.r[3] = vSocketPos;
 
+	const WEAPON_SETTING& Setting = m_CurrentWeaponSetting;
+
 	_matrix LocalWeaponMatrix =
-		XMMatrixScaling(m_vLocalScale.x, m_vLocalScale.y, m_vLocalScale.z) *
+		XMMatrixScaling(
+			Setting.vLocalScale.x,
+			Setting.vLocalScale.y,
+			Setting.vLocalScale.z
+		) *
 		XMMatrixRotationRollPitchYaw(
-			XMConvertToRadians(m_vLocalRot.x),
-			XMConvertToRadians(m_vLocalRot.y),
-			XMConvertToRadians(m_vLocalRot.z)
+			XMConvertToRadians(Setting.vLocalRot.x),
+			XMConvertToRadians(Setting.vLocalRot.y),
+			XMConvertToRadians(Setting.vLocalRot.z)
 		) *
 		XMMatrixTranslation(
-			m_vLocalPos.x,
-			m_vLocalPos.y,
-			m_vLocalPos.z
+			Setting.vLocalPos.x,
+			Setting.vLocalPos.y,
+			Setting.vLocalPos.z
 		);
 
 	_matrix ChildMatrix = LocalWeaponMatrix * SocketPosMatrix;
@@ -84,18 +93,26 @@ void Player_Weapon::Update(_float fTimeDelta)
 	_float4x4 WeaponWorldFloat4x4 = __super::GetCombined();
 	_matrix WeaponWorld = XMLoadFloat4x4(&WeaponWorldFloat4x4);
 
-	_vector vMuzzleLocal = XMVectorSet(m_vMuzzleLocalPos.x,m_vMuzzleLocalPos.y,m_vMuzzleLocalPos.z,1.f);
+	_vector vMuzzleLocal =
+		XMVectorSet(
+			Setting.vMuzzleLocalPos.x,
+			Setting.vMuzzleLocalPos.y,
+			Setting.vMuzzleLocalPos.z,
+			1.f
+		);
 
-	_vector vMuzzleWorld =XMVector3TransformCoord(vMuzzleLocal, WeaponWorld);
+	_vector vMuzzleWorld =
+		XMVector3TransformCoord(vMuzzleLocal, WeaponWorld);
 
 	XMStoreFloat3(&m_vMuzzleWorldPos, vMuzzleWorld);
 
 	if (m_fFireTimer > 0.f)
 		m_fFireTimer -= fTimeDelta;
 
-
-
-	Update_MouseRecoil(fTimeDelta, CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_LB));
+	Update_MouseRecoil(
+		fTimeDelta,
+		CGameInstance::Get().Mouse_Pressing(MOUSEKEYSTATE::DIM_LB)
+	);
 }
 
 void Player_Weapon::Late_Update(_float fTimeDelta)
@@ -109,9 +126,21 @@ void Player_Weapon::Late_Update(_float fTimeDelta)
 
 HRESULT Player_Weapon::Render()
 {
-	if (!m_bVisible) 
-		return E_FAIL;
-	
+	if (!m_bVisible)
+		return S_OK;
+
+	if (m_strCurrentWeaponType == "Default")
+		return S_OK;
+
+	auto iterModel = m_pWeaponModelMap.find(m_strCurrentWeaponType);
+
+	if (iterModel == m_pWeaponModelMap.end())
+		return S_OK;
+
+	auto pModel = iterModel->second;
+
+	if (pModel == nullptr)
+		return S_OK;
 
 	if (FAILED(__super::Bind_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
@@ -119,52 +148,61 @@ HRESULT Player_Weapon::Render()
 	_float4x4 View, Proj;
 	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
-
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
 		return E_FAIL;
 
-
-
-	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
+	uint32_t iNumMeshes = pModel->Get_NumMeshes();
 
 	for (uint32_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+		if (FAILED(pModel->Bind_Materials(
+			m_pShaderCom,
+			"g_DiffuseTexture",
+			i,
+			ETOUI(TEXTURETYPE::DIFFUSE),
+			0)))
 			return E_FAIL;
 
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 
-
-		m_pModelCom->Render(i);
+		pModel->Render(i);
 	}
-
-
 
 	return S_OK;
 }
-
 HRESULT Player_Weapon::Ready_Components()
 {
-	m_pModelCom = dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Model_Gun2")));
-	if (FAILED(__super::Add_Component(TEXT("Com_Model"), m_pModelCom)))
-		return E_FAIL;
+	Ready_WeaponSettings();
 
-	m_pShaderCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_Vtx_FBX_Tex")));
+	for (auto& Pair : m_WeaponSettingMap)
+	{
+		const string& strWeaponType = Pair.first;
+		const WEAPON_SETTING& Setting = Pair.second;
+
+		auto pModel =dynamic_pointer_cast<Model>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),Setting.strModelPrototypeTag));
+
+		if (pModel == nullptr)
+			return E_FAIL;
+
+		m_pWeaponModelMap[strWeaponType] = pModel;
+
+		wstring strComponentName =
+			TEXT("Com_Model_") + wstring(strWeaponType.begin(), strWeaponType.end());
+
+		if (FAILED(__super::Add_Component(strComponentName.c_str(), pModel)))
+			return E_FAIL;
+	}
+
+	m_pShaderCom =dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_Vtx_FBX_Tex")));
+
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
 
-	//m_pColliderCom = dynamic_pointer_cast<BaseCollider>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_OBB_Collider")));
-	//if (FAILED(__super::Add_Component(TEXT("Com_OBBCollider"), m_pColliderCom)))
-	//	return E_FAIL;
-
-
-
-
-
+	Set_WeaponType("Default");
 
 	return S_OK;
 }
@@ -197,11 +235,15 @@ shared_ptr<Prototype> Player_Weapon::Clone(void* pArg)
 }
 void Player_Weapon::Fire_Bullet()
 {
+	if (m_strCurrentWeaponType == "Default")
+		return;
 
 	if (m_fFireTimer > 0.f)
 		return;
 
-	m_fFireTimer = m_fFireCoolTime;
+	const WEAPON_SETTING& Setting = m_CurrentWeaponSetting;
+
+	m_fFireTimer = Setting.fFireCoolTime;
 
 	_matrix ParentMatrix = XMLoadFloat4x4(m_pParentMatrix);
 
@@ -214,11 +256,13 @@ void Player_Weapon::Fire_Bullet()
 
 	Apply_MouseRecoil(vDir);
 
-
 	Bullet::BULLET_DESC Desc{};
 	Desc.vStartPos = m_vMuzzleWorldPos;
 	Desc.vDir = m_vBulletDir;
-	Desc.fSpeed = 60.f;
+
+	// 무기별 탄속
+	Desc.fSpeed = Setting.fBulletSpeed;
+
 	Desc.m_bCollider = false;
 	Desc.ContainerObject = true;
 	Desc.m_strName = TEXT("Bullet");
@@ -242,46 +286,42 @@ void Player_Weapon::GUI_PlayerWeapon()
 {
 	if (ImGui::Begin("Player Weapon Editor"))
 	{
-		ImGui::SeparatorText("Weapon Local Transform");
+		ImGui::Text("Current Weapon : %s", m_strCurrentWeaponType.c_str());
 
-		ImGui::DragFloat3("Local Position", reinterpret_cast<float*>(&m_vLocalPos), 0.01f, -100.f, 100.f);
-		ImGui::DragFloat3("Local Rotation", reinterpret_cast<float*>(&m_vLocalRot), 0.5f, -360.f, 360.f);
-		ImGui::DragFloat3("Local Scale", reinterpret_cast<float*>(&m_vLocalScale), 0.01f, 0.01f, 100.f);
-
-		ImGui::SeparatorText("Muzzle");
-
-		ImGui::DragFloat3("Muzzle Local Position", reinterpret_cast<float*>(&m_vMuzzleLocalPos), 0.01f, -10.f, 10.f);
-	
-		_float4x4 WeaponWorldFloat4x4 = __super::GetCombined();
-
-		_matrix WeaponWorld = XMLoadFloat4x4(&WeaponWorldFloat4x4);
-
-		// 기본 발사 위치 = Weapon 현재 위치
-		_vector vWeaponPos = WeaponWorld.r[3];
-
-		// 총구 Local Offset 적용
-		_vector vMuzzleLocal = XMVectorSet(m_vMuzzleLocalPos.x,m_vMuzzleLocalPos.y,m_vMuzzleLocalPos.z,1.f);
-
-		_vector vMuzzleWorld = XMVector3TransformCoord(vMuzzleLocal, WeaponWorld);
-
-		XMStoreFloat3(&m_vMuzzleWorldPos, vMuzzleWorld);
-
-		ImGui::Text("Bullet Dir : %.3f, %.3f, %.3f",
-			m_vBulletDir.x,
-			m_vBulletDir.y,
-			m_vBulletDir.z);
-
-		if (ImGui::Button("Test Fire"))
+		if (m_strCurrentWeaponType != "Default")
 		{
-			Fire_Bullet();
-		}
+			WEAPON_SETTING& Setting = m_CurrentWeaponSetting;
 
-		if (ImGui::Button("Reset"))
-		{
-			m_vLocalPos = { 0.f, 0.f, 0.f };
-			m_vLocalRot = { 90.f, 0.f, 0.f };
-			m_vLocalScale = { 1.f, 1.f, 1.f };
-			m_vMuzzleLocalPos = { 0.f, 0.f, 1.f };
+			ImGui::SeparatorText("Weapon Local Transform");
+
+			ImGui::DragFloat3("Local Position", reinterpret_cast<float*>(&Setting.vLocalPos), 0.01f, -100.f, 100.f);
+			ImGui::DragFloat3("Local Rotation", reinterpret_cast<float*>(&Setting.vLocalRot), 0.5f, -360.f, 360.f);
+			ImGui::DragFloat3("Local Scale", reinterpret_cast<float*>(&Setting.vLocalScale), 0.01f, 0.01f, 100.f);
+
+			ImGui::SeparatorText("Muzzle");
+			ImGui::DragFloat3("Muzzle Local Position", reinterpret_cast<float*>(&Setting.vMuzzleLocalPos), 0.01f, -10.f, 10.f);
+
+			ImGui::SeparatorText("Fire");
+			ImGui::DragFloat("Fire CoolTime", &Setting.fFireCoolTime, 0.01f, 0.01f, 10.f);
+			ImGui::DragFloat("Bullet Speed", &Setting.fBulletSpeed, 1.f, 1.f, 300.f);
+
+			ImGui::SeparatorText("Recoil");
+			ImGui::DragFloat("Recoil Power", &Setting.fMouseRecoilPower, 1.f, 0.f, 500.f);
+			ImGui::DragFloat("Recoil Power Random", &Setting.fMouseRecoilPowerRandom, 1.f, 0.f, 500.f);
+			ImGui::DragFloat("Recoil Side Random", &Setting.fMouseRecoilSideRandom, 1.f, 0.f, 500.f);
+			ImGui::DragFloat("Recoil Max Offset", &Setting.fMouseRecoilMaxOffset, 1.f, 0.f, 1000.f);
+			ImGui::DragFloat("Recoil Kick Speed", &Setting.fMouseRecoilKickSpeed, 1.f, 0.f, 2000.f);
+			ImGui::DragFloat("Recoil Recover Speed", &Setting.fMouseRecoilRecoverSpeed, 1.f, 0.f, 2000.f);
+
+			if (ImGui::Button("Apply To SettingMap"))
+			{
+				m_WeaponSettingMap[m_strCurrentWeaponType] = m_CurrentWeaponSetting;
+			}
+
+			if (ImGui::Button("Test Fire"))
+			{
+				Fire_Bullet();
+			}
 		}
 	}
 
@@ -342,9 +382,13 @@ _bool Player_Weapon::Make_ScreenDirFromWorldDir(const _float3& vWorldPos,_vector
 
 	return true;
 }
-
 void Player_Weapon::Apply_MouseRecoil(_vector vBulletDir)
 {
+	if (m_strCurrentWeaponType == "Default")
+		return;
+
+	const WEAPON_SETTING& Setting = m_CurrentWeaponSetting;
+
 	_float2 vScreenDir{};
 
 	Make_ScreenDirFromWorldDir(m_vMuzzleWorldPos, vBulletDir, vScreenDir);
@@ -354,11 +398,17 @@ void Player_Weapon::Apply_MouseRecoil(_vector vBulletDir)
 	vSideDir.y = vScreenDir.x;
 
 	_float fPower =
-		m_fMouseRecoilPower +
-		CGameInstance::Get().Random(-m_fMouseRecoilPowerRandom, m_fMouseRecoilPowerRandom);
+		Setting.fMouseRecoilPower +
+		CGameInstance::Get().Random(
+			-Setting.fMouseRecoilPowerRandom,
+			Setting.fMouseRecoilPowerRandom
+		);
 
 	_float fSidePower =
-		CGameInstance::Get().Random(-m_fMouseRecoilSideRandom, m_fMouseRecoilSideRandom);
+		CGameInstance::Get().Random(
+			-Setting.fMouseRecoilSideRandom,
+			Setting.fMouseRecoilSideRandom
+		);
 
 	_float2 vKick{};
 	vKick.x = vScreenDir.x * fPower + vSideDir.x * fSidePower;
@@ -379,12 +429,10 @@ void Player_Weapon::Apply_MouseRecoil(_vector vBulletDir)
 	}
 	else
 	{
-		// 유저가 반동 중에도 마우스를 움직였으면 기준점 갱신
 		m_ptMouseRecoilBase.x = LONG(ptCursor.x - m_vPrevAppliedMouseRecoil.x);
 		m_ptMouseRecoilBase.y = LONG(ptCursor.y - m_vPrevAppliedMouseRecoil.y);
 	}
 
-	// 여기서 바로 마우스를 움직이지 않고 목표값만 증가
 	m_vMouseRecoilTargetOffset.x += vKick.x;
 	m_vMouseRecoilTargetOffset.y += vKick.y;
 
@@ -393,9 +441,9 @@ void Player_Weapon::Apply_MouseRecoil(_vector vBulletDir)
 		m_vMouseRecoilTargetOffset.y * m_vMouseRecoilTargetOffset.y
 	);
 
-	if (fLen > m_fMouseRecoilMaxOffset)
+	if (fLen > Setting.fMouseRecoilMaxOffset)
 	{
-		_float fRatio = m_fMouseRecoilMaxOffset / fLen;
+		_float fRatio = Setting.fMouseRecoilMaxOffset / fLen;
 
 		m_vMouseRecoilTargetOffset.x *= fRatio;
 		m_vMouseRecoilTargetOffset.y *= fRatio;
@@ -498,4 +546,124 @@ void Player_Weapon::Update_MouseRecoil(_float fTimeDelta, _bool bIsShooting)
 		m_vPrevAppliedMouseRecoil = { 0.f, 0.f };
 		m_bMouseRecoilActive = false;
 	}
+}
+
+void Player_Weapon::Ready_WeaponSettings()
+{
+	m_WeaponSettingMap.clear();
+
+	WEAPON_SETTING Gun1{};
+	Gun1.strModelPrototypeTag = TEXT("Prototype_Com_Model_Gun1");
+
+	// Gun1 전용 위치
+	Gun1.vLocalPos = { -0.03, 0.0f, 0.05f };
+	Gun1.vLocalRot = { 360.f, -180.f, -10.f };
+	Gun1.vLocalScale = { 1.f, 1.f, 1.f };
+
+	// Gun1 총구 위치
+	Gun1.vMuzzleLocalPos = { 0.25f, 0.f, 0.28f };
+
+	// Gun1 성능
+	Gun1.fFireCoolTime = 1.f;      // 빠른 연사
+	Gun1.fBulletSpeed = 40.f;
+	Gun1.fMouseRecoilPower = 45.f;
+	Gun1.fMouseRecoilPowerRandom = 8.f;
+	Gun1.fMouseRecoilSideRandom = 8.f;
+	Gun1.fMouseRecoilMaxOffset = 160.f;
+	Gun1.fMouseRecoilKickSpeed = 520.f;
+	Gun1.fMouseRecoilRecoverSpeed = 220.f;
+
+	m_WeaponSettingMap["Gun1"] = Gun1;
+
+
+	WEAPON_SETTING Gun2{};
+	Gun2.strModelPrototypeTag = TEXT("Prototype_Com_Model_Gun2");
+
+	// 기존 Gun2 값
+	Gun2.vLocalPos = { -0.06f, 0.15f, 0.27f };
+	Gun2.vLocalRot = { 360.f, -148.5f, -14.5f };
+	Gun2.vLocalScale = { 1.f, 1.f, 1.f };
+
+	Gun2.vMuzzleLocalPos = { 0.f, 0.f,0.19f };
+
+	Gun2.fFireCoolTime = 0.2f;
+	Gun2.fBulletSpeed = 60.f;
+	Gun2.fMouseRecoilPower = 70.f;
+	Gun2.fMouseRecoilPowerRandom = 10.f;
+	Gun2.fMouseRecoilSideRandom = 12.f;
+	Gun2.fMouseRecoilMaxOffset = 220.f;
+	Gun2.fMouseRecoilKickSpeed = 550.f;
+	Gun2.fMouseRecoilRecoverSpeed = 180.f;
+
+	m_WeaponSettingMap["Gun2"] = Gun2;
+
+
+	WEAPON_SETTING Gun3{};
+	Gun3.strModelPrototypeTag = TEXT("Prototype_Com_Model_Gun3");
+
+	// Gun3는 아예 다른 무기라고 가정
+	Gun3.vLocalPos = { -0.23, 0.0f, 0.25f };
+	Gun3.vLocalRot = { 360.f, -177.5f, -18.f };
+	Gun3.vLocalScale = { 1.15f, 1.15f, 1.15f };
+
+	Gun3.vMuzzleLocalPos = { 0.f, 0.f, 0.77f };
+
+	// 예: 느리지만 강한 총
+	Gun3.fFireCoolTime = 0.45f;
+	Gun3.fBulletSpeed = 90.f;
+	Gun3.fMouseRecoilPower = 120.f;
+	Gun3.fMouseRecoilPowerRandom = 20.f;
+	Gun3.fMouseRecoilSideRandom = 25.f;
+	Gun3.fMouseRecoilMaxOffset = 300.f;
+	Gun3.fMouseRecoilKickSpeed = 700.f;
+	Gun3.fMouseRecoilRecoverSpeed = 130.f;
+
+	m_WeaponSettingMap["Gun3"] = Gun3;
+}
+
+void Player_Weapon::Set_WeaponType(const string& strWeaponType)
+{
+	if (strWeaponType == "Default")
+	{
+		m_strCurrentWeaponType = "Default";
+		m_fFireTimer = 0.f;
+		return;
+	}
+
+	auto iterSetting = m_WeaponSettingMap.find(strWeaponType);
+	if (iterSetting == m_WeaponSettingMap.end())
+	{
+		m_strCurrentWeaponType = "Default";
+		return;
+	}
+
+	auto iterModel = m_pWeaponModelMap.find(strWeaponType);
+	if (iterModel == m_pWeaponModelMap.end())
+	{
+		m_strCurrentWeaponType = "Default";
+		return;
+	}
+
+	if (iterModel->second == nullptr)
+	{
+		m_strCurrentWeaponType = "Default";
+		return;
+	}
+
+	m_strCurrentWeaponType = strWeaponType;
+	m_CurrentWeaponSetting = iterSetting->second;
+
+	// 무기 바꿀 때 연사 타이머 초기화
+	m_fFireTimer = 0.f;
+
+	// 반동 상태도 초기화
+	m_bMouseRecoilActive = false;
+	m_vMouseRecoilTargetOffset = { 0.f, 0.f };
+	m_vMouseRecoilAppliedOffset = { 0.f, 0.f };
+	m_vPrevAppliedMouseRecoil = { 0.f, 0.f };
+}
+
+const string& Player_Weapon::Get_WeaponType() const
+{
+	return m_strCurrentWeaponType;
 }

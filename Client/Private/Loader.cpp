@@ -27,6 +27,9 @@
 #include "LittleMonster_Weapon.h"
 #include "LittleMonster_StateUI.h"
 #include "Particle_Blood.h"
+#include "Player_Armor.h"
+#include "Player_Helmat.h"
+
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -207,8 +210,6 @@ HRESULT CLoader::Loading_For_MapEditor()
 			return E_FAIL;
 
 
-
-
 		/* For.Prototype_Com_Texture_UI_BaseRectCustom1 */
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_BaseRectCustom1"),
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Inven/UI_BaseRect1.png"), 1))))
@@ -220,10 +221,60 @@ HRESULT CLoader::Loading_For_MapEditor()
 			return E_FAIL;
 
 
+		/* For.Prototype_Com_Texture_UI_Item_Gun1*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Gun1"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/Pfb_WPM_Glock_02.png"), 1))))
+			return E_FAIL;
+
+
 		/* For.Prototype_Com_Texture_UI_Item_Gun2*/
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Gun2"),
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/MachineGun01.png"), 1))))
 			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_UI_Item_Gun3*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Gun3"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/Pfb_WPN_SonicFist_P.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_UI_Item_Stick*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Stick"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/WoodStick.png"), 1))))
+			return E_FAIL;
+
+
+
+		/* For.Prototype_Com_Texture_UI_Item_Armor0*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Armor0"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/Clothes_LV1.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_UI_Item_Armor1*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Armor1"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/Clothes_LV3.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_UI_Item_Armor2*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Armor2"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/Clothes_LV5_3.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_UI_Item_Helmat0*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Helmat0"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/hat_0.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_UI_Item_Helmat1*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Helmat1"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/Hair_Hat_LV1.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_UI_Item_Helmat2*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_UI_Item_Helmat2"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/Item/Hair_Hat_LV6.png"), 1))))
+			return E_FAIL;
+
+
 
 		/* For.Prototype_Com_Texture_UI_Item_Gun2*/
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_BulletTrail"),
@@ -439,8 +490,20 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	_matrix GunMatrix =
 		XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Gun1",
+		Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(), L"Gun1",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Gun1/SM_Gun1.bin", GunMatrix))))
+	{
+		return E_FAIL;
+	}
+
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Gun2",
-		Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(), L"Gun2",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Gun2/SM_Gun2.bin", GunMatrix))))
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Gun2", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Gun2/SM_Gun2.bin", GunMatrix))))
+	{
+		return E_FAIL;
+	}
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Gun3",
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Gun3", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Gun3/SM_Gun3.bin", GunMatrix))))
 	{
 		return E_FAIL;
 	}
@@ -452,10 +515,61 @@ HRESULT CLoader::Loading_For_MapEditor()
 	{
 		return E_FAIL;
 	}
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Stick",
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Stick", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Stick/SM_Stick.bin", LittleMonsterWeaponMatrix))))
+	{
+		return E_FAIL;
+	}
 	_matrix BulletMatrix =
 		XMMatrixScaling(0.01f, 0.01f, 0.01f);
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Bullet",
 		Model::Create(m_pDevice,m_pContext,CGameInstance::Get().Get_Level(), L"Bullet",ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Bullet/SM_Bullet.bin", BulletMatrix))))
+	{
+		return E_FAIL;
+	}
+
+	_matrix PlayerArmor0Matrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
+		XMMatrixRotationY(XMConvertToRadians(180.f));
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Armor0",
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Armor0", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Armor0/SM_Armor0.bin", PlayerArmor0Matrix))))
+	{
+		return E_FAIL;
+	}
+
+	_matrix PlayerArmor1Matrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
+		XMMatrixRotationY(XMConvertToRadians(180.f));
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Armor1",
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Armor1", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Armor1/SM_Armor1.bin", PlayerArmor1Matrix))))
+	{
+		return E_FAIL;
+	}
+
+	_matrix PlayerArmor2Matrix =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
+		XMMatrixRotationY(XMConvertToRadians(180.f));
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Armor2",
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Armor2", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Armor2/SM_Armor2.bin", PlayerArmor2Matrix))))
+	{
+		return E_FAIL;
+	}
+
+	_matrix PlayerHelmet =
+		XMMatrixScaling(0.01f, 0.01f, 0.01f) *
+		XMMatrixRotationY(XMConvertToRadians(180.f));
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Helmat0",
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Helmat0", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Helmat0/SM_Helmat0.bin", PlayerArmor2Matrix))))
+	{
+		return E_FAIL;
+	}
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Helmat1",
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Helmat1", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Helmet1/SM_Helmet1.bin", PlayerArmor2Matrix))))
+	{
+		return E_FAIL;
+	}
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), L"Prototype_Com_Model_Helmat2",
+		Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), L"Helmat2", ETOUI(MODELTYPE::NONANIM), "../../Resources/Model/StaticMesh/NonAnim/SM_Helmet2/SM_Helmet2.bin", PlayerArmor2Matrix))))
 	{
 		return E_FAIL;
 	}
@@ -624,6 +738,16 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_Particle_Blood */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Particle_Blood"),
 		Particle_Blood::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_Player_Armor */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Armor"),
+		Player_Armor::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_Player_Helmat */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Helmat"),
+		Player_Helmat::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

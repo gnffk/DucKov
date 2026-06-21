@@ -59,7 +59,7 @@ public:
         CLOSING
     };
 
-    struct INV_SLOT
+    typedef struct INV_SLOT
     {
         wstring     strSlotRectKey;   // m_UIRects에 있는 박스 UI 이름
         SLOT_KIND   eKind = SLOT_KIND::END;
@@ -67,9 +67,9 @@ public:
         int         iItemIndex = -1;  // 이 슬롯에 들어있는 아이템 번호
         float       fNormalAlpha = 0.20f;
         float       fHoverAlpha = 0.65f;
-    };
+    }INV_SLOT;
 
-    struct INV_ITEM
+    typedef struct INV_ITEM
     {
         wstring     strItemName;
         wstring     strIconRectKey;
@@ -78,7 +78,9 @@ public:
         SLOT_KIND   eEquipKind = SLOT_KIND::END;
 
         _float2     vIconSize = { 48.f, 48.f };
-    };
+
+        string      strEquipModelKey = "Default";
+    }INV_ITEM;
 
 protected:
 	UIObject(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

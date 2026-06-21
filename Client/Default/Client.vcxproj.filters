@@ -235,6 +235,12 @@
     <Filter Include="02. GameObject\Particle\Blood">
       <UniqueIdentifier>{a404f810-f669-41bf-aedc-22d398fd411e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\UI\Armor">
+      <UniqueIdentifier>{15d45cfc-0bb2-4591-9446-d51f1a2a9c60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\Helmat">
+      <UniqueIdentifier>{9573eac0-8e24-432a-b228-d89f0ec924a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -456,6 +462,12 @@
     <ClInclude Include="..\Public\Particle_Blood.h">
       <Filter>02. GameObject\Particle\Blood</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player_Armor.h">
+      <Filter>02. GameObject\Player\UI\Armor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_Helmat.h">
+      <Filter>02. GameObject\Player\Helmat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -674,6 +686,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Particle_Blood.cpp">
       <Filter>02. GameObject\Particle\Blood</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_Armor.cpp">
+      <Filter>02. GameObject\Player\UI\Armor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_Helmat.cpp">
+      <Filter>02. GameObject\Player\Helmat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

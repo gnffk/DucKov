@@ -70,6 +70,11 @@ public:
 
     float LerpFloat(float fStart, float fEnd, float fRatio);
 
+
+public:
+    void Set_WeaponSlotIcon(int iSlotNumber, const wstring& strTextureTag);
+    void Clear_WeaponSlotIcon(int iSlotNumber);
+
 public:
     static unique_ptr<MainUI> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
     virtual shared_ptr<Prototype> Clone(void* pArg) override;

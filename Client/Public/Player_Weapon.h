@@ -22,6 +22,30 @@ public:
 	}WEAPON_DESC;
 
 private:
+	typedef struct tagWeaponSetting
+	{
+		wstring strModelPrototypeTag = L"";
+
+		_float3 vLocalPos = { 0.f, 0.f, 0.f };
+		_float3 vLocalRot = { 0.f, 0.f, 0.f };
+		_float3 vLocalScale = { 1.f, 1.f, 1.f };
+
+		_float3 vMuzzleLocalPos = { 0.f, 0.f, 1.f };
+
+		float fFireCoolTime = 0.2f;
+		float fBulletSpeed = 60.f;
+
+		float fMouseRecoilPower = 70.f;
+		float fMouseRecoilPowerRandom = 10.f;
+		float fMouseRecoilSideRandom = 12.f;
+		float fMouseRecoilMaxOffset = 220.f;
+
+		float fMouseRecoilKickSpeed = 550.f;
+		float fMouseRecoilRecoverSpeed = 180.f;
+
+	} WEAPON_SETTING;
+
+private:
 	Player_Weapon(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	Player_Weapon(const Player_Weapon& Prototype);
 public:
@@ -37,21 +61,26 @@ public:
 
 
 private:
-	shared_ptr<Model>			m_pModelCom = { nullptr };
-	shared_ptr<Shader>			m_pShaderCom = { nullptr };
-	shared_ptr<BaseCollider>		m_pColliderCom = { nullptr };
+	map<string, shared_ptr<Model>> m_pWeaponModelMap;
+	shared_ptr<Shader>				m_pShaderCom = { nullptr };
+	map<string, WEAPON_SETTING>    m_WeaponSettingMap;
+
+	string m_strCurrentWeaponType = "Default";
+	WEAPON_SETTING m_CurrentWeaponSetting{};
 private:
 	const uint32_t* m_pParentState = { nullptr };
 	const _float4x4* m_pSocketMatrix = { nullptr };
-private:
-	//Gun2
-	_float3 m_vLocalPos = { -0.06f, 0.15f, 0.27f };
-	_float3 m_vLocalRot = { 360.f, -148.5f, -14.5f };
-	_float3 m_vLocalScale = { 1.f, 1.f, 1.f };
 
-	_float3 m_vMuzzleLocalPos = { 0.3, 0.f, -0.3 };
+private:
 	_float3 m_vMuzzleWorldPos = {};
 	_float3 m_vBulletDir = { 0.f, 0.f, 1.f };
+
+public:
+	void Set_WeaponType(const string& strWeaponType);
+	const string& Get_WeaponType() const;
+
+private:
+	void Ready_WeaponSettings();
 
 	// 마우스 반동
 private:

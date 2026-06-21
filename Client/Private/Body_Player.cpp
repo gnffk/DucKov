@@ -61,7 +61,7 @@ void Body_Player::Update(_float fTimeDelta)
 		switch (*m_pParentState)
 		{
 		case Player_FSM::PLAYER_STATE::IDLE:
-			targetAnim = 0;
+			targetAnim = 1;
 			blendDuration = 0.18f;
 			nextAnimPlus = 1.f;
 			break;
@@ -213,11 +213,28 @@ HRESULT Body_Player::Render()
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
+		_float fHitRatio = 0.f;
+
+		if (m_bHit)
+		{
+			fHitRatio = 1.f;
+		}
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fHitRatio", &fHitRatio, sizeof(_float))))
+			return E_FAIL;
+
+		_float4 vHitColor = { 1.f, 0.05f, 0.02f, 1.f };
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vHitColor", &vHitColor, sizeof(_float4))))
+			return E_FAIL;
+
+
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 
 
 		m_pModelCom->Render(i);
+
 	}
 
 	return S_OK;

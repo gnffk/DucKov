@@ -31,6 +31,8 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+
+
 public:
 	void Turn_To_Direction(const _float3& vDirection, _float fTimeDelta);
 	void Turn_To_Position(const _float3& vPosition, _float fTimeDelta);

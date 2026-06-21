@@ -9,8 +9,11 @@
 #include "Player_FSM.h"
 #include "GameInstance.h"
 #include "Player_Weapon.h"
-
-
+#include "Player_State_UI.h"
+#include "Particle_System.h"
+#include "Player_Armor.h"
+#include "Player_Helmat.h"
+#include "UIObject.h"
 Player::Player(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: ContainerObject{ pDevice, pContext }
 {
@@ -81,6 +84,18 @@ void Player::Priority_Update(_float fTimeDelta)
 
 void Player::Update(_float fTimeDelta)
 {
+
+	if (CGameInstance::Get().Key_Down(DIK_1))
+	{
+		Switch_WeaponSlot(1);
+	}
+
+	if (CGameInstance::Get().Key_Down(DIK_2))
+	{
+		Switch_WeaponSlot(2);
+	}
+
+
 	if (CGameInstance::Get().Key_Down(DIK_I))
 	{
 		m_bInventoryOpen = !m_bInventoryOpen;
@@ -736,6 +751,42 @@ HRESULT Player::Ready_PartObjects()
 
 
 
+	Player_Armor::ARMOR_DESC		ArmorDesc{};
+	ArmorDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	ArmorDesc.pParentState = &m_iState;
+	ArmorDesc.pSocketMatrix = dynamic_pointer_cast<Body_Player>(m_PartObjects[TEXT("Part_Body")])->Get_SocketMatrixPtr("ArmorSocket");
+	ArmorDesc.ObjectType = ETOUI(OBJECTTYPE::OBEJCT_PART);
+	ArmorDesc.m_strName = L"ObjectPart";
+	ArmorDesc.pParentState = &m_iState;
+	ArmorDesc.m_strPrototypeObjectName = L"";
+	ArmorDesc.m_strPrototypeBaseName = L"SK_CustomBody";
+	ArmorDesc.pCameraType = ETOUI(CAMERA::NONE);
+	ArmorDesc.fSpeedPerSec = 5.f;
+	ArmorDesc.fRotationPerSec = 1.f;
+
+	if (FAILED(__super::Add_PartObject(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Armor"),
+		TEXT("Part_Armor"), &ArmorDesc)))
+		return E_FAIL;
+
+	Player_Helmat::HELMAT_DESC		HelmatDesc{};
+	HelmatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	HelmatDesc.pParentState = &m_iState;
+	HelmatDesc.pSocketMatrix = dynamic_pointer_cast<Body_Player>(m_PartObjects[TEXT("Part_Body")])->Get_SocketMatrixPtr("HelmatSocket");
+	HelmatDesc.ObjectType = ETOUI(OBJECTTYPE::OBEJCT_PART);
+	HelmatDesc.m_strName = L"ObjectPart";
+	HelmatDesc.pParentState = &m_iState;
+	HelmatDesc.m_strPrototypeObjectName = L"";
+	HelmatDesc.m_strPrototypeBaseName = L"SK_CustomBody";
+	HelmatDesc.pCameraType = ETOUI(CAMERA::NONE);
+	HelmatDesc.fSpeedPerSec = 5.f;
+	HelmatDesc.fRotationPerSec = 1.f;
+
+	if (FAILED(__super::Add_PartObject(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Helmat"),
+		TEXT("Part_Helmat"), &HelmatDesc)))
+		return E_FAIL;
+
+
+
 
 	return S_OK;
 }
@@ -881,6 +932,281 @@ _bool Player::Collider_Box(_float fTimeDelta)
 
 	return bHitInteractBox;
 }
+_bool Player::Collider_HitAttack(_float fTimeDelta)
+{
+	auto ColliderGroup = CGameInstance::Get().GetColliderGroups(L"HitAttack_for_Player");
+	auto& ColliderPlayer = m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].front();
+	if (ColliderGroup != nullptr && ColliderPlayer != nullptr) {
+
+		for (auto Collider : *ColliderGroup)
+		{
+			if (CGameInstance::Get().Intersect(ColliderPlayer.get(), Collider))
+			{
+				_float3 vHitPos{};
+
+				auto pBulletOwner = Collider->GetOwner();
+
+				if (pBulletOwner != nullptr && pBulletOwner->GetTransform() != nullptr)
+				{
+					XMStoreFloat3(&vHitPos, pBulletOwner->GetTransform()->Get_State(STATE::POSITION));
+				}
+				else
+				{
+					XMStoreFloat3(&vHitPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+					vHitPos.y += 1.0f;
+				}
+
+				Take_Damage(10.f, vHitPos);
+
+				if (pBulletOwner != nullptr) {
+					pBulletOwner->Set_Dead();
+
+				}
+
+				Collider->SetColliderColor(ColliderColor::RED);
+				ColliderPlayer->SetColliderColor(ColliderColor::RED);
+
+				break;
+			}
+
+
+		}
+
+
+	}
+
+	return _bool();
+}
+
+void Player::Take_Damage(_float fDamage, const _float3& vHitPos)
+{
+	if (Get_Dead())
+		return;
+
+	if (fDamage <= 0.f)
+		return;
+
+	m_fHP -= fDamage;
+
+	if (m_fHP < 0.f)
+		m_fHP = 0.f;
+
+	Update_HP_UI();
+
+	Spawn_BloodEffect(vHitPos);
+
+	m_bHit = true;
+	m_fHitTime = 0.f;
+
+	if (m_fHP <= 0.f)
+	{
+	
+		//Set_Dead();
+	}
+}
+
+
+void Player::Spawn_BloodEffect(const _float3& vSpawnPos)
+{
+	Particle_System::PARTICLE_SPAWN_DESC Desc{};
+	Desc.vSpawnPos = vSpawnPos;
+	Desc.iCount = 20;
+	Desc.fPower = 1.f;
+
+	CGameInstance::Get().Add_Particle(PARTICLE_TYPE::BLOOD, &Desc);
+}
+
+void Player::Update_HP_UI()
+{
+	auto iter = m_pUI.find("PlayerStateUI");
+
+	if (iter == m_pUI.end())
+		return;
+
+	auto pStateUI = dynamic_pointer_cast<Player_State_UI>(iter->second);
+
+	if (pStateUI == nullptr)
+		return;
+
+	pStateUI->Set_HP(m_fHP, m_fMaxHP);
+}
+void Player::Equip_Item(Engine::UIObject::SLOT_KIND eSlotKind, const Engine::UIObject::INV_ITEM& Item)
+{
+	if (eSlotKind == Engine::UIObject::SLOT_KIND::CLOTHES)
+	{
+		auto iter = m_PartObjects.find(TEXT("Part_Armor"));
+
+		if (iter == m_PartObjects.end())
+			return;
+
+		auto pArmor = dynamic_pointer_cast<Player_Armor>(iter->second);
+
+		if (pArmor == nullptr)
+			return;
+
+		pArmor->Set_ArmorType(Item.strEquipModelKey);
+	}
+
+	if (eSlotKind == Engine::UIObject::SLOT_KIND::HEAD)
+	{
+		auto iter = m_PartObjects.find(TEXT("Part_Helmat"));
+
+		if (iter == m_PartObjects.end())
+			return;
+
+		auto pArmor = dynamic_pointer_cast<Player_Helmat>(iter->second);
+
+		if (pArmor == nullptr)
+			return;
+
+		pArmor->Set_HelmatType(Item.strEquipModelKey);
+	}
+
+	if (eSlotKind == Engine::UIObject::SLOT_KIND::GUN)
+	{
+		auto iter = m_PartObjects.find(TEXT("Part_Weapon"));
+
+		if (iter == m_PartObjects.end())
+			return;
+
+		auto pWeapon = dynamic_pointer_cast<Player_Weapon>(iter->second);
+
+		if (pWeapon == nullptr)
+			return;
+
+		pWeapon->Set_WeaponType(Item.strEquipModelKey);
+	}
+}
+
+void Player::Unequip_Item(Engine::UIObject::SLOT_KIND eSlotKind, const Engine::UIObject::INV_ITEM& Item)
+{
+	if (eSlotKind == Engine::UIObject::SLOT_KIND::CLOTHES)
+	{
+		auto iter = m_PartObjects.find(TEXT("Part_Armor"));
+
+		if (iter == m_PartObjects.end())
+			return;
+
+		auto pArmor = dynamic_pointer_cast<Player_Armor>(iter->second);
+
+		if (pArmor == nullptr)
+			return;
+
+		pArmor->Set_ArmorType("Default");
+	}
+	if (eSlotKind == Engine::UIObject::SLOT_KIND::HEAD)
+	{
+		auto iter = m_PartObjects.find(TEXT("Part_Helmat"));
+
+		if (iter == m_PartObjects.end())
+			return;
+
+		auto pArmor = dynamic_pointer_cast<Player_Helmat>(iter->second);
+
+		if (pArmor == nullptr)
+			return;
+
+		pArmor->Set_HelmatType("Default");
+	}
+	if (eSlotKind == Engine::UIObject::SLOT_KIND::GUN)
+	{
+		auto iter = m_PartObjects.find(TEXT("Part_Weapon"));
+
+		if (iter == m_PartObjects.end())
+			return;
+
+		auto pWeapon = dynamic_pointer_cast<Player_Weapon>(iter->second);
+
+		if (pWeapon == nullptr)
+			return;
+
+		pWeapon->Set_WeaponType("Default");
+	}
+}
+
+void Player::Set_WeaponSlot(int iSlotNumber, const Engine::UIObject::INV_ITEM& Item)
+{
+	// iSlotNumber는 1 또는 2
+	if (iSlotNumber < 1 || iSlotNumber > 2)
+		return;
+
+	int iIndex = iSlotNumber - 1;
+
+	m_strWeaponSlotKey[iIndex] = Item.strEquipModelKey;
+
+	// 현재 들고 있는 슬롯에 새 무기를 넣은 경우 바로 갱신
+	if (m_iCurrentWeaponSlot == iIndex)
+	{
+		Switch_WeaponSlot(iSlotNumber);
+	}
+
+	// 아직 아무 무기도 안 들고 있으면 첫 장착 무기를 바로 들게 함
+	if (m_iCurrentWeaponSlot == -1)
+	{
+		Switch_WeaponSlot(iSlotNumber);
+	}
+}
+
+void Player::Clear_WeaponSlot(int iSlotNumber)
+{
+	if (iSlotNumber < 1 || iSlotNumber > 2)
+		return;
+
+	int iIndex = iSlotNumber - 1;
+
+	m_strWeaponSlotKey[iIndex] = "Default";
+
+	if (m_iCurrentWeaponSlot == iIndex)
+	{
+		auto iter = m_PartObjects.find(TEXT("Part_Weapon"));
+
+		if (iter == m_PartObjects.end())
+			return;
+
+		auto pWeapon = dynamic_pointer_cast<Player_Weapon>(iter->second);
+
+		if (pWeapon == nullptr)
+			return;
+
+		pWeapon->Set_WeaponType("Default");
+
+		m_iCurrentWeaponSlot = -1;
+	}
+}
+
+void Player::Switch_WeaponSlot(int iSlotNumber)
+{
+	if (iSlotNumber < 1 || iSlotNumber > 2)
+		return;
+
+	int iIndex = iSlotNumber - 1;
+
+	const string& strWeaponKey = m_strWeaponSlotKey[iIndex];
+
+	auto iter = m_PartObjects.find(TEXT("Part_Weapon"));
+
+	if (iter == m_PartObjects.end())
+		return;
+
+	auto pWeapon = dynamic_pointer_cast<Player_Weapon>(iter->second);
+
+	if (pWeapon == nullptr)
+		return;
+
+	// 빈 슬롯이면 손에 든 무기 제거
+	if (strWeaponKey == "Default")
+	{
+		pWeapon->Set_WeaponType("Default");
+		m_iCurrentWeaponSlot = -1;
+		return;
+	}
+
+	pWeapon->Set_WeaponType(strWeaponKey);
+	m_iCurrentWeaponSlot = iIndex;
+}
+
+
 unique_ptr<Player> Player::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
 	auto	pInstance = unique_ptr<Player>(new Player(pDevice, pContext));

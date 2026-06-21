@@ -24,7 +24,7 @@ void Player_Idle_State::Enter(FSM* pFSM) {
 
 	auto& weapon = pPlayer->GetPartObjectMap()[TEXT("Part_Weapon")];
 
-	weapon->SetVisible(false);
+	weapon->SetVisible(true);
 }
 void Player_Idle_State::Exit(FSM* pFSM) {
 	auto pPlayerFSM = dynamic_cast<Player_FSM*>(pFSM);

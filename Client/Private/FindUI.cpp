@@ -105,7 +105,7 @@ HRESULT FindUI::Ready_LootSlots()
 
         INV_SLOT Slot{};
         Slot.strSlotRectKey = szSlotKey;
-        Slot.eKind = SLOT_KIND::BAG;
+        Slot.eKind =SLOT_KIND::BAG;
         Slot.iItemIndex = -1;
         Slot.fNormalAlpha = 0.20f;
         Slot.fHoverAlpha = 0.65f;
@@ -121,28 +121,103 @@ HRESULT FindUI::Ready_LootItems()
 {
 
     // 예시 아이템 1 
-    if (FAILED(Add_UIRect( TEXT("LootItem_Gun2"), TEXT("LootItem_Gun2"), TEXT("Prototype_Com_Texture_UI_Item_Gun2"), { 0.f, 0.f },{ 48.f, 48.f }, 0.0f)))
+    if (FAILED(Add_UIRect( TEXT("LootItem_Gun1"), TEXT("LootItem_Gun1"), TEXT("Prototype_Com_Texture_UI_Item_Gun1"), { 0.f, 0.f },{ 48.f, 48.f }, 0.0f)))
         return E_FAIL;
 
-    INV_ITEM ItemGun{};
-    ItemGun.strItemName = TEXT("Gun2");
-    ItemGun.strIconRectKey = TEXT("LootItem_Gun2");
-    ItemGun.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Gun2");
-    ItemGun.eEquipKind = SLOT_KIND::GUN;
-    ItemGun.vIconSize = { 48.f, 48.f };
+    INV_ITEM ItemGun1{};
+    ItemGun1.strItemName = TEXT("Gun1");
+    ItemGun1.strIconRectKey = TEXT("LootItem_Gun1");
+    ItemGun1.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Gun1");
+    ItemGun1.eEquipKind = SLOT_KIND::GUN;
+    ItemGun1.vIconSize = { 48.f, 48.f };
+    ItemGun1.strEquipModelKey = "Gun1";
 
 
 
-
-
-    m_InventoryItems.push_back(ItemGun);
+    m_InventoryItems.push_back(ItemGun1);
 
     // 아이템을 Loot Slot에 배치
     if (m_InventorySlots.size() > 0)
         m_InventorySlots[0].iItemIndex = 0;
 
-    if (m_InventorySlots.size() > 1)
+
+    // 예시 아이템 1 
+    if (FAILED(Add_UIRect(TEXT("LootItem_Gun2"), TEXT("LootItem_Gun2"), TEXT("Prototype_Com_Texture_UI_Item_Gun2"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
+        return E_FAIL;
+
+    INV_ITEM ItemGun2{};
+    ItemGun2.strItemName = TEXT("Gun2");
+    ItemGun2.strIconRectKey = TEXT("LootItem_Gun2");
+    ItemGun2.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Gun2");
+    ItemGun2.eEquipKind = SLOT_KIND::GUN;
+    ItemGun2.vIconSize = { 48.f, 48.f };
+    ItemGun2.strEquipModelKey = "Gun2";
+
+
+
+    m_InventoryItems.push_back(ItemGun2);
+
+    // 아이템을 Loot Slot에 배치
+    if (m_InventorySlots.size() > 0)
         m_InventorySlots[1].iItemIndex = 1;
+
+
+    // 예시 아이템 1 
+    if (FAILED(Add_UIRect(TEXT("LootItem_Gun3"), TEXT("LootItem_Gun3"), TEXT("Prototype_Com_Texture_UI_Item_Gun3"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
+        return E_FAIL;
+
+    INV_ITEM ItemGun3{};
+    ItemGun3.strItemName = TEXT("Gun3");
+    ItemGun3.strIconRectKey = TEXT("LootItem_Gun3");
+    ItemGun3.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Gun3");
+    ItemGun3.eEquipKind = SLOT_KIND::GUN;
+    ItemGun3.vIconSize = { 48.f, 48.f };
+    ItemGun3.strEquipModelKey = "Gun3";
+
+
+
+    m_InventoryItems.push_back(ItemGun3);
+
+    // 아이템을 Loot Slot에 배치
+    if (m_InventorySlots.size() > 0)
+        m_InventorySlots[2].iItemIndex = 2;
+
+
+
+
+
+
+    //// 예시 아이템 1 
+    //if (FAILED(Add_UIRect(TEXT("LootItem_Helmat0"), TEXT("LootItem_Helmat0"), TEXT("Prototype_Com_Texture_UI_Item_Helmat0"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
+    //    return E_FAIL;
+
+    //INV_ITEM ItemHelmat{};
+    //ItemHelmat.strItemName = TEXT("Helmat0");
+    //ItemHelmat.strIconRectKey = TEXT("LootItem_Helmat0");
+    //ItemHelmat.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Helmat0");
+    //ItemHelmat.eEquipKind = SLOT_KIND::HEAD;
+    //ItemHelmat.vIconSize = { 48.f, 48.f };
+    //ItemHelmat.strEquipModelKey = "Helmat0";
+
+    //m_InventoryItems.push_back(ItemHelmat);
+    //if (m_InventorySlots.size() > 1)
+    //    m_InventorySlots[1].iItemIndex = 1;
+
+    //// 예시 아이템 1 
+    //if (FAILED(Add_UIRect(TEXT("LootItem_Helmat0"), TEXT("LootItem_Helmat0"), TEXT("Prototype_Com_Texture_UI_Item_Helmat0"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
+    //    return E_FAIL;
+
+    //INV_ITEM ItemHelmat{};
+    //ItemHelmat.strItemName = TEXT("Helmat0");
+    //ItemHelmat.strIconRectKey = TEXT("LootItem_Helmat0");
+    //ItemHelmat.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Helmat0");
+    //ItemHelmat.eEquipKind = SLOT_KIND::HEAD;
+    //ItemHelmat.vIconSize = { 48.f, 48.f };
+    //ItemHelmat.strEquipModelKey = "Helmat0";
+
+    //m_InventoryItems.push_back(ItemHelmat);
+    //if (m_InventorySlots.size() > 1)
+    //    m_InventorySlots[1].iItemIndex = 1;
 
     return S_OK;
 }
@@ -1187,6 +1262,43 @@ _bool FindUI::Is_PointInRect(const _float2& vPoint, const UI_RECT& Rect)
 _bool FindUI::Is_ItemIconKey(const wstring& strKey)
 {
     return strKey.find(TEXT("LootItem_")) == 0;
+}
+HRESULT FindUI::Set_LootItems(const vector<INV_ITEM>& LootItems)
+{
+    m_InventoryItems.clear();
+
+    for (auto& Slot : m_InventorySlots)
+        Slot.iItemIndex = -1;
+
+    for (uint32_t i = 0; i < LootItems.size(); ++i)
+    {
+        if (i >= m_InventorySlots.size())
+            break;
+
+        const INV_ITEM& SrcItem = LootItems[i];
+
+        wchar_t szIconKey[128]{};
+        swprintf_s(szIconKey, TEXT("LootItem_%u"), i);
+
+        if (FAILED(Add_UIRect(
+            szIconKey,
+            szIconKey,
+            SrcItem.strTextureTag,
+            { 0.f, 0.f },
+            SrcItem.vIconSize,
+            0.0f)))
+            return E_FAIL;
+
+        INV_ITEM NewItem = SrcItem;
+        NewItem.strIconRectKey = szIconKey;
+
+        m_InventoryItems.push_back(NewItem);
+        m_InventorySlots[i].iItemIndex = static_cast<int>(i);
+    }
+
+    Update_ItemIconPosition();
+
+    return S_OK;
 }
 void FindUI::Set_CollidingOwner(_bool bColliding)
 {

@@ -60,6 +60,11 @@ protected:
 	_bool			m_bDead = false;
 	_bool			m_bCollision = false;
 
+protected:
+	_bool  m_bHit = false;
+	_float m_fHitTime = 0.f;
+	_float m_fHitDuration = 0.15f;
+
 public:
 	void SetCollision(_bool bcol) { m_bCollision = bcol; }
 	_bool GetCollision() { return m_bCollision; }

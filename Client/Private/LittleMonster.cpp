@@ -117,6 +117,7 @@ HRESULT LittleMonster::Update_Animation(_float fTimeDelta)
 		}
 	}
 
+
 	nextAnim = targetAnim;
 	nextAnimPlus = animSpeed;
 
@@ -277,7 +278,7 @@ void LittleMonster::Spawn_BloodEffect(const _float3& vSpawnPos)
 {
 	Particle_System::PARTICLE_SPAWN_DESC Desc{};
 	Desc.vSpawnPos = vSpawnPos;
-	Desc.iCount = 10;
+	Desc.iCount = 20;
 	Desc.fPower = 1.f;
 
 	CGameInstance::Get().Add_Particle(PARTICLE_TYPE::BLOOD, &Desc);
@@ -293,6 +294,17 @@ void LittleMonster::Priority_Update(_float fTimeDelta)
 void LittleMonster::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
+
+	if (m_bHit)
+	{
+		m_fHitTime += fTimeDelta;
+
+		if (m_fHitTime >= m_fHitDuration)
+		{
+			m_bHit = false;
+			m_fHitTime = 0.f;
+		}
+	}
 
 
 	if (m_pLittleMonsterPattern)
@@ -364,10 +376,28 @@ HRESULT LittleMonster::Render()
 		m_pModelCom->Render(i);
 	}
 
+	_float fHitRatio = 0.f;
+
+	if (m_bHit)
+	{
+		fHitRatio = 1.f;
+	}
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fHitRatio", &fHitRatio, sizeof(_float))))
+		return E_FAIL;
+
+	_float4 vHitColor = { 1.f, 0.05f, 0.02f, 1.f };
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vHitColor", &vHitColor, sizeof(_float4))))
+		return E_FAIL;
+
+
 
 
 	return S_OK;
 }
+
+
 
 void LittleMonster::Turn_To_Direction(const _float3& vDirection, _float fTimeDelta)
 {
@@ -507,6 +537,9 @@ void LittleMonster::Take_Damage(_float fDamage, const _float3& vHitPos)
 	Update_HP_UI();
 
 	Spawn_BloodEffect(vHitPos);
+
+	m_bHit = true;
+	m_fHitTime = 0.f;
 
 	if (m_fHP <= 0.f)
 	{

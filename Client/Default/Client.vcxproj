@@ -191,7 +191,9 @@
     <ClInclude Include="..\Public\LittleMonster_Weapon.h" />
     <ClInclude Include="..\Public\MainUI.h" />
     <ClInclude Include="..\Public\Particle_Blood.h" />
+    <ClInclude Include="..\Public\Player_Armor.h" />
     <ClInclude Include="..\Public\Player_HAND_UP_State.h" />
+    <ClInclude Include="..\Public\Player_Helmat.h" />
     <ClInclude Include="..\Public\Player_Idle_State.h" />
     <ClInclude Include="..\Public\Player_FSM.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
@@ -265,7 +267,9 @@
     <ClCompile Include="..\Private\LittleMonster_Weapon.cpp" />
     <ClCompile Include="..\Private\MainUI.cpp" />
     <ClCompile Include="..\Private\Particle_Blood.cpp" />
+    <ClCompile Include="..\Private\Player_Armor.cpp" />
     <ClCompile Include="..\Private\Player_HAND_UP_State.cpp" />
+    <ClCompile Include="..\Private\Player_Helmat.cpp" />
     <ClCompile Include="..\Private\Player_Idle_State.cpp" />
     <ClCompile Include="..\Private\Player_FSM.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
