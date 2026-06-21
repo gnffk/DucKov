@@ -44,22 +44,23 @@ private:
 	const uint32_t* m_pParentState = { nullptr };
 	const _float4x4* m_pSocketMatrix = { nullptr };
 private:
-	//Gun2
+	// Gun2 기준 배치
 	_float3 m_vLocalPos = { -0.06f, 0.15f, 0.27f };
 	_float3 m_vLocalRot = { 360.f, -148.5f, -14.5f };
 	_float3 m_vLocalScale = { 1.f, 1.f, 1.f };
 
-	_float3 m_vMuzzleLocalPos = { 1.f, 0.f, -1.f };
+	// Gun2 기준 총구 위치
+	_float3 m_vMuzzleLocalPos = { 0.3f, 0.f, -0.3f };
 	_float3 m_vMuzzleWorldPos = {};
 	_float3 m_vBulletDir = { 0.f, 0.f, 1.f };
-
-
-public:
-	void Fire_Bullet();
 
 private:
 	_float m_fFireCoolTime = 0.2f;
 	_float m_fFireTimer = 0.f;
+
+
+public:
+	void Fire_Bullet();
 
 private:
 	HRESULT Ready_Components();

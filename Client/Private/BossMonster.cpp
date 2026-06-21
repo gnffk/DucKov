@@ -3,6 +3,10 @@
 #include "BossMonsterFSM.h"
 #include "Boss_Weapon.h"
 #include "BossPattern.h"
+#include "Boss_State_UI.h"
+#include "Particle_System.h"
+#include "BaseCollider.h"
+#include "BossMonster_Page2.h"
 NS_BEGIN(Client)
 
 BossMonster::BossMonster(ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext): Monster{ pDevice, pContext }
@@ -56,6 +60,14 @@ HRESULT BossMonster::Initialize(void* pArg)
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
 
+	if (FAILED(Ready_UI()))
+		return E_FAIL;
+	 
+
+
+	m_pShaderBossCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_BossMonster")));
+	if (FAILED(__super::Add_Component(TEXT("Com_BossShader"), m_pShaderBossCom)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -234,6 +246,25 @@ HRESULT BossMonster::Ready_PartObjects()
 HRESULT BossMonster::Ready_UI()
 {
 
+	UIObject::UIOBJECT_DESC DesBossMonsterStateUI{};
+	DesBossMonsterStateUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+	DesBossMonsterStateUI.m_strName = L"BossMonsterUI";
+	DesBossMonsterStateUI.m_strPrototypeObjectName = L"Prototype_GameObject_BossMonster_State_UI";
+	DesBossMonsterStateUI.m_strPrototypeBaseName = L"BossMonsterUI";
+	DesBossMonsterStateUI.pCameraType = ETOUI(CAMERA::NONE);
+	DesBossMonsterStateUI.fSpeedPerSec = 5.f;
+	DesBossMonsterStateUI.fRotationPerSec = 1.f;
+	DesBossMonsterStateUI.fSizeX = 1.f;
+	DesBossMonsterStateUI.fSizeY = 1.f;
+	DesBossMonsterStateUI.fX = 1.f;
+	DesBossMonsterStateUI.fY = 1.f;
+
+	m_pUI.emplace("BossMonsterUI", dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossMonster_State_UI"), &DesBossMonsterStateUI)));
+
+	static_pointer_cast<Boss_State_UI>(m_pUI["BossMonsterUI"])->SetOwner(SHARED_THIS(Boss_State_UI));
+	static_pointer_cast<Boss_State_UI>(m_pUI["BossMonsterUI"])->Set_HP(m_fHP, m_fMaxHP);
+
+	
 	return S_OK;
 }
 
@@ -246,6 +277,19 @@ void BossMonster::Priority_Update(_float fTimeDelta)
 
 void BossMonster::Update(_float fTimeDelta)
 {
+
+	if (m_bLastPattern)
+	{
+		m_fPatternRatio += fTimeDelta * 1.5f;
+	}
+	else
+	{
+		m_fPatternRatio -= fTimeDelta * 2.f;
+	}
+
+	m_fPatternRatio = std::clamp(m_fPatternRatio, 0.f, 1.f);
+
+
 	__super::Update(fTimeDelta);
 	
 
@@ -265,6 +309,19 @@ void BossMonster::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 
+	for (auto& Pair : m_pUI)
+	{
+		const string& strUIName = Pair.first;
+		auto pUIObject = Pair.second;
+
+		if (nullptr == pUIObject)
+			continue;
+
+
+
+		CGameInstance::Get().Add_UIObject(L"BossMonster", static_pointer_cast<UIObject>(pUIObject));
+	}
+	Collider_Bullet(fTimeDelta);
 	m_pMonsterFSM->Late_Update(fTimeDelta);
 }
 
@@ -280,6 +337,7 @@ HRESULT BossMonster::Render()
 
 	_float4x4 World = m_pTransformCom->GetWorldMatrix();
 
+
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
@@ -291,6 +349,9 @@ HRESULT BossMonster::Render()
 
 	for (uint32_t i = 0; i < iNumMeshes; i++)
 	{
+		if (i == 2) {
+			continue;
+		}
 		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (uint32_t)i)))
@@ -305,6 +366,49 @@ HRESULT BossMonster::Render()
 
 		m_pModelCom->Render(i);
 	}
+
+
+
+
+
+	_float4 vCamPos{};
+	CGameInstance::Get().Get_MainCameraPosition(vCamPos);
+
+
+
+	if (FAILED(m_pShaderBossCom->Bind_RawValue("g_vCamPosition", &vCamPos, sizeof(_float4))))
+		return E_FAIL;
+
+	_float fPatternRatio = m_fPatternRatio;
+
+	if (FAILED(m_pShaderBossCom->Bind_RawValue("g_fPatternRatio", &fPatternRatio, sizeof(_float))))
+		return E_FAIL;
+
+
+	if (FAILED(m_pShaderBossCom->Bind_Matrix("g_WorldMatrix", &World)))
+		return E_FAIL;
+	if (FAILED(m_pShaderBossCom->Bind_Matrix("g_ViewMatrix", &View)))
+		return E_FAIL;
+	if (FAILED(m_pShaderBossCom->Bind_Matrix("g_ProjMatrix", &Proj)))
+		return E_FAIL;
+
+
+
+	if (FAILED(m_pModelCom->Bind_Materials(m_pShaderBossCom, "g_DiffuseTexture", 2, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+		return E_FAIL;
+	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderBossCom, "g_BoneMatrices", 2)))
+		return E_FAIL;
+
+	//if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_Normals, 0)))
+	//	return E_FAIL;
+
+	if (FAILED(m_pShaderBossCom->Begin(0)))
+		return E_FAIL;
+
+
+	m_pModelCom->Render(2);
+	
+
 
 
 
@@ -421,6 +525,147 @@ void BossMonster::Move_Forward(_float fTimeDelta,_float fSpeedScale)
 	vLook =XMVector3Normalize(vLook);
 
 	m_pTransformCom->Go_Direction(vLook,fTimeDelta,m_pNavigationCom,fSpeedScale);
+}
+void BossMonster::Spawn_BossPage2()
+{
+	BossMonster_Page2::BOSSMONSTER_PAGE2_DESC Desc{};
+
+	XMStoreFloat3(&Desc.vSpawnPos,m_pTransformCom->Get_State(STATE::POSITION));
+
+	_vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+	XMStoreFloat3(&Desc.vSpawnLook, vLook);
+
+	Desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+	Desc.m_strName = L"BossMonster_Page2";
+	Desc.m_strPrototypeObjectName = L"Prototype_GameObject_BossMonster_Page2";
+	Desc.m_strPrototypeBaseName = L"BossMonster_Page2";
+	Desc.pCameraType = ETOUI(CAMERA::NONE);
+	Desc.fSpeedPerSec = 6.f;
+	Desc.fRotationPerSec = 1.5f;
+
+	CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_BossMonster_Page2"),CGameInstance::Get().Get_Level(),TEXT("Layer_Monster"),&Desc);
+}
+void BossMonster::Last_Performance()
+{
+	m_bLastPattern = true;
+	
+}
+void BossMonster::Take_Damage(_float fDamage)
+{
+	_float3 vBloodPos{};
+	XMStoreFloat3(&vBloodPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	vBloodPos.y += 1.0f;
+
+
+
+	Take_Damage(fDamage, vBloodPos);
+}
+void BossMonster::Take_Damage(_float fDamage, const _float3& vHitPos)
+{
+	if (Get_Dead())
+		return;
+
+	if (fDamage <= 0.f)
+		return;
+
+	m_fHP -= fDamage;
+
+	if (m_fHP < 0.f)
+		m_fHP = 0.f;
+
+	Update_HP_UI();
+
+	Spawn_BloodEffect(vHitPos);
+
+	m_bHit = true;
+	m_fHitTime = 0.f;
+
+	if (m_fHP <= 0.f)
+	{
+		//Spawn_BossPage2();
+
+		auto iter = m_pUI.find("BossMonsterUI");
+		if (iter != m_pUI.end())
+		{
+
+			m_pUI.erase(iter);
+
+		}
+		Last_Performance();
+
+	}
+}
+void BossMonster::Update_HP_UI()
+{
+	auto iter = m_pUI.find("BossMonsterUI");
+
+	if (iter == m_pUI.end())
+		return;
+
+	auto pStateUI = dynamic_pointer_cast<Boss_State_UI>(iter->second);
+
+	if (pStateUI == nullptr)
+		return;
+
+	pStateUI->Set_HP(m_fHP, m_fMaxHP);
+}
+
+
+void BossMonster::Spawn_BloodEffect(const _float3& vSpawnPos)
+{
+	Particle_System::PARTICLE_SPAWN_DESC Desc{};
+	Desc.vSpawnPos = vSpawnPos;
+	Desc.iCount = 20;
+	Desc.fPower = 1.f;
+
+	CGameInstance::Get().Add_Particle(PARTICLE_TYPE::BLOOD, &Desc);
+}
+_bool BossMonster::Collider_Bullet(_float fTimeDelta)
+{
+	auto ColliderGroup = CGameInstance::Get().GetColliderGroups(L"Bullet");
+	auto& ColliderPlayer = m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].front();
+	if (ColliderGroup != nullptr && ColliderPlayer != nullptr) {
+
+		for (auto Collider : *ColliderGroup)
+		{
+			if (CGameInstance::Get().Intersect(ColliderPlayer.get(), Collider))
+			{
+				_float3 vHitPos{};
+
+				auto pBulletOwner = Collider->GetOwner();
+
+				if (pBulletOwner != nullptr && pBulletOwner->GetTransform() != nullptr)
+				{
+					XMStoreFloat3(&vHitPos, pBulletOwner->GetTransform()->Get_State(STATE::POSITION));
+				}
+				else
+				{
+					XMStoreFloat3(&vHitPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+					vHitPos.y += 1.0f;
+				}
+
+				Take_Damage(20.f, vHitPos);
+
+				if (pBulletOwner != nullptr) {
+					pBulletOwner->Set_Dead();
+
+				}
+
+				Collider->SetColliderColor(ColliderColor::RED);
+				ColliderPlayer->SetColliderColor(ColliderColor::RED);
+
+				break;
+			}
+
+
+		}
+
+
+	}
+
+	return _bool();
 }
 
 unique_ptr<BossMonster> BossMonster::Create(ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext)

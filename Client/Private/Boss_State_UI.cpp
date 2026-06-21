@@ -1,5 +1,5 @@
-#include "LittleMonster_StateUI.h"
-
+#include "Boss_State_UI.h"
+#include "BossMonster.h"
 #include "GameInstance.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -9,24 +9,24 @@
 #include <fstream>
 #include <sstream>
 
-LittleMonster_StateUI::LittleMonster_StateUI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : UIObject{ pDevice, pContext }
+Boss_State_UI::Boss_State_UI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext) : UIObject{ pDevice, pContext }
 {
 }
 
-LittleMonster_StateUI::LittleMonster_StateUI(const LittleMonster_StateUI& Prototype) : UIObject{ Prototype }
+Boss_State_UI::Boss_State_UI(const Boss_State_UI& Prototype) : UIObject{ Prototype }
 {
 }
 
-LittleMonster_StateUI::~LittleMonster_StateUI()
+Boss_State_UI::~Boss_State_UI()
 {
 }
 
-HRESULT LittleMonster_StateUI::Initialize_Prototype()
+HRESULT Boss_State_UI::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT LittleMonster_StateUI::Initialize(void* pArg)
+HRESULT Boss_State_UI::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -60,7 +60,7 @@ HRESULT LittleMonster_StateUI::Initialize(void* pArg)
     m_UIRects[TEXT("HP_Fill")].vColor = { 0.9f, 0.05f, 0.05f, 1.f };
     m_UIRects[TEXT("HP_Fill")].fAlpha = 1.f;
 
-    Load_UIRects(TEXT("../../Resources/Data/UI/BossMonster_State_UI.txt"));
+    Load_UIRects(TEXT("../../Resources/Data/UI/LittleMonster_State_UI.txt"));
     m_vBillboardHPSize = { 0.8f, 0.14f };
     m_vBillboardOffset = { 0.f, 1.5f, 0.f };
 
@@ -70,25 +70,25 @@ HRESULT LittleMonster_StateUI::Initialize(void* pArg)
     return S_OK;
 }
 
-void LittleMonster_StateUI::Priority_Update(_float fTimeDelta)
+void Boss_State_UI::Priority_Update(_float fTimeDelta)
 {
 }
 
-void LittleMonster_StateUI::Update(_float fTimeDelta)
+void Boss_State_UI::Update(_float fTimeDelta)
 {
     Update_FollowOwner();
     Update_HPBar(fTimeDelta);
 
-    #ifdef _DEBUG
-    GUI_MonsterStateUI();
-    #endif
+#ifdef _DEBUG
+    GUI_BossStateUI();
+#endif
 }
 
-void LittleMonster_StateUI::Late_Update(_float fTimeDelta)
+void Boss_State_UI::Late_Update(_float fTimeDelta)
 {
 }
 
-HRESULT LittleMonster_StateUI::Render()
+HRESULT Boss_State_UI::Render()
 {
     if (nullptr == m_pShaderCom)
         return E_FAIL;
@@ -111,7 +111,7 @@ HRESULT LittleMonster_StateUI::Render()
     return S_OK;
 }
 
-HRESULT LittleMonster_StateUI::Render_BillboardRect(const wstring& strKey)
+HRESULT Boss_State_UI::Render_BillboardRect(const wstring& strKey)
 {
     auto iter = m_UIRects.find(strKey);
     if (iter == m_UIRects.end())
@@ -188,7 +188,7 @@ HRESULT LittleMonster_StateUI::Render_BillboardRect(const wstring& strKey)
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &UI.vColor, sizeof(_float4))))
         return E_FAIL;
 
-    if (FAILED(UI.pTexture->Bind_ShaderResource(m_pShaderCom, "g_Texture",  UI.iTextureIndex)))
+    if (FAILED(UI.pTexture->Bind_ShaderResource(m_pShaderCom, "g_Texture", UI.iTextureIndex)))
         return E_FAIL;
 
     m_pShaderCom->Begin(0);
@@ -199,7 +199,7 @@ HRESULT LittleMonster_StateUI::Render_BillboardRect(const wstring& strKey)
     return S_OK;
 }
 
-void LittleMonster_StateUI::Set_BarRatio_Billboard(const wstring& strKey,const _float2& vBaseSize,float fRatio)
+void Boss_State_UI::Set_BarRatio_Billboard(const wstring& strKey, const _float2& vBaseSize, float fRatio)
 {
     fRatio = ClampFloat(fRatio, 0.f, 1.f);
 
@@ -222,7 +222,7 @@ void LittleMonster_StateUI::Set_BarRatio_Billboard(const wstring& strKey,const _
     Bar.bVisible = fRatio > 0.001f;
 }
 
-void LittleMonster_StateUI::Update_HPBarVisual_Billboard()
+void Boss_State_UI::Update_HPBarVisual_Billboard()
 {
     auto iterBack = m_UIRects.find(TEXT("HP_Back"));
     if (iterBack == m_UIRects.end())
@@ -265,7 +265,7 @@ void LittleMonster_StateUI::Update_HPBarVisual_Billboard()
     }
 }
 
-HRESULT LittleMonster_StateUI::Ready_Components()
+HRESULT Boss_State_UI::Ready_Components()
 {
     if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_VtxPosTex"), TEXT("Com_Shader"), m_pShaderCom)))
         return E_FAIL;
@@ -276,7 +276,7 @@ HRESULT LittleMonster_StateUI::Ready_Components()
     return S_OK;
 }
 
-HRESULT LittleMonster_StateUI::Add_UIRect(const wstring& UIName, const wstring& strName, const wstring& strTextureTag, const _float2& vPos, const _float2& vSize, _float fDepth)
+HRESULT Boss_State_UI::Add_UIRect(const wstring& UIName, const wstring& strName, const wstring& strTextureTag, const _float2& vPos, const _float2& vSize, _float fDepth)
 {
     UI_RECT UI{};
 
@@ -290,7 +290,7 @@ HRESULT LittleMonster_StateUI::Add_UIRect(const wstring& UIName, const wstring& 
     UI.fAlpha = 1.f;
     UI.vColor = { 1.f, 1.f, 1.f, 1.f };
 
-    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), strTextureTag.c_str(),  UI.strName,  UI.pTexture)))
+    if (FAILED(__super::Add_Component(CGameInstance::Get().Get_Level(), strTextureTag.c_str(), UI.strName, UI.pTexture)))
         return E_FAIL;
 
     m_UIRects[UIName] = UI;
@@ -298,7 +298,7 @@ HRESULT LittleMonster_StateUI::Add_UIRect(const wstring& UIName, const wstring& 
     return S_OK;
 }
 
-HRESULT LittleMonster_StateUI::Render_UIRect_ByKey(const wstring& strKey)
+HRESULT Boss_State_UI::Render_UIRect_ByKey(const wstring& strKey)
 {
     auto iter = m_UIRects.find(strKey);
     if (iter == m_UIRects.end())
@@ -324,7 +324,7 @@ HRESULT LittleMonster_StateUI::Render_UIRect_ByKey(const wstring& strKey)
     return S_OK;
 }
 
-HRESULT LittleMonster_StateUI::Render_UIRect(UI_RECT& UI)
+HRESULT Boss_State_UI::Render_UIRect(UI_RECT& UI)
 {
     _float2 vViewportSize = CGameInstance::Get().Get_ViewportSize();
 
@@ -353,13 +353,13 @@ HRESULT LittleMonster_StateUI::Render_UIRect(UI_RECT& UI)
 
     return S_OK;
 }
-void LittleMonster_StateUI::Set_HP(float fCurHP, float fMaxHP)
+void Boss_State_UI::Set_HP(float fCurHP, float fMaxHP)
 {
     m_fMaxHP = max(fMaxHP, 1.f);
     m_fCurHP = ClampFloat(fCurHP, 0.f, m_fMaxHP);
 }
 
-void LittleMonster_StateUI::Update_HPBar(_float fTimeDelta)
+void Boss_State_UI::Update_HPBar(_float fTimeDelta)
 {
     float fTargetRatio = 0.f;
 
@@ -386,7 +386,7 @@ void LittleMonster_StateUI::Update_HPBar(_float fTimeDelta)
     Update_HPBarVisual_Billboard();
 }
 
-void LittleMonster_StateUI::Update_HPBarVisual()
+void Boss_State_UI::Update_HPBarVisual()
 {
     auto iterBack = m_UIRects.find(TEXT("HP_Back"));
     if (iterBack == m_UIRects.end())
@@ -414,7 +414,7 @@ void LittleMonster_StateUI::Update_HPBarVisual()
     Set_BarRatio(TEXT("HP_Damage"), vInnerPos, vInnerSize, m_fDamageRatio);
     Set_BarRatio(TEXT("HP_Fill"), vInnerPos, vInnerSize, m_fHpRatio);
 }
-void LittleMonster_StateUI::Set_BarRatio(const wstring& strKey, const _float2& vBasePos, const _float2& vBaseSize, float fRatio)
+void Boss_State_UI::Set_BarRatio(const wstring& strKey, const _float2& vBasePos, const _float2& vBaseSize, float fRatio)
 {
     fRatio = ClampFloat(fRatio, 0.f, 1.f);
 
@@ -435,7 +435,7 @@ void LittleMonster_StateUI::Set_BarRatio(const wstring& strKey, const _float2& v
 
     Bar.bVisible = fRatio > 0.001f;
 }
-float LittleMonster_StateUI::ClampFloat(float fValue, float fMin, float fMax)
+float Boss_State_UI::ClampFloat(float fValue, float fMin, float fMax)
 {
     if (fValue < fMin)
         return fMin;
@@ -446,7 +446,7 @@ float LittleMonster_StateUI::ClampFloat(float fValue, float fMin, float fMax)
     return fValue;
 }
 
-float LittleMonster_StateUI::LerpFloat(float fStart, float fEnd, float fRatio)
+float Boss_State_UI::LerpFloat(float fStart, float fEnd, float fRatio)
 {
     fRatio = ClampFloat(fRatio, 0.f, 1.f);
 
@@ -454,7 +454,7 @@ float LittleMonster_StateUI::LerpFloat(float fStart, float fEnd, float fRatio)
 }
 
 
-void LittleMonster_StateUI::Update_FollowOwner()
+void Boss_State_UI::Update_FollowOwner()
 {
     auto pOwner = m_pOwner;
 
@@ -497,26 +497,26 @@ void LittleMonster_StateUI::Update_FollowOwner()
     for (auto& Pair : m_UIRects)
         Pair.second.bVisible = true;
 }
-unique_ptr<LittleMonster_StateUI> LittleMonster_StateUI::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
+unique_ptr<Boss_State_UI> Boss_State_UI::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
-    unique_ptr<LittleMonster_StateUI> pInstance = unique_ptr<LittleMonster_StateUI>(new LittleMonster_StateUI(pDevice, pContext));
+    unique_ptr<Boss_State_UI> pInstance = unique_ptr<Boss_State_UI>(new Boss_State_UI(pDevice, pContext));
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created : LittleMonster_StateUI");
+        MSG_BOX("Failed to Created : Boss_State_UI");
         return nullptr;
     }
 
     return pInstance;
 }
 
-shared_ptr<Prototype> LittleMonster_StateUI::Clone(void* pArg)
+shared_ptr<Prototype> Boss_State_UI::Clone(void* pArg)
 {
-    shared_ptr<LittleMonster_StateUI> pInstance = shared_ptr<LittleMonster_StateUI>(new LittleMonster_StateUI(*this));
+    shared_ptr<Boss_State_UI> pInstance = shared_ptr<Boss_State_UI>(new Boss_State_UI(*this));
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned : LittleMonster_StateUI");
+        MSG_BOX("Failed to Cloned : Boss_State_UI");
         return nullptr;
     }
 
@@ -524,9 +524,9 @@ shared_ptr<Prototype> LittleMonster_StateUI::Clone(void* pArg)
 }
 
 #ifdef _DEBUG
-void LittleMonster_StateUI::GUI_MonsterStateUI()
+void Boss_State_UI::GUI_BossStateUI()
 {
-    string strWindowName = "BossMonster State UI Editor##";
+    string strWindowName = "Player State UI Editor##";
     strWindowName += to_string(reinterpret_cast<size_t>(this));
 
     if (ImGui::Begin(strWindowName.c_str()))
@@ -588,13 +588,13 @@ void LittleMonster_StateUI::GUI_MonsterStateUI()
             Set_HP(m_fCurHP - 10.f, m_fMaxHP);
 
 
-            _vector vPos =  m_pOwner->GetTransform()->Get_State(STATE::POSITION);
+            _vector vPos = m_pOwner->GetTransform()->Get_State(STATE::POSITION);
 
-			_float3 vPosFloat3;
+            _float3 vPosFloat3;
 
             XMStoreFloat3(&vPosFloat3, vPos);
 
-			static_pointer_cast<LittleMonster>(m_pOwner)->Take_Damage(10.f, vPosFloat3);
+            static_pointer_cast<BossMonster>(m_pOwner)->Take_Damage(10.f, vPosFloat3);
 
 
         }
@@ -760,7 +760,7 @@ void LittleMonster_StateUI::GUI_MonsterStateUI()
 }
 #endif
 
-HRESULT LittleMonster_StateUI::Save_UIRects(const wstring& strFilePath)
+HRESULT Boss_State_UI::Save_UIRects(const wstring& strFilePath)
 {
     ofstream ofs(strFilePath);
 
@@ -795,7 +795,7 @@ HRESULT LittleMonster_StateUI::Save_UIRects(const wstring& strFilePath)
     return S_OK;
 }
 
-HRESULT LittleMonster_StateUI::Load_UIRects(const wstring& strFilePath)
+HRESULT Boss_State_UI::Load_UIRects(const wstring& strFilePath)
 {
     ifstream ifs(strFilePath);
 

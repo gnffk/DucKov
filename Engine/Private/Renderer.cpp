@@ -35,6 +35,10 @@ HRESULT Renderer::Initialize()
     if (FAILED(CGameInstance::Get().Add_RenderTarget(TEXT("Target_Specular"), vViewportSize.x, vViewportSize.y, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
         return E_FAIL;
 
+    /* For.Target_Emission */
+    if (FAILED(CGameInstance::Get().Add_RenderTarget(TEXT("Target_Emission"),vViewportSize.x,vViewportSize.y, DXGI_FORMAT_R16G16B16A16_FLOAT,_float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+
     /* For.Target_Depth */
     if (FAILED(CGameInstance::Get().Add_RenderTarget(TEXT("Target_Depth"), vViewportSize.x, vViewportSize.y, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
         return E_FAIL;
@@ -130,6 +134,9 @@ HRESULT Renderer::Initialize()
         return E_FAIL;
     if (FAILED(CGameInstance::Get().Add_MRT(TEXT("MRT_GameObject"), TEXT("Target_PickPos"))))
         return E_FAIL;
+    if (FAILED(CGameInstance::Get().Add_MRT(TEXT("MRT_GameObject"), TEXT("Target_Emission"))))
+        return E_FAIL;
+
 
     /* For.MRT_LightAcc */
     if (FAILED(CGameInstance::Get().Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
@@ -500,7 +507,8 @@ HRESULT Renderer::Render_Combined()
         return E_FAIL;
     if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
         return E_FAIL;
-
+    if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Emission"), m_pShader, "g_EmissionTexture")))
+        return E_FAIL;
     m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
     m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);

@@ -155,7 +155,10 @@
     <ClInclude Include="..\Public\Body_Player.h" />
     <ClInclude Include="..\Public\BossMonster.h" />
     <ClInclude Include="..\Public\BossMonsterFSM.h" />
+    <ClInclude Include="..\Public\BossMonster_Page2.h" />
+    <ClInclude Include="..\Public\BossMonster_Page2FSM.h" />
     <ClInclude Include="..\Public\BossPattern.h" />
+    <ClInclude Include="..\Public\BossPattern_Page2.h" />
     <ClInclude Include="..\Public\Boss_HAND_UP_AND_LEFT_State.h" />
     <ClInclude Include="..\Public\Boss_HAND_UP_AND_RIGHT_State.h" />
     <ClInclude Include="..\Public\Boss_HAND_UP_AND_WALK_State.h" />
@@ -165,6 +168,7 @@
     <ClInclude Include="..\Public\Boss_RIGHT_WALK_State.h" />
     <ClInclude Include="..\Public\Boss_ROLL_State.h" />
     <ClInclude Include="..\Public\Boss_RUN_State.h" />
+    <ClInclude Include="..\Public\Boss_State_UI.h" />
     <ClInclude Include="..\Public\Boss_WALK_State.h" />
     <ClInclude Include="..\Public\Boss_Weapon.h" />
     <ClInclude Include="..\Public\Bullet.h" />
@@ -232,7 +236,10 @@
     <ClCompile Include="..\Private\Body_Player.cpp" />
     <ClCompile Include="..\Private\BossMonster.cpp" />
     <ClCompile Include="..\Private\BossMonsterFSM.cpp" />
+    <ClCompile Include="..\Private\BossMonster_Page2.cpp" />
+    <ClCompile Include="..\Private\BossMonster_Page2FSM.cpp" />
     <ClCompile Include="..\Private\BossPattern.cpp" />
+    <ClCompile Include="..\Private\BossPattern_Page2.cpp" />
     <ClCompile Include="..\Private\Boss_HAND_UP_AND_LEFT_State.cpp" />
     <ClCompile Include="..\Private\Boss_HAND_UP_AND_RIGHT_State.cpp" />
     <ClCompile Include="..\Private\Boss_HAND_UP_AND_WALK_State.cpp" />
@@ -242,6 +249,7 @@
     <ClCompile Include="..\Private\Boss_RIGHT_WALK_State.cpp" />
     <ClCompile Include="..\Private\Boss_ROLL_State.cpp" />
     <ClCompile Include="..\Private\Boss_RUN_State.cpp" />
+    <ClCompile Include="..\Private\Boss_State_UI.cpp" />
     <ClCompile Include="..\Private\Boss_WALK_State.cpp" />
     <ClCompile Include="..\Private\Boss_Weapon.cpp" />
     <ClCompile Include="..\Private\Bullet.cpp" />
@@ -318,6 +326,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_BossMonster.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

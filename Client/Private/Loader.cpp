@@ -29,6 +29,7 @@
 #include "Particle_Blood.h"
 #include "Player_Armor.h"
 #include "Player_Helmat.h"
+#include "Boss_State_UI.h"
 
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
@@ -347,6 +348,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_Blood_Particle_Rect"),
 		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_Blood_Particle.hlsl"), VTXINSTANCE_PARTICLE_RECT::Elements, VTXINSTANCE_PARTICLE_RECT::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_BossMonster"),
+		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_Vtx_BossMonster.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 
 
@@ -748,6 +753,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_Player_Helmat */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_Helmat"),
 		Player_Helmat::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_BossMonster_State_UI */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossMonster_State_UI"),
+		Boss_State_UI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

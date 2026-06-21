@@ -39,7 +39,10 @@ HRESULT Boss_Weapon::Initialize(void* pArg)
 		return E_FAIL;
 
 
-
+	m_vLocalPos = { -0.06f, 0.15f, 0.27f };
+	m_vLocalRot = { 360.f, -148.5f, -14.5f };
+	m_vLocalScale = { 1.f, 1.f, 1.f };
+	m_vMuzzleLocalPos = { 0.3f, 0.f, -0.3f };
 	return S_OK;
 }
 
@@ -103,7 +106,7 @@ void Boss_Weapon::Late_Update(_float fTimeDelta)
 HRESULT Boss_Weapon::Render()
 {
 	if (!m_bVisible)
-		return E_FAIL;
+		return S_OK;
 
 
 	if (FAILED(__super::Bind_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))

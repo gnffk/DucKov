@@ -15,6 +15,7 @@ public:
 	
 	} BOSSMONSTER_DESC;
 
+
 private:
 	BossMonster(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 	BossMonster(const BossMonster& Prototype);
@@ -53,17 +54,32 @@ private:
 	HRESULT Ready_UI();
 
 
+private:
+	void Spawn_BossPage2();
+	void Last_Performance();
+public:
+	void Take_Damage(_float fDamage);
+	void Take_Damage(_float fDamage, const _float3& vHitPos);
+	void Update_HP_UI();
+	void Spawn_BloodEffect(const _float3& vSpawnPos);
+
+private:
+	_bool Collider_Bullet(_float fTimeDelta);
+
 public:
 	shared_ptr<class FSM> GetFSM() { return m_pMonsterFSM; }
 private:
 	shared_ptr<class BossPattern> m_pBossPattern = { nullptr };
 	shared_ptr<class FSM> m_pMonsterFSM = { nullptr };
 	shared_ptr<class Navigation> m_pNavigationCom = { nullptr };
+	shared_ptr<class Shader> m_pShaderBossCom = { nullptr };
 
-	_float		m_fMaxHP = 1000.f;
-	_float		m_fHP = 1000.f;
+	map<string, shared_ptr<class GameObject>> m_pUI;
+	_float		m_fMaxHP = 100.f;
+	_float		m_fHP = 100.f;
 	_float		m_fAttackPower = 100.f;
-
+	_float		m_fPatternRatio = 0.f;
+	_bool		m_bLastPattern = false;
 private:
 	uint32_t			m_iState = {};
 
