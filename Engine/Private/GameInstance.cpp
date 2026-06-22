@@ -387,6 +387,12 @@ weak_ptr<Camera> CGameInstance::Find_Camera(uint32_t iCameraType)
 void  CGameInstance::GetWorldMatrix(_float4x4& WorldMatrix) {
     m_pCamera_Manager->Get_MainCameraWorldMatrix(WorldMatrix);
 }
+HRESULT  CGameInstance::Set_MainCameraPosition(_float4& CameraPosition) {
+    return m_pCamera_Manager->Set_MainCameraPosition(CameraPosition);
+}
+HRESULT  CGameInstance::Set_MainCameraLookAt(_float4& CameraLookAT) {
+    return m_pCamera_Manager->Set_MainCameraLookAt(CameraLookAT);
+}
 
 #pragma endregion
 #pragma region Collider_Manager

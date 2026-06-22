@@ -61,6 +61,17 @@ void Camera::Set_Proj(float fov, float aspect, float nearZ, float farZ)
 	XMStoreFloat4x4(&m_ProjectionMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(fov), aspect, nearZ, farZ));
 
 }
+void Camera::Set_Look(_float4& vLookPosition)
+{
+	_vector vTarget = XMLoadFloat4(&vLookPosition);
+
+	m_pTransformCom->LookAt(vTarget);
+}
+
+void Camera::Set_Position(_float4& vPosition)
+{
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(vPosition.x, vPosition.y, vPosition.z, vPosition.w));
+}
 
 void Camera::GetShaderMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix)
 {

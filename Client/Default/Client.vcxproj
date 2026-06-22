@@ -195,6 +195,7 @@
     <ClInclude Include="..\Public\LittleMonster_Weapon.h" />
     <ClInclude Include="..\Public\MainUI.h" />
     <ClInclude Include="..\Public\Particle_Blood.h" />
+    <ClInclude Include="..\Public\PerformaceCamera.h" />
     <ClInclude Include="..\Public\Player_Armor.h" />
     <ClInclude Include="..\Public\Player_HAND_UP_State.h" />
     <ClInclude Include="..\Public\Player_Helmat.h" />
@@ -275,6 +276,7 @@
     <ClCompile Include="..\Private\LittleMonster_Weapon.cpp" />
     <ClCompile Include="..\Private\MainUI.cpp" />
     <ClCompile Include="..\Private\Particle_Blood.cpp" />
+    <ClCompile Include="..\Private\PerformaceCamera.cpp" />
     <ClCompile Include="..\Private\Player_Armor.cpp" />
     <ClCompile Include="..\Private\Player_HAND_UP_State.cpp" />
     <ClCompile Include="..\Private\Player_Helmat.cpp" />

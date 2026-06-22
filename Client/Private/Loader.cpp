@@ -30,7 +30,7 @@
 #include "Player_Armor.h"
 #include "Player_Helmat.h"
 #include "Boss_State_UI.h"
-
+#include "PerformaceCamera.h"
 
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -758,6 +758,11 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_BossMonster_State_UI */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossMonster_State_UI"),
 		Boss_State_UI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_BossPerformanceCamera */
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossPerformanceCamera"),
+		PerformaceCamera::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

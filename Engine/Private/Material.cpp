@@ -71,7 +71,7 @@ HRESULT Material::Bind_ShaderResource(shared_ptr<class Shader> pShader, const _c
 		return S_OK;
 	}
 
-	return pShader->Bind_SRV(pConstantName,
+ 	return pShader->Bind_SRV(pConstantName,
 		m_Materials[eMaterialType][iTextureIndex]);
 }
 

@@ -256,6 +256,9 @@
     <Filter Include="02. GameObject\Monster\BossPage2\Pattern">
       <UniqueIdentifier>{50e13bb1-a049-44a8-b7c3-4d684c3ad79b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Camera\PerformanceCamera">
+      <UniqueIdentifier>{b6bb3952-05c0-47d1-9d7d-886140bd6026}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -495,6 +498,9 @@
     <ClInclude Include="..\Public\BossPattern_Page2.h">
       <Filter>02. GameObject\Monster\BossPage2\Pattern</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PerformaceCamera.h">
+      <Filter>02. GameObject\Camera\PerformanceCamera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -731,6 +737,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BossPattern_Page2.cpp">
       <Filter>02. GameObject\Monster\BossPage2\Pattern</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PerformaceCamera.cpp">
+      <Filter>02. GameObject\Camera\PerformanceCamera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

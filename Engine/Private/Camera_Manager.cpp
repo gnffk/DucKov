@@ -79,6 +79,27 @@ HRESULT Camera_Manager::Get_MainCameraPosition(_float4& CameraPosition)
 	return E_FAIL;
 }
 
+HRESULT Camera_Manager::Set_MainCameraPosition(_float4& CameraPosition)
+{
+	auto camera = p_MainCamera.lock();
+	if (camera) {
+		camera->Set_Position(CameraPosition);
+		return S_OK;
+	}
+	return E_FAIL;
+}
+
+HRESULT Camera_Manager::Set_MainCameraLookAt(_float4& CameraLookAT)
+{
+	auto camera = p_MainCamera.lock();
+	if (camera) {
+
+		camera->Set_Look(CameraLookAT);
+		return S_OK;
+	}
+	return E_FAIL;
+}
+
 weak_ptr<Camera> Camera_Manager::Find_Camera(uint32_t iCameraType)
 {
 

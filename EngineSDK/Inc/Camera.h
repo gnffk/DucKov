@@ -21,8 +21,12 @@ public:
 	virtual HRESULT Render() override;
 
 	virtual void Set_View();
-
 	virtual void Set_Proj(float fov, float aspect, float nearZ, float farZ);
+	void		 Set_Look(_float4& vLookPosition);
+	
+	void         Set_Position(_float4& vPosition);
+
+
 
 	void GetShaderMatrix( _float4x4& ViewMatrix, _float4x4& ProjectionMatrix);
 	void GetViewMatrix( _float4x4& ViewMatrix);

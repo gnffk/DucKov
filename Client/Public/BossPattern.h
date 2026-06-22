@@ -14,6 +14,7 @@ public:
         CHASE,
         ATTACK,
         RETURN,
+        DIE,
         END
     };
 
@@ -33,6 +34,7 @@ private:
     void Update_Roam(_float fTimeDelta);
     void Update_Chase(_float fTimeDelta);
     void Update_Attack(_float fTimeDelta);
+    void Update_DIE(_float fTimeDelta);
 
 private:
 
@@ -75,6 +77,10 @@ private:
 
     void Change_BossState(BossMonsterFSM::BOSS_STATE eState);
 
+public:
+    void Pattern_Dead() { m_bDead = true; }
+private:
+	_bool m_bDead = false;
 private:
     _float m_fDetectRange = 15.f;
     _float m_fAttackRange = 8.f;

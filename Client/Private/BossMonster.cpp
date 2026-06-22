@@ -7,6 +7,7 @@
 #include "Particle_System.h"
 #include "BaseCollider.h"
 #include "BossMonster_Page2.h"
+#include "PerformaceCamera.h"
 NS_BEGIN(Client)
 
 BossMonster::BossMonster(ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext): Monster{ pDevice, pContext }
@@ -278,9 +279,26 @@ void BossMonster::Priority_Update(_float fTimeDelta)
 void BossMonster::Update(_float fTimeDelta)
 {
 
-	if (m_bLastPattern)
+	if (m_bLastPattern )
 	{
-		m_fPatternRatio += fTimeDelta * 1.5f;
+
+		m_fPatternRatio += fTimeDelta/ 5.f;
+		auto pWeak = CGameInstance::Get().Find_Camera(ETOUI(CAMERA::SUB)).lock();
+		if (pWeak) {
+			_float4 Position;
+			CGameInstance::Get().Get_MainCameraPosition(Position);
+
+			if (m_fPerformanceMove - Position.y < 4.5f) {
+
+				static_pointer_cast<PerformaceCamera>(pWeak)->Zoom(m_fPatternRatio / 15.f);
+			}
+			else {
+				if(m_fPatternRatio >= 0.9f)
+					m_bNextPattern = true;
+			}
+			
+		}
+
 	}
 	else
 	{
@@ -384,6 +402,9 @@ HRESULT BossMonster::Render()
 	if (FAILED(m_pShaderBossCom->Bind_RawValue("g_fPatternRatio", &fPatternRatio, sizeof(_float))))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderBossCom->Bind_RawValue("g_fBossPattern1", &m_bNextPattern, sizeof(_bool))))
+		return E_FAIL;
+
 
 	if (FAILED(m_pShaderBossCom->Bind_Matrix("g_WorldMatrix", &World)))
 		return E_FAIL;
@@ -396,6 +417,10 @@ HRESULT BossMonster::Render()
 
 	if (FAILED(m_pModelCom->Bind_Materials(m_pShaderBossCom, "g_DiffuseTexture", 2, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
 		return E_FAIL;
+
+	if (FAILED(m_pModelCom->Bind_Materials(m_pShaderBossCom, "g_EmbissionTexture", 2, (uint32_t)ETOUI(TEXTURETYPE::EMISSIVE), 0)))
+		return E_FAIL;
+
 	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderBossCom, "g_BoneMatrices", 2)))
 		return E_FAIL;
 
@@ -547,8 +572,43 @@ void BossMonster::Spawn_BossPage2()
 }
 void BossMonster::Last_Performance()
 {
+
+	if (m_bLastPattern)
+		return;
+	GameObject::GAMEOBJECT_DESC descBossPerformance_Camera{};
+
+	descBossPerformance_Camera.ObjectType = ETOUI(OBJECTTYPE::OBJECT_CAMERA);
+	descBossPerformance_Camera.m_strName = L"BossPerformance_Camera";
+	descBossPerformance_Camera.m_strPrototypeObjectName = L"Prototype_GameObject_BossPerformanceCamera";
+	descBossPerformance_Camera.m_strPrototypeBaseName = L"Prototype_GameObject_BossPerformanceCamera";
+	descBossPerformance_Camera.pCameraType = ETOUI(CAMERA::SUB);
+	descBossPerformance_Camera.fSpeedPerSec = 10.f;
+	descBossPerformance_Camera.fRotationPerSec = 0.1f;
+
+	CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossPerformanceCamera"), CGameInstance::Get().Get_Level(), L"BossTag", &descBossPerformance_Camera);
+
+	CGameInstance::Get().Add_Camera(ETOUI(CAMERA::SUB), dynamic_pointer_cast<Camera>(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"BossTag", L"BossPerformance_Camera")));
+
+	CGameInstance::Get().Change_Camera((int32_t)CAMERA::SUB);
+
+	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+	_float4 fBossPerformancePos, finalPos;
+	XMStoreFloat4(&fBossPerformancePos, vPos);
+
+	finalPos = _float4{ fBossPerformancePos.x, fBossPerformancePos.y+5.f, fBossPerformancePos.z-0.8f, fBossPerformancePos.w};
+	fBossPerformancePos = _float4{ fBossPerformancePos.x, fBossPerformancePos.y, fBossPerformancePos.z - 0.9f, fBossPerformancePos.w};
+
+	CGameInstance::Get().Set_MainCameraPosition(finalPos);
+	CGameInstance::Get().Set_MainCameraLookAt(fBossPerformancePos);
+
+	m_pTransformCom->Rotation(-90.f, 0.f, 0.f);
+
+	m_fPerformanceMove = finalPos.y;
+
+	m_pBossPattern->Pattern_Dead();
+	m_iState = BossMonsterFSM::BOSS_STATE::TPOSE;
 	m_bLastPattern = true;
-	
+
 }
 void BossMonster::Take_Damage(_float fDamage)
 {
@@ -592,6 +652,9 @@ void BossMonster::Take_Damage(_float fDamage, const _float3& vHitPos)
 			m_pUI.erase(iter);
 
 		}
+
+
+		
 		Last_Performance();
 
 	}

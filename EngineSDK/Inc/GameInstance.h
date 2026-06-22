@@ -89,6 +89,8 @@ public:
 	HRESULT Get_MainCameraPosition(_float4& Position);
 	void GetWorldMatrix(_float4x4& WorldMatrix);
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
+	HRESULT Set_MainCameraPosition(_float4& CameraPosition);
+	HRESULT Set_MainCameraLookAt(_float4& CameraLookAT);
 #pragma endregion
 
 #pragma region Collider_Manager

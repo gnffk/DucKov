@@ -1822,8 +1822,7 @@ void MapEditor::IMGUI_AddPlayer()
         cameraNames,
         IM_ARRAYSIZE(cameraNames)))
     {
-        CGameInstance::Get().Change_Camera(
-            (uint32_t)currentCamera);
+        CGameInstance::Get().Change_Camera( (uint32_t)currentCamera);
     }
 
     ImGui::End();

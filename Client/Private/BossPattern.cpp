@@ -58,6 +58,12 @@ void BossPattern::Update(_float fTimeDelta)
 
     Change_PatternState(eNextState);
 
+
+    if(m_bDead == true)
+    {
+        Change_PatternState(PATTERN_STATE::DIE);
+	}
+
     switch (m_ePatternState)
     {
     case PATTERN_STATE::ROAM:
@@ -70,6 +76,9 @@ void BossPattern::Update(_float fTimeDelta)
 
     case PATTERN_STATE::ATTACK:
         Update_Attack(fTimeDelta);
+        break;
+    case PATTERN_STATE::DIE:
+		Update_DIE(fTimeDelta);
         break;
     }
 }
@@ -327,6 +336,10 @@ void BossPattern::Update_Attack(_float fTimeDelta)
         m_bAttacking = false;
         m_ePatternState = PATTERN_STATE::CHASE;
     }
+}
+void BossPattern::Update_DIE(_float fTimeDelta)
+{
+    Change_BossState(BossMonsterFSM::BOSS_STATE::TPOSE);
 }
 void BossPattern::Follow_Path(_float fTimeDelta,_float fSpeedScale)
 {

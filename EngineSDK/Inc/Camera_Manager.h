@@ -26,6 +26,9 @@ public:
 	
 	
 	HRESULT Get_MainCameraPosition(_float4& CameraPosition);
+	HRESULT Set_MainCameraPosition(_float4& CameraPosition);
+	HRESULT Set_MainCameraLookAt(_float4& CameraLookAT);
+	
 	weak_ptr<Camera> Find_Camera(uint32_t iCameraType);
 	
 	

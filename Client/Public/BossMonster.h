@@ -80,6 +80,8 @@ private:
 	_float		m_fAttackPower = 100.f;
 	_float		m_fPatternRatio = 0.f;
 	_bool		m_bLastPattern = false;
+	_float      m_fPerformanceMove = 0.f;
+	_bool		m_bNextPattern = false;	
 private:
 	uint32_t			m_iState = {};
 
