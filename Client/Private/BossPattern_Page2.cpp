@@ -53,9 +53,17 @@ void BossPattern_Page2::Update(_float fTimeDelta)
 
         return;
     }
-
+ 
     switch (m_eCurrentPattern)
     {
+    case PATTERN_TYPE::BEFORE_START:
+        Update_Before_Start(fTimeDelta);
+        break;
+
+    case PATTERN_TYPE::START_APPEAR:
+        Update_Start_Appear(fTimeDelta);
+        break;
+
     case PATTERN_TYPE::LASER_CANNON:
         Update_LaserCannon(fTimeDelta);
         break;
@@ -97,7 +105,8 @@ void BossPattern_Page2::Select_NextPattern()
 
     if (pPlayer == nullptr)
     {
-        Start_Pattern(PATTERN_TYPE::METEOR_PATTERN);
+        // 없을떄 시작
+        Start_Pattern(PATTERN_TYPE::BEFORE_START);
         return;
     }
 
@@ -165,7 +174,7 @@ void BossPattern_Page2::Start_Pattern(PATTERN_TYPE ePattern)
         break;
 
     case PATTERN_TYPE::WHIRLWIND_ATTACK:
-        Change_BossState(BossMonster_Page2FSM::BOSS_STATE::ROLL);
+        Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
         break;
 
     case PATTERN_TYPE::ROLL_ATTACK:
@@ -176,10 +185,14 @@ void BossPattern_Page2::Start_Pattern(PATTERN_TYPE ePattern)
         Change_BossState(BossMonster_Page2FSM::BOSS_STATE::HAND_UP);
         break;
 
+    case PATTERN_TYPE::BEFORE_START:
+        Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
+        break;
+
+    case PATTERN_TYPE::START_APPEAR:
+        Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
+        break;
     case PATTERN_TYPE::DIE:
-        // BossMonster_Page2FSM에 DIE가 있으면 DIE로 바꾸고,
-        // 없으면 일단 TPOSE나 HIT로 대체.
-        // Change_BossState(BossMonster_Page2FSM::BOSS_STATE::DIE);
         Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
         break;
     }
@@ -203,6 +216,82 @@ void BossPattern_Page2::End_Pattern()
 
     // 다음 패턴까지 대기 시간
     m_fPatternCoolTimer = 0.8f + static_cast<_float>(rand() % 100) / 100.f * 0.8f;
+}
+
+void BossPattern_Page2::Update_Before_Start(_float fTimeDelta)
+{
+    m_fPatternTimer += fTimeDelta;
+    m_fStepTimer += fTimeDelta;
+
+    auto pOwner = m_pOwner.lock();
+
+    if (pOwner == nullptr)
+        return;
+
+    switch (m_ePatternStep)
+    {
+    case PATTERN_STEP::START:
+        m_ePatternStep = PATTERN_STEP::START;
+        m_fStepTimer = 0.f;
+        m_fFireTimer = 0.f;
+
+        Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
+        break;
+    }
+
+}
+
+void BossPattern_Page2::Update_Start_Appear(_float fTimeDelta)
+{
+    m_fPatternTimer += fTimeDelta;
+    m_fStepTimer += fTimeDelta;
+
+    auto pOwner = m_pOwner.lock();
+
+    if (pOwner == nullptr)
+        return;
+
+    switch (m_ePatternStep)
+    {
+    case PATTERN_STEP::START:
+        m_ePatternStep = PATTERN_STEP::READY;
+        m_fStepTimer = 0.f;
+        Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
+        break;
+
+    case PATTERN_STEP::READY:
+        Lending_On_Floor(fTimeDelta);
+
+        if (m_fStepTimer >= m_fAppearReadyTime)
+        {
+            m_ePatternStep = PATTERN_STEP::ACTIVE;
+            m_fStepTimer = 0.f;
+        }
+
+        break;
+
+    case PATTERN_STEP::ACTIVE:
+        m_ePatternStep = PATTERN_STEP::ACTIVE;
+        m_fStepTimer = 0.f;
+
+        m_eCurrentPattern = PATTERN_TYPE::NONE;
+        m_ePatternStep = PATTERN_STEP::NONE;
+
+        m_fPatternTimer = 0.f;
+        m_fStepTimer = 0.f;
+        m_fFireTimer = 0.f;
+        m_fDamageTimer = 0.f;
+
+        m_bHasDamagedThisPattern = false;
+
+        m_Meteors.clear();
+
+        Change_BossState(BossMonster_Page2FSM::BOSS_STATE::IDLE);
+
+        // 다음 패턴까지 대기 시간
+        m_fPatternCoolTimer = 20.f;
+        break;
+    }
 }
 
 void BossPattern_Page2::Update_LaserCannon(_float fTimeDelta)
@@ -334,7 +423,6 @@ void BossPattern_Page2::Update_ChargeAttack(_float fTimeDelta)
         break;
     }
 }
-
 
 void BossPattern_Page2::Update_WhirlwindAttack(_float fTimeDelta)
 {
@@ -608,8 +696,6 @@ void BossPattern_Page2::Update_Die(_float fTimeDelta)
     if (pOwner == nullptr)
         return;
 
-    // BossMonster_Page2FSM에 DIE 상태가 있으면 이걸로 교체
-    // Change_BossState(BossMonster_Page2FSM::BOSS_STATE::DIE);
     Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
 
     if (m_fPatternTimer >= 1.5f)
@@ -686,11 +772,7 @@ void BossPattern_Page2::Move_Away_From_Player(_float fTimeDelta, _float fSpeedSc
 
 shared_ptr<GameObject> BossPattern_Page2::Find_Player()
 {
-    return CGameInstance::Get().Find_Object(
-        CGameInstance::Get().Get_Level(),
-        L"PlayerTag",
-        L"Player"
-    );
+    return CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
 }
 
 _bool BossPattern_Page2::Get_PlayerPos(_float3& vOutPlayerPos)
@@ -703,10 +785,7 @@ _bool BossPattern_Page2::Get_PlayerPos(_float3& vOutPlayerPos)
     if (pPlayer->GetTransform() == nullptr)
         return false;
 
-    XMStoreFloat3(
-        &vOutPlayerPos,
-        pPlayer->GetTransform()->Get_State(STATE::POSITION)
-    );
+    XMStoreFloat3(&vOutPlayerPos,pPlayer->GetTransform()->Get_State(STATE::POSITION));
 
     return true;
 }
@@ -776,10 +855,7 @@ void BossPattern_Page2::Damage_Player_If_Close(_float fRange, _float fDamage)
     pPlayer->Take_Damage(fDamage, vHitPos);
 }
 
-void BossPattern_Page2::Damage_Player_If_InFront(
-    _float fRange,
-    _float fAngleDegree,
-    _float fDamage)
+void BossPattern_Page2::Damage_Player_If_InFront( _float fRange, _float fAngleDegree,_float fDamage)
 {
     auto pOwner = m_pOwner.lock();
     auto pPlayerObject = Find_Player();
@@ -830,6 +906,10 @@ void BossPattern_Page2::Damage_Player_If_InFront(
     pPlayer->Take_Damage(fDamage, vHitPos);
 }
 
+void BossPattern_Page2::Lending_On_Floor(_float fTimeDelta)
+{
+}
+
 void BossPattern_Page2::Change_BossState(int iState)
 {
     auto pOwner = m_pOwner.lock();
@@ -847,8 +927,7 @@ void BossPattern_Page2::Change_BossState(int iState)
 
 shared_ptr<BossPattern_Page2> BossPattern_Page2::Create(shared_ptr<BossMonster_Page2> pOwner)
 {
-    shared_ptr<BossPattern_Page2> pInstance =
-        shared_ptr<BossPattern_Page2>(new BossPattern_Page2());
+    shared_ptr<BossPattern_Page2> pInstance = shared_ptr<BossPattern_Page2>(new BossPattern_Page2());
 
     if (FAILED(pInstance->Initialize(pOwner)))
     {

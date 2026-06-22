@@ -11,6 +11,7 @@
 #include "Boss_RIGHT_WALK_State.h"
 #include "Boss_ROLL_State.h"
 #include "Boss_RUN_State.h"
+#include "Boss_TPOSE_State.h"
 
 BossMonster_Page2FSM::BossMonster_Page2FSM()
 {
@@ -29,6 +30,7 @@ HRESULT BossMonster_Page2FSM::Initialize(uint32_t* eModelState)
 	__super::AddState(BOSS_STATE::RIGHT_WALK, Boss_RIGHT_WALK_State::Create());
 	__super::AddState(BOSS_STATE::ROLL, Boss_ROLL_State::Create());
 	__super::AddState(BOSS_STATE::RUN, Boss_RUN_State::Create());
+	__super::AddState(BOSS_STATE::TPOSE, Boss_TPOSE_State::Create());
 	m_eModelState = eModelState;
 	*m_eModelState = BOSS_STATE::IDLE;
 	return S_OK;

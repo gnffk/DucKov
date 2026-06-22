@@ -7,11 +7,12 @@ NS_BEGIN(Client)
 
 class BossPattern_Page2
 {
-private:
+public:
     enum class PATTERN_TYPE
     {
         NONE,
-
+        BEFORE_START,
+        START_APPEAR,
         LASER_CANNON,
         CHARGE_ATTACK,
         WHIRLWIND_ATTACK,
@@ -59,6 +60,8 @@ private:
     void End_Pattern();
 
 private:
+    void Update_Before_Start(_float fTimeDelta);
+    void Update_Start_Appear(_float fTimeDelta);
     void Update_LaserCannon(_float fTimeDelta);
     void Update_ChargeAttack(_float fTimeDelta);
     void Update_WhirlwindAttack(_float fTimeDelta);
@@ -73,7 +76,10 @@ private:
     void Move_Away_From_Player(_float fTimeDelta, _float fSpeedScale);
     void Damage_Player_If_Close(_float fRange, _float fDamage);
     void Damage_Player_If_InFront(_float fRange, _float fAngleDegree, _float fDamage);
+	void Lending_On_Floor(_float fTimeDelta);
 
+public:
+	PATTERN_TYPE Get_CurrentPattern() const { return m_eCurrentPattern; }
 private:
     shared_ptr<GameObject> Find_Player();
     _bool Get_PlayerPos(_float3& vOutPlayerPos);
@@ -93,6 +99,8 @@ private:
 private:
     _float m_fPatternTimer = 0.f;
     _float m_fPatternCoolTimer = 1.5f;
+
+    _float m_fAppearReadyTime = 0.f;
 
     _float m_fStepTimer = 0.f;
     _float m_fFireTimer = 0.f;

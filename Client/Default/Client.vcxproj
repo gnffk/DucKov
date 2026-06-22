@@ -169,6 +169,7 @@
     <ClInclude Include="..\Public\Boss_ROLL_State.h" />
     <ClInclude Include="..\Public\Boss_RUN_State.h" />
     <ClInclude Include="..\Public\Boss_State_UI.h" />
+    <ClInclude Include="..\Public\Boss_TPOSE_State.h" />
     <ClInclude Include="..\Public\Boss_WALK_State.h" />
     <ClInclude Include="..\Public\Boss_Weapon.h" />
     <ClInclude Include="..\Public\Bullet.h" />
@@ -251,6 +252,7 @@
     <ClCompile Include="..\Private\Boss_ROLL_State.cpp" />
     <ClCompile Include="..\Private\Boss_RUN_State.cpp" />
     <ClCompile Include="..\Private\Boss_State_UI.cpp" />
+    <ClCompile Include="..\Private\Boss_TPOSE_State.cpp" />
     <ClCompile Include="..\Private\Boss_WALK_State.cpp" />
     <ClCompile Include="..\Private\Boss_Weapon.cpp" />
     <ClCompile Include="..\Private\Bullet.cpp" />
@@ -329,6 +331,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_BossMonster.hlsl" />
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_BossPage2.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

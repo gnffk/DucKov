@@ -61,18 +61,11 @@ HRESULT Target_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bUseDepth)
     m_pBackBufferRTV.Reset();
     m_pOriginalDSV.Reset();
 
-    m_pContext->OMGetRenderTargets(
-        1,
-        m_pBackBufferRTV.GetAddressOf(),
-        m_pOriginalDSV.GetAddressOf()
-    );
+    m_pContext->OMGetRenderTargets(1,m_pBackBufferRTV.GetAddressOf(),m_pOriginalDSV.GetAddressOf());
 
     // 현재 Viewport 저장
     m_iOriginalViewportCount = 1;
-    m_pContext->RSGetViewports(
-        &m_iOriginalViewportCount,
-        &m_OriginalViewport
-    );
+    m_pContext->RSGetViewports( &m_iOriginalViewportCount, &m_OriginalViewport );
 
     ID3D11RenderTargetView* pRTVs[8] = {};
     uint32_t iNumRenderTargets = 0;

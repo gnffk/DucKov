@@ -32,18 +32,13 @@ const _float4x4* BossMonster_Page2::Get_SocketMatrixPtr(const _char* pSocketName
 
 void BossMonster_Page2::SetCurrentNavMesh()
 {
-    if (nullptr != m_pNavigationCom)
+    if (nullptr != m_pNavigationCom && 
+        m_pBossPattern->Get_CurrentPattern() != BossPattern_Page2::PATTERN_TYPE::BEFORE_START&&
+        m_pBossPattern->Get_CurrentPattern() != BossPattern_Page2::PATTERN_TYPE::START_APPEAR)
     {
-        m_pNavigationCom->Set_CurrentCell(
-            m_pTransformCom->Get_State(STATE::POSITION)
-        );
+        m_pNavigationCom->Set_CurrentCell(m_pTransformCom->Get_State(STATE::POSITION));
 
-        m_pTransformCom->Set_State(
-            STATE::POSITION,
-            m_pNavigationCom->SetUp_OnNavigation(
-                m_pTransformCom->Get_State(STATE::POSITION)
-            )
-        );
+        m_pTransformCom->Set_State(STATE::POSITION, m_pNavigationCom->SetUp_OnNavigation( m_pTransformCom->Get_State(STATE::POSITION)));
     }
 }
 
@@ -62,31 +57,21 @@ HRESULT BossMonster_Page2::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    // Page1 보스가 죽은 위치에서 Page2를 스폰하기 위한 처리
     if (pDesc != nullptr)
     {
-        m_pTransformCom->Set_State(
-            STATE::POSITION,
-            XMLoadFloat3(&pDesc->vSpawnPos)
-        );
-
-        // Look 방향까지 넘겨받고 싶을 때 사용
-        _vector vLook = XMLoadFloat3(&pDesc->vSpawnLook);
-        vLook = XMVectorSetY(vLook, 0.f);
-
-        if (XMVectorGetX(XMVector3LengthSq(vLook)) > 0.0001f)
-        {
-            vLook = XMVector3Normalize(vLook);
-
-            // 네 Transform에 LookAt_Direction 같은 함수가 없으면 이 부분은 주석 처리
-            // m_pTransformCom->LookAt_Direction(vLook);
-        }
+        _float3 vSpawnPos = { 443.f, 41.f, 273.f };
+        m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vSpawnPos));
     }
 
     // 2페이즈 전용 스탯
     m_fMaxHP = 1800.f;
     m_fHP = m_fMaxHP;
     m_fAttackPower = 20.f;
+	m_pTransformCom->Set_Scale(3.f, 3.f, 3.f);
+
+    m_pShaderBossCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_BossPage2")));
+    if (FAILED(__super::Add_Component(TEXT("Com_BossShader"), m_pShaderBossCom)))
+        return E_FAIL;
 
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
@@ -233,14 +218,7 @@ HRESULT BossMonster_Page2::Ready_PartObjects()
     // Navigation ----------------------------------------------------------------
     Navigation::NAVIGATION_DESC NaviDesc{ 1 };
 
-    m_pNavigationCom =
-        dynamic_pointer_cast<Navigation>(
-            CGameInstance::Get().Clone_Prototype(
-                CGameInstance::Get().Get_Level(),
-                TEXT("Prototype_Component_Navigation"),
-                &NaviDesc
-            )
-        );
+    m_pNavigationCom =dynamic_pointer_cast<Navigation>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Component_Navigation_Boss"),&NaviDesc ));
 
     if (FAILED(__super::Add_Component(TEXT("Com_Navigation"), m_pNavigationCom)))
         return E_FAIL;
@@ -264,14 +242,9 @@ HRESULT BossMonster_Page2::Ready_PartObjects()
     WeaponDesc.fSpeedPerSec = 5.f;
     WeaponDesc.fRotationPerSec = 1.f;
 
-    if (FAILED(__super::Add_PartObject(
-        CGameInstance::Get().Get_Level(),
-        TEXT("Prototype_GameObject_BossPlayer_Weapon"),
-        TEXT("Part_Weapon"),
-        &WeaponDesc)))
+    if (FAILED(__super::Add_PartObject(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_BossPlayer_Weapon"),TEXT("Part_Weapon"),&WeaponDesc)))
         return E_FAIL;
 
-    // 2페이즈에서는 보스 무기 쿨타임을 더 빠르게 하고 싶으면 사용
     auto iterWeapon = m_PartObjects.find(TEXT("Part_Weapon"));
 
     if (iterWeapon != m_PartObjects.end())
@@ -303,16 +276,7 @@ HRESULT BossMonster_Page2::Ready_UI()
     DescBossMonsterStateUI.fX = 1.f;
     DescBossMonsterStateUI.fY = 1.f;
 
-    m_pUI.emplace(
-        "BossMonsterPage2UI",
-        dynamic_pointer_cast<GameObject>(
-            CGameInstance::Get().Clone_Prototype(
-                CGameInstance::Get().Get_Level(),
-                TEXT("Prototype_GameObject_BossMonster_State_UI"),
-                &DescBossMonsterStateUI
-            )
-        )
-    );
+    m_pUI.emplace("BossMonsterPage2UI",dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_BossMonster_State_UI"),&DescBossMonsterStateUI)));
 
     auto iter = m_pUI.find("BossMonsterPage2UI");
 
@@ -370,10 +334,7 @@ void BossMonster_Page2::Late_Update(_float fTimeDelta)
         if (nullptr == pUIObject)
             continue;
 
-        CGameInstance::Get().Add_UIObject(
-            L"BossMonster_Page2",
-            static_pointer_cast<UIObject>(pUIObject)
-        );
+        CGameInstance::Get().Add_UIObject( L"BossMonster_Page2",static_pointer_cast<UIObject>(pUIObject));
     }
 
     Collider_Bullet(fTimeDelta);
@@ -387,43 +348,84 @@ HRESULT BossMonster_Page2::Render()
     if (FAILED(__super::Render()))
         return E_FAIL;
 
+
+
     _float4x4 View, Proj;
     CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
     _float4x4 World = m_pTransformCom->GetWorldMatrix();
 
+
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
         return E_FAIL;
-
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &View)))
         return E_FAIL;
-
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
         return E_FAIL;
 
-    uint32_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+    uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
     for (uint32_t i = 0; i < iNumMeshes; i++)
     {
-        if (FAILED(m_pModelCom->Bind_Materials(
-            m_pShaderCom,
-            "g_DiffuseTexture",
-            i,
-            ETOUI(TEXTURETYPE::DIFFUSE),
-            0)))
+        if (i == 2) {
+            continue;
+        }
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (uint32_t)i)))
             return E_FAIL;
 
-        if (FAILED(m_pModelCom->Bind_BoneMatrices(
-            m_pShaderCom,
-            "g_BoneMatrices",
-            i)))
-            return E_FAIL;
+        //if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_Normals, 0)))
+        //	return E_FAIL;
 
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
 
+
         m_pModelCom->Render(i);
     }
+
+
+
+
+
+    _float4 vCamPos{};
+    CGameInstance::Get().Get_MainCameraPosition(vCamPos);
+
+
+
+    if (FAILED(m_pShaderBossCom->Bind_RawValue("g_vCamPosition", &vCamPos, sizeof(_float4))))
+        return E_FAIL;
+
+
+
+    if (FAILED(m_pShaderBossCom->Bind_Matrix("g_WorldMatrix", &World)))
+        return E_FAIL;
+    if (FAILED(m_pShaderBossCom->Bind_Matrix("g_ViewMatrix", &View)))
+        return E_FAIL;
+    if (FAILED(m_pShaderBossCom->Bind_Matrix("g_ProjMatrix", &Proj)))
+        return E_FAIL;
+
+
+
+    if (FAILED(m_pModelCom->Bind_Materials(m_pShaderBossCom, "g_DiffuseTexture", 2, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Bind_Materials(m_pShaderBossCom, "g_EmbissionTexture", 2, (uint32_t)ETOUI(TEXTURETYPE::EMISSIVE), 0)))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderBossCom, "g_BoneMatrices", 2)))
+        return E_FAIL;
+
+    //if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_Normals, 0)))
+    //	return E_FAIL;
+
+    if (FAILED(m_pShaderBossCom->Begin(0)))
+        return E_FAIL;
+
+
+    m_pModelCom->Render(2);
+
 
     return S_OK;
 }
@@ -490,9 +492,7 @@ void BossMonster_Page2::Turn_To_Direction(const _float3& vDirection,_float fTime
     }
 }
 
-void BossMonster_Page2::Turn_To_Position(
-    const _float3& vPosition,
-    _float fTimeDelta)
+void BossMonster_Page2::Turn_To_Position(const _float3& vPosition, _float fTimeDelta)
 {
     if (m_pTransformCom == nullptr)
         return;
@@ -513,10 +513,7 @@ void BossMonster_Page2::Turn_To_Position(
     Turn_To_Direction(vDirFloat, fTimeDelta);
 }
 
-void BossMonster_Page2::Move_Direction(
-    const _float3& vDirection,
-    _float fTimeDelta,
-    _float fSpeedScale)
+void BossMonster_Page2::Move_Direction(const _float3& vDirection,_float fTimeDelta,_float fSpeedScale)
 {
     if (m_pTransformCom == nullptr)
         return;
@@ -539,9 +536,7 @@ void BossMonster_Page2::Move_Direction(
     );
 }
 
-void BossMonster_Page2::Move_Forward(
-    _float fTimeDelta,
-    _float fSpeedScale)
+void BossMonster_Page2::Move_Forward(_float fTimeDelta,_float fSpeedScale)
 {
     if (m_pTransformCom == nullptr)
         return;
@@ -566,19 +561,14 @@ void BossMonster_Page2::Move_Forward(
 void BossMonster_Page2::Take_Damage(_float fDamage)
 {
     _float3 vBloodPos{};
-    XMStoreFloat3(
-        &vBloodPos,
-        m_pTransformCom->Get_State(STATE::POSITION)
-    );
+    XMStoreFloat3( &vBloodPos,m_pTransformCom->Get_State(STATE::POSITION));
 
     vBloodPos.y += 1.0f;
 
     Take_Damage(fDamage, vBloodPos);
 }
 
-void BossMonster_Page2::Take_Damage(
-    _float fDamage,
-    const _float3& vHitPos)
+void BossMonster_Page2::Take_Damage(_float fDamage,const _float3& vHitPos)
 {
     if (Get_Dead())
         return;
@@ -670,17 +660,11 @@ _bool BossMonster_Page2::Collider_Bullet(_float fTimeDelta)
 
             if (pBulletOwner != nullptr && pBulletOwner->GetTransform() != nullptr)
             {
-                XMStoreFloat3(
-                    &vHitPos,
-                    pBulletOwner->GetTransform()->Get_State(STATE::POSITION)
-                );
+                XMStoreFloat3(&vHitPos,pBulletOwner->GetTransform()->Get_State(STATE::POSITION));
             }
             else
             {
-                XMStoreFloat3(
-                    &vHitPos,
-                    m_pTransformCom->Get_State(STATE::POSITION)
-                );
+                XMStoreFloat3(&vHitPos, m_pTransformCom->Get_State(STATE::POSITION));
 
                 vHitPos.y += 1.0f;
             }
@@ -701,14 +685,9 @@ _bool BossMonster_Page2::Collider_Bullet(_float fTimeDelta)
     return true;
 }
 
-unique_ptr<BossMonster_Page2> BossMonster_Page2::Create(
-    ComPtr<ID3D11Device> pDevice,
-    ComPtr<ID3D11DeviceContext> pContext)
+unique_ptr<BossMonster_Page2> BossMonster_Page2::Create(ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext)
 {
-    unique_ptr<BossMonster_Page2> pInstance =
-        unique_ptr<BossMonster_Page2>(
-            new BossMonster_Page2(pDevice, pContext)
-        );
+    unique_ptr<BossMonster_Page2> pInstance =unique_ptr<BossMonster_Page2>( new BossMonster_Page2(pDevice, pContext));
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
@@ -721,10 +700,7 @@ unique_ptr<BossMonster_Page2> BossMonster_Page2::Create(
 
 shared_ptr<Prototype> BossMonster_Page2::Clone(void* pArg)
 {
-    shared_ptr<BossMonster_Page2> pInstance =
-        shared_ptr<BossMonster_Page2>(
-            new BossMonster_Page2(*this)
-        );
+    shared_ptr<BossMonster_Page2> pInstance =shared_ptr<BossMonster_Page2>(new BossMonster_Page2(*this));
 
     if (FAILED(pInstance->Initialize(pArg)))
     {

@@ -71,6 +71,7 @@ private:
     shared_ptr<class BossMonster_Page2FSM> m_pMonsterFSM = nullptr;
     shared_ptr<class BossPattern_Page2> m_pBossPattern = nullptr;
     shared_ptr<class Navigation> m_pNavigationCom = nullptr;
+    shared_ptr<class Shader> m_pShaderBossCom = { nullptr };
 
 private:
     map<string, shared_ptr<class GameObject>> m_pUI;

@@ -259,6 +259,9 @@
     <Filter Include="02. GameObject\Camera\PerformanceCamera">
       <UniqueIdentifier>{b6bb3952-05c0-47d1-9d7d-886140bd6026}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\BossMonster\State\TPOSE">
+      <UniqueIdentifier>{b401f8a6-6d64-4d7c-a0cd-b5586a4c5db4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -501,6 +504,9 @@
     <ClInclude Include="..\Public\PerformaceCamera.h">
       <Filter>02. GameObject\Camera\PerformanceCamera</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Boss_TPOSE_State.h">
+      <Filter>02. GameObject\Monster\BossMonster\State\TPOSE</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -741,6 +747,9 @@
     <ClCompile Include="..\Private\PerformaceCamera.cpp">
       <Filter>02. GameObject\Camera\PerformanceCamera</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Boss_TPOSE_State.cpp">
+      <Filter>02. GameObject\Monster\BossMonster\State\TPOSE</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -777,6 +786,9 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_BossMonster.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_BossPage2.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

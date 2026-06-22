@@ -64,7 +64,7 @@ HRESULT BossMonster::Initialize(void* pArg)
 	if (FAILED(Ready_UI()))
 		return E_FAIL;
 	 
-
+	
 
 	m_pShaderBossCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_BossMonster")));
 	if (FAILED(__super::Add_Component(TEXT("Com_BossShader"), m_pShaderBossCom)))
