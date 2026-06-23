@@ -45,10 +45,10 @@ HRESULT PlayerCamera::Initialize(void* pArg)
 
 	_vector vPlayerPos =m_Owner->GetTransform()->Get_State(STATE::POSITION);
 
-	_vector vOffset =XMVectorSet( 2.5f, 8.7f, -5.f ,0.f);
+	_vector vOffset =XMVectorSet( 2.5f, 11.f, -5.f ,0.f);
 
 	_vector vCamPos =vPlayerPos + vOffset;
-
+	m_vBaseOffset = { 2.5f, 11.f, -5.f };
 	_vector vLook =XMVector3Normalize(vPlayerPos - vCamPos);
 
 	_vector vRight =XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f),vLook));
@@ -77,7 +77,9 @@ void PlayerCamera::Update(_float fTimeDelta)
 
 	FollowCamera();
 	__super::Set_View();
-
+#ifdef _DEBUG
+	IMGUI_CameraOffset();
+#endif
 
 
 }
@@ -100,6 +102,44 @@ HRESULT PlayerCamera::Ready_Components()
 
 	return S_OK;
 }
+
+#ifdef _DEBUG
+void PlayerCamera::IMGUI_CameraOffset()
+{
+	ImGui::Begin("Player Camera Offset");
+
+	ImGui::DragFloat(
+		"Base Offset X",
+		&m_vBaseOffset.x,
+		0.05f,
+		-100.f,
+		100.f
+	);
+
+	ImGui::DragFloat(
+		"Base Offset Y",
+		&m_vBaseOffset.y,
+		0.05f,
+		-100.f,
+		100.f
+	);
+
+	ImGui::DragFloat(
+		"Base Offset Z",
+		&m_vBaseOffset.z,
+		0.05f,
+		-100.f,
+		100.f
+	);
+
+	if (ImGui::Button("Reset Offset", ImVec2(160.f, 35.f)))
+	{
+		m_vBaseOffset = { 2.5f, 8.7f, -5.f };
+	}
+
+	ImGui::End();
+}
+#endif
 
 unique_ptr<PlayerCamera> PlayerCamera::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
@@ -153,8 +193,12 @@ void PlayerCamera::FollowCamera()
 
 	float offsetZ = mouseY * 1.f;
 
-	_vector vOffset = XMVectorSet(2.5f + offsetX, 8.7f , -5.f - offsetZ, 0.f);
-
+	_vector vOffset = XMVectorSet(
+		m_vBaseOffset.x + offsetX,
+		m_vBaseOffset.y,
+		m_vBaseOffset.z - offsetZ,
+		0.f
+	);
 	_vector vCamPos = vPlayerPos + vOffset;
 
 	m_pTransformCom->Set_State(STATE::POSITION, vCamPos);

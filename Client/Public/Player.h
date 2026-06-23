@@ -88,6 +88,11 @@ public:
 	void Clear_WeaponSlot(int iSlotNumber);
 	void Switch_WeaponSlot(int iSlotNumber);
 
+public:
+	HRESULT Change_Navigation(const wstring& strNavigationPrototypeTag, uint32_t iStartCellIndex = 1);
+	HRESULT Change_Navigation_AndWarp(const wstring& strNavigationPrototypeTag, const _float3& vWarpPos, uint32_t iStartCellIndex);
+private:
+	wstring m_strCurrentNavigationTag = L"Prototype_Component_Navigation";
 private:
 	string m_strWeaponSlotKey[2] = { "Default", "Default" };
 	int m_iCurrentWeaponSlot = -1;

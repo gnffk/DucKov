@@ -3,9 +3,9 @@
 #include "BossMonster_Page2FSM.h"
 #include "BossPattern_Page2.h"
 #include "Boss_Weapon.h"
-#include "Boss_State_UI.h"
 #include "Particle_System.h"
 #include "BaseCollider.h"
+#include "BossPage2UI.h"
 
 NS_BEGIN(Client)
 
@@ -32,9 +32,7 @@ const _float4x4* BossMonster_Page2::Get_SocketMatrixPtr(const _char* pSocketName
 
 void BossMonster_Page2::SetCurrentNavMesh()
 {
-    if (nullptr != m_pNavigationCom && 
-        m_pBossPattern->Get_CurrentPattern() != BossPattern_Page2::PATTERN_TYPE::BEFORE_START&&
-        m_pBossPattern->Get_CurrentPattern() != BossPattern_Page2::PATTERN_TYPE::START_APPEAR)
+    if (nullptr != m_pNavigationCom && m_pBossPattern->Get_CurrentPattern() != BossPattern_Page2::PATTERN_TYPE::BEFORE_START&&m_pBossPattern->Get_CurrentPattern() != BossPattern_Page2::PATTERN_TYPE::START_APPEAR)
     {
         m_pNavigationCom->Set_CurrentCell(m_pTransformCom->Get_State(STATE::POSITION));
 
@@ -59,7 +57,7 @@ HRESULT BossMonster_Page2::Initialize(void* pArg)
 
     if (pDesc != nullptr)
     {
-        _float3 vSpawnPos = { 443.f, 41.f, 273.f };
+        _float3 vSpawnPos = { 442.f, 30.f, 263.f };
         m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vSpawnPos));
     }
 
@@ -68,6 +66,8 @@ HRESULT BossMonster_Page2::Initialize(void* pArg)
     m_fHP = m_fMaxHP;
     m_fAttackPower = 20.f;
 	m_pTransformCom->Set_Scale(3.f, 3.f, 3.f);
+	m_pTransformCom->Rotation(-180.f, 0.f, -180.f);
+
 
     m_pShaderBossCom = dynamic_pointer_cast<Shader>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_BossPage2")));
     if (FAILED(__super::Add_Component(TEXT("Com_BossShader"), m_pShaderBossCom)))
@@ -79,6 +79,10 @@ HRESULT BossMonster_Page2::Initialize(void* pArg)
     if (FAILED(Ready_UI()))
         return E_FAIL;
 
+
+    auto& ColliderBoss = m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].front();
+	ColliderBoss->Set_Center(_float3{ 0.f, 0.5f, 0.f });
+	ColliderBoss->Set_Extend(_float3{ 1.5f,2.f,1.5f });
     return S_OK;
 }
 
@@ -258,6 +262,8 @@ HRESULT BossMonster_Page2::Ready_PartObjects()
         }
     }
 
+
+
     return S_OK;
 }
 
@@ -265,9 +271,9 @@ HRESULT BossMonster_Page2::Ready_UI()
 {
     UIObject::UIOBJECT_DESC DescBossMonsterStateUI{};
     DescBossMonsterStateUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
-    DescBossMonsterStateUI.m_strName = L"BossMonsterPage2UI";
-    DescBossMonsterStateUI.m_strPrototypeObjectName = L"Prototype_GameObject_BossMonster_State_UI";
-    DescBossMonsterStateUI.m_strPrototypeBaseName = L"BossMonsterPage2UI";
+    DescBossMonsterStateUI.m_strName = L"BossPage2UI";
+    DescBossMonsterStateUI.m_strPrototypeObjectName = L"Prototype_GameObject_BossMonster_Page2_State_UI";
+    DescBossMonsterStateUI.m_strPrototypeBaseName = L"BossPage2UI";
     DescBossMonsterStateUI.pCameraType = ETOUI(CAMERA::NONE);
     DescBossMonsterStateUI.fSpeedPerSec = 5.f;
     DescBossMonsterStateUI.fRotationPerSec = 1.f;
@@ -276,19 +282,18 @@ HRESULT BossMonster_Page2::Ready_UI()
     DescBossMonsterStateUI.fX = 1.f;
     DescBossMonsterStateUI.fY = 1.f;
 
-    m_pUI.emplace("BossMonsterPage2UI",dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_BossMonster_State_UI"),&DescBossMonsterStateUI)));
+    m_pUI.emplace("BossPage2UI",dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_BossMonster_Page2_State_UI"),&DescBossMonsterStateUI)));
 
-    auto iter = m_pUI.find("BossMonsterPage2UI");
+    auto iter = m_pUI.find("BossPage2UI");
 
     if (iter == m_pUI.end())
-        return E_FAIL;
-
-    auto pStateUI = dynamic_pointer_cast<Boss_State_UI>(iter->second);
+        return E_FAIL; 
+    
+    auto pStateUI = dynamic_pointer_cast<BossPage2UI>(iter->second);
 
     if (pStateUI == nullptr)
         return E_FAIL;
 
-    pStateUI->SetOwner(SHARED_THIS(BossMonster_Page2));
 
     // 네 Boss_State_UI 함수 이름이 Set_HP라면 이거 사용
     pStateUI->Set_HP(m_fHP, m_fMaxHP);
@@ -528,12 +533,7 @@ void BossMonster_Page2::Move_Direction(const _float3& vDirection,_float fTimeDel
     vMoveDir = XMVector3Normalize(vMoveDir);
 
     // 2페이즈는 기본 이동을 조금 더 빠르게
-    m_pTransformCom->Go_Direction(
-        vMoveDir,
-        fTimeDelta,
-        m_pNavigationCom,
-        fSpeedScale * 1.25f
-    );
+    m_pTransformCom->Go_Direction(vMoveDir,fTimeDelta,m_pNavigationCom,fSpeedScale * 1.25f);
 }
 
 void BossMonster_Page2::Move_Forward(_float fTimeDelta,_float fSpeedScale)
@@ -550,12 +550,7 @@ void BossMonster_Page2::Move_Forward(_float fTimeDelta,_float fSpeedScale)
 
     vLook = XMVector3Normalize(vLook);
 
-    m_pTransformCom->Go_Direction(
-        vLook,
-        fTimeDelta,
-        m_pNavigationCom,
-        fSpeedScale * 1.25f
-    );
+    m_pTransformCom->Go_Direction(vLook,fTimeDelta,m_pNavigationCom,fSpeedScale * 1.25f);
 }
 
 void BossMonster_Page2::Take_Damage(_float fDamage)
@@ -594,7 +589,7 @@ void BossMonster_Page2::Take_Damage(_float fDamage,const _float3& vHitPos)
 
         if (iter != m_pUI.end())
         {
-            auto pStateUI = dynamic_pointer_cast<Boss_State_UI>(iter->second);
+            auto pStateUI = dynamic_pointer_cast<BossPage2UI>(iter->second);
 
             if (pStateUI != nullptr)
             {
@@ -609,17 +604,17 @@ void BossMonster_Page2::Take_Damage(_float fDamage,const _float3& vHitPos)
 
 void BossMonster_Page2::Update_HP_UI()
 {
-    auto iter = m_pUI.find("BossMonsterPage2UI");
+    auto iter = m_pUI.find("BossPage2UI");
 
     if (iter == m_pUI.end())
         return;
 
-    auto pStateUI = dynamic_pointer_cast<Boss_State_UI>(iter->second);
+    auto pBossUI = dynamic_pointer_cast<BossPage2UI>(iter->second);
 
-    if (pStateUI == nullptr)
+    if (pBossUI == nullptr)
         return;
 
-    pStateUI->Set_HP(m_fHP, m_fMaxHP);
+    pBossUI->Set_HP(m_fHP, m_fMaxHP);
 }
 
 void BossMonster_Page2::Spawn_BloodEffect(const _float3& vSpawnPos)
@@ -683,6 +678,22 @@ _bool BossMonster_Page2::Collider_Bullet(_float fTimeDelta)
     }
 
     return true;
+}
+
+void BossMonster_Page2::Show_BossUI()
+{
+    auto iter = m_pUI.find("BossPage2UI");
+
+    if (iter == m_pUI.end())
+        return;
+
+    auto pBossUI = dynamic_pointer_cast<BossPage2UI>(iter->second);
+
+    if (pBossUI == nullptr)
+        return;
+
+    pBossUI->Set_HP(m_fHP, m_fMaxHP);
+    pBossUI->Start_Appear();
 }
 
 unique_ptr<BossMonster_Page2> BossMonster_Page2::Create(ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext)

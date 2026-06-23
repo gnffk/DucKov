@@ -892,22 +892,25 @@ HRESULT InvenUI::Ready_InventorySlots()
 
 HRESULT InvenUI::Ready_InventoryItems()
 {
-    //// 예시 아이템 1개
-    //if (FAILED(Add_UIRect(TEXT("Item_Bag01"), TEXT("Item_Bag01"), TEXT("Prototype_Com_Texture_Heart"), { 0.f, 0.f }, { 48.f, 48.f },0.0f)))
-    //    return E_FAIL;
 
-    //INV_ITEM Item{};
-    //Item.strItemName = TEXT("Lv3_Bag");
-    //Item.strIconRectKey = TEXT("Item_Bag01");
-    //Item.eEquipKind = SLOT_KIND::GUN;
-    //Item.vIconSize = { 48.f, 48.f };
 
-    //m_InventoryItems.push_back(Item);
+    if (FAILED(Add_UIRect(TEXT("LootItem_Gun1"), TEXT("LootItem_Gun1"), TEXT("Prototype_Com_Texture_UI_Item_Gun1"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
+        return E_FAIL;
 
-    //// 아이템을 일단 첫 번째 가방 슬롯에 넣기
-    //// 장비 슬롯 5개 이후부터 BagSlot_00임
-    //const int iFirstBagSlotIndex = 5;
-    //m_InventorySlots[iFirstBagSlotIndex].iItemIndex = 0;
+    INV_ITEM ItemGun2{};
+    ItemGun2.strItemName = TEXT("Gun1");
+    ItemGun2.strIconRectKey = TEXT("LootItem_Gun1");
+    ItemGun2.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Gun1");
+    ItemGun2.eEquipKind = SLOT_KIND::GUN;
+    ItemGun2.vIconSize = { 48.f, 48.f };
+    ItemGun2.strEquipModelKey = "Gun1";
+
+    m_InventoryItems.push_back(ItemGun2);
+
+    // 아이템을 일단 첫 번째 가방 슬롯에 넣기
+    // 장비 슬롯 5개 이후부터 BagSlot_00임
+    const int iFirstBagSlotIndex = 5;
+    m_InventorySlots[iFirstBagSlotIndex].iItemIndex = 0;
 
     return S_OK;
 }

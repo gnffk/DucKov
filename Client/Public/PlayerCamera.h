@@ -30,6 +30,14 @@ private:
 	uint32_t m_iCameraType{};
 	POINT m_OldCursorPos{};
 
+private:
+	_float3 m_vBaseOffset = { 2.5f, 8.7f, -5.f };
+
+#ifdef _DEBUG
+private:
+	void IMGUI_CameraOffset();
+
+#endif
 	GameObject* m_Owner = nullptr;
 public:
 	static unique_ptr<PlayerCamera> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

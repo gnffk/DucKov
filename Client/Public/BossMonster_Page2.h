@@ -53,6 +53,9 @@ private:
     _bool Collider_Bullet(_float fTimeDelta);
 
 public:
+    void Show_BossUI();
+
+public:
     void Turn_To_Direction(const _float3& vDirection, _float fTimeDelta);
     void Turn_To_Position(const _float3& vPosition, _float fTimeDelta);
     void Move_Direction(const _float3& vDirection, _float fTimeDelta, _float fSpeedScale = 1.f);

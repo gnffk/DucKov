@@ -56,6 +56,17 @@ HRESULT Particle_Manager::Add_Particle(PARTICLE_TYPE eType, void* pArg)
 					return E_FAIL;
 				}
 			}
+			else if (pParicle != nullptr && m_ParticleSystems[eType].lock() == nullptr) {
+				auto pBlood = dynamic_pointer_cast<Particle_System>(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), TEXT("Effect"), TEXT("Particle_Blood")));
+
+				if (pBlood == nullptr)
+					return E_FAIL;
+
+				if (FAILED(CGameInstance::Get().Register_ParticleSystem(PARTICLE_TYPE::BLOOD, pBlood)))
+				{
+					return E_FAIL;
+				}
+			}
 
 		}
 		break;
@@ -72,7 +83,7 @@ HRESULT Particle_Manager::Add_Particle(PARTICLE_TYPE eType, void* pArg)
 	auto pParticleSystem = iter->second.lock();
 
 	if (pParticleSystem == nullptr)
-		return E_FAIL;
+ 		return E_FAIL;
 
 	pParticleSystem->Add_Particle(*pDesc);
 

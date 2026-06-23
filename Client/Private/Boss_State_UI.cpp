@@ -78,10 +78,10 @@ void Boss_State_UI::Update(_float fTimeDelta)
 {
     Update_FollowOwner();
     Update_HPBar(fTimeDelta);
-
-#ifdef _DEBUG
-    GUI_BossStateUI();
-#endif
+//
+//#ifdef _DEBUG
+//    GUI_BossStateUI();
+//#endif
 }
 
 void Boss_State_UI::Late_Update(_float fTimeDelta)

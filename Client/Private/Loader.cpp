@@ -32,7 +32,8 @@
 #include "Boss_State_UI.h"
 #include "PerformaceCamera.h"
 #include "BossMonster_Page2.h"
-
+#include "LaserTrail.h"
+#include "BossPage2UI.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
 	, m_pContext{ pContext }
 {
@@ -303,6 +304,16 @@ HRESULT CLoader::Loading_For_MapEditor()
 			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Blood/Blood_N.png"), 1))))
 			return E_FAIL;
 
+		/* For.Prototype_Com_Texture_LaserTrail*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_LaserTrail"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Laser/LaserTrail.png"), 1))))
+			return E_FAIL;
+
+		/* For.Prototype_Com_Texture_BossPage2_Name*/
+		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_BossPage2_Name"),
+			Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/BossPage2_Name.png"), 1))))
+			return E_FAIL;
+
 
 
 
@@ -357,6 +368,10 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_BossPage2"),
 		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_Vtx_BossPage2.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Shader_LaserTrail"),
+		Shader::Create(m_pDevice,m_pContext,TEXT("../../Resources/Shaders/Shader_Laser.hlsl"), VTXBULLETTRAIL::Elements, VTXBULLETTRAIL::iNumElements))))
 		return E_FAIL;
 
 
@@ -605,7 +620,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 
 	/* For.Prototype_Com_VIBuffer_Particle_Blood */
 	VIBuffer_Particle_Rect::PARTICLE_INSTANCE_DESC		BloodDesc{};
-	BloodDesc.iNumInstances = 50;
+	BloodDesc.iNumInstances = 200;
 	BloodDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	BloodDesc.vRange = _float3(0.f, 0.f, 0.f);
 	BloodDesc.vSize = _float2(10.f, 12.f);
@@ -773,6 +788,16 @@ HRESULT CLoader::Loading_For_MapEditor()
 	/* For.Prototype_GameObject_BossMonster_Page2 */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossMonster_Page2"),
 		BossMonster_Page2::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_LaserTrail*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_LaserTrail"),
+		LaserTrail::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_BossMonster_Page2_State_UI*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossMonster_Page2_State_UI"),
+		BossPage2UI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

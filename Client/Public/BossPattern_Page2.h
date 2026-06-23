@@ -16,8 +16,6 @@ public:
         LASER_CANNON,
         CHARGE_ATTACK,
         WHIRLWIND_ATTACK,
-        ROLL_ATTACK,
-        METEOR_PATTERN,
 
         DIE
     };
@@ -65,8 +63,6 @@ private:
     void Update_LaserCannon(_float fTimeDelta);
     void Update_ChargeAttack(_float fTimeDelta);
     void Update_WhirlwindAttack(_float fTimeDelta);
-    void Update_RollAttack(_float fTimeDelta);
-    void Update_MeteorPattern(_float fTimeDelta);
     void Update_Die(_float fTimeDelta);
 
 private:
@@ -127,39 +123,83 @@ private:
     _float m_fLaserRecoverTime = 0.5f;
     _float m_fLaserFireInterval = 0.12f;
 
-    // 돌진
-    _float m_fChargeReadyTime = 0.5f;
-    _float m_fChargeActiveTime = 1.0f;
-    _float m_fChargeRecoverTime = 0.5f;
-    _float m_fChargeSpeedScale = 3.2f;
-    _float m_fChargeDamageRange = 2.0f;
+    // 대쉬 공격
+    _float m_fChargeReadyTime = 0.45f;
+    _float m_fChargeActiveTime = 0.35f;
+    _float m_fChargeRecoverTime = 0.65f;
+
+    _float m_fChargeSpeedScale = 12.f;
+    _float m_fChargeDamageRange = 2.5f;
     _float m_fChargeDamage = 30.f;
 
+    _float m_fChargeHitStartTime = 0.08f;
+    _float m_fChargeHitEndTime = 0.28f;
+
     // 회오리
-    _float m_fWhirlwindActiveTime = 2.5f;
-    _float m_fWhirlwindRecoverTime = 0.6f;
-    _float m_fWhirlwindSpeedScale = 1.7f;
+    _float m_fWhirlwindActiveTime = 3.5f;
+    _float m_fWhirlwindRecoverTime = 0.8f;
+    _float m_fWhirlwindSpeedScale = 2.f;
+    _float m_fWhirlwindRotationScale = 8.f;
     _float m_fWhirlwindDamageInterval = 0.35f;
-    _float m_fWhirlwindDamageRange = 2.5f;
+    _float m_fWhirlwindDamageRange = 3.0f;
     _float m_fWhirlwindDamage = 15.f;
 
-    // 구르기
-    _float m_fRollReadyTime = 0.25f;
-    _float m_fRollActiveTime = 0.9f;
-    _float m_fRollRecoverTime = 0.45f;
-    _float m_fRollSpeedScale = 3.8f;
-    _float m_fRollDamageRange = 2.2f;
-    _float m_fRollDamage = 25.f;
 
-    // 메테오
-    _float m_fMeteorMoveAwayTime = 1.0f;
-    _float m_fMeteorGrowTime = 1.0f;
-    _float m_fMeteorCastTime = 3.0f;
-    _float m_fMeteorRecoverTime = 1.0f;
-    _float m_fMeteorSpawnInterval = 0.45f;
-    _float m_fMeteorDropDelay = 0.8f;
-    _float m_fMeteorDamageRange = 2.8f;
-    _float m_fMeteorDamage = 35.f;
+
+	// 등장
+    _float3 m_vAppearStartPos = {};
+    _float3 m_vAppearTargetPos = {};
+
+    _float m_fAppearUpTime = 1.2f;
+    _float m_fAppearLandingDelay = 0.4f;
+    _float m_fAppearRecoverTime = 0.6f;
+    _float m_fAppearHideY = 8.f;
+    _bool  m_bAppearLandingDamage = false;
+
+    
+    _float3 m_vCutCamStartPos = {};
+    _float3 m_vCutCamBossViewPos = {};
+    _float3 m_vCutCamReturnStartPos = {};
+    _float3 m_vCutCamReturnTargetPos = {};
+    _float3 m_vCutCamLookAtPos = {};
+
+    _float m_fCutCamMoveTime = 1.2f;
+    _float m_fCutCamReturnTime = 0.8f;
+    _float m_fCutCamMoveSpeed = 25.f;
+    _float m_fCutCamArriveDistance = 0.15f;
+    _float m_fBossViewDistance = 7.0f;
+    _float m_fBossViewHeight = 2.5f;
+    _float m_fBossLookAtHeight = 1.5f;
+
+    _bool m_bCutCamReady = false;
+
+private:
+    _float m_fAppearDropTime = 0.35f;          // 확 내려오는 시간
+    _float m_fAppearAfterLandingWait = 5.f;  // 착지 후 기다리는 시간
+
+private:
+    shared_ptr<GameObject> Find_PlayerCamera();
+    shared_ptr<GameObject> Find_BossCutSceneCamera();
+    void Setup_AppearCutSceneCamera();
+    _bool Update_CutSceneCamera_MoveToBoss(_float fTimeDelta);
+    void Update_CutSceneCamera_ReturnToPlayer(_float fTimeDelta);
+    void Set_CameraLookAt(shared_ptr<GameObject> pCameraObject, const _float3& vEye, const _float3& vAt);
+    _float SmoothStepRatio(_float fTimer, _float fDuration);
+    _float3 Lerp_Float3(const _float3& vA, const _float3& vB, _float fRatio);
+
+
+private:
+    shared_ptr<class LaserTrail> m_pLaserTrail = nullptr;
+
+private:
+    HRESULT Ready_LaserTrail();
+
+    void Begin_BossLaser();
+    void Update_BossLaser(_float fTimeDelta);
+    void End_BossLaser();
+
+    void Get_LaserStartAndDir(_float3& vOutStartPos, _float3& vOutDir);
+
 
 public:
     static shared_ptr<BossPattern_Page2> Create(shared_ptr<BossMonster_Page2> pOwner);

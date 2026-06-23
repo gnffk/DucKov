@@ -48,7 +48,8 @@ HRESULT Bullet::Initialize(void* pArg)
 
 		m_pTransformCom->Set_WorldMatrix(World);
 	}
-
+	m_fLifeTimer = 0.f;
+	m_fLifeTime = 5.f;
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
@@ -81,7 +82,13 @@ void Bullet::Priority_Update(_float fTimeDelta)
 
 void Bullet::Update(_float fTimeDelta)
 {
+	m_fLifeTimer += fTimeDelta;
 
+	if (m_fLifeTimer >= m_fLifeTime)
+	{
+		Set_Dead();
+		return;
+	}
 	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vDir = XMLoadFloat3(&m_vDir);
 

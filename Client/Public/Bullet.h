@@ -64,6 +64,10 @@ private:
 
 	float m_fTrailLife = 0.15f;
 	float m_fTrailWidth = 0.3f;
+
+private:
+	_float m_fLifeTime = 5.f;
+	_float m_fLifeTimer = 0.f;
 private:
 	static constexpr uint32_t MAX_TRAIL_POINTS = 32;
 	static constexpr uint32_t MAX_TRAIL_VERTICES = MAX_TRAIL_POINTS * 2;

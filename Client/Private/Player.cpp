@@ -85,6 +85,17 @@ void Player::Priority_Update(_float fTimeDelta)
 void Player::Update(_float fTimeDelta)
 {
 
+	if (m_bHit)
+	{
+		m_fHitTime += fTimeDelta;
+
+		if (m_fHitTime >= m_fHitDuration)
+		{
+			m_bHit = false;
+			m_fHitTime = 0.f;
+		}
+	}
+
 	if (CGameInstance::Get().Key_Down(DIK_1))
 	{
 		Switch_WeaponSlot(1);
@@ -679,6 +690,40 @@ void Player::IMGUI_DEBUGRENDER()
 	ImGui::PopStyleVar(2);
 
 	ImGui::End();
+
+	// =====================================================
+  // Navigation Change Debug GUI
+  // =====================================================
+	ImGui::Begin("Player Navigation");
+
+	static _float3 vBossWarpPos = { 438.f, 37.f, 220 };
+	static int iBossStartCell = 1;
+
+	ImGui::DragFloat3(
+		"Boss Warp Pos",
+		reinterpret_cast<float*>(&vBossWarpPos),
+		0.1f
+	);
+
+	ImGui::InputInt("Boss Start Cell", &iBossStartCell);
+
+	if (iBossStartCell < 0)
+		iBossStartCell = 0;
+
+	if (ImGui::Button("Change To Boss Navigation + Warp", ImVec2(300.f, 40.f)))
+	{
+		Change_Navigation_AndWarp(L"Prototype_Component_Navigation_Boss",vBossWarpPos,static_cast<uint32_t>(iBossStartCell));
+	}
+
+	if (ImGui::Button("Change To Normal Navigation", ImVec2(300.f, 40.f)))
+	{
+		Change_Navigation(
+			L"Prototype_Component_Navigation",
+			1
+		);
+	}
+
+	ImGui::End();
 }
 #endif
 HRESULT Player::Ready_Components()
@@ -821,7 +866,8 @@ HRESULT Player::Ready_UI()
 	DesUI.fY = 1.f;	
 
 	m_pUI.emplace("MainUI", dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_MainUI"), &DesUI)));
-
+	// 추가
+	static_pointer_cast<MainUI>(m_pUI["MainUI"])->Set_HP(m_fHP, m_fMaxHP);
 
 	UIObject::UIOBJECT_DESC DesPlayerMouseUI{};
 	DesPlayerMouseUI.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
@@ -867,7 +913,7 @@ HRESULT Player::Ready_UI()
 	DesPlayerStateUI.fY = 1.f;
 
 	m_pUI.emplace("PlayerStateUI", dynamic_pointer_cast<GameObject>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Player_State_UI"), &DesPlayerStateUI)));
-
+	static_pointer_cast<Player_State_UI>(m_pUI["PlayerStateUI"])->Set_HP(m_fHP, m_fMaxHP);
 
 
 	return S_OK;
@@ -1019,17 +1065,26 @@ void Player::Spawn_BloodEffect(const _float3& vSpawnPos)
 
 void Player::Update_HP_UI()
 {
-	auto iter = m_pUI.find("PlayerStateUI");
+	auto iterState = m_pUI.find("PlayerStateUI");
 
-	if (iter == m_pUI.end())
-		return;
+	if (iterState != m_pUI.end())
+	{
+		auto pStateUI = dynamic_pointer_cast<Player_State_UI>(iterState->second);
 
-	auto pStateUI = dynamic_pointer_cast<Player_State_UI>(iter->second);
+		if (pStateUI != nullptr)
+			pStateUI->Set_HP(m_fHP, m_fMaxHP);
+	}
 
-	if (pStateUI == nullptr)
-		return;
+	// 2. 메인 화면 HP UI
+	auto iterMain = m_pUI.find("MainUI");
 
-	pStateUI->Set_HP(m_fHP, m_fMaxHP);
+	if (iterMain != m_pUI.end())
+	{
+		auto pMainUI = dynamic_pointer_cast<MainUI>(iterMain->second);
+
+		if (pMainUI != nullptr)
+			pMainUI->Set_HP(m_fHP, m_fMaxHP);
+	}
 }
 void Player::Equip_Item(Engine::UIObject::SLOT_KIND eSlotKind, const Engine::UIObject::INV_ITEM& Item)
 {
@@ -1206,7 +1261,115 @@ void Player::Switch_WeaponSlot(int iSlotNumber)
 	m_iCurrentWeaponSlot = iIndex;
 }
 
+HRESULT Player::Change_Navigation(const wstring& strNavigationPrototypeTag, uint32_t iStartCellIndex)
+{
+	Navigation::NAVIGATION_DESC NaviDesc{ iStartCellIndex };
 
+	auto pNewNavigation =dynamic_pointer_cast<Navigation>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),strNavigationPrototypeTag.c_str(),&NaviDesc));
+
+	if (nullptr == pNewNavigation)
+		return E_FAIL;
+
+	// 기존 m_pNavigationCom을 새 Navigation으로 교체
+	m_pNavigationCom = pNewNavigation;
+
+	// 이미 "Com_Navigation"이라는 컴포넌트 키가 있으므로 Add_Component 다시 하면 실패할 수 있음.
+	// 따라서 map에 직접 덮어쓰기.
+	m_Components[TEXT("Com_Navigation")] = m_pNavigationCom;
+
+	m_strCurrentNavigationTag = strNavigationPrototypeTag;
+
+	// 현재 플레이어 위치 기준으로 새 Navigation의 Cell 다시 설정
+	if (nullptr != m_pTransformCom)
+	{
+		_vector vCurPos = m_pTransformCom->Get_State(STATE::POSITION);
+
+		m_pNavigationCom->Set_CurrentCell(vCurPos);
+
+		m_pTransformCom->Set_State(STATE::POSITION,m_pNavigationCom->SetUp_OnNavigation(vCurPos));
+	}
+
+	GameObject::GAMEOBJECT_DESC descBossCutCamera{};
+
+	descBossCutCamera.ObjectType = ETOUI(OBJECTTYPE::OBJECT_CAMERA);
+	descBossCutCamera.m_strName = L"Boss_CutScene_Camera";
+	descBossCutCamera.m_strPrototypeObjectName = L"Prototype_GameObject_PlayerCamera";
+	descBossCutCamera.m_strPrototypeBaseName = L"Prototype_GameObject_PlayerCamera";
+	descBossCutCamera.pCameraType = ETOUI(CAMERA::SUB2);
+	descBossCutCamera.fSpeedPerSec = 10.f;
+	descBossCutCamera.fRotationPerSec = 0.1f;
+
+	CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_PlayerCamera"),CGameInstance::Get().Get_Level(),L"CameraTag",&descBossCutCamera);
+
+	CGameInstance::Get().Add_Camera(
+		ETOUI(CAMERA::SUB2),
+		dynamic_pointer_cast<Camera>(
+			CGameInstance::Get().Find_Object(
+				CGameInstance::Get().Get_Level(),
+				L"CameraTag",
+				L"Boss_CutScene_Camera"
+			)
+		)
+	);
+
+	return S_OK;
+}
+
+HRESULT Player::Change_Navigation_AndWarp(const wstring& strNavigationPrototypeTag,const _float3& vWarpPos,uint32_t iStartCellIndex)
+{
+	Navigation::NAVIGATION_DESC NaviDesc{ iStartCellIndex };
+
+	auto pNewNavigation = dynamic_pointer_cast<Navigation>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),strNavigationPrototypeTag.c_str(),&NaviDesc));
+
+	if (pNewNavigation == nullptr)
+		return E_FAIL;
+
+	m_pNavigationCom = pNewNavigation;
+
+	// 기존 Navigation 컴포넌트 교체
+	m_Components[TEXT("Com_Navigation")] = m_pNavigationCom;
+
+	if (m_pTransformCom != nullptr)
+	{
+		_vector vNewPos = XMVectorSet(vWarpPos.x,vWarpPos.y,vWarpPos.z,1.f);
+
+		// 먼저 보스 근처 위치로 이동
+		m_pTransformCom->Set_State(STATE::POSITION,vNewPos);
+
+		// 새 Navigation 기준으로 현재 Cell 다시 잡기
+		m_pNavigationCom->Set_CurrentCell(vNewPos);
+
+		// 바닥 높이 보정
+		_vector vFixedPos =m_pNavigationCom->SetUp_OnNavigation(vNewPos);
+
+		m_pTransformCom->Set_State(STATE::POSITION,vFixedPos);
+	}
+
+	GameObject::GAMEOBJECT_DESC descBossCutCamera{};
+
+	descBossCutCamera.ObjectType = ETOUI(OBJECTTYPE::OBJECT_CAMERA);
+	descBossCutCamera.m_strName = L"Boss_CutScene_Camera";
+	descBossCutCamera.m_strPrototypeObjectName = L"Prototype_GameObject_BossPerformanceCamera";
+	descBossCutCamera.m_strPrototypeBaseName = L"Prototype_GameObject_BossPerformanceCamera";
+	descBossCutCamera.pCameraType = ETOUI(CAMERA::SUB2);
+	descBossCutCamera.fSpeedPerSec = 10.f;
+	descBossCutCamera.fRotationPerSec = 0.1f;
+
+	CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossPerformanceCamera"), CGameInstance::Get().Get_Level(), L"CameraTag", &descBossCutCamera);
+
+	CGameInstance::Get().Add_Camera(
+		ETOUI(CAMERA::SUB2),
+		dynamic_pointer_cast<Camera>(
+			CGameInstance::Get().Find_Object(
+				CGameInstance::Get().Get_Level(),
+				L"CameraTag",
+				L"Boss_CutScene_Camera"
+			)
+		)
+	);
+
+	return S_OK;
+}
 unique_ptr<Player> Player::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 {
 	auto	pInstance = unique_ptr<Player>(new Player(pDevice, pContext));

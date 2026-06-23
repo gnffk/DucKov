@@ -157,12 +157,14 @@
     <ClInclude Include="..\Public\BossMonsterFSM.h" />
     <ClInclude Include="..\Public\BossMonster_Page2.h" />
     <ClInclude Include="..\Public\BossMonster_Page2FSM.h" />
+    <ClInclude Include="..\Public\BossPage2UI.h" />
     <ClInclude Include="..\Public\BossPattern.h" />
     <ClInclude Include="..\Public\BossPattern_Page2.h" />
     <ClInclude Include="..\Public\Boss_HAND_UP_AND_LEFT_State.h" />
     <ClInclude Include="..\Public\Boss_HAND_UP_AND_RIGHT_State.h" />
     <ClInclude Include="..\Public\Boss_HAND_UP_AND_WALK_State.h" />
     <ClInclude Include="..\Public\Boss_Hand_UP_State.h" />
+    <ClInclude Include="..\Public\Boss_HIT_State.h" />
     <ClInclude Include="..\Public\Boss_Idle_State.h" />
     <ClInclude Include="..\Public\Boss_LEFT_WALK_State.h" />
     <ClInclude Include="..\Public\Boss_RIGHT_WALK_State.h" />
@@ -178,6 +180,7 @@
     <ClInclude Include="..\Public\FindUI.h" />
     <ClInclude Include="..\Public\InteractBox.h" />
     <ClInclude Include="..\Public\InvenUI.h" />
+    <ClInclude Include="..\Public\LaserTrail.h" />
     <ClInclude Include="..\Public\LittleMonster.h" />
     <ClInclude Include="..\Public\LittleMonsterFSM.h" />
     <ClInclude Include="..\Public\LittleMonster_Attack_State.h" />
@@ -240,12 +243,14 @@
     <ClCompile Include="..\Private\BossMonsterFSM.cpp" />
     <ClCompile Include="..\Private\BossMonster_Page2.cpp" />
     <ClCompile Include="..\Private\BossMonster_Page2FSM.cpp" />
+    <ClCompile Include="..\Private\BossPage2UI.cpp" />
     <ClCompile Include="..\Private\BossPattern.cpp" />
     <ClCompile Include="..\Private\BossPattern_Page2.cpp" />
     <ClCompile Include="..\Private\Boss_HAND_UP_AND_LEFT_State.cpp" />
     <ClCompile Include="..\Private\Boss_HAND_UP_AND_RIGHT_State.cpp" />
     <ClCompile Include="..\Private\Boss_HAND_UP_AND_WALK_State.cpp" />
     <ClCompile Include="..\Private\Boss_Hand_UP_State.cpp" />
+    <ClCompile Include="..\Private\Boss_HIT_State.cpp" />
     <ClCompile Include="..\Private\Boss_Idle_State.cpp" />
     <ClCompile Include="..\Private\Boss_LEFT_WALK_State.cpp" />
     <ClCompile Include="..\Private\Boss_RIGHT_WALK_State.cpp" />
@@ -260,6 +265,7 @@
     <ClCompile Include="..\Private\FindUI.cpp" />
     <ClCompile Include="..\Private\InteractBox.cpp" />
     <ClCompile Include="..\Private\InvenUI.cpp" />
+    <ClCompile Include="..\Private\LaserTrail.cpp" />
     <ClCompile Include="..\Private\LittleMonster.cpp" />
     <ClCompile Include="..\Private\LittleMonsterFSM.cpp" />
     <ClCompile Include="..\Private\LittleMonster_Attack_State.cpp" />
@@ -322,6 +328,7 @@
     <FxCompile Include="..\..\Resources\Shaders\Shader_Blood_Particle.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_BulletTrail.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl" />
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Laser.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_MainUI.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Obstacle.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxCube.hlsl" />
