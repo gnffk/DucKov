@@ -187,38 +187,6 @@ HRESULT FindUI::Ready_LootItems()
 
 
 
-    //// 예시 아이템 1 
-    //if (FAILED(Add_UIRect(TEXT("LootItem_Helmat0"), TEXT("LootItem_Helmat0"), TEXT("Prototype_Com_Texture_UI_Item_Helmat0"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
-    //    return E_FAIL;
-
-    //INV_ITEM ItemHelmat{};
-    //ItemHelmat.strItemName = TEXT("Helmat0");
-    //ItemHelmat.strIconRectKey = TEXT("LootItem_Helmat0");
-    //ItemHelmat.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Helmat0");
-    //ItemHelmat.eEquipKind = SLOT_KIND::HEAD;
-    //ItemHelmat.vIconSize = { 48.f, 48.f };
-    //ItemHelmat.strEquipModelKey = "Helmat0";
-
-    //m_InventoryItems.push_back(ItemHelmat);
-    //if (m_InventorySlots.size() > 1)
-    //    m_InventorySlots[1].iItemIndex = 1;
-
-    //// 예시 아이템 1 
-    //if (FAILED(Add_UIRect(TEXT("LootItem_Helmat0"), TEXT("LootItem_Helmat0"), TEXT("Prototype_Com_Texture_UI_Item_Helmat0"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
-    //    return E_FAIL;
-
-    //INV_ITEM ItemHelmat{};
-    //ItemHelmat.strItemName = TEXT("Helmat0");
-    //ItemHelmat.strIconRectKey = TEXT("LootItem_Helmat0");
-    //ItemHelmat.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Helmat0");
-    //ItemHelmat.eEquipKind = SLOT_KIND::HEAD;
-    //ItemHelmat.vIconSize = { 48.f, 48.f };
-    //ItemHelmat.strEquipModelKey = "Helmat0";
-
-    //m_InventoryItems.push_back(ItemHelmat);
-    //if (m_InventorySlots.size() > 1)
-    //    m_InventorySlots[1].iItemIndex = 1;
-
     return S_OK;
 }
 

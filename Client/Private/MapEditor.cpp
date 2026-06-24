@@ -558,6 +558,53 @@ void MapEditor::IMGUI_SaveLoad_Render()
                 CGameInstance::Get().Load(
                     name,
                     CGameInstance::Get().Get_Level());
+
+                if (name == "Stage_Boss") {
+                    CGameInstance::Get().Load_Lights_FromJson(L"../../Resources/Data/Light/Lights_Boss.json");
+
+                    GameObject::GAMEOBJECT_DESC desc{};
+
+                    desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_MONSTER);
+
+                    desc.m_strName = L"BossStage2";
+
+                    desc.m_strPrototypeObjectName = L"Prototype_GameObject_BossMonster_Page2";
+
+                    desc.m_strPrototypeBaseName = L"SK_Boss_Test";
+
+                    desc.pCameraType = ETOUI(CAMERA::NONE);
+
+                    desc.fSpeedPerSec = 3.f;
+
+                    desc.fRotationPerSec = 180.f;
+
+                    CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_BossMonster_Page2"), CGameInstance::Get().Get_Level(), L"Boss", &desc);
+
+                }
+                if (name == "Stage_Test") {
+                    CGameInstance::Get().Load_Lights_FromJson(L"../../Resources/Data/Light/Lights.json");
+
+                    GameObject::GAMEOBJECT_DESC desc{};
+
+                    desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_MONSTER);
+
+                    desc.m_strName = L"BossStage1";
+
+                    desc.m_strPrototypeObjectName = L"Prototype_GameObject_BossMonster";
+
+                    desc.m_strPrototypeBaseName = L"SK_Boss_Test";
+
+                    desc.pCameraType = ETOUI(CAMERA::NONE);
+
+                    desc.fSpeedPerSec = 3.f;
+
+                    desc.fRotationPerSec = 180.f;
+
+                    CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),TEXT("Prototype_GameObject_BossMonster"), CGameInstance::Get().Get_Level(),L"Boss", &desc);
+
+
+
+                }
             }
 
             ImGui::Spacing();

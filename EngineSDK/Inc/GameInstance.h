@@ -165,7 +165,7 @@ public:
 public:
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
 	HRESULT Render_Lights(shared_ptr<class Shader> pShader, shared_ptr<class VIBuffer_Rect> pVIBuffer);
-
+	HRESULT Load_Lights_FromJson(const _wstring& strFilePath);
 #pragma endregion
 
 #pragma region PICKING

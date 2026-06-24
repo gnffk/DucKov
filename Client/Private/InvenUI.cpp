@@ -912,6 +912,41 @@ HRESULT InvenUI::Ready_InventoryItems()
     const int iFirstBagSlotIndex = 5;
     m_InventorySlots[iFirstBagSlotIndex].iItemIndex = 0;
 
+
+
+
+    // 예시 아이템 1 
+    if (FAILED(Add_UIRect(TEXT("LootItem_Helmat0"), TEXT("LootItem_Helmat0"), TEXT("Prototype_Com_Texture_UI_Item_Helmat0"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
+        return E_FAIL;
+
+    INV_ITEM ItemHelmat{};
+    ItemHelmat.strItemName = TEXT("Helmat0");
+    ItemHelmat.strIconRectKey = TEXT("LootItem_Helmat0");
+    ItemHelmat.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Helmat0");
+    ItemHelmat.eEquipKind = SLOT_KIND::HEAD;
+    ItemHelmat.vIconSize = { 48.f, 48.f };
+    ItemHelmat.strEquipModelKey = "Helmat0";
+
+    m_InventoryItems.push_back(ItemHelmat);
+
+    m_InventorySlots[iFirstBagSlotIndex+1].iItemIndex =1;
+
+    // 예시 아이템 1 
+    if (FAILED(Add_UIRect(TEXT("LootItem_Armor2"), TEXT("LootItem_Armor2"), TEXT("Prototype_Com_Texture_UI_Item_Armor2"), { 0.f, 0.f }, { 48.f, 48.f }, 0.0f)))
+        return E_FAIL;
+
+    INV_ITEM ItemARM{};
+    ItemARM.strItemName = TEXT("Armor2");
+    ItemARM.strIconRectKey = TEXT("LootItem_Armor2");
+    ItemARM.strTextureTag = TEXT("Prototype_Com_Texture_UI_Item_Armor2");
+    ItemARM.eEquipKind = SLOT_KIND::CLOTHES;
+    ItemARM.vIconSize = { 48.f, 48.f };
+    ItemARM.strEquipModelKey = "Armor2";
+
+    m_InventoryItems.push_back(ItemARM);
+
+    m_InventorySlots[iFirstBagSlotIndex+2].iItemIndex =2;
+
     return S_OK;
 }
 

@@ -561,6 +561,9 @@ HRESULT CGameInstance::Render_Lights(shared_ptr<class Shader> pShader, shared_pt
 {
     return m_pLight_Manager->Render(pShader, pVIBuffer);
 }
+HRESULT  CGameInstance::Load_Lights_FromJson(const _wstring& strFilePath) {
+    return m_pLight_Manager->Load_Lights_FromJson(strFilePath);
+}
 #pragma endregion
 
 #pragma region PICKING
