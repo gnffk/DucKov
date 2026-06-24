@@ -6,7 +6,7 @@
 #include "BaseCollider.h"
 #include "NavMeshEditor.h"
 #include "Tree.h"
-
+#include "Portal.h"
 
 MapEditor::MapEditor(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
@@ -145,7 +145,7 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
     }
 
 	return S_OK;
-  
+    
 }
 
 
@@ -304,6 +304,12 @@ void MapEditor::IMGUI_Level_Render()
                     ImGui::OpenPopup("Select InteractBox");
 
                 }
+                else if (className == "Portal")
+                {
+                    OpenDataObject = true;
+                    ImGui::OpenPopup("Select Portal");
+                }
+
                 else if (className == "LittleMonster")
                 {
                     OpenDataObject = true;
@@ -516,11 +522,9 @@ void MapEditor::IMGUI_SaveLoad_Render()
     // Save Load
     // =====================================================
 
-    if (ImGui::CollapsingHeader(u8"Save Load",
-        ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader(u8"Save Load", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        auto& mapNames =
-            CGameInstance::Get().GetMapNames();
+        auto& mapNames =CGameInstance::Get().GetMapNames();
 
         static string currentMap;
 
@@ -555,12 +559,11 @@ void MapEditor::IMGUI_SaveLoad_Render()
             {
                 currentMap = name;
 
-                CGameInstance::Get().Load(
-                    name,
-                    CGameInstance::Get().Get_Level());
+                CGameInstance::Get().Load(name,CGameInstance::Get().Get_Level());
 
                 if (name == "Stage_Boss") {
                     CGameInstance::Get().Load_Lights_FromJson(L"../../Resources/Data/Light/Lights_Boss.json");
+             
 
                     GameObject::GAMEOBJECT_DESC desc{};
 
@@ -735,7 +738,33 @@ void MapEditor::IMGUI_MadeFunction()
     ImGui::PopID();
 
     ImGui::Spacing();
+    // =====================================================
+// Portal
+// =====================================================
 
+    ImGui::PushID("Portal");
+
+    if (ImGui::Button("Portal", buttonSize))
+    {
+    }
+
+    if (ImGui::BeginDragDropSource())
+    {
+        string className = "Portal";
+
+        ImGui::SetDragDropPayload(
+            "GAME_OBJECT",
+            className.c_str(),
+            className.size() + 1);
+
+        ImGui::Text("Create Portal");
+
+        ImGui::EndDragDropSource();
+    }
+
+    ImGui::PopID();
+
+    ImGui::Spacing();
     // =====================================================
     // BossMonster_Page2
     // =====================================================
@@ -2004,6 +2033,188 @@ void MapEditor::IMGUI_ChoiceObject()
         ImGui::EndPopup();
     }
 
+    if (ImGui::BeginPopupModal(
+        "Select Portal",
+        nullptr))
+    {
+        static char portalObjectName[128] = "Portal";
+        static char portalLayerName[128] = "Portal";
+
+        static wstring selectedMeshName = L"";
+        static wstring selectedMeshPath = L"";
+        static string selectedDisplayName = "";
+
+        static int selectedNextLevelIndex = 0;
+
+        const char* nextLevelNames[] =
+        {
+            "HOME",
+            "LOGO",
+            "GAMEPLAY",
+            "MAPEDITOR"
+        };
+
+        LEVEL nextLevels[] =
+        {
+            LEVEL::HOME,
+            LEVEL::LOGO,
+            LEVEL::GAMEPLAY,
+            LEVEL::MAPEDITOR
+        };
+
+        filesystem::path rootPath = L"../../Resources/Model/StaticMesh";
+
+        ImGui::Text("Create Portal");
+        ImGui::Separator();
+
+        ImGui::InputText(
+            "Object Name",
+            portalObjectName,
+            IM_ARRAYSIZE(portalObjectName));
+
+        ImGui::InputText(
+            "Layer Name",
+            portalLayerName,
+            IM_ARRAYSIZE(portalLayerName));
+
+        ImGui::Separator();
+
+        ImGui::Text("Select StaticMesh");
+        ImGui::Separator();
+
+        ImGui::BeginChild(
+            "PortalStaticMeshTree",
+            ImVec2(0.f, 300.f),
+            true);
+
+        ShowStaticMeshTree(
+            rootPath,
+            selectedMeshName,
+            selectedMeshPath,
+            selectedDisplayName);
+
+        ImGui::EndChild();
+
+        ImGui::Separator();
+
+        if (selectedMeshName.empty())
+        {
+            ImGui::TextDisabled("Selected : None");
+        }
+        else
+        {
+            ImGui::Text("Selected : %s", selectedDisplayName.c_str());
+        }
+
+        ImGui::Separator();
+
+        ImGui::Text("Next Level");
+
+        ImGui::Combo(
+            "Move To",
+            &selectedNextLevelIndex,
+            nextLevelNames,
+            IM_ARRAYSIZE(nextLevelNames));
+
+        ImGui::Separator();
+
+        bool canCreate =
+            !selectedMeshName.empty()
+            && strlen(portalObjectName) > 0
+            && strlen(portalLayerName) > 0;
+
+        if (!canCreate)
+            ImGui::BeginDisabled();
+
+        if (ImGui::Button(
+            "Create",
+            ImVec2(120.f, 35.f)))
+        {
+            Portal::PORTAL_DESC desc{};
+
+            wstring inputName =
+                CGameInstance::Get().StringToWString(
+                    portalObjectName);
+
+            wstring inputLayer =
+                CGameInstance::Get().StringToWString(
+                    portalLayerName);
+
+            desc.ObjectType =
+                ETOUI(OBJECTTYPE::OBJECT_STATIC);
+
+            desc.m_strName =
+                Make_UniqueObjectName(inputLayer, inputName);
+
+            desc.m_strPrototypeObjectName =
+                L"Prototype_GameObject_Portal";
+
+            desc.m_strPrototypeBaseName =
+                selectedMeshName;
+
+            desc.pCameraType =
+                ETOUI(CAMERA::NONE);
+
+            desc.fSpeedPerSec =
+                0.f;
+
+            desc.fRotationPerSec =
+                0.f;
+
+            desc.vSpawnPos =
+            {
+                0.f,
+                0.f,
+                0.f
+            };
+
+            desc.eNextLevel =
+                nextLevels[selectedNextLevelIndex];
+
+            CGameInstance::Get().Add_GameObject_toLayer(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_GameObject_Portal"),
+                CGameInstance::Get().Get_Level(),
+                inputLayer,
+                &desc);
+
+            auto pPortal =
+                CGameInstance::Get().Find_Object(
+                    CGameInstance::Get().Get_Level(),
+                    inputLayer,
+                    desc.m_strName);
+
+            if (pPortal)
+            {
+                CGameInstance::Get().SetSeletObject(
+                    pPortal.get());
+            }
+
+            selectedMeshName.clear();
+            selectedMeshPath.clear();
+            selectedDisplayName.clear();
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (!canCreate)
+            ImGui::EndDisabled();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(
+            "Cancel",
+            ImVec2(120.f, 35.f)))
+        {
+            selectedMeshName.clear();
+            selectedMeshPath.clear();
+            selectedDisplayName.clear();
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 }
 void MapEditor::IMGUI_AddPlayer()
 {

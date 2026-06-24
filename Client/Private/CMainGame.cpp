@@ -4,6 +4,8 @@
 #include "GameInstance.h"
 #include "Level_Loading.h"
 
+#include "Loading_BackGround_UI.h"
+
 Client::CMainGame::CMainGame()
 {
 }
@@ -28,9 +30,45 @@ HRESULT Client::CMainGame::Initialize()
 	if (FAILED(Ready_Fonts()))
 		return E_FAIL;
 
+	//---- Texture Prototype ----//
+
+	/* For.Prototype_Com_Texture_MainMenu_BackGround_GAMEPLAY */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_Com_Texture_MainMenu_BackGround_GAMEPLAY"),
+		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Loading_Frame/frame_%d.png"), 90))))
+		return E_FAIL;
+
+	/* For.Prototype_Com_Texture_Loading_Mask */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_Com_Texture_Loading_Mask"),
+		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Loading_Frame/frame_90.png"), 1))))
+		return E_FAIL;
+
+
+	/* For.Prototype_Com_Shader_VtxPosTex_Loading */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_Com_Shader_VtxPosTex_Loading"),
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_VtxPosTex_Loading.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Com_VIBuffer_Rect */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_Com_VIBuffer_Rect"),
+		VIBuffer_Rect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+
+	//---- GameObject Prototype ----//
+
+	// For.Prototype_GameObject_Loading_BackGround_UI
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_GameObject_Loading_BackGround_UI"), Loading_BackGround_UI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;
+
+
+
+
 
 
 	return S_OK;

@@ -16,7 +16,9 @@ public:
 	virtual HRESULT Initialize() override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	
+private:
+	map<string, shared_ptr<class GameObject>> m_pUI;
 
 public:
 	static unique_ptr<Level_Logo> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);

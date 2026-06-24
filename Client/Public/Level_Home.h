@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "Client_Defines.h"
@@ -5,12 +6,12 @@
 
 NS_BEGIN(Client)
 
-class Level_GamePlay final : public CLevel
+class Level_Home final : public CLevel
 {
 private:
-	Level_GamePlay(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
+	Level_Home(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);
 public:
-	virtual ~Level_GamePlay();
+	virtual ~Level_Home();
 
 public:
 	virtual HRESULT Initialize() override;
@@ -18,14 +19,13 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	HRESULT Ready_GamePlay();
+	HRESULT Ready_Home();
 private:
 	map<string, shared_ptr<class GameObject>> m_pUI;
 private:
 	unique_ptr<class NavMeshEditor> m_pNavMeshEditor = nullptr;
-
 public:
-	static unique_ptr<Level_GamePlay> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
+	static unique_ptr<Level_Home> Create(ComPtr<ID3D11Device>	pDevice, ComPtr<ID3D11DeviceContext> pContext);
 };
 
 NS_END

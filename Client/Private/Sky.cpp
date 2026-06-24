@@ -79,7 +79,7 @@ HRESULT Sky::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &Proj)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 2)))
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Begin(0)))
@@ -106,7 +106,7 @@ HRESULT Sky::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Shader"), m_pShaderCom)))
 		return E_FAIL;
 
-	m_pTextureCom = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Sky")));
+	m_pTextureCom = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Sky_Home")));
 	if (FAILED(__super::Add_Component(TEXT("Com_Texture"), m_pTextureCom)))
 		return E_FAIL;
 

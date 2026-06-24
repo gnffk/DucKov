@@ -47,6 +47,7 @@ public:
 		return m_Owner;
 	}
 	void SetColliderColor(ColliderColor _eColor) { m_eColor = _eColor; }
+	ColliderColor GetCollor() { return m_eColor; }
 
 
 	_float3 Get_Extend() { return m_Extend; }

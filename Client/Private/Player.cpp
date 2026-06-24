@@ -960,7 +960,7 @@ _bool Player::Collider_Box(_float fTimeDelta)
 				if (CGameInstance::Get().Intersect(_PlayerCollider, Collider))
 				{
 					bHitInteractBox = true;
-
+					
 					Collider->SetColliderColor(ColliderColor::RED);
 					_PlayerCollider->SetColliderColor(ColliderColor::RED);
 				}
@@ -1368,6 +1368,39 @@ HRESULT Player::Change_Navigation_AndWarp(const wstring& strNavigationPrototypeT
 		)
 	);
 
+	return S_OK;
+}
+HRESULT Player::Change_Navigation_AndHome(const wstring& strNavigationPrototypeTag, const _float3& vWarpPos, uint32_t iStartCellIndex)
+{
+	Navigation::NAVIGATION_DESC NaviDesc{ iStartCellIndex };
+
+	auto pNewNavigation = dynamic_pointer_cast<Navigation>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), strNavigationPrototypeTag.c_str(), &NaviDesc));
+
+	if (pNewNavigation == nullptr)
+		return E_FAIL;
+
+	m_pNavigationCom = pNewNavigation;
+
+	// 기존 Navigation 컴포넌트 교체
+	m_Components[TEXT("Com_Navigation")] = m_pNavigationCom;
+
+	if (m_pTransformCom != nullptr)
+	{
+		_vector vNewPos = XMVectorSet(vWarpPos.x, vWarpPos.y, vWarpPos.z, 1.f);
+
+		// 먼저 보스 근처 위치로 이동
+		m_pTransformCom->Set_State(STATE::POSITION, vNewPos);
+
+		// 새 Navigation 기준으로 현재 Cell 다시 잡기
+		m_pNavigationCom->Set_CurrentCell(vNewPos);
+
+		// 바닥 높이 보정
+		_vector vFixedPos = m_pNavigationCom->SetUp_OnNavigation(vNewPos);
+
+		m_pTransformCom->Set_State(STATE::POSITION, vFixedPos);
+	}
+
+	
 	return S_OK;
 }
 unique_ptr<Player> Player::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)

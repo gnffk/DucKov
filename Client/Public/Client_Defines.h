@@ -10,7 +10,7 @@ namespace Client
 	static const unsigned int		g_iWinSizeX = { 1280 };
 	static const unsigned int		g_iWinSizeY = { 720 };
 
-	enum class LEVEL {LOADING, LOGO, GAMEPLAY, MAPEDITOR, END};
+	enum class LEVEL {LOADING, LOGO, GAMEPLAY, MAPEDITOR, HOME,NEVER, END};
 	enum class CAMERA {MAIN, SUB, NONE,PLAYER,SUB2, END};
 	enum class TEXTURETYPE {
 		NONE = 0, DIFFUSE = 1, SPECULAR = 2, AMBIENT = 3, EMISSIVE = 4, HEIGHT = 5, NORMALS = 6, SHININESS = 7, OPACITY = 8, DISPLACEMENT = 9, LIGHTMAP = 10, REFLECTION = 11, BASE_COLOR = 12,

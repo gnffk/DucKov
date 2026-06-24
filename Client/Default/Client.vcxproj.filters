@@ -262,6 +262,27 @@
     <Filter Include="02. GameObject\Monster\BossMonster\State\TPOSE">
       <UniqueIdentifier>{b401f8a6-6d64-4d7c-a0cd-b5586a4c5db4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\MainMenu">
+      <UniqueIdentifier>{aba7e1da-1cf4-4604-bdc3-be6df85779eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\MenuUI">
+      <UniqueIdentifier>{f3c9cbbe-528a-4f97-9973-bfbc398f91c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Laser">
+      <UniqueIdentifier>{6f63c84f-0f6c-4ec7-b23e-5d70a9976c7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Loading_BackGround_UI">
+      <UniqueIdentifier>{09371960-20c7-4df4-98dc-5629712be330}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\Home">
+      <UniqueIdentifier>{40147e6a-828c-4f85-9e6c-36d816934289}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Portal">
+      <UniqueIdentifier>{77386708-fbdb-41fa-8bc4-41813fee1526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Portal\PortalUI">
+      <UniqueIdentifier>{cfa75d48-e2f5-4fd0-916e-d7af92af6e86}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -278,9 +299,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\CMainGame.h">
       <Filter>00. MainGame</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Client_Defines.h">
-      <Filter>99. Client_Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h">
       <Filter>01. Levels\GamePlay</Filter>
@@ -506,6 +524,36 @@
     </ClInclude>
     <ClInclude Include="..\Public\Boss_TPOSE_State.h">
       <Filter>02. GameObject\Monster\BossMonster\State\TPOSE</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MainMenu.h">
+      <Filter>01. Levels\MainMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MainMenu_UI.h">
+      <Filter>02. GameObject\MenuUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_HIT_State.h">
+      <Filter>02. GameObject\Monster\BossPage2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossPage2UI.h">
+      <Filter>02. GameObject\Monster\BossPage2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LaserTrail.h">
+      <Filter>02. GameObject\Laser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loading_BackGround_UI.h">
+      <Filter>02. GameObject\Loading_BackGround_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Home.h">
+      <Filter>01. Levels\Home</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Portal.h">
+      <Filter>02. GameObject\Portal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Client_Defines.h">
+      <Filter>99. Client_Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PortalUI.h">
+      <Filter>02. GameObject\Portal\PortalUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -750,6 +798,33 @@
     <ClCompile Include="..\Private\Boss_TPOSE_State.cpp">
       <Filter>02. GameObject\Monster\BossMonster\State\TPOSE</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\MainMenu.cpp">
+      <Filter>01. Levels\MainMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MainMenu_UI.cpp">
+      <Filter>02. GameObject\MenuUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_HIT_State.cpp">
+      <Filter>02. GameObject\Monster\BossPage2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossPage2UI.cpp">
+      <Filter>02. GameObject\Monster\BossPage2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LaserTrail.cpp">
+      <Filter>02. GameObject\Laser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loading_BackGround_UI.cpp">
+      <Filter>02. GameObject\Loading_BackGround_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Home.cpp">
+      <Filter>01. Levels\Home</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Portal.cpp">
+      <Filter>02. GameObject\Portal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PortalUI.cpp">
+      <Filter>02. GameObject\Portal\PortalUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -789,6 +864,12 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_BossPage2.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Laser.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex_Loading.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
