@@ -7,6 +7,172 @@
 #include "UIObject.h"
 #include "FindUI.h"
 
+namespace
+{
+	UIObject::INV_ITEM Make_LootItem(
+		const wstring& strItemName,
+		const wstring& strTextureTag,
+		UIObject::SLOT_KIND eEquipKind,
+		const _float2& vIconSize,
+		const string& strEquipModelKey)
+	{
+		UIObject::INV_ITEM Item{};
+
+		Item.strItemName = strItemName;
+
+		// FindUI::Set_LootItems에서 LootItem_0, LootItem_1 이런 식으로 다시 세팅함.
+		Item.strIconRectKey = TEXT("");
+
+		Item.strTextureTag = strTextureTag;
+		Item.eEquipKind = eEquipKind;
+		Item.vIconSize = vIconSize;
+		Item.strEquipModelKey = strEquipModelKey;
+
+		return Item;
+	}
+
+	UIObject::INV_ITEM Make_Stage1_Item()
+	{
+		return Make_LootItem(
+			TEXT("Gun1"),
+			TEXT("Prototype_Com_Texture_UI_Item_Gun1"),
+			UIObject::SLOT_KIND::GUN,
+			{ 48.f, 48.f },
+			"Gun1"
+		);
+	}
+
+	UIObject::INV_ITEM Make_Stage1_Item_Helmet()
+	{
+		return Make_LootItem(
+			TEXT("Helmat1"),
+			TEXT("Prototype_Com_Texture_UI_Item_Helmat1"),
+			UIObject::SLOT_KIND::HEAD,
+			{ 48.f, 48.f },
+			"Helmat1"
+		);
+	}
+
+	UIObject::INV_ITEM Make_Stage1_Item_Armor()
+	{
+		return Make_LootItem(
+			TEXT("Armor1"),
+			TEXT("Prototype_Com_Texture_UI_Item_Armor1"),
+			UIObject::SLOT_KIND::CLOTHES,
+			{ 48.f, 48.f },
+			"Armor1"
+		);
+	}
+
+
+
+	UIObject::INV_ITEM Make_Stage2_Item()
+	{
+		return Make_LootItem(
+			TEXT("Gun2"),
+			TEXT("Prototype_Com_Texture_UI_Item_Gun2"),
+			UIObject::SLOT_KIND::GUN,
+			{ 48.f, 48.f },
+			"Gun2"
+		);
+	}
+	UIObject::INV_ITEM Make_Stage2_Item_Helmet()
+	{
+		return Make_LootItem(
+			TEXT("Helmat2"),
+			TEXT("Prototype_Com_Texture_UI_Item_Helmat2"),
+			UIObject::SLOT_KIND::HEAD,
+			{ 48.f, 48.f },
+			"Helmat2"
+		);
+	}
+
+	UIObject::INV_ITEM Make_Stage2_Item_Armor()
+	{
+		return Make_LootItem(
+			TEXT("Armor2"),
+			TEXT("Prototype_Com_Texture_UI_Item_Armor2"),
+			UIObject::SLOT_KIND::CLOTHES,
+			{ 48.f, 48.f },
+			"Armor2"
+		);
+	}
+
+
+
+
+
+	UIObject::INV_ITEM Make_Stage3_Item()
+	{
+		return Make_LootItem(
+			TEXT("Gun3"),
+			TEXT("Prototype_Com_Texture_UI_Item_Gun3"),
+			UIObject::SLOT_KIND::GUN,
+			{ 48.f, 48.f },
+			"Gun3"
+		);
+	}
+	UIObject::INV_ITEM Make_Stage3_Item_Helmet()
+	{
+		return Make_LootItem(
+			TEXT("Helmat3"),
+			TEXT("Prototype_Com_Texture_UI_Item_Helmat3"),
+			UIObject::SLOT_KIND::HEAD,
+			{ 48.f, 48.f },
+			"Helmat3"
+		);
+	}
+
+	UIObject::INV_ITEM Make_Stage3_Item_Armor()
+	{
+		return Make_LootItem(
+			TEXT("Armor3"),
+			TEXT("Prototype_Com_Texture_UI_Item_Armor3"),
+			UIObject::SLOT_KIND::CLOTHES,
+			{ 48.f, 48.f },
+			"Armor3"
+		);
+	}
+
+	vector<UIObject::INV_ITEM> Make_LootItems_ByBoxType(InteractBox::InteractType eType)
+	{
+		vector<UIObject::INV_ITEM> LootItems;
+
+		switch (eType)
+		{
+		case InteractBox::StartBox:
+			// 시작 상자 : 1단계 아이템
+			LootItems.push_back(Make_Stage1_Item());
+			break;
+
+		case InteractBox::FoodBox:
+			LootItems.push_back(Make_Stage1_Item());
+			break;
+
+		case InteractBox::GeneralBox:
+			LootItems.push_back(Make_Stage2_Item());
+			LootItems.push_back(Make_Stage2_Item_Helmet());
+			break;
+
+		case InteractBox::GoodBox:
+			// 좋은 상자 : 1, 2, 3단계 물품 전부
+			LootItems.push_back(Make_Stage3_Item());
+			LootItems.push_back(Make_Stage3_Item_Helmet());
+			LootItems.push_back(Make_Stage3_Item_Armor());
+			break;
+
+		case InteractBox::Die:
+			LootItems.push_back(Make_Stage1_Item_Armor());
+			break;
+
+		default:
+			break;
+		}
+
+		return LootItems;
+	}
+}
+
 InteractBox::InteractBox(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: GameObject{ pDevice, pContext }
 
@@ -220,7 +386,26 @@ HRESULT InteractBox::Ready_UI()
 
 	m_pUI.emplace("FindUI", FindUIObject);
 
-	
+
+
+
+
+	auto iterFindUI = m_pUI.find("FindUI");
+
+	if (iterFindUI != m_pUI.end())
+	{
+		auto pFindUI = dynamic_pointer_cast<FindUI>(iterFindUI->second);
+
+		if (pFindUI == nullptr)
+			return E_FAIL;
+
+		vector<UIObject::INV_ITEM> LootItems = Make_LootItems_ByBoxType(m_eInteractType);
+
+		if (FAILED(pFindUI->Set_LootItems(LootItems)))
+			return E_FAIL;
+	}
+
+	return S_OK;
 
 	return S_OK;
 }

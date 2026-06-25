@@ -553,7 +553,14 @@ bool NavMeshEditor::Pick_OnTerrain(_float3& vOutPoint) const
 	if (nullptr == pTerrain)
 		return false;
 
+#ifdef _DEBUG
 	return pTerrain->Picking_Terrain_ForNavMesh(vOutPoint);
+#endif
+
+#ifdef NDEBUG
+	return false;
+#endif
+	
 }
 bool NavMeshEditor::Find_NearPoint(const _float3& vPoint, int32_t& iOutTriangle, int32_t& iOutPoint) const
 {

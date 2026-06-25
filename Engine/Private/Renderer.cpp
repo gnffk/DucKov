@@ -292,6 +292,7 @@ HRESULT Renderer::Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObje
 
 HRESULT Renderer::Draw()
 {
+#ifdef _DEBUG
     if (CGameInstance::Get().Key_Down(DIK_1)) {
         debugRender = 1;
     }
@@ -316,7 +317,7 @@ HRESULT Renderer::Draw()
     if (CGameInstance::Get().Key_Down(DIK_8)) {
         debugRender = 8;
     }
-
+#endif
 
     if (FAILED(Render_NonBlend()))
         return E_FAIL;
@@ -567,6 +568,7 @@ HRESULT Renderer::Render_Effect()
 
 HRESULT Renderer::Render_Final()
 {
+#ifdef _DEBUG
     if (debugRender == 1) {
         if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_Texture")))
             return E_FAIL;
@@ -612,6 +614,7 @@ HRESULT Renderer::Render_Final()
         m_pShader->Bind_RawValue("g_fFinalBloomStrength",&fFinalBloomStrength,sizeof(_float));
     }
 
+
     m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
     m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
@@ -624,8 +627,25 @@ HRESULT Renderer::Render_Final()
         if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::FINAL))))
             return E_FAIL;
     }
+#endif
 
+#ifdef NDEBUG
+    if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_Texture")))
+        return E_FAIL;
 
+    if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Blur0"), m_pShader, "g_BloomTexture")))
+        return E_FAIL;
+
+    _float fFinalBloomStrength = 0.6f;
+    m_pShader->Bind_RawValue("g_fFinalBloomStrength", &fFinalBloomStrength, sizeof(_float));
+
+    m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
+    m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
+    m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
+
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::COMPOSITE))))
+        return E_FAIL;
+#endif
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
 

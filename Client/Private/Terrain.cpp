@@ -121,7 +121,7 @@ HRESULT Terrain::Render()
 	if (FAILED(m_pShaderCom->Bind_SRV("g_SplatTexture", m_pSplatSRV.Get())))
 		return E_FAIL;
 
-#elif
+#else
 	if (FAILED(m_pSplatTex->Bind_ShaderResource(m_pShaderCom, "g_SplatTexture", 0)))
 		return E_FAIL;
 #endif // _DEBUG

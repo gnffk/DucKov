@@ -72,7 +72,7 @@ public:
 	HRESULT Add_Component(const _wstring& strComponentTag, shared_ptr<Component> pComponent);
 protected:
 	
-	
+
 	HRESULT Clear_Compnent();
 
 	template<typename T>
