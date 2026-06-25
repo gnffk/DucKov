@@ -283,6 +283,9 @@
     <Filter Include="02. GameObject\Portal\PortalUI">
       <UniqueIdentifier>{cfa75d48-e2f5-4fd0-916e-d7af92af6e86}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Cloud">
+      <UniqueIdentifier>{f1e09065-47d7-4041-a51f-87195c7e2ae7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -555,6 +558,9 @@
     <ClInclude Include="..\Public\PortalUI.h">
       <Filter>02. GameObject\Portal\PortalUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Cloud.h">
+      <Filter>02. GameObject\Cloud</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -825,6 +831,9 @@
     <ClCompile Include="..\Private\PortalUI.cpp">
       <Filter>02. GameObject\Portal\PortalUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Cloud.cpp">
+      <Filter>02. GameObject\Cloud</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -870,6 +879,9 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex_Loading.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Cloud.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

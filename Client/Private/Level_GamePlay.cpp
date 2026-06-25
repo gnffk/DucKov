@@ -10,7 +10,7 @@
 #include "NavMeshEditor.h"
 #include "Player.h"
 #include "Tree.h"
-
+#include "Cloud.h"
 
 Level_GamePlay::Level_GamePlay(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
@@ -127,6 +127,73 @@ HRESULT Level_GamePlay::Initialize()
 
     auto pTree = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"Instance", descTree.m_strName);
     static_pointer_cast<Tree>(pTree)->Load_Trees_JSON("../../Resources/Data/Instance/TreeData.json");
+
+
+    {
+        const uint32_t iCloudCount = 20;
+
+        const wstring CloudModelNames[] =
+        {
+            L"Prototype_Com_Model_SM_Cloud_Polygon_Blender_1",
+            L"Prototype_Com_Model_SM_Cloud_Polygon_Blender_1",
+            L"Prototype_Com_Model_SM_Cloud_Polygon_Blender_1"
+        };
+
+        for (uint32_t i = 0; i < iCloudCount; ++i)
+        {
+            Cloud::CLOUD_DESC CloudDesc{};
+
+            CloudDesc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+
+            CloudDesc.m_strName =
+                L"Cloud_" + to_wstring(i);
+
+            CloudDesc.m_strPrototypeObjectName =
+                L"Prototype_GameObject_Cloud";
+
+            int iModelIndex =
+                rand() % 3;
+
+            CloudDesc.m_strPrototypeBaseName =
+                CloudModelNames[iModelIndex];
+
+            CloudDesc.pCameraType =
+                ETOUI(CAMERA::NONE);
+
+            CloudDesc.fSpeedPerSec = 0.f;
+            CloudDesc.fRotationPerSec = 0.f;
+
+            float fX =
+                CGameInstance::Get().Random(250.f, 480.f);
+
+            float fY =
+                CGameInstance::Get().Random(40.f,40.f);
+
+            float fZ =
+                CGameInstance::Get().Random(50.f, 320.f);
+
+            CloudDesc.vSpawnPos =
+            {
+                fX,
+                fY,
+                fZ
+            };
+
+            CloudDesc.fMoveSpeed =
+                CGameInstance::Get().Random(0.5f, 0.6f);
+
+            CloudDesc.fResetDistance = CGameInstance::Get().Random(100.f, 150.f);
+
+            CGameInstance::Get().Add_GameObject_toLayer(
+                CGameInstance::Get().Get_Level(),
+                TEXT("Prototype_GameObject_Cloud"),
+                CGameInstance::Get().Get_Level(),
+                TEXT("Sky"),
+                &CloudDesc
+            );
+        }
+    }
+
 
 
     Shadow::SHADOW_LIGHT_DESC			ShadowLightDesc{};

@@ -38,6 +38,7 @@
 #include "Loading_BackGround_UI.h"
 #include "Portal.h"
 #include "PortalUI.h"
+#include "Cloud.h"
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
 	, m_pContext{ pContext }
 {
@@ -961,6 +962,9 @@ HRESULT CLoader::Loading_For_GamePlay()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_LaserTrail"),
 		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Laser.hlsl"), VTXBULLETTRAIL::Elements, VTXBULLETTRAIL::iNumElements))))
 		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_Cloud"),
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Cloud.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
 
 
 #pragma endregion
@@ -996,42 +1000,6 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 
 	namespace fs = std::filesystem;
-
-	const fs::path basePath = "../../Resources/Model/StaticMesh/Home/NonAnim/";
-
-	for (const auto& dirEntry : fs::directory_iterator(basePath))
-	{
-		if (!dirEntry.is_directory())
-			continue;
-
-		const fs::path folderPath = dirEntry.path();
-
-		// 폴더 이름
-		std::wstring folderName = folderPath.filename().wstring();
-
-		// bin 파일 경로 자동 생성
-		fs::path binPath = folderPath / (folderName + L".bin");
-
-		if (!fs::exists(binPath))
-			continue;
-
-		// Prototype 이름 자동 생성
-		std::wstring prototypeTag =
-			L"Prototype_Com_Model_" + folderName;
-
-		// Home만 다른 Transform 사용
-		_matrix transformMatrix =
-			(folderName == L"SM_MeshV2")
-			? HomeTransformMatrix
-			: PreTransformMatrix;
-
-		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), prototypeTag.c_str(),
-			Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), folderName.c_str(), ETOUI(MODELTYPE::NONANIM), binPath.string().c_str(), transformMatrix))))
-		{
-			return E_FAIL;
-		}
-	}
-
 
 
 	const fs::path basePath1 = "../../Resources/Model/StaticMesh/Stage1/Anim/";
@@ -1186,6 +1154,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 	{
 		return E_FAIL;
 	}
+	
 
 
 #pragma endregion
@@ -1396,6 +1365,11 @@ HRESULT CLoader::Loading_For_GamePlay()
 	/* For.Prototype_GameObject_PortalUI*/
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_PortalUI"),
 		PortalUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_Cloud*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Cloud"),
+		Cloud::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 
@@ -1798,8 +1772,7 @@ HRESULT CLoader::Loading_For_MapEditor()
 			continue;
 
 		// Prototype 이름 자동 생성
-		std::wstring prototypeTag =
-			L"Prototype_Com_Model_" + folderName;
+		std::wstring prototypeTag = L"Prototype_Com_Model_" + folderName;
 
 		if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), prototypeTag.c_str(),
 			Model::Create(m_pDevice, m_pContext, CGameInstance::Get().Get_Level(), folderName.c_str(), ETOUI(MODELTYPE::NONANIM), binPath.string().c_str(), PreTransformMatrix))))

@@ -175,6 +175,7 @@
     <ClInclude Include="..\Public\Boss_WALK_State.h" />
     <ClInclude Include="..\Public\Boss_Weapon.h" />
     <ClInclude Include="..\Public\Bullet.h" />
+    <ClInclude Include="..\Public\Cloud.h" />
     <ClInclude Include="..\Public\CMainGame.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\FindUI.h" />
@@ -267,6 +268,7 @@
     <ClCompile Include="..\Private\Boss_WALK_State.cpp" />
     <ClCompile Include="..\Private\Boss_Weapon.cpp" />
     <ClCompile Include="..\Private\Bullet.cpp" />
+    <ClCompile Include="..\Private\Cloud.cpp" />
     <ClCompile Include="..\Private\CMainGame.cpp" />
     <ClCompile Include="..\Private\FindUI.cpp" />
     <ClCompile Include="..\Private\InteractBox.cpp" />
@@ -340,6 +342,7 @@
     <FxCompile Include="..\..\Resources\Shaders\Shader_Blood_Particle.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_BulletTrail.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cell.hlsl" />
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Cloud.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Laser.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_MainUI.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Obstacle.hlsl" />
