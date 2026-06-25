@@ -245,6 +245,31 @@ void Player_Weapon::Fire_Bullet()
 
 	m_fFireTimer = Setting.fFireCoolTime;
 
+	// 무기별 발사 사운드
+	if (Setting.strModelPrototypeTag == L"Prototype_Com_Model_Gun1")
+	{
+		CGameInstance::Get().PlaySoundOne(
+			L"EFFECT_GUN1",
+			CHANNELID::EFFECT,
+			0.4f
+		);
+	}
+	if (Setting.strModelPrototypeTag == L"Prototype_Com_Model_Gun2")
+	{
+		CGameInstance::Get().PlaySoundOne(
+			L"EFFECT_GUN2",
+			CHANNELID::EFFECT,
+			0.4f
+		);
+	}
+	if (Setting.strModelPrototypeTag == L"Prototype_Com_Model_Gun3")
+	{
+		CGameInstance::Get().PlaySoundOne(
+			L"EFFECT_GUN3",
+			CHANNELID::EFFECT,
+			0.4f
+		);
+	}
 	_matrix ParentMatrix = XMLoadFloat4x4(m_pParentMatrix);
 
 	_vector vDir = ParentMatrix.r[2];
@@ -574,6 +599,8 @@ void Player_Weapon::Ready_WeaponSettings()
 	Gun1.fMouseRecoilRecoverSpeed = 220.f;
 
 	m_WeaponSettingMap["Gun1"] = Gun1;
+	Gun1.strFireSoundKey = L"EFFECT_GUN1";
+	Gun1.fFireSoundVolume = 0.8f;
 
 
 	WEAPON_SETTING Gun2{};
@@ -594,6 +621,9 @@ void Player_Weapon::Ready_WeaponSettings()
 	Gun2.fMouseRecoilMaxOffset = 220.f;
 	Gun2.fMouseRecoilKickSpeed = 550.f;
 	Gun2.fMouseRecoilRecoverSpeed = 180.f;
+
+	Gun2.strFireSoundKey = L"EFFECT_GUN2";
+	Gun2.fFireSoundVolume = 0.8f;
 
 	m_WeaponSettingMap["Gun2"] = Gun2;
 
@@ -617,6 +647,8 @@ void Player_Weapon::Ready_WeaponSettings()
 	Gun3.fMouseRecoilMaxOffset = 300.f;
 	Gun3.fMouseRecoilKickSpeed = 700.f;
 	Gun3.fMouseRecoilRecoverSpeed = 130.f;
+	Gun2.strFireSoundKey = L"EFFECT_GUN3";
+	Gun2.fFireSoundVolume = 0.8f;
 
 	m_WeaponSettingMap["Gun3"] = Gun3;
 }

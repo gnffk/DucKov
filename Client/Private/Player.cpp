@@ -98,17 +98,21 @@ void Player::Update(_float fTimeDelta)
 
 	if (CGameInstance::Get().Key_Down(DIK_1))
 	{
+		CGameInstance::Get().PlaySoundOne(L"EFFECT_Switching1", CHANNELID::EFFECT, 0.5f);
+
 		Switch_WeaponSlot(1);
 	}
 
 	if (CGameInstance::Get().Key_Down(DIK_2))
 	{
+		CGameInstance::Get().PlaySoundOne(L"EFFECT_Switching2", CHANNELID::EFFECT, 0.5f);
 		Switch_WeaponSlot(2);
 	}
 
 
 	if (CGameInstance::Get().Key_Down(DIK_I))
 	{
+		CGameInstance::Get().PlaySoundOne(L"EFFECT_InvenOpen",CHANNELID::EFFECT, 0.5f);
 		m_bInventoryOpen = !m_bInventoryOpen;
 		
 	}
@@ -1430,4 +1434,142 @@ shared_ptr<Prototype> Player::Clone(void* pArg)
 
 	return pInstance;
 }
+void Player::Apply_SaveData(const PLAYER_SAVE_DATA& Data)
+{
+	m_fHP = Data.fHP;
+	m_fMaxHP = Data.fMaxHP;
 
+	if (m_fHP < 0.f)
+		m_fHP = 0.f;
+
+	if (m_fHP > m_fMaxHP)
+		m_fHP = m_fMaxHP;
+
+
+
+	// 인벤토리 먼저 복원
+	auto iterInven = m_pUI.find("InvenUI");
+
+	if (iterInven != m_pUI.end())
+	{
+		auto pInvenUI = dynamic_pointer_cast<InvenUI>(iterInven->second);
+
+		if (pInvenUI != nullptr)
+			pInvenUI->Apply_SaveData(Data.Inventory);
+	}
+
+	// Player 내부 무기 슬롯 데이터 복원
+	m_strWeaponSlotKey[0] = Data.strWeaponSlotKey[0];
+	m_strWeaponSlotKey[1] = Data.strWeaponSlotKey[1];
+	m_iCurrentWeaponSlot = Data.iCurrentWeaponSlot;
+
+	// 현재 손에 들고 있는 무기 복원
+	if (m_iCurrentWeaponSlot >= 0 && m_iCurrentWeaponSlot < 2)
+	{
+		Switch_WeaponSlot(m_iCurrentWeaponSlot + 1);
+	}
+	else
+	{
+		auto iterWeapon = m_PartObjects.find(TEXT("Part_Weapon"));
+
+		if (iterWeapon != m_PartObjects.end())
+		{
+			auto pWeapon = dynamic_pointer_cast<Player_Weapon>(iterWeapon->second);
+
+			if (pWeapon != nullptr)
+				pWeapon->Set_WeaponType(Data.strCurrentWeaponType);
+		}
+	}
+
+	// 갑옷 복원
+	auto iterArmor = m_PartObjects.find(TEXT("Part_Armor"));
+
+	if (iterArmor != m_PartObjects.end())
+	{
+		auto pArmor = dynamic_pointer_cast<Player_Armor>(iterArmor->second);
+
+		if (pArmor != nullptr)
+			pArmor->Set_ArmorType(Data.strCurrentArmorType);
+	}
+
+	// 헬멧 복원
+	auto iterHelmat = m_PartObjects.find(TEXT("Part_Helmat"));
+
+	if (iterHelmat != m_PartObjects.end())
+	{
+		auto pHelmat = dynamic_pointer_cast<Player_Helmat>(iterHelmat->second);
+
+		if (pHelmat != nullptr)
+			pHelmat->Set_HelmatType(Data.strCurrentHelmatType);
+	}
+
+	Update_HP_UI();
+}
+
+
+
+PLAYER_SAVE_DATA Player::Make_SaveData() const
+{
+	PLAYER_SAVE_DATA Data{};
+
+	if (m_pTransformCom != nullptr)
+	{
+		XMStoreFloat3(
+			&Data.vPosition,
+			m_pTransformCom->Get_State(STATE::POSITION)
+		);
+	}
+
+	Data.fHP = m_fHP;
+	Data.fMaxHP = m_fMaxHP;
+
+	Data.strWeaponSlotKey[0] = m_strWeaponSlotKey[0];
+	Data.strWeaponSlotKey[1] = m_strWeaponSlotKey[1];
+	Data.iCurrentWeaponSlot = m_iCurrentWeaponSlot;
+
+	// 현재 손에 보이는 무기 타입
+	auto iterWeapon = m_PartObjects.find(TEXT("Part_Weapon"));
+
+	if (iterWeapon != m_PartObjects.end())
+	{
+		auto pWeapon = dynamic_pointer_cast<Player_Weapon>(iterWeapon->second);
+
+		if (pWeapon != nullptr)
+			Data.strCurrentWeaponType = pWeapon->Get_WeaponType();
+	}
+
+	// 현재 갑옷 타입
+	auto iterArmor = m_PartObjects.find(TEXT("Part_Armor"));
+
+	if (iterArmor != m_PartObjects.end())
+	{
+		auto pArmor = dynamic_pointer_cast<Player_Armor>(iterArmor->second);
+
+		if (pArmor != nullptr)
+			Data.strCurrentArmorType = pArmor->Get_ArmorType();
+	}
+
+	// 현재 헬멧 타입
+	auto iterHelmat = m_PartObjects.find(TEXT("Part_Helmat"));
+
+	if (iterHelmat != m_PartObjects.end())
+	{
+		auto pHelmat = dynamic_pointer_cast<Player_Helmat>(iterHelmat->second);
+
+		if (pHelmat != nullptr)
+			Data.strCurrentHelmatType = pHelmat->Get_HelmatType();
+	}
+
+	// 인벤토리 저장
+	auto iterInven = m_pUI.find("InvenUI");
+
+	if (iterInven != m_pUI.end())
+	{
+		auto pInvenUI = dynamic_pointer_cast<InvenUI>(iterInven->second);
+
+		if (pInvenUI != nullptr)
+			Data.Inventory = pInvenUI->Make_SaveData();
+	}
+
+	return Data;
+}

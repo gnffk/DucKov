@@ -8,6 +8,7 @@
 #include "BaseCollider.h"
 #include "BossMonster_Page2.h"
 #include "PerformaceCamera.h"
+#include "Player.h"
 NS_BEGIN(Client)
 
 BossMonster::BossMonster(ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext): Monster{ pDevice, pContext }
@@ -402,9 +403,17 @@ HRESULT BossMonster::Render()
 	if (FAILED(m_pShaderBossCom->Bind_RawValue("g_fPatternRatio", &fPatternRatio, sizeof(_float))))
 		return E_FAIL;
 
+
 	if (FAILED(m_pShaderBossCom->Bind_RawValue("g_fBossPattern1", &m_bNextPattern, sizeof(_bool))))
 		return E_FAIL;
+	
+	if (m_bNextPattern == true) {
+		CGameInstance::Get().PlaySoundOne(L"EFFECT_APPEARBOSSSOUND", EFFECT_BOSSAPPEAR, 0.5f);
+		auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
 
+		static_pointer_cast<Player>(pPlayer)->m_bNext = true;
+		m_bNextPattern = false;
+	}
 
 	if (FAILED(m_pShaderBossCom->Bind_Matrix("g_WorldMatrix", &World)))
 		return E_FAIL;
@@ -625,6 +634,7 @@ void BossMonster::Take_Damage(_float fDamage, const _float3& vHitPos)
 {
 	if (Get_Dead())
 		return;
+	CGameInstance::Get().PlaySoundOne(L"EFFECT_HIT", CHANNELID::EFFECT_LITTLEMONSTER_HIT, 0.5f);
 
 	if (fDamage <= 0.f)
 		return;
@@ -644,7 +654,7 @@ void BossMonster::Take_Damage(_float fDamage, const _float3& vHitPos)
 	if (m_fHP <= 0.f)
 	{
 		//Spawn_BossPage2();
-
+		CGameInstance::Get().PlaySoundOne(L"EFFECT_DIE", CHANNELID::EFFECT_LITTLEMONSTER_DIE, 0.5f);
 		auto iter = m_pUI.find("BossMonsterUI");
 		if (iter != m_pUI.end())
 		{

@@ -525,7 +525,8 @@ void LittleMonster::Take_Damage(_float fDamage, const _float3& vHitPos)
 {
 	if (Get_Dead())
 		return;
-
+	CGameInstance::Get().PlaySoundOne(L"EFFECT_HIT", CHANNELID::EFFECT_LITTLEMONSTER_HIT, 0.5f);
+	
 	if (fDamage <= 0.f)
 		return;
 
@@ -543,6 +544,7 @@ void LittleMonster::Take_Damage(_float fDamage, const _float3& vHitPos)
 
 	if (m_fHP <= 0.f)
 	{
+		CGameInstance::Get().PlaySoundOne(L"EFFECT_DIE", CHANNELID::EFFECT_LITTLEMONSTER_DIE, 0.5f);
 		Spawn_DieBox();
 		Set_Dead();
 	}

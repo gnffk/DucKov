@@ -32,6 +32,17 @@ public:
 	string WStringToString(const std::wstring& wstr);
 	wstring StringToWString(const string& str);
 
+
+private:
+	bool m_bHasPlayerSaveData = false;
+	PLAYER_SAVE_DATA m_PlayerSaveData{};
+
+public:
+	void Save_PlayerData(const PLAYER_SAVE_DATA& Data);
+	bool Has_PlayerSaveData() const;
+	const PLAYER_SAVE_DATA& Get_PlayerSaveData() const;
+	void Clear_PlayerSaveData();
+
 public:
 #pragma region TIME_MANAGER
 	_float			Random(_float fMin, _float fMax);
@@ -184,7 +195,7 @@ public:
 
 #pragma region Sound_Manager
 	HRESULT Add_Sound(std::wstring_view svSoundKey, std::wstring_view svSoundPath);
-	void PlaySoundLoop(std::wstring_view svSoundKey, CHANNELID eID, float fVolume);
+	void PlaySoundLoop(std::wstring_view svSoundKey, CHANNELID eID, float fVolume, float fPitch = 1.f);
 	void PlaySoundOne(std::wstring_view svSoundKey, CHANNELID eID, float fVolume);
 	void StopSound(CHANNELID eID);
 	void StopAll();

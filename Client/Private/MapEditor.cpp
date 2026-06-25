@@ -131,7 +131,8 @@ HRESULT MapEditor::Ready_Layer_MapEditor(const _wstring& strLayerTag)
     descTree.fSpeedPerSec = 0.f;
     descTree.fRotationPerSec = 0.f;
 
-    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),  TEXT("Prototype_GameObject_Tree"),  CGameInstance::Get().Get_Level(),  L"Instance", &descTree)))
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(),  TEXT("Prototype_GameObject_Tree"),  
+        CGameInstance::Get().Get_Level(),  L"Instance", &descTree)))
     {
         return E_FAIL;
     }

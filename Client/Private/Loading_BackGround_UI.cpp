@@ -44,8 +44,7 @@ HRESULT Loading_BackGround_UI::Initialize(void* pArg)
     m_fFrameAcc = 0.f;
     m_iFrameIndex = 0;
 
-    // GAMEPLAY 로딩이면 애니메이션 끝날 때까지 대기
-    // 다른 로딩이면 애니메이션 없음 = 바로 완료 취급
+  
     m_bAnimationFinished = !m_bUseSpecialLoading;
 
     if (FAILED(Ready_Components()))
@@ -84,9 +83,7 @@ void Loading_BackGround_UI::Update(_float fTimeDelta)
 }
 void Loading_BackGround_UI::Late_Update(_float fTimeDelta)
 {
-    CGameInstance::Get().Add_RenderObject(
-        RENDERGROUP::UI,
-        SHARED_THIS(Loading_BackGround_UI));
+    CGameInstance::Get().Add_RenderObject(RENDERGROUP::UI,SHARED_THIS(Loading_BackGround_UI));
 }
 
 HRESULT Loading_BackGround_UI::Render()

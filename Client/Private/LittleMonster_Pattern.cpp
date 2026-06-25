@@ -71,8 +71,10 @@ void LittleMonster_Pattern::Update(_float fTimeDelta)
         {
             if (Should_Roll(pPlayer))
                 eNextState = PATTERN_STATE::ROLL;
-            else
+            else {
                 eNextState = PATTERN_STATE::CHASE;
+            
+            }
         }
         else
         {
@@ -150,6 +152,57 @@ _bool LittleMonster_Pattern::Build_RoamPath()
     return false;
 }
 
+void LittleMonster_Pattern::Update_RoamWalkSound(_float fTimeDelta)
+{
+    auto pPlayer = CGameInstance::Get().Find_Object(
+        CGameInstance::Get().Get_Level(),
+        L"PlayerTag",
+        L"Player"
+    );
+
+    if (pPlayer == nullptr)
+    {
+        Reset_RoamWalkSound();
+        return;
+    }
+
+    _float fDistance = Compute_Distance_To_Player(pPlayer);
+
+    if (fDistance > m_fRoamWalkSoundRange)
+    {
+        Reset_RoamWalkSound();
+        return;
+    }
+
+    m_fRoamWalkSoundTimer -= fTimeDelta;
+
+    if (m_fRoamWalkSoundTimer > 0.f)
+        return;
+
+    _float fRatio = fDistance / m_fRoamWalkSoundRange;
+
+    if (fRatio < 0.f)
+        fRatio = 0.f;
+
+    if (fRatio > 1.f)
+        fRatio = 1.f;
+
+    // 가까울수록 1, 멀수록 0
+    fRatio = 1.f - fRatio;
+
+    _float fVolume = 0.15f + fRatio * 0.25f;
+
+    CGameInstance::Get().PlaySoundOne( L"EFFECT_MONSTER_WALK",CHANNELID::EFFECT,fVolume);
+
+    m_fRoamWalkSoundTimer = m_fRoamWalkSoundInterval;
+}
+
+void LittleMonster_Pattern::Reset_RoamWalkSound()
+{
+    m_fRoamWalkSoundTimer = 0.f;
+}
+
+
 void LittleMonster_Pattern::Update_Roam(_float fTimeDelta)
 {
     auto pOwner = m_pOwner.lock();
@@ -160,6 +213,8 @@ void LittleMonster_Pattern::Update_Roam(_float fTimeDelta)
     if (m_bRoamIdle)
     {
         Change_LittleMonsterState(LittleMonsterFSM::LITTLEMONSTER_STATE::IDLE);
+
+        Reset_RoamWalkSound();
 
         m_fRoamIdleTimer -= fTimeDelta;
 
@@ -179,6 +234,8 @@ void LittleMonster_Pattern::Update_Roam(_float fTimeDelta)
 
         Change_LittleMonsterState(LittleMonsterFSM::LITTLEMONSTER_STATE::IDLE);
 
+        Reset_RoamWalkSound();
+
         return;
     }
 
@@ -191,11 +248,15 @@ void LittleMonster_Pattern::Update_Roam(_float fTimeDelta)
 
             Change_LittleMonsterState(LittleMonsterFSM::LITTLEMONSTER_STATE::IDLE);
 
+            Reset_RoamWalkSound();
+
             return;
         }
     }
 
     Change_LittleMonsterState(LittleMonsterFSM::LITTLEMONSTER_STATE::WALK);
+
+    Update_RoamWalkSound(fTimeDelta);
 
     Follow_Path(fTimeDelta, 0.5f);
 }
@@ -250,9 +311,9 @@ void LittleMonster_Pattern::Update_Chase(_float fTimeDelta)
     // =====================================================
     // 공격 사거리 밖이면 추적
     // =====================================================
-    Change_LittleMonsterState(
-        LittleMonsterFSM::LITTLEMONSTER_STATE::WALK);
+    Change_LittleMonsterState(LittleMonsterFSM::LITTLEMONSTER_STATE::WALK);
 
+  
     // 바로 갈 수 있으면 A* 없이 직선 추적
     if (Can_See_Player(pPlayer))
     {
@@ -269,7 +330,7 @@ void LittleMonster_Pattern::Update_Chase(_float fTimeDelta)
             pOwner->Turn_To_Direction(vDir, fTimeDelta);
             pOwner->Move_Direction(vDir, fTimeDelta, 2.5f);
         }
-
+        Reset_WalkSound();
         Clear_Path();
 
         return;
@@ -384,9 +445,30 @@ void LittleMonster_Pattern::Change_PatternState(PATTERN_STATE eNextState)
     if (m_ePatternState == eNextState)
         return;
 
+    PATTERN_STATE ePrevState = m_ePatternState;
+
     m_ePatternState = eNextState;
 
+    // 처음 CHASE로 진입한 순간에만 재생
+    if (ePrevState != PATTERN_STATE::CHASE &&
+        m_ePatternState == PATTERN_STATE::CHASE)
+    {
+        CGameInstance::Get().PlaySoundOne(
+            L"EFFECT_LITTLE_MONSTERSOUND",
+            EFFECT_LITTLEMONSTER_MOUSE,
+            0.5f
+        );
+    }
+
+
     Clear_Path();
+
+    if (m_ePatternState != PATTERN_STATE::ROAM &&
+        m_ePatternState != PATTERN_STATE::CHASE)
+    {
+        //CGameInstance::Get().PlaySoundOne(L"EFFECT_LITTLE_MONSTERSOUND", EFFECT_LITTLEMONSTER_MOUSE, 0.5f);
+        Reset_WalkSound();
+    }
 
     if (m_ePatternState != PATTERN_STATE::ROAM)
     {
@@ -698,6 +780,68 @@ void LittleMonster_Pattern::Update_Roll(_float fTimeDelta)
         Change_PatternState(PATTERN_STATE::CHASE);
     }
 }
+
+void LittleMonster_Pattern::Update_WalkSound(
+    _float fTimeDelta,
+    _float fInterval,
+    _float fBaseVolume
+)
+{
+    auto pPlayer = CGameInstance::Get().Find_Object(
+        CGameInstance::Get().Get_Level(),
+        L"PlayerTag",
+        L"Player"
+    );
+
+    if (pPlayer == nullptr)
+    {
+        Reset_WalkSound();
+        return;
+    }
+
+    _float fDistance = Compute_Distance_To_Player(pPlayer);
+
+    // 플레이어가 너무 멀면 발소리 안 남
+    if (fDistance > m_fWalkSoundRange)
+    {
+        Reset_WalkSound();
+        return;
+    }
+
+    m_fWalkSoundTimer -= fTimeDelta;
+
+    if (m_fWalkSoundTimer > 0.f)
+        return;
+
+    // 가까울수록 볼륨 증가
+    _float fRatio = fDistance / m_fWalkSoundRange;
+
+    if (fRatio < 0.f)
+        fRatio = 0.f;
+
+    if (fRatio > 1.f)
+        fRatio = 1.f;
+
+    fRatio = 1.f - fRatio;
+
+    _float fVolume = fBaseVolume + fRatio * 0.25f;
+
+    CGameInstance::Get().PlaySoundOne(
+        L"EFFECT_MONSTER_WALK",
+        CHANNELID::EFFECT,
+        fVolume
+    );
+
+    m_fWalkSoundTimer = fInterval;
+}
+
+void LittleMonster_Pattern::Reset_WalkSound()
+{
+    m_fWalkSoundTimer = 0.f;
+}
+
+
+
 
 shared_ptr<LittleMonster_Pattern> LittleMonster_Pattern::Create(shared_ptr<LittleMonster> pOwner)
 {

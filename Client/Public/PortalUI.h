@@ -46,7 +46,8 @@ private:
 private:
     _bool m_bVisible = false;
     _bool m_bChangingLevel = false;
-
+public:
+    _bool m_bNext = false;
 private:
     _float2 m_vTextPos = {};
     _float2 m_vBackPos = {};

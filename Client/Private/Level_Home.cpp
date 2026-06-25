@@ -8,6 +8,7 @@
 #include "BaseCollider.h"
 #include "NavMeshEditor.h"
 #include "Player.h"
+#include "CircleMask_UI.h"
 
 Level_Home::Level_Home(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
 	: CLevel{ pDevice, pContext }
@@ -71,7 +72,42 @@ HRESULT Level_Home::Initialize()
 
 
 
-    CGameInstance::Get().PlaySoundLoop(L"BGM_HOME", CHANNELID::BGM_HOME, 0.5f);
+
+    CGameInstance::Get().PlaySoundLoop(L"BGM_HOME", CHANNELID::BGM_HOME, 0.3f);
+
+
+
+    CircleMask_UI::CIRCLEMASK_DESC MaskDesc{};
+
+    MaskDesc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_UI);
+    MaskDesc.m_strName = L"CircleMask_UI";
+    MaskDesc.m_strPrototypeObjectName = L"Prototype_GameObject_CircleMask_UI";
+    MaskDesc.m_strPrototypeBaseName = L"CircleMask_UI";
+    MaskDesc.pCameraType = ETOUI(CAMERA::NONE);
+
+    MaskDesc.fSpeedPerSec = 0.f;
+    MaskDesc.fRotationPerSec = 0.f;
+
+    MaskDesc.fX = 0.f;
+    MaskDesc.fY = 0.f;
+    MaskDesc.fSizeX = CGameInstance::Get().Get_ViewportSize().x;
+    MaskDesc.fSizeY = CGameInstance::Get().Get_ViewportSize().y;
+
+    MaskDesc.fStartRadius = -0.05f;
+    MaskDesc.fMaxRadius = 1.2f;
+
+    auto pCircleMask = dynamic_pointer_cast<GameObject>( CGameInstance::Get().Clone_Prototype(ETOUI(LEVEL::NEVER),TEXT("Prototype_GameObject_CircleMask_UI"), &MaskDesc ) );
+
+    if (pCircleMask == nullptr)
+    {
+        MSG_BOX("CircleMask_UI Clone Failed");
+        return E_FAIL;
+    }
+
+    m_pUI.emplace("CircleMask_UI", pCircleMask);
+
+    m_eFadeState = HOME_FADE_STATE::OPENING;
+    m_fMaskRadius = -0.05f;
 
 
 
@@ -81,18 +117,103 @@ HRESULT Level_Home::Initialize()
 
 void Level_Home::Update(_float fTimeDelta)
 {
+    auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
+    if (static_pointer_cast<Player>(pPlayer)->m_bNext) {
+        m_eFadeState = HOME_FADE_STATE::CLOSING;
+    }
+    // =====================================================
+    // Circle Mask Fade In
+    // =====================================================
+    if (m_eFadeState == HOME_FADE_STATE::OPENING)
+    {
+        m_fMaskRadius += m_fMaskSpeed * fTimeDelta;
 
-	for (auto& Pair : m_pUI)
-	{
-		const string& strUIName = Pair.first;
-		auto pUIObject = Pair.second;
+        if (m_fMaskRadius >= m_fMaskMaxRadius)
+        {
+            m_fMaskRadius = m_fMaskMaxRadius;
+            m_eFadeState = HOME_FADE_STATE::OPENED;
+        }
+    }
 
-		if (nullptr == pUIObject)
-			continue;
+    if (m_eFadeState == HOME_FADE_STATE::CLOSING)
+    {
+        m_fMaskRadius -= m_fMaskSpeed * fTimeDelta;
+
+        if (m_fMaskRadius <= -0.05f)
+        {
+
+            auto pPlayerObj = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(),L"PlayerTag", L"Player" );
+
+            if (pPlayerObj != nullptr)
+            {
+                auto pPlayer = dynamic_pointer_cast<Player>(pPlayerObj);
+
+                if (pPlayer != nullptr)
+                {
+                    PLAYER_SAVE_DATA SaveData = pPlayer->Make_SaveData();
+
+                    CGameInstance::Get().Save_PlayerData(SaveData);
+                }
+            }
 
 
-		CGameInstance::Get().Add_UIObject(L"MainMenu_UI", static_pointer_cast<UIObject>(pUIObject));
-	}
+            m_fMaskRadius = -0.05f;
+            m_eFadeState = HOME_FADE_STATE::CLOSED;
+
+            CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING), Level_Loading::Create(m_pDevice, m_pDeviceContext, LEVEL::GAMEPLAY));
+
+            return;
+        }
+    }
+
+    auto iterMask = m_pUI.find("CircleMask_UI");
+
+    if (iterMask != m_pUI.end())
+    {
+        auto pMask = dynamic_pointer_cast<CircleMask_UI>(iterMask->second);
+
+        if (pMask != nullptr)
+        {
+            pMask->Set_Radius(m_fMaskRadius);
+
+            // 테스트 중에는 항상 보이게
+            pMask->Set_Visible(true);
+
+            // 완전히 열린 뒤에는 안 그리게 하고 싶으면 이걸로 변경
+            // pMask->Set_Visible(m_eFadeState != HOME_FADE_STATE::OPENED);
+        }
+    }
+
+    // =====================================================
+    // 일반 UI 먼저
+    // =====================================================
+    for (auto& Pair : m_pUI)
+    {
+        const string& strUIName = Pair.first;
+        auto pUIObject = Pair.second;
+
+        if (nullptr == pUIObject)
+            continue;
+
+        if (strUIName == "CircleMask_UI")
+            continue;
+
+        CGameInstance::Get().Add_UIObject(
+            L"MainMenu_UI",
+            static_pointer_cast<UIObject>(pUIObject)
+        );
+    }
+
+    // =====================================================
+    // CircleMask는 무조건 마지막
+    // =====================================================
+    if (iterMask != m_pUI.end() && iterMask->second != nullptr)
+    {
+        CGameInstance::Get().Add_UIObject(
+            L"MainMenu_UI",
+            static_pointer_cast<UIObject>(iterMask->second)
+        );
+    }
 
     if (m_pNavMeshEditor)
         m_pNavMeshEditor->Update();

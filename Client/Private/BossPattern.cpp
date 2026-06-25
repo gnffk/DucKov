@@ -49,6 +49,7 @@ void BossPattern::Update(_float fTimeDelta)
         else if (fDistance <= m_fDetectRange)
         {
             eNextState = PATTERN_STATE::CHASE;
+          
         }
         else
         {
@@ -266,9 +267,22 @@ void BossPattern::Change_PatternState(PATTERN_STATE eNextState)
 {
     if (m_ePatternState == eNextState)
         return;
+    PATTERN_STATE ePrevState = m_ePatternState;
+
 
     m_ePatternState = eNextState;
 
+    // ROAM / ATTACK 등에서 CHASE로 처음 들어온 순간에만 재생
+    if (ePrevState != PATTERN_STATE::ROAM &&
+        m_ePatternState == PATTERN_STATE::CHASE)
+    {
+        CGameInstance::Get().PlaySoundOne(
+            L"EFFECT_BOSSSOUND",
+            EFFECT_BOSSMONSTER_MOUSE,
+            0.5f
+        );
+
+    }
     Clear_Path();
 
     if (m_ePatternState != PATTERN_STATE::ROAM)

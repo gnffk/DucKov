@@ -10,6 +10,53 @@
 #include <fstream>
 #include <sstream>
 
+static SAVE_SLOT_KIND To_SaveSlotKind(Engine::UIObject::SLOT_KIND eKind)
+{
+    switch (eKind)
+    {
+    case Engine::UIObject::SLOT_KIND::BAG:
+        return SAVE_SLOT_KIND::BAG;
+
+    case Engine::UIObject::SLOT_KIND::GUN:
+        return SAVE_SLOT_KIND::GUN;
+
+    case Engine::UIObject::SLOT_KIND::MELEE:
+        return SAVE_SLOT_KIND::MELEE;
+
+    case Engine::UIObject::SLOT_KIND::CLOTHES:
+        return SAVE_SLOT_KIND::CLOTHES;
+
+    case Engine::UIObject::SLOT_KIND::HEAD:
+        return SAVE_SLOT_KIND::HEAD;
+
+    default:
+        return SAVE_SLOT_KIND::BAG;
+    }
+}
+
+static Engine::UIObject::SLOT_KIND To_UIObjectSlotKind(SAVE_SLOT_KIND eKind)
+{
+    switch (eKind)
+    {
+    case SAVE_SLOT_KIND::BAG:
+        return Engine::UIObject::SLOT_KIND::BAG;
+
+    case SAVE_SLOT_KIND::GUN:
+        return Engine::UIObject::SLOT_KIND::GUN;
+
+    case SAVE_SLOT_KIND::MELEE:
+        return Engine::UIObject::SLOT_KIND::MELEE;
+
+    case SAVE_SLOT_KIND::CLOTHES:
+        return Engine::UIObject::SLOT_KIND::CLOTHES;
+
+    case SAVE_SLOT_KIND::HEAD:
+        return Engine::UIObject::SLOT_KIND::HEAD;
+
+    default:
+        return Engine::UIObject::SLOT_KIND::BAG;
+    }
+}
 
 InvenUI::InvenUI(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
     : UIObject{ pDevice, pContext }
@@ -1164,6 +1211,36 @@ void InvenUI::End_DragItem()
     m_InventorySlots[iTargetSlot].iItemIndex = iDraggingItem;
     m_InventorySlots[iSrcSlot].iItemIndex = iTargetItem;
 
+
+    if (Is_EquipSlot(iTargetSlot) && iDraggingItem != -1)
+    {
+        CGameInstance::Get().PlaySoundOne(
+            L"EFFECT_Store",
+            CHANNELID::EFFECT,
+            0.7f
+        );
+    }
+
+    // 장비 슬롯에서 가방으로 뺀 경우
+    else if (Is_EquipSlot(iSrcSlot) && iTargetSlot != iSrcSlot)
+    {
+        CGameInstance::Get().PlaySoundOne(
+            L"EFFECT_Store1",
+            CHANNELID::EFFECT,
+            0.6f
+        );
+    }
+
+    // 그냥 가방 안에서 이동한 경우
+    else
+    {
+        CGameInstance::Get().PlaySoundOne(
+            L"EFFECT_Store2",
+            CHANNELID::EFFECT,
+            0.45f
+        );
+    }
+
     // 장비 슬롯 변화 반영
     if (Is_EquipSlot(iSrcSlot))
     {
@@ -1539,4 +1616,152 @@ float InvenUI::EaseOutCubic(float fRatio)
     float fInv = 1.f - fRatio;
 
     return 1.f - fInv * fInv * fInv;
+}
+
+PLAYER_INVENTORY_SAVE InvenUI::Make_SaveData() const
+{
+    PLAYER_INVENTORY_SAVE Data{};
+
+    Data.Items.reserve(m_InventoryItems.size());
+
+    for (const INV_ITEM& Item : m_InventoryItems)
+    {
+        PLAYER_ITEM_SAVE ItemSave{};
+
+        ItemSave.strItemName = Item.strItemName;
+        ItemSave.strIconRectKey = Item.strIconRectKey;
+        ItemSave.strTextureTag = Item.strTextureTag;
+        ItemSave.eEquipKind = To_SaveSlotKind(Item.eEquipKind);
+        ItemSave.vIconSize = Item.vIconSize;
+        ItemSave.strEquipModelKey = Item.strEquipModelKey;
+
+        Data.Items.push_back(ItemSave);
+    }
+
+    Data.Slots.reserve(m_InventorySlots.size());
+
+    for (const INV_SLOT& Slot : m_InventorySlots)
+    {
+        PLAYER_SLOT_SAVE SlotSave{};
+
+        SlotSave.strSlotRectKey = Slot.strSlotRectKey;
+        SlotSave.eKind = To_SaveSlotKind(Slot.eKind);
+        SlotSave.iItemIndex = Slot.iItemIndex;
+
+        Data.Slots.push_back(SlotSave);
+    }
+
+    return Data;
+}
+
+void InvenUI::Apply_SaveData(const PLAYER_INVENTORY_SAVE& Data)
+{// 기존 아이템 아이콘 숨기기
+    for (auto& Item : m_InventoryItems)
+    {
+        auto iterRect = m_UIRects.find(Item.strIconRectKey);
+
+        if (iterRect != m_UIRects.end())
+            iterRect->second.bVisible = false;
+    }
+
+    m_InventoryItems.clear();
+
+    for (auto& Slot : m_InventorySlots)
+    {
+        Slot.iItemIndex = -1;
+    }
+
+    // 아이템 복원
+    for (uint32_t i = 0; i < Data.Items.size(); ++i)
+    {
+        const PLAYER_ITEM_SAVE& SrcItem = Data.Items[i];
+
+        INV_ITEM NewItem{};
+
+        NewItem.strItemName = SrcItem.strItemName;
+        NewItem.strTextureTag = SrcItem.strTextureTag;
+        NewItem.eEquipKind = To_UIObjectSlotKind(SrcItem.eEquipKind);
+        NewItem.vIconSize = SrcItem.vIconSize;
+        NewItem.strEquipModelKey = SrcItem.strEquipModelKey;
+
+        // 저장된 아이콘 키가 없으면 새로 생성
+        if (SrcItem.strIconRectKey.empty())
+        {
+            wchar_t szIconKey[128]{};
+            swprintf_s(szIconKey, TEXT("Item_Save_%u"), i);
+            NewItem.strIconRectKey = szIconKey;
+        }
+        else
+        {
+            NewItem.strIconRectKey = SrcItem.strIconRectKey;
+        }
+
+        // UI Rect가 없으면 새로 생성
+        if (m_UIRects.find(NewItem.strIconRectKey) == m_UIRects.end())
+        {
+            if (FAILED(Add_UIRect(
+                NewItem.strIconRectKey,
+                NewItem.strIconRectKey,
+                NewItem.strTextureTag,
+                { 0.f, 0.f },
+                NewItem.vIconSize,
+                0.0f)))
+            {
+                continue;
+            }
+        }
+
+        auto iterRect = m_UIRects.find(NewItem.strIconRectKey);
+
+        if (iterRect != m_UIRects.end())
+        {
+            iterRect->second.vSize = NewItem.vIconSize;
+            iterRect->second.fAlpha = 1.f;
+            iterRect->second.vColor = { 1.f, 1.f, 1.f, 1.f };
+            iterRect->second.bVisible = false;
+        }
+
+        m_InventoryItems.push_back(NewItem);
+    }
+
+    // 슬롯 복원
+    const size_t iSlotCount =
+        (m_InventorySlots.size() < Data.Slots.size())
+        ? m_InventorySlots.size()
+        : Data.Slots.size();
+
+    for (size_t i = 0; i < iSlotCount; ++i)
+    {
+        int iSavedItemIndex = Data.Slots[i].iItemIndex;
+
+        if (iSavedItemIndex < 0 ||
+            iSavedItemIndex >= static_cast<int>(m_InventoryItems.size()))
+        {
+            m_InventorySlots[i].iItemIndex = -1;
+        }
+        else
+        {
+            m_InventorySlots[i].iItemIndex = iSavedItemIndex;
+        }
+    }
+
+    Update_ItemIconPosition();
+
+    // 장비 슬롯 상태를 Player에 다시 반영
+    Refresh_EquipSlots_ForSaveLoad();
+}
+
+void InvenUI::Refresh_EquipSlots_ForSaveLoad()
+{
+    for (int i = 0; i < static_cast<int>(m_InventorySlots.size()); ++i)
+    {
+        if (false == Is_EquipSlot(i))
+            continue;
+
+        Notify_EquipChanged(
+            i,
+            -1,
+            m_InventorySlots[i].iItemIndex
+        );
+    }
 }

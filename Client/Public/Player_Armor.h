@@ -35,17 +35,17 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-
+public:
+	const std::string& Get_ArmorType() const
+	{
+		return currentArmorType;
+	}
 public:
 	void Set_ArmorType(const string& strArmorType)
 	{
 		currentArmorType = strArmorType;
 	}
 
-	const string& Get_ArmorType() const
-	{
-		return currentArmorType;
-	}
 
 
 private:

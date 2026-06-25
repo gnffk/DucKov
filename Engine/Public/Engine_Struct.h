@@ -272,6 +272,68 @@ namespace Engine
 		XMFLOAT4		vRight, vUp, vLook, vTranslation;
 		XMFLOAT2		vLifeTime;
 	}VTXINSTANCE_PARTICLE;
+	enum class SAVE_SLOT_KIND
+	{
+		BAG,
+		GUN,
+		MELEE,
+		CLOTHES,
+		HEAD,
+		END
+	};
+
+	struct PLAYER_ITEM_SAVE
+	{
+		std::wstring strItemName = L"";
+		std::wstring strIconRectKey = L"";
+		std::wstring strTextureTag = L"";
+
+		SAVE_SLOT_KIND eEquipKind = SAVE_SLOT_KIND::BAG;
+
+		_float2 vIconSize = { 48.f, 48.f };
+
+		std::string strEquipModelKey = "Default";
+	};
+
+	struct PLAYER_SLOT_SAVE
+	{
+		std::wstring strSlotRectKey = L"";
+
+		SAVE_SLOT_KIND eKind = SAVE_SLOT_KIND::BAG;
+
+		int iItemIndex = -1;
+	};
+
+	struct PLAYER_INVENTORY_SAVE
+	{
+		std::vector<PLAYER_ITEM_SAVE> Items;
+		std::vector<PLAYER_SLOT_SAVE> Slots;
+	};
+
+	struct PLAYER_SAVE_DATA
+	{
+		_float3 vPosition = { 0.f, 0.f, 0.f };
+
+		_float fHP = 100.f;
+		_float fMaxHP = 100.f;
+
+		std::string strWeaponSlotKey[2] =
+		{
+			"Default",
+			"Default"
+		};
+
+		int iCurrentWeaponSlot = -1;
+
+		std::string strCurrentWeaponType = "Default";
+		std::string strCurrentArmorType = "Default";
+		std::string strCurrentHelmatType = "Default";
+
+		PLAYER_INVENTORY_SAVE Inventory;
+	};
+
+
+
 
 }
 

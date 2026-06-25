@@ -14,7 +14,7 @@ HRESULT Player_RUN_State::Initialize() {
 }
 void Player_RUN_State::Enter(FSM* pFSM) {
 
-	CGameInstance::Get().PlaySoundLoop(L"EFFECT_Player_Walk", EFFECT_WALKPlayer, 1.f);
+	CGameInstance::Get().PlaySoundLoop(L"EFFECT_Player_Walk", EFFECT_WALKPlayer, 0.5f, 2.f);
 	
 }
 void Player_RUN_State::Exit(FSM* pFSM) {

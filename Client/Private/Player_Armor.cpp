@@ -79,8 +79,6 @@ void Player_Armor::Late_Update(_float fTimeDelta)
 
 HRESULT Player_Armor::Render()
 {
-
-
 	if (FAILED(__super::Bind_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 

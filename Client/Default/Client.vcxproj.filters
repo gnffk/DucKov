@@ -286,6 +286,9 @@
     <Filter Include="02. GameObject\Cloud">
       <UniqueIdentifier>{f1e09065-47d7-4041-a51f-87195c7e2ae7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Circle_UI">
+      <UniqueIdentifier>{28027b8e-41e4-438a-89e8-4ac846084e1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -561,6 +564,9 @@
     <ClInclude Include="..\Public\Cloud.h">
       <Filter>02. GameObject\Cloud</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CircleMask_UI.h">
+      <Filter>02. GameObject\Circle_UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -834,6 +840,9 @@
     <ClCompile Include="..\Private\Cloud.cpp">
       <Filter>02. GameObject\Cloud</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\CircleMask_UI.cpp">
+      <Filter>02. GameObject\Circle_UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -882,6 +891,9 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Cloud.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_CircleMask.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

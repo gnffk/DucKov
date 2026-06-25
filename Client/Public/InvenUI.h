@@ -65,6 +65,7 @@ private:
     HRESULT Ready_InventorySlots();
     HRESULT Ready_InventoryItems();
 
+
     void Update_Inventory(_float fTimeDelta);
     void Update_SlotHover();
     void Update_ItemIconPosition();
@@ -82,6 +83,14 @@ private:
     _bool Is_EquipSlot(int iSlotIndex);
     void Notify_EquipChanged(int iSlotIndex, int iPrevItemIndex, int iNewItemIndex);
     _bool Is_ItemIconKey(const wstring& strKey);
+
+public:
+    PLAYER_INVENTORY_SAVE Make_SaveData() const;
+    void Apply_SaveData(const PLAYER_INVENTORY_SAVE& Data);
+
+private:
+    void Refresh_EquipSlots_ForSaveLoad();
+
 private:
     vector<INV_SLOT> m_InventorySlots;
     vector<INV_ITEM> m_InventoryItems;

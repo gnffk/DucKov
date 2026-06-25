@@ -19,15 +19,13 @@ Level_Loading::~Level_Loading()
 
 HRESULT Level_Loading::Initialize(LEVEL eNextLevelIndex)
 {
+	CGameInstance::Get().StopAll();
 	m_eNextLevelIndex = eNextLevelIndex;
 
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	m_pLoader = CLoader::Create(
-		m_pDevice,
-		m_pDeviceContext,
-		m_eNextLevelIndex);
+	m_pLoader = CLoader::Create(m_pDevice,m_pDeviceContext,m_eNextLevelIndex);
 
 	if (nullptr == m_pLoader)
 		return E_FAIL;
@@ -49,9 +47,7 @@ void Level_Loading::Update(_float fTimeDelta)
 		if (nullptr == pUI)
 			continue;
 
-		CGameInstance::Get().Add_UIObject(
-			L"Loading_UI",
-			pUI);
+		CGameInstance::Get().Add_UIObject(L"Loading_UI",pUI);
 	}
 
 	if (m_bLevelChanged)
@@ -66,8 +62,7 @@ void Level_Loading::Update(_float fTimeDelta)
 
 	if (iter != m_pUI.end())
 	{
-		pLoadingUI =
-			dynamic_pointer_cast<Loading_BackGround_UI>(iter->second);
+		pLoadingUI = dynamic_pointer_cast<Loading_BackGround_UI>(iter->second);
 	}
 
 	// 1. 실제 리소스 로딩이 끝나야 함

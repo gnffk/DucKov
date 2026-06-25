@@ -187,7 +187,11 @@ void Boss_Weapon::Fire_Bullet()
 
 	if (m_fFireTimer > 0.f)
 		return;
-
+	CGameInstance::Get().PlaySoundOne(
+		L"EFFECT_GUN2",
+		CHANNELID::EFFECT_BOSSATTACK,
+		0.4f
+	);
 	m_fFireTimer = m_fFireCoolTime;
 
 	_matrix ParentMatrix = XMLoadFloat4x4(m_pParentMatrix);

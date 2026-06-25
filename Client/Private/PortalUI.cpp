@@ -4,7 +4,7 @@
 #include "Transform.h"
 #include "Portal.h"
 #include "Level_Loading.h"
-
+#include "Player.h"
 PortalUI::PortalUI(
     ComPtr<ID3D11Device> pDevice,
     ComPtr<ID3D11DeviceContext> pContext)
@@ -124,10 +124,9 @@ void PortalUI::Try_MoveLevel()
 
         m_bChangingLevel = true;
 
-        if (FAILED(CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING), Level_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY)))) {
 
-            return;
-        }
+        auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
+        static_pointer_cast<Player>(pPlayer)->m_bNext = true;
     }
 
 }

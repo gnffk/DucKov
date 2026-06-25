@@ -700,6 +700,8 @@ void FindUI::Update_FindPrompt(_float fTimeDelta)
      
             iterBoxText->second.bVisible = false;
         }
+
+ 
     }
     else
     {
@@ -707,6 +709,15 @@ void FindUI::Update_FindPrompt(_float fTimeDelta)
     }
     if (CGameInstance::Get().Key_Down(DIK_F))
     {
+        if (m_bBoxOpen == false)
+        {
+            CGameInstance::Get().PlaySoundOne(
+                L"EFFECT_BOX_OPEN",
+                CHANNELID::EFFECT,
+                0.65f
+            );
+
+        }
         m_bBoxOpen = true;
 
         auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
@@ -778,8 +789,17 @@ void FindUI::Update_LootBox(_float fTimeDelta)
             iterSlot->second.bVisible = true;
     }
 
+    m_iPrevHoverSlot = m_iHoverSlot;
     m_iHoverSlot = Find_Slot_ByMouse(m_vMouseUIPos);
 
+    if (m_iHoverSlot != -1 && m_iHoverSlot != m_iPrevHoverSlot)
+    {
+        CGameInstance::Get().PlaySoundOne(
+            L"EFFECT_SLOT_HOVER",
+            CHANNELID::EFFECT,
+            0.35f
+        );
+    }
     Update_SlotHover();
     Update_ItemIconPosition();
 
@@ -916,6 +936,11 @@ void FindUI::Farm_Item(int iSlotIndex)
         return;
     }
 
+    CGameInstance::Get().PlaySoundOne(
+        L"EFFECT_LOOT_GET",
+        CHANNELID::EFFECT,
+        0.65f
+    );
 
     Slot.iItemIndex = -1;
 
@@ -1285,6 +1310,15 @@ void FindUI::Set_CollidingOwner(_bool bColliding)
 
     if (false == m_bCollidingOwner) {
         pPlayerObj->InvenSet(false);
+
+        if (m_bBoxOpen)
+        {
+            CGameInstance::Get().PlaySoundOne(
+                L"EFFECT_BOX_CLOSE",
+                CHANNELID::EFFECT,
+                0.55f
+            );
+        }
 
         m_bBoxOpen = false;
     }

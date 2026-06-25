@@ -22,9 +22,26 @@ private:
 	ComPtr<ID3D11Device>			m_pDevice = { nullptr };
 	ComPtr<ID3D11DeviceContext>		m_pContext = { nullptr };
 
+
+private:
+	struct FADE_DESC
+	{
+		bool  bFading = false;
+
+		float fStartVolume = 1.f;
+		float fTargetVolume = 1.f;
+
+		float fDuration = 1.f;
+		float fAccTime = 0.f;
+
+		bool bStopAfterFade = false;
+	};
+
+private:
+	FADE_DESC m_FadeDescs[MAXCHANNEL]{};
 public:
-
-
+	void FadeOutSound(CHANNELID eID, float fDuration);
+	void FadeToVolume(CHANNELID eID, float fTargetVolume, float fDuration);
 public:
 	FMOD_SYSTEM* Get_System() const { return m_pSystem; }
 
@@ -36,7 +53,7 @@ public:
 	shared_ptr<Sound> Find_Sound(std::wstring_view svSoundKey);
 
 public:
-	void PlaySoundLoop(std::wstring_view svSoundKey, CHANNELID eID, float fVolume);
+	void PlaySoundLoop(std::wstring_view svSoundKey,CHANNELID eID,float fVolume,float fPitch = 1.f);
 	void PlaySoundOne(std::wstring_view svSoundKey, CHANNELID eID, float fVolume);
 	void StopSound(CHANNELID eID);
 	void StopAll();
@@ -44,7 +61,7 @@ public:
 
 	bool IsChannelPlaying(CHANNELID eID);
 
-	void UpdateSound();
+	void UpdateSound(float fTimeDelta);
 
 private:
 	FMOD_CHANNEL* m_pChannelArr[MAXCHANNEL]{};

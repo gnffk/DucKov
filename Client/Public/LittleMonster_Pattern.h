@@ -114,7 +114,25 @@ private:
     _bool m_bAttacking = false;
     _float m_fAttackMotionTime = 0.2f;
     _float m_fAttackMotionTimer = 0.f;
+private:
+    _float m_fRoamWalkSoundTimer = 0.f;
+    _float m_fRoamWalkSoundInterval = 0.35f;
+    _float m_fRoamWalkSoundRange = 20.f;
+    _float m_fChaseWalkSoundInterval = 0.22f;
 
+private:
+    _float m_fWalkSoundTimer = 0.f;
+
+
+
+    _float m_fWalkSoundRange = 35.f;
+private:
+    void Update_RoamWalkSound(_float fTimeDelta);
+    void Reset_RoamWalkSound();
+
+private:
+    void Update_WalkSound(_float fTimeDelta, _float fInterval, _float fBaseVolume);
+    void Reset_WalkSound();
 private:
     _bool Can_See_Player(shared_ptr<GameObject> pPlayer);
     void Smooth_Path();

@@ -142,7 +142,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
     m_pUI_Manager->Late_Update(fTimeDelta);
 
-    m_pSound_Manager->UpdateSound();
+    m_pSound_Manager->UpdateSound(fTimeDelta);
 }
 
 HRESULT CGameInstance::Draw()
@@ -251,6 +251,30 @@ wstring CGameInstance::StringToWString(const string& str)
 
     return wstr;
 }
+
+
+void CGameInstance::Save_PlayerData(const PLAYER_SAVE_DATA& Data)
+{
+    m_PlayerSaveData = Data;
+    m_bHasPlayerSaveData = true;
+}
+
+bool CGameInstance::Has_PlayerSaveData() const
+{
+    return m_bHasPlayerSaveData;
+}
+
+const PLAYER_SAVE_DATA& CGameInstance::Get_PlayerSaveData() const
+{
+    return m_PlayerSaveData;
+}
+
+void CGameInstance::Clear_PlayerSaveData()
+{
+    m_bHasPlayerSaveData = false;
+}
+
+
 #pragma region TIMER_MANAGER
 _float CGameInstance::Random(_float fMin, _float fMax)
 {
@@ -643,8 +667,8 @@ HRESULT CGameInstance::Add_Particle(PARTICLE_TYPE eType, void* pArg ) {
 HRESULT CGameInstance::Add_Sound(std::wstring_view svSoundKey, std::wstring_view svSoundPath) {
     return m_pSound_Manager->Add_Sound(svSoundKey, svSoundPath);
 }
-void CGameInstance::PlaySoundLoop(std::wstring_view svSoundKey, CHANNELID eID, float fVolume) {
-    m_pSound_Manager->PlaySoundLoop(svSoundKey, eID, fVolume);
+void CGameInstance::PlaySoundLoop(std::wstring_view svSoundKey, CHANNELID eID, float fVolume,float fPitch) {
+    m_pSound_Manager->PlaySoundLoop(svSoundKey, eID, fVolume, fPitch);
 }
 void CGameInstance::PlaySoundOne(std::wstring_view svSoundKey, CHANNELID eID, float fVolume) {
     m_pSound_Manager->PlaySoundOne(svSoundKey, eID, fVolume);

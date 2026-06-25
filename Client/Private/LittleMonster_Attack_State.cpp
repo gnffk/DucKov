@@ -27,6 +27,9 @@ void LittleMonster_Attack_State::Enter(FSM* pFSM) {
 	auto& weapon = pMonster->GetPartObjectMap()[TEXT("Part_Weapon")];
 
 	weapon->SetVisible(true);
+
+
+	CGameInstance::Get().PlaySoundOne(L"EFFECT_LITTLEMONSTER_ATTACK", EFFECT_LITTLEMONSTER_ATTACK, 0.5f);
 }
 void LittleMonster_Attack_State::Exit(FSM* pFSM) {
 	auto pLittleMonsterFSM = dynamic_cast<LittleMonsterFSM*>(pFSM);

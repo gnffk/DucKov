@@ -7,6 +7,8 @@ NS_BEGIN(Client)
 
 class Player final : public ContainerObject
 {
+
+
 public:
 	typedef struct tagPlayerDesc : public ContainerObject::CONTAINEROBJECT_DESC
 	{
@@ -59,6 +61,9 @@ private:
 	_float		m_fHP = 1000.f;
 	_float		m_fAttackPower = 10.f;
 
+
+public:
+	_bool	m_bNext = false;
 private:
 #ifdef _DEBUG
 	void			IMGUI_DEBUGRENDER();
@@ -97,6 +102,10 @@ private:
 private:
 	string m_strWeaponSlotKey[2] = { "Default", "Default" };
 	int m_iCurrentWeaponSlot = -1;
+
+public:
+	PLAYER_SAVE_DATA Make_SaveData() const;
+	void Apply_SaveData(const PLAYER_SAVE_DATA& Data);
 
 private:
 	_bool Collider_Obstacle(_float fTimeDelta);

@@ -43,6 +43,11 @@ private:
 		float fMouseRecoilKickSpeed = 550.f;
 		float fMouseRecoilRecoverSpeed = 180.f;
 
+
+		// Ãß°¡
+		std::wstring strFireSoundKey = L"";
+		_float fFireSoundVolume = 0.7f;
+
 	} WEAPON_SETTING;
 
 private:

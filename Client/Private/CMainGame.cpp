@@ -3,7 +3,7 @@
 #include "CMainGame.h"
 #include "GameInstance.h"
 #include "Level_Loading.h"
-
+#include "CircleMask_UI.h"
 #include "Loading_BackGround_UI.h"
 
 Client::CMainGame::CMainGame()
@@ -48,6 +48,11 @@ HRESULT Client::CMainGame::Initialize()
 		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_VtxPosTex_Loading.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
 		return E_FAIL;
 
+	/* For.Prototype_Com_Shader_CircleMask */
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_Com_Shader_CircleMask"),
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_CircleMask.hlsl"), VTXTEX::Elements, VTXTEX::iNumElements))))
+		return E_FAIL;
+
 	/* For.Prototype_Com_VIBuffer_Rect */
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_Com_VIBuffer_Rect"),
 		VIBuffer_Rect::Create(m_pDevice, m_pContext))))
@@ -60,19 +65,90 @@ HRESULT Client::CMainGame::Initialize()
 	// For.Prototype_GameObject_Loading_BackGround_UI
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_GameObject_Loading_BackGround_UI"), Loading_BackGround_UI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+	// For.Prototype_GameObject_CircleMask_UI
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_GameObject_CircleMask_UI"), CircleMask_UI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	if (FAILED(CGameInstance::Get().Add_Sound(L"BGM_HOME", L"../../Resources/Sounds/DuckFunk.mp3")))
 		return E_FAIL;
-
-	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Player_Roll", L"../../Resources/Sounds/Roll.wav")))
+	if (FAILED(CGameInstance::Get().Add_Sound(L"BGM_MENU", L"../../Resources/Sounds/MainTheme.mp3")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"BGM_PLAY", L"../../Resources/Sounds/Game_Play.mp3")))
 		return E_FAIL;
 
-	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Player_Walk", L"../../Resources/Sounds/walk.wav")))
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Click", L"../../Resources/Sounds/Click.mp3")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Player_Roll", L"../../Resources/Sounds/Roll.mp3")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Player_Walk", L"../../Resources/Sounds/walk.mp3")))
 		return E_FAIL;
 
 	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Player_RUN", L"../../Resources/Sounds/FastWalk.wav")))
 		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_InvenOpen", L"../../Resources/Sounds/FindItem.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Switching1", L"../../Resources/Sounds/Switching1.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Switching2", L"../../Resources/Sounds/Switching2.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Store", L"../../Resources/Sounds/Store.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Store1", L"../../Resources/Sounds/Store1.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Store2", L"../../Resources/Sounds/Store2.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_GUN1", L"../../Resources/Sounds/Player_Attack.mp3")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_GUN2", L"../../Resources/Sounds/Player_Attack2.mp3")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_GUN3", L"../../Resources/Sounds/Player_Attack3.mp3")))
+		return E_FAIL;
+
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_MONSTER_WALK", L"../../Resources/Sounds/walk.mp3")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_HIT", L"../../Resources/Sounds/LittleBlood.wav")))
+		return E_FAIL;
+
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_DIE", L"../../Resources/Sounds/Blood.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_LITTLE_MONSTERSOUND", L"../../Resources/Sounds/Duck_Sound1.wav")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOSSSOUND", L"../../Resources/Sounds/BossMonster_Mouse.wav")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_APPEARBOSSSOUND", L"../../Resources/Sounds/AppearBoss.mp3")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_LITTLEMONSTER_ATTACK", L"../../Resources/Sounds/LIttleMonster_ATTACK.mp3")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_FIND_PROMPT",L"../../Resources/Sounds/FindItem.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOX_OPEN",L"../../Resources/Sounds/Store.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOX_CLOSE",L"../../Resources/Sounds/Store1.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_SLOT_HOVER",L"../../Resources/Sounds/Click.mp3")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_LOOT_GET",L"../../Resources/Sounds/Store2.wav")))
+		return E_FAIL;
+
 
 
 

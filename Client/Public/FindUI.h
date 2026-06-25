@@ -40,6 +40,11 @@ private:
     map<wstring, UI_RECT> m_UIRects;
 
 private:
+    _bool m_bPrevFindPromptVisible = false;
+    _bool m_bPrevBoxOpen = false;
+
+    int m_iPrevHoverSlot = -1;
+private:
     HRESULT Ready_Components();
     HRESULT Add_UIRect(const wstring& UIName, const wstring& strName, const wstring& strTextureTag, const _float2& vPos, const _float2& vSize, _float fDepth);
     HRESULT Render_UIRect(UI_RECT& UI);

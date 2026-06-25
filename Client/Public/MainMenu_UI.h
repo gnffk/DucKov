@@ -112,6 +112,9 @@ private:
     shared_ptr<Shader> m_pShaderCom = nullptr;
     shared_ptr<VIBuffer_Rect> m_pVIBufferCom = nullptr;
 
+
+public:
+    _bool   otherOpen = false;
 private:
     map<wstring, UI_RECT> m_UIRects;
     map<wstring, UI_TEXT> m_UITexts;
@@ -120,6 +123,7 @@ private:
     _float2 m_vMouseUIPos = {};
     int32_t m_iHoverButton = -1;
 
+    int m_iPrevHoverButton = -1;
 private:
     _bool m_bSettingOpen = false;
 

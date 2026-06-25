@@ -62,7 +62,7 @@ void MainMenu_UI::Update(_float fTimeDelta)
 
 void MainMenu_UI::Late_Update(_float fTimeDelta)
 {
-    CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(MainMenu_UI));
+
 }
 
 HRESULT MainMenu_UI::Render()
@@ -358,6 +358,7 @@ HRESULT MainMenu_UI::Render_UIRect_ByKey(const wstring& strKey)
 
 void MainMenu_UI::Update_Button()
 {
+    m_iPrevHoverButton = m_iHoverButton;
     m_iHoverButton = -1;
 
     auto iterStart = m_UIRects.find(TEXT("StartButton"));
@@ -367,19 +368,31 @@ void MainMenu_UI::Update_Button()
     if (iterStart != m_UIRects.end())
     {
         if (Is_PointInRect(m_vMouseUIPos, iterStart->second))
+        {
             m_iHoverButton = 0;
+        }
     }
 
     if (iterSetting != m_UIRects.end())
     {
         if (Is_PointInRect(m_vMouseUIPos, iterSetting->second))
+        {
             m_iHoverButton = 1;
+        }
     }
 
     if (iterExit != m_UIRects.end())
     {
         if (Is_PointInRect(m_vMouseUIPos, iterExit->second))
+        {
             m_iHoverButton = 2;
+        }
+    }
+
+    // 버튼 위로 새로 진입했을 때만 사운드 재생
+    if (m_iHoverButton != -1 && m_iHoverButton != m_iPrevHoverButton)
+    {
+        CGameInstance::Get().PlaySoundOne(L"EFFECT_Click", EFFECT, 0.5f);
     }
 
     if (iterStart != m_UIRects.end())
@@ -435,7 +448,6 @@ void MainMenu_UI::Update_Button()
         return;
     }
 }
-
 void MainMenu_UI::Update_SettingPanel()
 {
     auto iterPanel = m_UIRects.find(TEXT("SettingPanel"));
@@ -454,10 +466,7 @@ void MainMenu_UI::Update_SettingPanel()
 
 void MainMenu_UI::Click_Start()
 {
-    if (FAILED(CGameInstance::Get().Change_Level(ETOUI(LEVEL::LOADING),Level_Loading::Create(m_pDevice, m_pContext, LEVEL::HOME)))) {
-
-        return;
-    }
+    otherOpen = true;
 }
 
 void MainMenu_UI::Click_Setting()
