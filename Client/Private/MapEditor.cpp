@@ -28,6 +28,36 @@ HRESULT MapEditor::Initialize()
 
 	CGameInstance::Get().Change_Camera(ETOUI(CAMERA::MAIN));
 
+
+
+    m_vShadowEye = { -20.f, 100.f, -5.5f };
+    m_vShadowAt = { 20.f,   5.f,  5.f };
+
+    m_fShadowFovyDeg = 60.f;
+    m_fShadowNear = 0.1f;
+    m_fShadowFar = 1000.f;
+
+    m_ShadowLightDesc.vEye = _float4(
+        m_vShadowEye.x,
+        m_vShadowEye.y,
+        m_vShadowEye.z,
+        1.f
+    );
+
+    m_ShadowLightDesc.vAt = _float4(
+        m_vShadowAt.x,
+        m_vShadowAt.y,
+        m_vShadowAt.z,
+        1.f
+    );
+
+    m_ShadowLightDesc.fFovy = XMConvertToRadians(m_fShadowFovyDeg);
+    m_ShadowLightDesc.fNear = m_fShadowNear;
+    m_ShadowLightDesc.fFar = m_fShadowFar;
+
+    if (FAILED(CGameInstance::Get().Add_Shadow_Light(m_ShadowLightDesc)))
+        return E_FAIL;
+
 	return S_OK;
 }
 
@@ -195,13 +225,142 @@ void MapEditor::IMGUI_Render() {
     IMGUI_SaveLoad_Render();
     IMGUI_MadeFunction();
     IMGUI_AddPlayer();
-
+    IMGUI_ShadowLight_Render();
     IMGUI_TreeBrush_Render();
     if (m_pNavMeshEditor)
         m_pNavMeshEditor->IMGUI_Render();
 #endif
 
 }
+
+void MapEditor::IMGUI_ShadowLight_Render()
+{
+#if _DEBUG
+    ImGui::Begin("Shadow Light");
+
+    bool bChanged = false;
+
+    ImGui::Text("Shadow Camera");
+    ImGui::Separator();
+
+    bChanged |= ImGui::DragFloat3(
+        "Eye",
+        reinterpret_cast<float*>(&m_vShadowEye),
+        0.1f,
+        -1000.f,
+        1000.f
+    );
+
+    bChanged |= ImGui::DragFloat3(
+        "At",
+        reinterpret_cast<float*>(&m_vShadowAt),
+        0.1f,
+        -1000.f,
+        1000.f
+    );
+
+    ImGui::Separator();
+
+    bChanged |= ImGui::DragFloat(
+        "FOV Degree",
+        &m_fShadowFovyDeg,
+        0.1f,
+        1.f,
+        179.f
+    );
+
+    bChanged |= ImGui::DragFloat(
+        "Near",
+        &m_fShadowNear,
+        0.01f,
+        0.001f,
+        100.f
+    );
+
+    bChanged |= ImGui::DragFloat(
+        "Far",
+        &m_fShadowFar,
+        1.f,
+        1.f,
+        5000.f
+    );
+
+    if (m_fShadowNear < 0.001f)
+        m_fShadowNear = 0.001f;
+
+    if (m_fShadowFar <= m_fShadowNear)
+        m_fShadowFar = m_fShadowNear + 1.f;
+
+    ImGui::Separator();
+
+    if (ImGui::Button("Apply Shadow Light", ImVec2(200.f, 35.f)))
+    {
+        Apply_ShadowLight();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Reset", ImVec2(100.f, 35.f)))
+    {
+        m_vShadowEye = { -20.f, 100.f, -5.5f };
+        m_vShadowAt = { 20.f, 5.f, 5.f };
+        m_fShadowFovyDeg = 60.f;
+        m_fShadowNear = 0.1f;
+        m_fShadowFar = 1000.f;
+
+        Apply_ShadowLight();
+    }
+
+    // 드래그할 때 바로 적용하고 싶으면 사용
+    if (bChanged)
+    {
+        Apply_ShadowLight();
+    }
+
+    ImGui::Separator();
+
+    ImGui::Text("Current");
+    ImGui::Text("Eye : %.2f, %.2f, %.2f",
+        m_vShadowEye.x,
+        m_vShadowEye.y,
+        m_vShadowEye.z
+    );
+
+    ImGui::Text("At  : %.2f, %.2f, %.2f",
+        m_vShadowAt.x,
+        m_vShadowAt.y,
+        m_vShadowAt.z
+    );
+
+    ImGui::Text("FOV : %.2f deg", m_fShadowFovyDeg);
+    ImGui::Text("Near/Far : %.3f / %.3f", m_fShadowNear, m_fShadowFar);
+
+    ImGui::End();
+#endif
+}
+void MapEditor::Apply_ShadowLight()
+{
+    m_ShadowLightDesc.vEye = _float4(
+        m_vShadowEye.x,
+        m_vShadowEye.y,
+        m_vShadowEye.z,
+        1.f
+    );
+
+    m_ShadowLightDesc.vAt = _float4(
+        m_vShadowAt.x,
+        m_vShadowAt.y,
+        m_vShadowAt.z,
+        1.f
+    );
+
+    m_ShadowLightDesc.fFovy = XMConvertToRadians(m_fShadowFovyDeg);
+    m_ShadowLightDesc.fNear = m_fShadowNear;
+    m_ShadowLightDesc.fFar = m_fShadowFar;
+
+    CGameInstance::Get().Add_Shadow_Light(m_ShadowLightDesc);
+}
+
 void MapEditor::IMGUI_Level_Render()
 {// --------------------------------Levels -----------------------------------------------------
     ImGui::SetNextWindowBgAlpha(0.5f);

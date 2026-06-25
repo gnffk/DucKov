@@ -39,7 +39,19 @@ public:
 
 private:
 	_bool b_Debug = false;
+private:
+	Shadow::SHADOW_LIGHT_DESC m_ShadowLightDesc{};
 
+	_float3 m_vShadowEye = { -20.f, 100.f, -5.5f };
+	_float3 m_vShadowAt = { 20.f,   5.f,  5.f };
+
+	float m_fShadowFovyDeg = 60.f;
+	float m_fShadowNear = 0.1f;
+	float m_fShadowFar = 1000.f;
+
+private:
+	void IMGUI_ShadowLight_Render();
+	void Apply_ShadowLight();
 private:
 	unique_ptr<class NavMeshEditor> m_pNavMeshEditor = nullptr;
 

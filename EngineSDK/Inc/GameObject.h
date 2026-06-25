@@ -30,7 +30,7 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
-
+	virtual HRESULT Render_Shadow() { return S_OK; }
 
 public:
 	void Set_Dead() { m_bDead = true; }

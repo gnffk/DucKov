@@ -15,6 +15,8 @@ HRESULT Player_ROLL_State::Initialize() {
 void Player_ROLL_State::Enter(FSM* pFSM) {
 
     m_fCurrentSpeed = 6.f;
+   
+
 }
 void Player_ROLL_State::Exit(FSM* pFSM) {
 

@@ -19,3 +19,4 @@ xcopy				/y			.\Engine\lib\imgui\ImGuizmo-1.83\*.h			.\EngineSDK\Inc\
 
 xcopy				/y/I			.\Engine\lib\imgui\gismo.dll		.\Client\Bin\
 xcopy				/y/I			.\Engine\lib\assimp\assimp-vc143-mtd.dll 		.\Client\Bin\
+xcopy				/y/I			.\Engine\lib\fmod\fmod.dll 		.\Client\Bin\

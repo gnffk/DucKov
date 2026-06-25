@@ -58,6 +58,21 @@ HRESULT Level_Home::Initialize()
     CGameInstance::Get().Change_Camera(3);
 
 
+    Shadow::SHADOW_LIGHT_DESC			ShadowLightDesc{};
+
+    ShadowLightDesc.vEye = _float4(-20.f, 100.f, -5.5f, 1.f);
+    ShadowLightDesc.vAt = _float4(0.f, 5.f, 5.f, 1.f);
+    ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
+    ShadowLightDesc.fNear = 0.1f;
+    ShadowLightDesc.fFar = 1000.f;
+
+    if (FAILED(CGameInstance::Get().Add_Shadow_Light(ShadowLightDesc)))
+        return E_FAIL;
+
+
+
+    CGameInstance::Get().PlaySoundLoop(L"BGM_HOME", CHANNELID::BGM_HOME, 0.5f);
+
 
 
 

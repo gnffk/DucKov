@@ -181,7 +181,7 @@ void Body_Player::Late_Update(_float fTimeDelta)
 {
 
 	Make_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
-
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::SHADOW, SHARED_THIS(Body_Player));
 	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Body_Player));
 
 	__super::Late_Update(fTimeDelta);
@@ -248,7 +248,34 @@ HRESULT Body_Player::Render()
 
 	return S_OK;
 }
+HRESULT Body_Player::Render_Shadow()
+{
+	if (FAILED(__super::Bind_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", CGameInstance::Get().Get_ShadowLightTransform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", CGameInstance::Get().Get_ShadowLightTransform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(2)))
+			return E_FAIL;
+
+
+		m_pModelCom->Render(i);
+	}
+
+	return S_OK;
+}
 HRESULT Body_Player::Ready_Components()
 {
 	__super::Clear_Compnent();

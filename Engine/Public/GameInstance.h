@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Prototype_Manager.h"
-
+#include "Shadow.h"
 
 NS_BEGIN(Engine)
 
@@ -41,6 +41,7 @@ public:
 #pragma endregion
 
 #pragma region GRAPHIC_DEVICE
+	HRESULT			Bind_BackBuffer(_bool depth = true);
 	HRESULT			Clear_BackBuffer_View(const _float4* pClearColor);
 	HRESULT			Clear_DepthStencil_View();
 	HRESULT			Present();
@@ -149,10 +150,12 @@ public:
 	HRESULT Add_RenderTarget(const _wstring& strTargetTag, uint32_t iWidth, uint32_t iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
 	HRESULT Begin_MRT(const _wstring& strMRTTag, _bool bUseDepth = true);
+	HRESULT Begin_MRT(const _wstring& strMRTTag, ComPtr<ID3D11DepthStencilView> pDSV);
+
 	HRESULT End_MRT();
+	HRESULT End_MRT(_bool _d);
 	HRESULT Bind_RT_ShaderResource(const _wstring& strTargetTag, shared_ptr<class Shader> pShader, const _char* pConstantName);
 	HRESULT Copy_RenderTarget(const _wstring& strTargetTag, ComPtr<ID3D11Texture2D> pOut);
-
 
 #ifdef _DEBUG
 	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
@@ -166,6 +169,7 @@ public:
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
 	HRESULT Render_Lights(shared_ptr<class Shader> pShader, shared_ptr<class VIBuffer_Rect> pVIBuffer);
 	HRESULT Load_Lights_FromJson(const _wstring& strFilePath);
+	vector<shared_ptr<class Light>>&GetLights ();
 #pragma endregion
 
 #pragma region PICKING
@@ -178,6 +182,20 @@ public:
 	HRESULT Add_Particle(PARTICLE_TYPE eType, void* pArg = nullptr);
 #pragma endregion
 
+#pragma region Sound_Manager
+	HRESULT Add_Sound(std::wstring_view svSoundKey, std::wstring_view svSoundPath);
+	void PlaySoundLoop(std::wstring_view svSoundKey, CHANNELID eID, float fVolume);
+	void PlaySoundOne(std::wstring_view svSoundKey, CHANNELID eID, float fVolume);
+	void StopSound(CHANNELID eID);
+	void StopAll();
+	void SetChannelVolume(CHANNELID eID, float fVolume);
+#pragma endregion
+
+#pragma region SHADOW
+	const _float4x4* Get_ShadowLightTransform(D3DTS eState);
+	HRESULT Add_Shadow_Light(const Shadow::SHADOW_LIGHT_DESC& LightDesc);
+	HRESULT Set_Shadow_Light(const Shadow::SHADOW_LIGHT_DESC& ShadowLightDesc);
+#pragma endregion
 
 private:
 	_float2											m_vViewportSize = {};
@@ -200,6 +218,8 @@ private:
 	unique_ptr<class Light_Manager>					m_pLight_Manager = { nullptr };
 	unique_ptr<class Picking>						m_pPicking = { nullptr };
 	unique_ptr<class Particle_Manager>				m_pParticle_Manager = {nullptr};
+	unique_ptr<class Sound_Manager>					m_pSound_Manager = {nullptr};
+	unique_ptr<class Shadow>						m_pShadow = { nullptr };
 
 public:
 	void			Release_Engine();

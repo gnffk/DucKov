@@ -9,8 +9,7 @@
 #include "MapEditor.h"
 #include "UIObject.h"
 #include "Loading_BackGround_UI.h"
-Level_Loading::Level_Loading(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)
-	: CLevel{ pDevice, pContext }
+Level_Loading::Level_Loading(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): CLevel{ pDevice, pContext }
 {
 }
 

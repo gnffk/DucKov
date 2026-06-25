@@ -14,6 +14,8 @@ public:
 	HRESULT Initialize(HWND hWnd, WINMODE eWinMode, int32_t iWinSizeX, int32_t iWinSizeY,
 		ComPtr<ID3D11Device>& pOutDevice, ComPtr<ID3D11DeviceContext>& pOutContext);
 
+	HRESULT Bind_BackBuffer(_bool bUseDepth);
+
 	HRESULT Clear_BackBuffer_View(const _float4* pClearColor);
 
 	HRESULT Clear_DepthStencil_View();

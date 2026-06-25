@@ -27,6 +27,8 @@ private:
 	shared_ptr<class Shader>				m_pShader = { nullptr };
 	_float4x4								m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
 
+private:
+	ComPtr<ID3D11DepthStencilView>		m_pShadowDSV = { nullptr };
 
 #ifdef _DEBUG
 private:
@@ -40,6 +42,7 @@ private:
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonBlend();
+	HRESULT Render_Shadow();
 	HRESULT Render_Blend();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
@@ -56,8 +59,10 @@ private:
 	HRESULT Render_DEBUG();
 
 
-private:
 
+private:
+	HRESULT Ready_ShadowDSV();
+	HRESULT SetUp_Viewport(uint32_t iWidth, uint32_t iHeight);
 
 	HRESULT Render_BloomDownSamples();
 

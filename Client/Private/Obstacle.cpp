@@ -47,6 +47,10 @@ HRESULT Obstacle::Initialize(void* pArg)
 
 void Obstacle::Priority_Update(_float fTimeDelta)
 {
+	if (m_ModelComponentName != L"Prototype_Com_Model_SM_MeshV2") {
+
+		CGameInstance::Get().Add_RenderObject(RENDERGROUP::SHADOW, SHARED_THIS(Obstacle));
+	}
 	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Obstacle));
 	
 	for (int type = 0; type < (int)COLLIDER::COLLIDER_END; ++type)
@@ -78,9 +82,9 @@ void Obstacle::Late_Update(_float fTimeDelta)
 
 HRESULT Obstacle::Render()
 {
-
+#ifdef _DEBUG
 	IMGUITEST();
-
+#endif
 	_float4x4 View, Proj;
 	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
@@ -120,6 +124,43 @@ HRESULT Obstacle::Render()
 	return S_OK;
 }
 
+HRESULT Obstacle::Render_Shadow()
+{
+	_float4x4 View, Proj;
+	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
+
+	_float4x4 World = m_pTransformCom->GetWorldMatrix();
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", CGameInstance::Get().Get_ShadowLightTransform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", CGameInstance::Get().Get_ShadowLightTransform(D3DTS::PROJ))))
+		return E_FAIL;
+
+
+
+	uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (uint32_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (uint32_t)i)))
+			return E_FAIL;
+
+		//if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_Normals, 0)))
+		//	return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(2)))
+			return E_FAIL;
+
+
+		m_pModelCom->Render(i);
+	}
+
+	return S_OK;
+}
 HRESULT Obstacle::Ready_Components()
 {
 	__super::Clear_Compnent();

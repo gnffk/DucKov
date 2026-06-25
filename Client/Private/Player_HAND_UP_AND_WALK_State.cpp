@@ -14,10 +14,11 @@ HRESULT Player_HAND_UP_AND_WALK_State::Initialize() {
 }
 void Player_HAND_UP_AND_WALK_State::Enter(FSM* pFSM) {
 
+	CGameInstance::Get().PlaySoundLoop(L"EFFECT_Player_Walk", EFFECT_WALKPlayer, 0.5f);
 
 }
 void Player_HAND_UP_AND_WALK_State::Exit(FSM* pFSM) {
-
+	CGameInstance::Get().StopSound(EFFECT_WALKPlayer);
 }
 
 void Player_HAND_UP_AND_WALK_State::Priority_Update(FSM* pFSM, float fDeltaTime) {

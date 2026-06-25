@@ -32,6 +32,9 @@ private:
 
 #endif
 
+
+public:
+	vector<shared_ptr<class Light>>& GetLights() { return m_Lights; }
 public:
 	HRESULT Save_Lights_ToJson(const _wstring& strFilePath);
 	HRESULT Load_Lights_FromJson(const _wstring& strFilePath);

@@ -202,6 +202,15 @@
     <Filter Include="16.Particle\Particle_System">
       <UniqueIdentifier>{849ac170-3be1-4f74-9971-4bc57526b3a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{54c42309-636f-42db-9fc3-859eebfda1cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound\SoundAsset">
+      <UniqueIdentifier>{8615f996-3067-4bc7-ab49-370cc46fb1a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="17.Shadow">
+      <UniqueIdentifier>{a5d603bf-6331-48ec-9254-07f373f47935}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameInstance.cpp">
@@ -417,6 +426,15 @@
     <ClCompile Include="..\Private\Particle_System.cpp">
       <Filter>16.Particle\Particle_System</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Sound_Manager.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sound.cpp">
+      <Filter>Sound\SoundAsset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Shadow.cpp">
+      <Filter>17.Shadow</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -619,6 +637,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Particle_System.h">
       <Filter>16.Particle\Particle_System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sound_Manager.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sound.h">
+      <Filter>Sound\SoundAsset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Shadow.h">
+      <Filter>17.Shadow</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

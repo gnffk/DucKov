@@ -28,7 +28,7 @@ public:
 	void Set_State(STATE eState, _fvector vState) {
 		XMStoreFloat4(reinterpret_cast<_float4*>(&m_WorldMatrix.m[ETOUI(eState)][0]), vState);
 	}
-	_float4x4 GetWorldMatrix(){return m_WorldMatrix;}
+_float4x4 GetWorldMatrix(){return m_WorldMatrix;}
 	const _float4x4* Get_WorldMatrixPtr() const {
 		return &m_WorldMatrix;
 	}

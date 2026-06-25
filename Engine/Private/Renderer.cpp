@@ -51,6 +51,13 @@ HRESULT Renderer::Initialize()
     if (FAILED(CGameInstance::Get().Add_RenderTarget(TEXT("Target_Scene"), vViewportSize.x, vViewportSize.y, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
         return E_FAIL;
 
+    /* For.Target_LightDepth */
+    if (FAILED(CGameInstance::Get().Add_RenderTarget(TEXT("Target_LightDepth"), g_iMaxWidth, g_iMaxHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
+        return E_FAIL;
+
+
+    if (FAILED(Ready_ShadowDSV()))
+        return E_FAIL;
 
     uint32_t iSceneWidth = static_cast<uint32_t>(vViewportSize.x);
     uint32_t iSceneHeight = static_cast<uint32_t>(vViewportSize.y);
@@ -209,6 +216,9 @@ HRESULT Renderer::Initialize()
     if (FAILED(CGameInstance::Get().Add_MRT( TEXT("MRT_BlurDown0"), TEXT("Target_BlurDown0"))))
         return E_FAIL;
 
+    /* For.MRT_ShadowObject */
+    if (FAILED(CGameInstance::Get().Add_MRT(TEXT("MRT_ShadowObject"), TEXT("Target_LightDepth"))))
+        return E_FAIL;
 
     m_pVIBuffer = VIBuffer_Rect::Create(m_pDevice, m_pContext);
     if (nullptr == m_pVIBuffer)
@@ -318,8 +328,10 @@ HRESULT Renderer::Draw()
         debugRender = 8;
     }
 #endif
+    if (FAILED(Render_Shadow()))
+        return E_FAIL;
 
-    if (FAILED(Render_NonBlend()))
+     if (FAILED(Render_NonBlend()))
         return E_FAIL;
 
     if (FAILED(Render_Lights()))
@@ -499,20 +511,34 @@ HRESULT Renderer::Render_Lights()
 
 HRESULT Renderer::Render_Combined()
 {
-
-
-
     if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Diffuse"), m_pShader, "g_DiffuseTexture")))
         return E_FAIL;
+
     if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Shade"), m_pShader, "g_ShadeTexture")))
         return E_FAIL;
+
     if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
         return E_FAIL;
+
     if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Emission"), m_pShader, "g_EmissionTexture")))
         return E_FAIL;
+
+    if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_LightDepth"), m_pShader, "g_LightDepthTexture")))
+        return E_FAIL;
+
     m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
     m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
+
+    m_pShader->Bind_Matrix(
+        "g_LightViewMatrix",
+        CGameInstance::Get().Get_ShadowLightTransform(D3DTS::VIEW)
+    );
+
+    m_pShader->Bind_Matrix(
+        "g_LightProjMatrix",
+        CGameInstance::Get().Get_ShadowLightTransform(D3DTS::PROJ)
+    );
 
     if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::COMBINED))))
         return E_FAIL;
@@ -523,11 +549,8 @@ HRESULT Renderer::Render_Combined()
     if (FAILED(m_pVIBuffer->Render()))
         return E_FAIL;
 
-
-
     return S_OK;
 }
-
 HRESULT Renderer::Render_NonLights()
 {
     for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERGROUP::NONLIGHT)])
@@ -568,6 +591,7 @@ HRESULT Renderer::Render_Effect()
 
 HRESULT Renderer::Render_Final()
 {
+
 #ifdef _DEBUG
     if (debugRender == 1) {
         if (FAILED(CGameInstance::Get().Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_Texture")))
@@ -675,6 +699,9 @@ HRESULT Renderer::Render_Scene()
     if (FAILED(CGameInstance::Get().End_MRT()))
         return E_FAIL;
 
+
+  
+
     return S_OK;
 }
 
@@ -714,6 +741,85 @@ unique_ptr<Renderer> Renderer::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D1
     }
 
     return pInstance;
+}
+
+HRESULT Renderer::Render_Shadow()
+{
+ 
+    /* Target_LightDepth */
+    if (FAILED(CGameInstance::Get().Begin_MRT(TEXT("MRT_ShadowObject"), m_pShadowDSV)))
+        return E_FAIL;
+
+    SetUp_Viewport(g_iMaxWidth, g_iMaxHeight);
+
+    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERGROUP::SHADOW)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render_Shadow();
+    }
+
+    m_RenderObjects[ETOUI(RENDERGROUP::SHADOW)].clear();
+
+    if (FAILED(CGameInstance::Get().End_MRT()))
+        return E_FAIL;
+
+    SetUp_Viewport(CGameInstance::Get().Get_ViewportSize().x, CGameInstance::Get().Get_ViewportSize().y);
+
+
+
+    return S_OK;
+}
+
+
+HRESULT Renderer::Ready_ShadowDSV()
+{
+
+    D3D11_TEXTURE2D_DESC	TextureDesc{};
+
+    /* 깊이 버퍼의 픽셀은 백버퍼의 픽셀과 갯수가 동일해야만 깊이 테스트가 가능해진다. */
+    /* 픽셀의 수가 다르면 아에 렌더링을 못함. */
+    TextureDesc.Width = g_iMaxWidth;
+    TextureDesc.Height = g_iMaxHeight;
+    TextureDesc.MipLevels = 1;
+    TextureDesc.ArraySize = 1;
+    TextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+    TextureDesc.SampleDesc.Quality = 0;
+    TextureDesc.SampleDesc.Count = 1;
+
+    /* 동적? 정적?  */
+    TextureDesc.Usage = D3D11_USAGE_DEFAULT /* 정적 */;
+    /* 추후에 어떤 용도로 바인딩 될 수 있는 View타입의 텍스쳐를 만들기위한 Texture2D입니까? */
+    TextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL
+        /*| D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE*/;
+    TextureDesc.CPUAccessFlags = 0;
+    TextureDesc.MiscFlags = 0;
+
+    ComPtr<ID3D11Texture2D>             pTexture2D = { nullptr };
+
+    if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pTexture2D)))
+        return E_FAIL;
+
+    if (FAILED(m_pDevice->CreateDepthStencilView(pTexture2D.Get(), nullptr, &m_pShadowDSV)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT Renderer::SetUp_Viewport(uint32_t iWidth, uint32_t iHeight)
+{
+    D3D11_VIEWPORT			ViewPortDesc;
+    ZeroMemory(&ViewPortDesc, sizeof(D3D11_VIEWPORT));
+    ViewPortDesc.TopLeftX = 0;
+    ViewPortDesc.TopLeftY = 0;
+    ViewPortDesc.Width = (_float)iWidth;
+    ViewPortDesc.Height = (_float)iHeight;
+    ViewPortDesc.MinDepth = 0.f;
+    ViewPortDesc.MaxDepth = 1.f;
+
+    m_pContext->RSSetViewports(1, &ViewPortDesc);
+
+    return S_OK;
 }
 
 

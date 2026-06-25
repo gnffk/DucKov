@@ -362,6 +362,7 @@ HRESULT Player::Roll(_float fTimeDelta)
 {
 	if (CGameInstance::Get().Key_Down(DIK_SPACE) && false == m_isRolling)
 	{
+		CGameInstance::Get().PlaySoundOne(L"EFFECT_Player_Roll", EFFECT_ROLLPlayer, 0.5f);
 		_vector vMoveDir = XMVectorZero();
 
 		_float4 fCameraPos;

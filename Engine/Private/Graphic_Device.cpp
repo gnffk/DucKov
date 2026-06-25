@@ -55,6 +55,19 @@ HRESULT Graphic_Device::Initialize(HWND hWnd, WINMODE eWinMode, int32_t iWinSize
 	return S_OK;
 }
 
+HRESULT Graphic_Device::Bind_BackBuffer(_bool bUseDepth)
+{
+	ID3D11RenderTargetView* pRTV = m_pBackBufferRTV.Get();
+
+	m_pDeviceContext->OMSetRenderTargets(
+		1,
+		&pRTV,
+		bUseDepth ? m_pDepthStencilView.Get() : nullptr
+	);
+
+	return S_OK;
+}
+
 HRESULT Graphic_Device::Clear_BackBuffer_View(const _float4* pClearColor)
 {
 	if (nullptr == m_pDeviceContext)

@@ -1,7 +1,22 @@
 #pragma once
 
 
+namespace Engine
+{
+	//const unsigned int g_iMaxWidth = 2560;
+	//const unsigned int g_iMaxHeight = 1440;
+	// const unsigned int g_iMaxWidth = 1280;
+	// const unsigned int g_iMaxHeight = 720;
 
+	/*
+	const unsigned int g_iMaxWidth = 16384;
+	const unsigned int g_iMaxHeight = 9216;
+	*/
+	const unsigned int g_iMaxWidth = 8192;
+	const unsigned int g_iMaxHeight = 4608;
+
+
+}
 
 #include <filesystem>
 #include <d3d11.h>

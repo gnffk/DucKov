@@ -49,6 +49,9 @@
     <ClInclude Include="..\Public\Picking.h" />
     <ClInclude Include="..\Public\RenderTarget.h" />
     <ClInclude Include="..\Public\Shader.h" />
+    <ClInclude Include="..\Public\Shadow.h" />
+    <ClInclude Include="..\Public\Sound.h" />
+    <ClInclude Include="..\Public\Sound_Manager.h" />
     <ClInclude Include="..\Public\Sphere_Collider.h" />
     <ClInclude Include="..\Public\stb_image.h" />
     <ClInclude Include="..\Public\stb_image_write.h" />
@@ -152,6 +155,9 @@
     <ClCompile Include="..\Private\Picking.cpp" />
     <ClCompile Include="..\Private\RenderTarget.cpp" />
     <ClCompile Include="..\Private\Shader.cpp" />
+    <ClCompile Include="..\Private\Shadow.cpp" />
+    <ClCompile Include="..\Private\Sound.cpp" />
+    <ClCompile Include="..\Private\Sound_Manager.cpp" />
     <ClCompile Include="..\Private\Sphere_Collider.cpp" />
     <ClCompile Include="..\Private\Target_Manager.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
@@ -240,13 +246,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>../Bin\</OutDir>
-    <IncludePath>$(ProjectDir)..\lib\nlohmann_3.12.0\include;$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(ProjectDir)..\lib\DirectXToolKit;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\lib\fmod\inc;$(ProjectDir)..\lib\nlohmann_3.12.0\include;$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\fmod;$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(ProjectDir)..\lib\DirectXToolKit;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>../Bin\</OutDir>
-    <IncludePath>$(ProjectDir)..\lib\nlohmann_3.12.0\include;$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(ProjectDir)..\lib\DirectXToolKit;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\lib\fmod\inc;$(ProjectDir)..\lib\nlohmann_3.12.0\include;$(ProjectDir)..\lib\assimp\include;$(ProjectDir)..\lib\imgui\imgui-1.83;$(ProjectDir)..\lib\imgui\ImGuizmo-1.83;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\fmod;$(ProjectDir)..\lib\assimp;$(ProjectDir)..\lib\shader;$(ProjectDir)..\lib\imgui;$(ProjectDir)..\lib\DirectXToolKit;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

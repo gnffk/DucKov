@@ -98,6 +98,32 @@ HRESULT Target_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bUseDepth)
 
     return S_OK;
 }
+
+HRESULT Target_Manager::Begin_MRT(const _wstring& strMRTTag, ComPtr<ID3D11DepthStencilView> pDSV)
+{
+    auto        pMRTList = Find_MRT(strMRTTag);
+    if (nullptr == pMRTList)
+        return E_FAIL;
+
+    m_pContext->OMGetRenderTargets(1, &m_pBackBufferRTV, &m_pOriginalDSV);
+
+    ComPtr<ID3D11RenderTargetView>      RenderTargets[8] = {};
+
+    uint32_t        iNumRenderTargets = { 0 };
+
+    for (auto& pRenderTarget : *pMRTList)
+    {
+        pRenderTarget->Clear();
+        RenderTargets[iNumRenderTargets++] = pRenderTarget->Get_RTV();
+    }
+
+    if (nullptr != pDSV)
+        m_pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+    m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets[0].GetAddressOf(), nullptr == pDSV ? m_pOriginalDSV.Get() : pDSV.Get());
+
+    return S_OK;
+}
 HRESULT Target_Manager::End_MRT()
 {
     ID3D11RenderTargetView* pBackBufferRTV = m_pBackBufferRTV.Get();
@@ -109,6 +135,17 @@ HRESULT Target_Manager::End_MRT()
 
     return S_OK;
 }
+
+HRESULT Target_Manager::End_MRT(_bool d)
+{
+    ComPtr<ID3D11RenderTargetView>      RenderTargets[8] = { m_pBackBufferRTV };
+
+    m_pContext->OMSetRenderTargets(8, RenderTargets[0].GetAddressOf(), m_pOriginalDSV.Get());
+
+    return S_OK;
+}
+
+
 HRESULT Target_Manager::Bind_ShaderResource(const _wstring& strTargetTag, shared_ptr<class Shader> pShader, const _char* pConstantName)
 {
     auto    pRenderTarget = Find_RenderTarget(strTargetTag);

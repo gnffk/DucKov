@@ -14,10 +14,11 @@ HRESULT Player_RUN_State::Initialize() {
 }
 void Player_RUN_State::Enter(FSM* pFSM) {
 
-
+	CGameInstance::Get().PlaySoundLoop(L"EFFECT_Player_Walk", EFFECT_WALKPlayer, 1.f);
+	
 }
 void Player_RUN_State::Exit(FSM* pFSM) {
-
+	CGameInstance::Get().StopSound(EFFECT_WALKPlayer);
 }
 
 void Player_RUN_State::Priority_Update(FSM* pFSM, float fDeltaTime) {

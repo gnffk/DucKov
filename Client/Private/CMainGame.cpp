@@ -62,8 +62,21 @@ HRESULT Client::CMainGame::Initialize()
 		return E_FAIL;
 
 
+	if (FAILED(CGameInstance::Get().Add_Sound(L"BGM_HOME", L"../../Resources/Sounds/DuckFunk.mp3")))
+		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::LOGO)))
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Player_Roll", L"../../Resources/Sounds/Roll.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Player_Walk", L"../../Resources/Sounds/walk.wav")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Player_RUN", L"../../Resources/Sounds/FastWalk.wav")))
+		return E_FAIL;
+
+
+
+	if (FAILED(Start_Level(LEVEL::MAPEDITOR)))
 		return E_FAIL;
 
 
@@ -79,6 +92,8 @@ HRESULT Client::CMainGame::Start_Level(LEVEL eStartLevelIndex)
 	if (FAILED(CGameInstance::Get().Change_Level(static_cast<uint32_t>(LEVEL::LOADING),
 		Level_Loading::Create(m_pDevice, m_pContext, eStartLevelIndex))))
 		return E_FAIL;
+
+
 
 	return S_OK;
 }

@@ -22,7 +22,7 @@ void Player_WALK_State::Enter(FSM* pFSM) {
 	if (nullptr == pPlayer)
 		return;
 	
-
+	
 }
 void Player_WALK_State::Exit(FSM* pFSM) {
 

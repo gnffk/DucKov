@@ -18,6 +18,8 @@
 #include "Layer.h"
 #include "Particle_Manager.h"
 #include "Particle_System.h"
+#include "Sound_Manager.h"
+
 
 CGameInstance::CGameInstance()
 {
@@ -102,7 +104,15 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& Engine_Desc, ComPtr<
     if (nullptr == m_pParticle_Manager)
         return E_FAIL;
 
+    m_pSound_Manager = Sound_Manager::Create(pOutDevice, pOutDeviceContext);
+    if (nullptr == m_pSound_Manager)
+        return E_FAIL;
+    m_pSound_Manager->Ready_SoundMgr();
 
+    m_pShadow = Shadow::Create();
+    if (nullptr == m_pShadow)
+
+        return E_FAIL;
     return S_OK;
 }
 
@@ -131,6 +141,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
     m_pUI_Manager->Update(fTimeDelta);
 
     m_pUI_Manager->Late_Update(fTimeDelta);
+
+    m_pSound_Manager->UpdateSound();
 }
 
 HRESULT CGameInstance::Draw()
@@ -263,6 +275,13 @@ HRESULT CGameInstance::Add_Timer(const _wstring& strTimerTag)
 #pragma endregion
 
 #pragma region Graphic_Device
+
+HRESULT CGameInstance::Bind_BackBuffer(_bool depth)
+{
+    return m_pGraphic_Device->Bind_BackBuffer(depth);
+
+
+}
 HRESULT CGameInstance::Clear_BackBuffer_View(const _float4* pClearColor)
 {
     return m_pGraphic_Device->Clear_BackBuffer_View(pClearColor);
@@ -520,11 +539,21 @@ HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, _bool bUseDepth)
 {
     return m_pTarget_Manager->Begin_MRT(strMRTTag, bUseDepth);
 }
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ComPtr<ID3D11DepthStencilView> pDSV)
+{
+    return m_pTarget_Manager->Begin_MRT(strMRTTag, pDSV);
+}
+
+
 
 
 HRESULT CGameInstance::End_MRT()
 {
     return m_pTarget_Manager->End_MRT();
+}
+HRESULT CGameInstance::End_MRT(_bool _d)
+{
+    return m_pTarget_Manager->End_MRT(_d);
 }
 
 HRESULT CGameInstance::Bind_RT_ShaderResource(const _wstring& strTargetTag, shared_ptr<class Shader> pShader, const _char* pConstantName)
@@ -562,6 +591,10 @@ HRESULT CGameInstance::Render_Lights(shared_ptr<class Shader> pShader, shared_pt
 HRESULT  CGameInstance::Load_Lights_FromJson(const _wstring& strFilePath) {
     return m_pLight_Manager->Load_Lights_FromJson(strFilePath);
 }
+
+vector<shared_ptr<class Light>>& CGameInstance::GetLights() {
+    return m_pLight_Manager->GetLights();
+}
 #pragma endregion
 
 #pragma region PICKING
@@ -571,6 +604,25 @@ _bool CGameInstance::Picking_to_Shader(_float4* pOut)
     return m_pPicking->Picking_to_Shader(pOut);
 }
 
+
+#pragma endregion
+
+#pragma region Shadow
+const _float4x4* CGameInstance::Get_ShadowLightTransform(D3DTS eState)
+{
+    return m_pShadow->Get_ShadowLightTransform(eState);
+}
+
+HRESULT CGameInstance::Add_Shadow_Light(const Shadow::SHADOW_LIGHT_DESC& LightDesc)
+{
+    return m_pShadow->Add_Shadow_Light(LightDesc);
+}
+
+HRESULT CGameInstance::Set_Shadow_Light(const Shadow::SHADOW_LIGHT_DESC& ShadowLightDesc)
+{
+    return m_pShadow->Set_ShadowLightDesc(ShadowLightDesc);
+}
+    
 
 #pragma endregion
 
@@ -585,9 +637,34 @@ HRESULT CGameInstance::Add_Particle(PARTICLE_TYPE eType, void* pArg ) {
 }
 #pragma endregion
 
+
+#pragma region Sound_Manager
+
+HRESULT CGameInstance::Add_Sound(std::wstring_view svSoundKey, std::wstring_view svSoundPath) {
+    return m_pSound_Manager->Add_Sound(svSoundKey, svSoundPath);
+}
+void CGameInstance::PlaySoundLoop(std::wstring_view svSoundKey, CHANNELID eID, float fVolume) {
+    m_pSound_Manager->PlaySoundLoop(svSoundKey, eID, fVolume);
+}
+void CGameInstance::PlaySoundOne(std::wstring_view svSoundKey, CHANNELID eID, float fVolume) {
+    m_pSound_Manager->PlaySoundOne(svSoundKey, eID, fVolume);
+}
+void CGameInstance::StopSound(CHANNELID eID) {
+    m_pSound_Manager->StopSound( eID);
+}
+void CGameInstance::StopAll() {
+    m_pSound_Manager->StopAll();
+}
+void CGameInstance::SetChannelVolume(CHANNELID eID, float fVolume) {
+    m_pSound_Manager->SetChannelVolume( eID, fVolume);
+}
+#pragma endregion
+
 void CGameInstance::Release_Engine()
 {
+    m_pShadow.reset();
 
+    m_pSound_Manager.reset();
 
     m_pParticle_Manager.reset();
 
