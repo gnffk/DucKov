@@ -379,7 +379,6 @@ void Obstacle::IMGUITEST()
 			.push_back(pOBBCom);
 	}
 
-
 	if (ImGui::Selectable("Sphere Collider", selectedCollider == 2))
 	{
 		selectedCollider = 2;

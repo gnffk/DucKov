@@ -19,6 +19,7 @@ public:
 
 public:
 	HRESULT Ready_GamePlay();
+	wstring Make_UniqueObjectName(const wstring& LayerName, const wstring& baseName);
 private:
 	map<string, shared_ptr<class GameObject>> m_pUI;
 private:

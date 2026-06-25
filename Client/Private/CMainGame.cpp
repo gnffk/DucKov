@@ -76,7 +76,7 @@ HRESULT Client::CMainGame::Initialize()
 
 
 
-	if (FAILED(Start_Level(LEVEL::MAPEDITOR)))
+	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;
 
 

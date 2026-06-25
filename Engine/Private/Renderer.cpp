@@ -303,7 +303,7 @@ HRESULT Renderer::Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObje
 HRESULT Renderer::Draw()
 {
 #ifdef _DEBUG
-    if (CGameInstance::Get().Key_Down(DIK_1)) {
+   /* if (CGameInstance::Get().Key_Down(DIK_1)) {
         debugRender = 1;
     }
     if (CGameInstance::Get().Key_Down(DIK_2)) {
@@ -326,7 +326,8 @@ HRESULT Renderer::Draw()
     }
     if (CGameInstance::Get().Key_Down(DIK_8)) {
         debugRender = 8;
-    }
+    }*/
+    debugRender = 8;
 #endif
     if (FAILED(Render_Shadow()))
         return E_FAIL;

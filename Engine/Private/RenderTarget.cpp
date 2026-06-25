@@ -72,9 +72,7 @@ HRESULT RenderTarget::Ready_Debug(_float fX, _float fY, _float fSizeX, _float fS
 {
 	_float2		vViewportSize = CGameInstance::Get().Get_ViewportSize();
 
-	XMStoreFloat4x4(&m_WorldMatrix,
-		XMMatrixScaling(fSizeX, fSizeY, 1.f) *
-		XMMatrixTranslation(fX - vViewportSize.x * 0.5f, -fY + vViewportSize.y * 0.5f, 0.f));
+	XMStoreFloat4x4(&m_WorldMatrix,XMMatrixScaling(fSizeX, fSizeY, 1.f) *XMMatrixTranslation(fX - vViewportSize.x * 0.5f, -fY + vViewportSize.y * 0.5f, 0.f));
 
 	return S_OK;
 }

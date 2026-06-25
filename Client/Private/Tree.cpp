@@ -43,6 +43,7 @@ HRESULT Tree::Initialize(void* pArg)
 void Tree::Priority_Update(_float fTimeDelta)
 {
 	CGameInstance::Get().Add_RenderObject(RENDERGROUP::NONBLEND, SHARED_THIS(Tree));
+	CGameInstance::Get().Add_RenderObject(RENDERGROUP::SHADOW, SHARED_THIS(Tree));
 
 
 
@@ -65,8 +66,6 @@ HRESULT Tree::Render()
 	if (m_pModelCom == nullptr || m_pShaderCom == nullptr)
 		return E_FAIL;
 
-	Render_GUI();
-
 	_float4x4 View, Proj;
 	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
 
@@ -88,6 +87,41 @@ HRESULT Tree::Render()
 		}
 	
 		if (FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT Tree::Render_Shadow()
+{
+	if (m_pModelCom == nullptr || m_pShaderCom == nullptr)
+		return E_FAIL;
+
+	_float4x4 View, Proj;
+	CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
+
+
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", CGameInstance::Get().Get_ShadowLightTransform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", CGameInstance::Get().Get_ShadowLightTransform(D3DTS::PROJ))))
+		return E_FAIL;
+
+
+	uint32_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (uint32_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+		{
+			return E_FAIL;
+		}
+
+		if (FAILED(m_pShaderCom->Begin(1)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(i)))

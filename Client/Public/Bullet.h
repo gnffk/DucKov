@@ -54,6 +54,9 @@ private:
 	HRESULT Render_Trail();
 
 private:
+	HRESULT Collier_Obstacle();
+
+private:
 	vector<TrailPoint> m_TrailPoints;
 	vector<VTXBULLETTRAIL>  m_TrailVertices;
 

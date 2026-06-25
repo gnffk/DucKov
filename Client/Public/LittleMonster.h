@@ -69,8 +69,8 @@ private:
 	shared_ptr<class Navigation> m_pNavigationCom = { nullptr };
 	map<string, shared_ptr<class GameObject>> m_pUI;
 
-	_float		m_fMaxHP = 1000.f;
-	_float		m_fHP = 1000.f;
+	_float		m_fMaxHP = 100.f;
+	_float		m_fHP = 100.f;
 	_float		m_fAttackPower = 10.f;
 
 private:

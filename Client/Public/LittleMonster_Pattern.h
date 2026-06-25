@@ -101,7 +101,7 @@ private:
     void Change_LittleMonsterState(LittleMonsterFSM::LITTLEMONSTER_STATE eState);
 
 private:
-    _float m_fDetectRange = 15.f;
+    _float m_fDetectRange = 8.f;
     _float m_fAttackRange = 1.f;
 
     _float m_fAttackCoolTime = 0.1f;

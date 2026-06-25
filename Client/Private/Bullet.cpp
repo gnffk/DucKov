@@ -146,7 +146,7 @@ void Bullet::Update(_float fTimeDelta)
 
 void Bullet::Late_Update(_float fTimeDelta)
 {
-
+	Collier_Obstacle();
 }
 
 HRESULT Bullet::Render()
@@ -241,6 +241,31 @@ HRESULT Bullet::Render_Trail()
 
 	return S_OK;
 }
+HRESULT Bullet::Collier_Obstacle()
+{
+	auto ColliderGroup = CGameInstance::Get().GetColliderGroups(L"Obstacle");
+	auto& ColliderBullet = m_pColliderComs[(int)COLLIDER::COLLIDER_OBB].front();
+	if (ColliderGroup != nullptr && ColliderBullet != nullptr) {
+
+		for (auto Collider : *ColliderGroup)
+		{
+			if (CGameInstance::Get().Intersect(ColliderBullet.get(), Collider))
+			{
+				
+				ColliderBullet->GetOwner()->Set_Dead();
+
+				break;
+			}
+
+
+		}
+
+
+	}
+
+	return S_OK;
+}
+
 HRESULT Bullet::Ready_Components()
 {
 	__super::Clear_Compnent();
