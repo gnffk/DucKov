@@ -87,6 +87,7 @@
     <ClInclude Include="..\Public\VIBuffer_Mesh.h" />
     <ClInclude Include="..\Public\VIBuffer_Mesh_Instance.h" />
     <ClInclude Include="..\Public\VIBuffer_Particle_Rect.h" />
+    <ClInclude Include="..\Public\VIBuffer_Particle_Point.h" />
     <ClInclude Include="..\Public\VIBuffer_Rect.h" />
     <ClInclude Include="..\Public\VIBuffer_Terrain.h" />
   </ItemGroup>
@@ -184,6 +185,7 @@
     <ClCompile Include="..\Private\VIBuffer_Mesh.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Mesh_Instance.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Particle_Rect.cpp" />
+    <ClCompile Include="..\Private\VIBuffer_Particle_Point.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Rect.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Terrain.cpp" />
   </ItemGroup>

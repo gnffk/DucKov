@@ -70,6 +70,50 @@ HRESULT Particle_Manager::Add_Particle(PARTICLE_TYPE eType, void* pArg)
 
 		}
 		break;
+	case PARTICLE_TYPE::SPARK:
+		{
+			auto pParicle = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(),L"Effect", L"Particle_Spark");
+			if(pParicle == nullptr)
+			{
+
+				GameObject::GAMEOBJECT_DESC Desc{};
+
+				Desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+				Desc.m_strName = L"Particle_Spark";
+				Desc.m_strPrototypeObjectName = L"Prototype_GameObject_Particle_Spark";
+				Desc.m_strPrototypeBaseName = L"Particle_Spark";
+				Desc.fSpeedPerSec = 0.f;
+				Desc.fRotationPerSec = 0.f;
+
+				if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Particle_Spark"), CGameInstance::Get().Get_Level(), TEXT("Effect"), &Desc)))
+				{
+					return E_FAIL;
+				}
+
+				auto pBlood = dynamic_pointer_cast<Particle_System>(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), TEXT("Effect"), TEXT("Particle_Spark")));
+
+				if (pBlood == nullptr)
+					return E_FAIL;
+
+				if (FAILED(CGameInstance::Get().Register_ParticleSystem(PARTICLE_TYPE::SPARK, pBlood)))
+				{
+					return E_FAIL;
+				}
+			}
+			else if (pParicle != nullptr && m_ParticleSystems[eType].lock() == nullptr) {
+				auto pSpark = dynamic_pointer_cast<Particle_System>(CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), TEXT("Effect"), TEXT("Particle_Spark")));
+
+				if (pSpark == nullptr)
+					return E_FAIL;
+
+				if (FAILED(CGameInstance::Get().Register_ParticleSystem(PARTICLE_TYPE::SPARK, pSpark)))
+				{
+					return E_FAIL;
+				}
+			}
+
+		}
+		break;
 	}
 
 	auto        pDesc = static_cast<Particle_System::PARTICLE_SPAWN_DESC*>(pArg);

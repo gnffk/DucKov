@@ -75,7 +75,7 @@ void Level_Logo::Update(_float fTimeDelta)
     // 처음 검은 화면 상태에서 클릭하면 중앙 원이 열림
     if (m_eFadeState == LOGO_FADE_STATE::CLOSED)
     {
-        if (CGameInstance::Get().Mouse_Down(MOUSEKEYSTATE::DIM_LB))
+        if (CGameInstance::Get().Key_Down(DIK_0))
         {
             m_eFadeState = LOGO_FADE_STATE::OPENING;
         }

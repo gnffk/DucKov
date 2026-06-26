@@ -64,6 +64,7 @@ private:
 
 public:
 	_bool	m_bNext = false;
+	_bool	m_bFinal = false;
 private:
 #ifdef _DEBUG
 	void			IMGUI_DEBUGRENDER();

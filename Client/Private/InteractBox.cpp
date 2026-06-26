@@ -407,7 +407,7 @@ HRESULT InteractBox::Ready_UI()
 
 	return S_OK;
 
-	return S_OK;
+
 }
 
 unique_ptr<InteractBox> InteractBox::Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext)

@@ -406,12 +406,28 @@ HRESULT BossMonster::Render()
 
 	if (FAILED(m_pShaderBossCom->Bind_RawValue("g_fBossPattern1", &m_bNextPattern, sizeof(_bool))))
 		return E_FAIL;
-	
-	if (m_bNextPattern == true) {
-		CGameInstance::Get().PlaySoundOne(L"EFFECT_APPEARBOSSSOUND", EFFECT_BOSSAPPEAR, 0.5f);
-		auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
+	if (m_bNextPattern == true)
+	{
+		if (false == m_bNextPatternSoundPlayed)
+		{
+			CGameInstance::Get().PlaySoundOne(
+				L"EFFECT_APPEARBOSSSOUND",
+				EFFECT_BOSSAPPEAR,
+				0.5f
+			);
 
-		static_pointer_cast<Player>(pPlayer)->m_bNext = true;
+			m_bNextPatternSoundPlayed = true;
+		}
+
+		auto pPlayer = CGameInstance::Get().Find_Object(
+			CGameInstance::Get().Get_Level(),
+			L"PlayerTag",
+			L"Player"
+		);
+
+		if (pPlayer != nullptr)
+			static_pointer_cast<Player>(pPlayer)->m_bNext = true;
+
 		m_bNextPattern = false;
 	}
 

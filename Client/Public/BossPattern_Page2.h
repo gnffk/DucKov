@@ -66,6 +66,9 @@ private:
     void Update_Die(_float fTimeDelta);
 
 private:
+    void Update_WhirlwindLightning(_float fTimeDelta);
+    void Spawn_WhirlwindLightning();
+private:
     void Fire_BossWeapon();
     void Turn_To_Player(_float fTimeDelta);
     void Move_To_Player(_float fTimeDelta, _float fSpeedScale);
@@ -143,6 +146,15 @@ private:
     _float m_fWhirlwindDamageInterval = 0.35f;
     _float m_fWhirlwindDamageRange = 3.0f;
     _float m_fWhirlwindDamage = 15.f;
+private:
+    _float m_fWhirlwindLightningTimer = 0.f;
+    _float m_fWhirlwindLightningInterval = 0.12f;
+
+    _float m_fWhirlwindLightningRadiusMin = 2.0f;
+    _float m_fWhirlwindLightningRadiusMax = 5.5f;
+
+    _float m_fWhirlwindLightningHeight = 6.0f;
+    _float m_fWhirlwindLightningLength = 6.5f;
 
 
 

@@ -179,11 +179,13 @@
     <ClInclude Include="..\Public\Cloud.h" />
     <ClInclude Include="..\Public\CMainGame.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Explosion.h" />
     <ClInclude Include="..\Public\FindUI.h" />
     <ClInclude Include="..\Public\InteractBox.h" />
     <ClInclude Include="..\Public\InvenUI.h" />
     <ClInclude Include="..\Public\LaserTrail.h" />
     <ClInclude Include="..\Public\Level_Home.h" />
+    <ClInclude Include="..\Public\Lightning.h" />
     <ClInclude Include="..\Public\LittleMonster.h" />
     <ClInclude Include="..\Public\LittleMonsterFSM.h" />
     <ClInclude Include="..\Public\LittleMonster_Attack_State.h" />
@@ -205,6 +207,7 @@
     <ClInclude Include="..\Public\MainUI.h" />
     <ClInclude Include="..\Public\MainMenu_UI.h" />
     <ClInclude Include="..\Public\Particle_Blood.h" />
+    <ClInclude Include="..\Public\Particle_Spark.h" />
     <ClInclude Include="..\Public\PerformaceCamera.h" />
     <ClInclude Include="..\Public\Player_Armor.h" />
     <ClInclude Include="..\Public\Player_HAND_UP_State.h" />
@@ -236,6 +239,7 @@
     <ClInclude Include="..\Public\Portal.h" />
     <ClInclude Include="..\Public\PortalUI.h" />
     <ClInclude Include="..\Public\Sky.h" />
+    <ClInclude Include="..\Public\Particle_Smoke.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Tree.h" />
     <ClInclude Include="Client.h" />
@@ -272,11 +276,13 @@
     <ClCompile Include="..\Private\CircleMask_UI.cpp" />
     <ClCompile Include="..\Private\Cloud.cpp" />
     <ClCompile Include="..\Private\CMainGame.cpp" />
+    <ClCompile Include="..\Private\Explosion.cpp" />
     <ClCompile Include="..\Private\FindUI.cpp" />
     <ClCompile Include="..\Private\InteractBox.cpp" />
     <ClCompile Include="..\Private\InvenUI.cpp" />
     <ClCompile Include="..\Private\LaserTrail.cpp" />
     <ClCompile Include="..\Private\Level_Home.cpp" />
+    <ClCompile Include="..\Private\Lightning.cpp" />
     <ClCompile Include="..\Private\LittleMonster.cpp" />
     <ClCompile Include="..\Private\LittleMonsterFSM.cpp" />
     <ClCompile Include="..\Private\LittleMonster_Attack_State.cpp" />
@@ -298,6 +304,7 @@
     <ClCompile Include="..\Private\MainUI.cpp" />
     <ClCompile Include="..\Private\MainMenu_UI.cpp" />
     <ClCompile Include="..\Private\Particle_Blood.cpp" />
+    <ClCompile Include="..\Private\Particle_Spark.cpp" />
     <ClCompile Include="..\Private\PerformaceCamera.cpp" />
     <ClCompile Include="..\Private\Player_Armor.cpp" />
     <ClCompile Include="..\Private\Player_HAND_UP_State.cpp" />
@@ -329,6 +336,7 @@
     <ClCompile Include="..\Private\Portal.cpp" />
     <ClCompile Include="..\Private\PortalUI.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
+    <ClCompile Include="..\Private\Particle_Smoke.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Tree.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -349,7 +357,9 @@
     <FxCompile Include="..\..\Resources\Shaders\Shader_Laser.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_MainUI.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Obstacle.hlsl" />
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Spark_Particle.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxCube.hlsl" />
+    <FxCompile Include="..\..\Resources\Shaders\Shader_VtxInstance_Particle_Point.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_VtxPosTex_Loading.hlsl" />
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_AnimFbx.hlsl">

@@ -29,10 +29,10 @@ HRESULT Light_Manager::Render(shared_ptr<class Shader> pShader, shared_ptr<class
     {
         pLight->Render(pShader, pVIBuffer);
     }
-
-#ifdef _DEBUG
-    ImGui_Render();
-#endif
+//
+//#ifdef _DEBUG
+//    ImGui_Render();
+//#endif
     return S_OK;
 }
 

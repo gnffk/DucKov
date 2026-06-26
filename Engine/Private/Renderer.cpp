@@ -640,6 +640,42 @@ HRESULT Renderer::Render_Final()
     }
 
 
+    _float2 vViewportSize = CGameInstance::Get().Get_ViewportSize();
+
+    _float fAspect = vViewportSize.x / vViewportSize.y;
+
+    m_pShader->Bind_RawValue(
+        "g_fScreenDistortionPower",
+        &m_fScreenDistortionPower,
+        sizeof(_float)
+    );
+
+    m_pShader->Bind_RawValue(
+        "g_fScreenDistortionRadius",
+        &m_fScreenDistortionRadius,
+        sizeof(_float)
+    );
+
+    m_pShader->Bind_RawValue(
+        "g_vScreenDistortionCenter",
+        &m_vScreenDistortionCenter,
+        sizeof(_float2)
+    );
+
+    m_pShader->Bind_RawValue(
+        "g_fAspect",
+        &fAspect,
+        sizeof(_float)
+    );
+
+    _float fTime = 0.0001f;
+
+    m_pShader->Bind_RawValue(
+        "g_fTime",
+        &fTime,
+        sizeof(_float)
+    );
+
     m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
     m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
@@ -663,6 +699,42 @@ HRESULT Renderer::Render_Final()
 
     _float fFinalBloomStrength = 0.6f;
     m_pShader->Bind_RawValue("g_fFinalBloomStrength", &fFinalBloomStrength, sizeof(_float));
+
+    _float2 vViewportSize = CGameInstance::Get().Get_ViewportSize();
+
+    _float fAspect = vViewportSize.x / vViewportSize.y;
+
+    m_pShader->Bind_RawValue(
+        "g_fScreenDistortionPower",
+        &m_fScreenDistortionPower,
+        sizeof(_float)
+    );
+
+    m_pShader->Bind_RawValue(
+        "g_fScreenDistortionRadius",
+        &m_fScreenDistortionRadius,
+        sizeof(_float)
+    );
+
+    m_pShader->Bind_RawValue(
+        "g_vScreenDistortionCenter",
+        &m_vScreenDistortionCenter,
+        sizeof(_float2)
+    );
+
+    m_pShader->Bind_RawValue(
+        "g_fAspect",
+        &fAspect,
+        sizeof(_float)
+    );
+
+    _float fTime = 0.0001f;
+
+    m_pShader->Bind_RawValue(
+        "g_fTime",
+        &fTime,
+        sizeof(_float)
+    );
 
     m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);

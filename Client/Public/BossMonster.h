@@ -82,12 +82,20 @@ private:
 	_bool		m_bLastPattern = false;
 	_float      m_fPerformanceMove = 0.f;
 	_bool		m_bNextPattern = false;	
+
+private:
+	_bool m_bNextPatternSoundPlayed = false;
+
 private:
 	uint32_t			m_iState = {};
+private:
+	_bool m_bNextPatternTriggered = false;
 
 	uint32_t nextAnim = 0;
 	float    nextAnimPlus{ 1 };
-
+private:
+	_bool m_bDeathStarted = false;
+	_bool m_bDieSoundPlayed = false;
 
 public:
 	static unique_ptr<BossMonster> Create(ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext);

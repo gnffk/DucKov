@@ -27,6 +27,7 @@
 #include "LittleMonster_Weapon.h"
 #include "LittleMonster_StateUI.h"
 #include "Particle_Blood.h"
+#include "Particle_Spark.h"
 #include "Player_Armor.h"
 #include "Player_Helmat.h"
 #include "Boss_State_UI.h"
@@ -39,6 +40,9 @@
 #include "Portal.h"
 #include "PortalUI.h"
 #include "Cloud.h"
+#include "Explosion.h"
+#include "Lightning.h"
+
 CLoader::CLoader(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext): m_pDevice{ pDevice }
 	, m_pContext{ pContext }
 {
@@ -210,7 +214,7 @@ HRESULT CLoader::Loading_For_Home()
 
 	/* For.Prototype_Com_Texture_Terrain_Splat */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Splat"),
-		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/Terrain_Splat.png"), 1))))
+		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/Terrain_Splat1.png"), 1))))
 		return E_FAIL;
 
 	/* For.Prototype_Com_Texture_Icon */
@@ -738,7 +742,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	/* For.Prototype_Com_Texture_Terrain_Splat */
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Splat"),
-		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/Terrain_Splat.png"), 1))))
+		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Terrian/Terrain_Splat1.png"), 1))))
 		return E_FAIL;
 
 	/* For.Prototype_Com_Texture_Icon */
@@ -903,6 +907,22 @@ HRESULT CLoader::Loading_For_GamePlay()
 		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/UI/BossPage2_Name.png"), 1))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Texture_Explosion*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_Texture_Explosion"),
+		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Explose/Explosion.png"), 1))))
+		return E_FAIL;
+
+	/* For.Prototype_Com_Texture_LightningTrail*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_LightningTrail"),
+		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Lightning/LightningTrail.png"), 1))))
+		return E_FAIL;
+
+
+	/* For.Prototype_Com_Texture_Spark*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Spark"),
+		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Effect/Lightning/Spark.png"), 1))))
+		return E_FAIL;
+
 
 
 
@@ -965,6 +985,14 @@ HRESULT CLoader::Loading_For_GamePlay()
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_Cloud"),
 		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Cloud.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Component_Shader_VtxInstance_Particle_Point"),
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_VtxInstance_Particle_Point.hlsl"), VTXINSTANCE_PARTICLE_POINT::Elements, VTXINSTANCE_PARTICLE_POINT::iNumElements))))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Shader_Spark_Particle_Rect"),
+		Shader::Create(m_pDevice, m_pContext, TEXT("../../Resources/Shaders/Shader_Spark_Particle.hlsl"), VTXINSTANCE_PARTICLE_RECT::Elements, VTXINSTANCE_PARTICLE_RECT::iNumElements))))
+		return E_FAIL;
+
+
 
 
 #pragma endregion
@@ -1174,6 +1202,21 @@ HRESULT CLoader::Loading_For_GamePlay()
 		VIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	VIBuffer_Particle_Point::PARTICLE_INSTANCE_DESC		ExploDesc{};
+	ExploDesc.iNumInstances = 200;
+	ExploDesc.vCenter = _float3(0.f, 5.f, 0.f);
+	ExploDesc.vRange = _float3(1.f, 0.2f, 1.f);
+	ExploDesc.vSize = _float2(0.1f,0.2f);
+	ExploDesc.vSpeed = _float2(0.2f, 1.f);
+	ExploDesc.vLifeTime = _float2(0.3f, 0.7f);
+	ExploDesc.isLoop = true;
+	ExploDesc.vPivot = ExploDesc.vCenter;
+
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_VIBuffer_Particle_Explosion"),
+		VIBuffer_Particle_Point::Create(m_pDevice, m_pContext, &ExploDesc))))
+		return E_FAIL;
+
 
 	/* For.Prototype_Com_VIBuffer_Particle_Blood */
 	VIBuffer_Particle_Rect::PARTICLE_INSTANCE_DESC		BloodDesc{};
@@ -1187,6 +1230,20 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Particle_Blood"),
 		VIBuffer_Particle_Rect::Create(m_pDevice, m_pContext, &BloodDesc))))
+		return E_FAIL;
+
+	/* For.Prototype_Com_VIBuffer_Particle_Spark */
+	VIBuffer_Particle_Rect::PARTICLE_INSTANCE_DESC		sparkDesc{};
+	sparkDesc.iNumInstances = 100;
+	sparkDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	sparkDesc.vRange = _float3(0.f, 0.f, 0.f);
+	sparkDesc.vSize = _float2(0.1f, 0.3f);
+	sparkDesc.vSpeed = _float2(1.f, 4.f);
+	sparkDesc.vLifeTime = _float2(2.f, 4.f);
+	sparkDesc.isLoop = false;
+
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_VIBuffer_Particle_Spark"),
+		VIBuffer_Particle_Rect::Create(m_pDevice, m_pContext, &sparkDesc))))
 		return E_FAIL;
 
 #pragma endregion
@@ -1372,7 +1429,20 @@ HRESULT CLoader::Loading_For_GamePlay()
 		Cloud::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	/* For.Prototype_GameObject_Explosion*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Explosion"),
+		Explosion::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
+	/* For.Prototype_GameObject_Particle_Spark*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Particle_Spark"),
+		Particle_Spark::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_Lightning*/
+	if (FAILED(CGameInstance::Get().Add_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_GameObject_Lightning"),
+		Lightning::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 #pragma endregion

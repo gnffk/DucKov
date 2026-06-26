@@ -6,7 +6,7 @@
 #include "Particle_System.h"
 #include "BaseCollider.h"
 #include "BossPage2UI.h"
-
+#include "Player.h"
 NS_BEGIN(Client)
 
 BossMonster_Page2::BossMonster_Page2(ComPtr<ID3D11Device> pDevice,ComPtr<ID3D11DeviceContext> pContext): Monster{ pDevice, pContext }
@@ -213,6 +213,13 @@ HRESULT BossMonster_Page2::Update_Animation(_float fTimeDelta)
 
 HRESULT BossMonster_Page2::Ready_PartObjects()
 {
+    PartObject::PARTOBJECT_DESC ExploDesc{};
+    ExploDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+
+    if (FAILED(__super::Add_PartObject(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Explosion"),
+        TEXT("Part_Effect"), &ExploDesc)))
+
+        return E_FAIL;
     // FSM -----------------------------------------------------------------------
     if ((m_pMonsterFSM = BossMonster_Page2FSM::Create(&m_iState)) == nullptr)
         return E_FAIL;
@@ -435,6 +442,42 @@ HRESULT BossMonster_Page2::Render()
     return S_OK;
 }
 
+HRESULT BossMonster_Page2::Render_Shadow()
+{
+    _float4x4 View, Proj;
+    CGameInstance::Get().Get_MainCameraMatrix(View, Proj);
+
+    _float4x4 World = m_pTransformCom->GetWorldMatrix();
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &World)))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", CGameInstance::Get().Get_ShadowLightTransform(D3DTS::VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", CGameInstance::Get().Get_ShadowLightTransform(D3DTS::PROJ))))
+        return E_FAIL;
+
+
+    uint32_t	iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+    for (uint32_t i = 0; i < iNumMeshes; i++)
+    {
+     
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", (uint32_t)i, (uint32_t)ETOUI(TEXTURETYPE::DIFFUSE), 0)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (uint32_t)i)))
+            return E_FAIL;
+
+        if (FAILED(m_pShaderCom->Begin(2)))
+            return E_FAIL;
+
+
+        m_pModelCom->Render(i);
+    }
+
+
+    return S_OK;
+}
+
 void BossMonster_Page2::Turn_To_Direction(const _float3& vDirection,_float fTimeDelta)
 {
     if (m_pTransformCom == nullptr)
@@ -593,11 +636,15 @@ void BossMonster_Page2::Take_Damage(_float fDamage,const _float3& vHitPos)
 
             if (pStateUI != nullptr)
             {
-                // Boss_State_UI에 Set_Visible 함수가 있으면 사용
-                // pStateUI->Set_Visible(false);
+              
             }
         }
+        CGameInstance::Get().StopAll();
 
+        CGameInstance::Get().PlaySoundOne(L"BGM_Ending", BGM_HOME, 0.5f);
+        auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
+
+        static_pointer_cast<Player>(pPlayer)->m_bFinal = true;
         Set_Dead();
     }
 }

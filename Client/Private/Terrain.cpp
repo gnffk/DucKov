@@ -167,13 +167,15 @@ HRESULT Terrain::Ready_Components()
 	if (FAILED(__super::Add_Component(TEXT("Com_Texture_Raod"), m_pRoadTex)))
 		return E_FAIL;
 
-
-#if _RELEASE
-	m_pSplatTex = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(),TEXT("Prototype_Com_Texture_Terrain_Splat")));
+#ifdef _DEBUG
+	// Debug Àü¿ë
+#else
+	m_pSplatTex = dynamic_pointer_cast<Texture>(CGameInstance::Get().Clone_Prototype(CGameInstance::Get().Get_Level(), TEXT("Prototype_Com_Texture_Terrain_Splat")));
 
 	if (FAILED(__super::Add_Component(TEXT("Com_Texture_Splat"), m_pSplatTex)))
 		return E_FAIL;
 #endif
+
 	return S_OK;
 }
 

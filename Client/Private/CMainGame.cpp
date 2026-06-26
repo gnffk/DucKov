@@ -31,7 +31,7 @@ HRESULT Client::CMainGame::Initialize()
 		return E_FAIL;
 
 	//---- Texture Prototype ----//
-
+	ShowCursor(FALSE);
 	/* For.Prototype_Com_Texture_MainMenu_BackGround_GAMEPLAY */
 	if (FAILED(CGameInstance::Get().Add_Prototype(ETOUI(LEVEL::NEVER), TEXT("Prototype_Com_Texture_MainMenu_BackGround_GAMEPLAY"),
 		Texture::Create(m_pDevice, m_pContext, TEXT("../../Resources/Textures/Loading_Frame/frame_%d.png"), 90))))
@@ -75,6 +75,10 @@ HRESULT Client::CMainGame::Initialize()
 	if (FAILED(CGameInstance::Get().Add_Sound(L"BGM_MENU", L"../../Resources/Sounds/MainTheme.mp3")))
 		return E_FAIL;
 	if (FAILED(CGameInstance::Get().Add_Sound(L"BGM_PLAY", L"../../Resources/Sounds/Game_Play.mp3")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"BGM_BOSS1", L"../../Resources/Sounds/Boss_Sniper.mp3")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"BGM_Ending", L"../../Resources/Sounds/Ending.mp3")))
 		return E_FAIL;
 
 	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_Click", L"../../Resources/Sounds/Click.mp3")))
@@ -149,7 +153,20 @@ HRESULT Client::CMainGame::Initialize()
 	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_LOOT_GET",L"../../Resources/Sounds/Store2.wav")))
 		return E_FAIL;
 
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOSS_LANDING",L"../../Resources/Sounds/BossLanding.mp3")))
+		return E_FAIL;
 
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOSS_DASH",L"../../Resources/Sounds/Boss_dash.wav")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOSS_LASER_CHARGE",L"../../Resources/Sounds/Layser_Charge.mp3")))
+		return E_FAIL;
+
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOSS_LASER", L"../../Resources/Sounds/Layser.mp3")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOSS_WINDMILL", L"../../Resources/Sounds/WindMill.mp3")))
+		return E_FAIL;
+	if (FAILED(CGameInstance::Get().Add_Sound(L"EFFECT_BOSS_Thunder", L"../../Resources/Sounds/Thunder.mp3")))
+		return E_FAIL;
 
 
 	if (FAILED(Start_Level(LEVEL::LOGO)))

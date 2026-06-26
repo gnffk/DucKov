@@ -1045,6 +1045,8 @@ void Player::Take_Damage(_float fDamage, const _float3& vHitPos)
 
 	Update_HP_UI();
 
+
+	CGameInstance::Get().PlaySoundOne(L"EFFECT_HIT", EFFECT_PLAYERHIT, 0.4f);
 	Spawn_BloodEffect(vHitPos);
 
 	m_bHit = true;

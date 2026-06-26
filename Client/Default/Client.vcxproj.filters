@@ -289,6 +289,18 @@
     <Filter Include="02. GameObject\Circle_UI">
       <UniqueIdentifier>{28027b8e-41e4-438a-89e8-4ac846084e1b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Particle\Smoke">
+      <UniqueIdentifier>{f62df273-7f03-4eee-b44c-66c83fea4da6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BossPage2\Explosion">
+      <UniqueIdentifier>{4adf00c3-a0fe-4256-9f2f-4de61431dd49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Lighting">
+      <UniqueIdentifier>{1e6934f5-be66-4a14-b8e8-42148f440d1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Particle\Spark">
+      <UniqueIdentifier>{d7620ea3-f0c8-4ada-88fe-45736ed16f08}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -567,6 +579,18 @@
     <ClInclude Include="..\Public\CircleMask_UI.h">
       <Filter>02. GameObject\Circle_UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Particle_Smoke.h">
+      <Filter>02. GameObject\Particle\Smoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Explosion.h">
+      <Filter>02. GameObject\Monster\BossPage2\Explosion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Lightning.h">
+      <Filter>02. GameObject\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Particle_Spark.h">
+      <Filter>02. GameObject\Particle\Spark</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -843,6 +867,18 @@
     <ClCompile Include="..\Private\CircleMask_UI.cpp">
       <Filter>02. GameObject\Circle_UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Particle_Smoke.cpp">
+      <Filter>02. GameObject\Particle\Smoke</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Explosion.cpp">
+      <Filter>02. GameObject\Monster\BossPage2\Explosion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Lightning.cpp">
+      <Filter>02. GameObject\Lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Particle_Spark.cpp">
+      <Filter>02. GameObject\Particle\Spark</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Resources\Shaders\Shader_Vtx_Fbx.hlsl">
@@ -894,6 +930,12 @@
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\Resources\Shaders\Shader_CircleMask.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_VtxInstance_Particle_Point.hlsl">
+      <Filter>02. GameObject\97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Resources\Shaders\Shader_Spark_Particle.hlsl">
       <Filter>02. GameObject\97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

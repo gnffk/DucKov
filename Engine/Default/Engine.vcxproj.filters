@@ -435,6 +435,9 @@
     <ClCompile Include="..\Private\Shadow.cpp">
       <Filter>17.Shadow</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Particle_Point.cpp">
+      <Filter>06.Component\VIBuffer\Instancing\Point</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameInstance.h">
@@ -646,6 +649,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Shadow.h">
       <Filter>17.Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Particle_Point.h">
+      <Filter>06.Component\VIBuffer\Instancing\Point</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -33,6 +33,7 @@ public:
 	wstring StringToWString(const string& str);
 
 
+
 private:
 	bool m_bHasPlayerSaveData = false;
 	PLAYER_SAVE_DATA m_PlayerSaveData{};
@@ -89,6 +90,9 @@ public:
 
 #pragma region RENDERER
 	HRESULT Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<GameObject> pRenderObject);
+	void Set_ScreenDistortionPower(_float fPower);
+	void Set_ScreenDistortionRadius(_float fRadius);
+	void Set_ScreenDistortionCenter(const _float2& vCenter);
 #pragma endregion
 
 #pragma region Camera_Manager

@@ -261,9 +261,17 @@ HRESULT Level_GamePlay::Initialize()
 void Level_GamePlay::Update(_float fTimeDelta)
 {
     auto pPlayer = CGameInstance::Get().Find_Object(CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
-    if (static_pointer_cast<Player>(pPlayer)->m_bNext == true) {
-        m_eFadeState = GAMEPLAY_FADE_STATE::CLOSING;
+
+    if (pPlayer != nullptr) {
+        if (static_pointer_cast<Player>(pPlayer)->m_bNext == true) {
+            m_eFadeState = GAMEPLAY_FADE_STATE::CLOSING;
+        }
+        if (static_pointer_cast<Player>(pPlayer)->m_bFinal == true) {
+            m_eFadeState = GAMEPLAY_FADE_STATE::CLOSING;
+        }
     }
+
+  
 
       
     if (m_eFadeState == GAMEPLAY_FADE_STATE::OPENING)
@@ -299,7 +307,14 @@ void Level_GamePlay::Update(_float fTimeDelta)
                 }
             }
 
-            Ready_GamePlay2();
+            if (static_pointer_cast<Player>(pPlayerObj)->m_bFinal != true) {
+                Ready_GamePlay2();
+            }
+            else if (static_pointer_cast<Player>(pPlayerObj)->m_bFinal == true) {
+                CGameInstance::Get().Load_Lights_FromJson(L"../../Resources/Data/Light/Lights_Boss.json");
+                CGameInstance::Get().Load("Stage_Boss", CGameInstance::Get().Get_Level());
+            }
+      
         }
     }
 

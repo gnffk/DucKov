@@ -7,7 +7,7 @@
 #include "Player.h"
 #include "Particle_System.h"
 #include "LaserTrail.h"
-
+#include "Lightning.h"
 NS_BEGIN(Client)
 
 BossPattern_Page2::BossPattern_Page2()
@@ -194,6 +194,9 @@ void BossPattern_Page2::Update_Before_Start(_float fTimeDelta)
 
     if (fDistance <= m_fDetectRange)
     {
+        
+        CGameInstance::Get().PlaySoundLoop(L"BGM_BOSS1", CHANNELID::BGM_HOME, 0.2f);
+  
         Start_Pattern(PATTERN_TYPE::START_APPEAR);
     }
 
@@ -217,15 +220,15 @@ void BossPattern_Page2::Update_Start_Appear(_float fTimeDelta)
     case PATTERN_STEP::START:
     {
         _bool bArrived = Update_CutSceneCamera_MoveToBoss(fTimeDelta);
-
+   
         if (bArrived)
         {
             m_ePatternStep = PATTERN_STEP::READY;
             m_fStepTimer = 0.f;
-
+        
             Change_BossState(BossMonster_Page2FSM::BOSS_STATE::IDLE);
         }
-
+        
         break;
     }
 
@@ -249,7 +252,7 @@ void BossPattern_Page2::Update_Start_Appear(_float fTimeDelta)
         if (fRatio >= 1.f)
         {
             pTransform->Set_State(STATE::POSITION, XMVectorSet( m_vAppearTargetPos.x, m_vAppearTargetPos.y, m_vAppearTargetPos.z,1.f));
-
+          
             Change_BossState(BossMonster_Page2FSM::BOSS_STATE::IDLE);
 
             m_ePatternStep = PATTERN_STEP::ACTIVE;
@@ -263,7 +266,8 @@ void BossPattern_Page2::Update_Start_Appear(_float fTimeDelta)
     {
         // 착지 직후 1회 광역 피해
         if (false == m_bAppearLandingDamage)
-        {
+        {  
+            CGameInstance::Get().PlaySoundOne(L"EFFECT_BOSS_LANDING", CHANNELID::EFFECT_BOSSAPPEAR, 0.3f);
    
             m_bAppearLandingDamage = true;
         }
@@ -325,6 +329,7 @@ void BossPattern_Page2::Update_LaserCannon(_float fTimeDelta)
         m_fFireTimer = 0.f;
         m_fDamageTimer = 0.f;
 
+        CGameInstance::Get().PlaySoundOne(L"EFFECT_BOSS_LASER", CHANNELID::EFFECT_BOSSLASER, 0.3f);
         Change_BossState(BossMonster_Page2FSM::BOSS_STATE::HAND_UP);
 
         break;
@@ -342,6 +347,7 @@ void BossPattern_Page2::Update_LaserCannon(_float fTimeDelta)
             m_fDamageTimer = 0.f;
 
             Begin_BossLaser();
+          
         }
 
         break;
@@ -372,6 +378,8 @@ void BossPattern_Page2::Update_LaserCannon(_float fTimeDelta)
             m_fStepTimer = 0.f;
 
             Change_BossState(BossMonster_Page2FSM::BOSS_STATE::IDLE);
+
+            CGameInstance::Get().StopSound( CHANNELID::EFFECT_BOSSLASER);
         }
 
         break;
@@ -405,6 +413,7 @@ void BossPattern_Page2::Update_ChargeAttack(_float fTimeDelta)
     {
     case PATTERN_STEP::START:
     {
+       
         m_ePatternStep = PATTERN_STEP::READY;
         m_fStepTimer = 0.f;
         m_bHasDamagedThisPattern = false;
@@ -428,7 +437,7 @@ void BossPattern_Page2::Update_ChargeAttack(_float fTimeDelta)
             m_ePatternStep = PATTERN_STEP::ACTIVE;
             m_fStepTimer = 0.f;
             m_bHasDamagedThisPattern = false;
-
+            CGameInstance::Get().PlaySoundOne(L"EFFECT_BOSS_DASH", CHANNELID::EFFECT_BOSSATTACK, 0.4f);
             // 핵심: RUN이 아니라 HIT
             Change_BossState(BossMonster_Page2FSM::BOSS_STATE::HIT);
         }
@@ -438,6 +447,7 @@ void BossPattern_Page2::Update_ChargeAttack(_float fTimeDelta)
 
     case PATTERN_STEP::ACTIVE:
     {
+      
         // HIT 애니메이션 중 앞으로 짧게 대쉬
         pOwner->Turn_To_Direction(m_vChargeDir, fTimeDelta);
 
@@ -507,9 +517,16 @@ void BossPattern_Page2::Update_WhirlwindAttack(_float fTimeDelta)
         m_fStepTimer = 0.f;
         m_fDamageTimer = 0.f;
 
-        // 핵심: ROLL이 아니라 TPOSE
+        m_fWhirlwindLightningTimer = 0.f;
+
         Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
 
+        CGameInstance::Get().PlaySoundOne(
+            L"EFFECT_BOSS_WINDMILL",
+            CHANNELID::EFFECT_BOSSATTACK,
+            0.4f
+        );
+        CGameInstance::Get().PlaySoundLoop(L"EFFECT_BOSS_Thunder", CHANNELID::EFFECT_THUNDER, 0.5f);
         break;
     }
 
@@ -517,24 +534,32 @@ void BossPattern_Page2::Update_WhirlwindAttack(_float fTimeDelta)
     {
         auto pTransform = pOwner->GetTransform();
 
-        // 1. TPOSE 상태로 Y축 회전
-        pTransform->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f),fTimeDelta * m_fWhirlwindRotationScale);
+        pTransform->Turn(
+            XMVectorSet(0.f, 1.f, 0.f, 0.f),
+            fTimeDelta * m_fWhirlwindRotationScale
+        );
 
-        // 2. 플레이어 방향으로 천천히 이동
-        //    여기서 Turn_To_Direction() 쓰면 안 됨.
         _float3 vDir = Compute_Direction_To_Player();
 
-        pOwner->Move_Direction(vDir, fTimeDelta, m_fWhirlwindSpeedScale  );
+        pOwner->Move_Direction(
+            vDir,
+            fTimeDelta,
+            m_fWhirlwindSpeedScale
+        );
 
-        // 3. 가까이 있으면 주기적으로 데미지
+        // 회오리 중 보스 주변 번개 생성
+        Update_WhirlwindLightning(fTimeDelta);
+
         if (m_fDamageTimer <= 0.f)
         {
             m_fDamageTimer = m_fWhirlwindDamageInterval;
 
-            Damage_Player_If_Close(m_fWhirlwindDamageRange,m_fWhirlwindDamage);
+            Damage_Player_If_Close(
+                m_fWhirlwindDamageRange,
+                m_fWhirlwindDamage
+            );
         }
 
-        // 4. 회오리 종료
         if (m_fStepTimer >= m_fWhirlwindActiveTime)
         {
             m_ePatternStep = PATTERN_STEP::RECOVER;
@@ -553,6 +578,8 @@ void BossPattern_Page2::Update_WhirlwindAttack(_float fTimeDelta)
 
         if (m_fStepTimer >= m_fWhirlwindRecoverTime)
         {
+            CGameInstance::Get().StopSound(CHANNELID::EFFECT_THUNDER);
+            CGameInstance::Get().StopSound(CHANNELID::EFFECT_BOSSATTACK);
             End_Pattern();
         }
 
@@ -574,10 +601,104 @@ void BossPattern_Page2::Update_Die(_float fTimeDelta)
         return;
 
     Change_BossState(BossMonster_Page2FSM::BOSS_STATE::TPOSE);
-
+    
     if (m_fPatternTimer >= 1.5f)
     {
+        CGameInstance::Get().PlaySoundOne(L"EFFECT_DIE", CHANNELID::EFFECT_LITTLEMONSTER_DIE, 0.5f);
         pOwner->Set_Dead();
+    }
+}
+
+void BossPattern_Page2::Update_WhirlwindLightning(_float fTimeDelta)
+{
+    m_fWhirlwindLightningTimer -= fTimeDelta;
+
+    if (m_fWhirlwindLightningTimer > 0.f)
+        return;
+
+    m_fWhirlwindLightningTimer = m_fWhirlwindLightningInterval;
+
+    // 한 번에 1~2개 정도 생성
+    Spawn_WhirlwindLightning();
+
+    if ((rand() % 100) < 35)
+        Spawn_WhirlwindLightning();
+}
+
+void BossPattern_Page2::Spawn_WhirlwindLightning()
+{
+    auto pOwner = m_pOwner.lock();
+
+    if (pOwner == nullptr || pOwner->GetTransform() == nullptr)
+        return;
+
+    _float3 vBossPos{};
+    XMStoreFloat3(
+        &vBossPos,
+        pOwner->GetTransform()->Get_State(STATE::POSITION)
+    );
+
+    _float fAngle =
+        static_cast<_float>(rand() % 360) * XM_PI / 180.f;
+
+    _float fRadiusRatio =
+        static_cast<_float>(rand()) / static_cast<_float>(RAND_MAX);
+
+    _float fRadius =
+        m_fWhirlwindLightningRadiusMin +
+        (m_fWhirlwindLightningRadiusMax - m_fWhirlwindLightningRadiusMin) * fRadiusRatio;
+
+    _float fX = cosf(fAngle) * fRadius;
+    _float fZ = sinf(fAngle) * fRadius;
+
+    // 보스 주변 위쪽에서 아래로 떨어지는 번개
+    _float3 vStartPos =
+    {
+        vBossPos.x + fX,
+        vBossPos.y + m_fWhirlwindLightningHeight,
+        vBossPos.z + fZ
+    };
+
+    _float3 vDir =
+    {
+        0.f,
+        -1.f,
+        0.f
+    };
+
+    Lightning::LIGHTNING_DESC Desc{};
+
+    Desc.ObjectType = ETOUI(OBJECTTYPE::OBJECT_STATIC);
+    Desc.m_strName = L"Whirlwind_Lightning";
+    Desc.m_strPrototypeObjectName = L"Prototype_GameObject_Lightning";
+    Desc.m_strPrototypeBaseName = L"Lightning";
+    Desc.pCameraType = ETOUI(CAMERA::NONE);
+
+    Desc.fSpeedPerSec = 0.f;
+    Desc.fRotationPerSec = 0.f;
+
+    Desc.vStartPos = vStartPos;
+    Desc.vDir = { 0.f, -1.f, 0.f };
+
+    Desc.fLength = 6.5f;
+    Desc.fWidth = 0.09f;
+    Desc.fLifeTime = 0.18f;
+    Desc.fJitterPower = 0.75f;
+    Desc.fRefreshInterval = 0.025f;
+    Desc.fSparkInterval = 0.04f;
+
+    Desc.bSpawnSpark = true;
+    Desc.bAutoDead = true;
+    Desc.bStartActive = true;
+
+    if (FAILED(CGameInstance::Get().Add_GameObject_toLayer(
+        CGameInstance::Get().Get_Level(),
+        TEXT("Prototype_GameObject_Lightning"),
+        CGameInstance::Get().Get_Level(),
+        TEXT("Effect"),
+        &Desc)))
+    {
+        return;
     }
 }
 

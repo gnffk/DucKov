@@ -83,6 +83,30 @@ private:
 
 
 
+
+private:
+	//--------------------------- 후처리 효과 ----------------------------------------------------//
+private:
+	_float  m_fScreenDistortionPower = 0.f;
+	_float  m_fScreenDistortionRadius = 0.35f;
+	_float2 m_vScreenDistortionCenter = { 0.5f, 0.5f };
+
+public:
+	void Set_ScreenDistortionPower(_float fPower)
+	{
+		m_fScreenDistortionPower = fPower;
+	}
+
+	void Set_ScreenDistortionRadius(_float fRadius)
+	{
+		m_fScreenDistortionRadius = fRadius;
+	}
+
+	void Set_ScreenDistortionCenter(const _float2& vCenter)
+	{
+		m_vScreenDistortionCenter = vCenter;
+	}
+
 public:
 
 	static unique_ptr<Renderer> Create(ComPtr<ID3D11Device> pDevice, ComPtr<ID3D11DeviceContext> pContext);

@@ -27,10 +27,22 @@ void BossPattern::Update(_float fTimeDelta)
     if (pOwner == nullptr)
         return;
 
+    // 죽었으면 ROAM/CHASE/ATTACK 판단하지 말고 바로 DIE만 처리
+    if (m_bDead == true)
+    {
+        Change_PatternState(PATTERN_STATE::DIE);
+        Update_DIE(fTimeDelta);
+        return;
+    }
+
     if (m_fAttackTimer > 0.f)
         m_fAttackTimer -= fTimeDelta;
 
-    auto pPlayer =CGameInstance::Get().Find_Object( CGameInstance::Get().Get_Level(), L"PlayerTag", L"Player");
+    auto pPlayer = CGameInstance::Get().Find_Object(
+        CGameInstance::Get().Get_Level(),
+        L"PlayerTag",
+        L"Player"
+    );
 
     PATTERN_STATE eNextState = PATTERN_STATE::ROAM;
 
@@ -49,7 +61,6 @@ void BossPattern::Update(_float fTimeDelta)
         else if (fDistance <= m_fDetectRange)
         {
             eNextState = PATTERN_STATE::CHASE;
-          
         }
         else
         {
@@ -58,12 +69,6 @@ void BossPattern::Update(_float fTimeDelta)
     }
 
     Change_PatternState(eNextState);
-
-
-    if(m_bDead == true)
-    {
-        Change_PatternState(PATTERN_STATE::DIE);
-	}
 
     switch (m_ePatternState)
     {
@@ -78,8 +83,9 @@ void BossPattern::Update(_float fTimeDelta)
     case PATTERN_STATE::ATTACK:
         Update_Attack(fTimeDelta);
         break;
+
     case PATTERN_STATE::DIE:
-		Update_DIE(fTimeDelta);
+        Update_DIE(fTimeDelta);
         break;
     }
 }
@@ -273,7 +279,7 @@ void BossPattern::Change_PatternState(PATTERN_STATE eNextState)
     m_ePatternState = eNextState;
 
     // ROAM / ATTACK 등에서 CHASE로 처음 들어온 순간에만 재생
-    if (ePrevState != PATTERN_STATE::ROAM &&
+    if (ePrevState == PATTERN_STATE::ROAM &&
         m_ePatternState == PATTERN_STATE::CHASE)
     {
         CGameInstance::Get().PlaySoundOne(

@@ -270,6 +270,7 @@ HRESULT Collider_Manager::Clear()
 
 void Collider_Manager::Render() {
 
+
     m_pDeviceContext->RSSetState(nullptr);
 
     m_pDeviceContext->OMSetBlendState(
@@ -312,6 +313,7 @@ void Collider_Manager::Render() {
     }
 
     m_batch->End();
+
     m_Colliders.clear();
 
 

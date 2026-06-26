@@ -367,6 +367,15 @@ HRESULT CGameInstance::Add_RenderObject(RENDERGROUP eRenderGroup, shared_ptr<Gam
 {
     return m_pRenderer->Add_RenderObject(eRenderGroup, pRenderObject);
 }
+void CGameInstance::Set_ScreenDistortionPower(_float fPower) {
+    m_pRenderer->Set_ScreenDistortionPower(fPower);
+}
+void CGameInstance::Set_ScreenDistortionRadius(_float fRadius) {
+    m_pRenderer->Set_ScreenDistortionRadius(fRadius);
+}
+void CGameInstance::Set_ScreenDistortionCenter(const _float2& vCenter) {
+    m_pRenderer->Set_ScreenDistortionCenter(vCenter);
+}
 #pragma endregion
 
 

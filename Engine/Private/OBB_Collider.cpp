@@ -92,7 +92,7 @@ HRESULT OBB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_b
         v[i].position = corners[i];
         v[i].color = m_color;
     }
-
+#ifdef _DEBUG
 
     // Front
     m_batch->DrawLine(v[0], v[1]);
@@ -112,7 +112,7 @@ HRESULT OBB_Collider::Render(shared_ptr<PrimitiveBatch<VertexPositionColor>> m_b
     m_batch->DrawLine(v[2], v[6]);
     m_batch->DrawLine(v[3], v[7]);
 
-
+#endif
     //GUI_ColliderExtend();
 
 
